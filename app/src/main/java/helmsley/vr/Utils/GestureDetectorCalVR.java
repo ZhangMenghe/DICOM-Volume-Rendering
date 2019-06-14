@@ -48,7 +48,6 @@ public class GestureDetectorCalVR {
             // TWO FINGER DOUBLE: right double
             public void onTwoFingerDoubleTap(float ex, float ey){
 //                JNIInterface.JNIonDoubleTouch(1, ex, ey);
-                UIsController.ToggleShowView();
             }
 
             public void onTwoFingerTripleTap(){}

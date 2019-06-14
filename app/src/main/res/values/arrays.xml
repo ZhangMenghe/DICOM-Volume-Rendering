@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="toogleArr_tb">
+    <string-array name="entry_has_sub">
         <item>Opacity</item>
     </string-array>
 
-    <string-array name="toogleArr_rc">
+    <string-array name="t1Arr">
+        <item>Opacity</item>
+    </string-array>
+
+    <string-array name="t2Arr">
         <item>Opacity</item>
         <item>Sample Step</item>
         <item>Threshold</item>
@@ -13,7 +17,7 @@
 
     <string-array name="switchArr">
         <item>Color Transfer</item>
-        <item>Render Mode</item>
+        <item>Raycast</item>
         <item>Cutting</item>
         <item>SimpleCube</item>
     </string-array>
@@ -22,5 +26,8 @@
         <item>Overall</item>
         <item>Low Bound</item>
         <item>Cut Off</item>
+    </string-array>
+    <string-array name="bottomArr">
+        <item>cut</item>
     </string-array>
 </resources>

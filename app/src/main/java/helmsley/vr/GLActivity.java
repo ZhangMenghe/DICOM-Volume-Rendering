@@ -10,6 +10,7 @@ import java.io.File;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import helmsley.vr.Utils.FPSCounter;
 import helmsley.vr.Utils.GestureDetectorCalVR;
 import helmsley.vr.Utils.fileUtils;
 
@@ -90,7 +91,7 @@ public class GLActivity extends AppCompatActivity {
     protected void setupResource(){
         copyFromAssets();
     }
-
+    protected void updateOnFrame(){}
     protected class Renderer implements GLSurfaceView.Renderer {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -106,7 +107,7 @@ public class GLActivity extends AppCompatActivity {
         @Override
         public void onDrawFrame(GL10 gl) {
             JNIInterface.JNIdrawFrame();
-//            uiController.updateFPS(JNIInterface.JNIgetFPS());
+            updateOnFrame();
         }
     }
 }

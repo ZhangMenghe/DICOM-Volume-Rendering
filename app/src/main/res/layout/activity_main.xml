@@ -76,17 +76,41 @@
             android:gravity="center_horizontal"
             app:layout_constraintHeight_percent="0.5"
             app:layout_constraintTop_toBottomOf="@id/switchPanel">
-            <Spinner
-                android:id="@+id/toggleSpinner"
-                android:entries="@array/toogleArr_tb"
-                android:layout_width="wrap_content"
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/toggleSpinnerPanel"
+                android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_gravity="center_horizontal"
-                android:theme="@style/Spinner"
+                android:orientation="horizontal"
+
                 app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintWidth_percent="0.4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+            <Spinner
+                android:id="@+id/toggleSpinnerArr1"
+                android:layout_width="wrap_content"
+                android:entries="@array/t1Arr"
+                android:layout_marginTop="10dp"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:theme="@style/Spinner"
+                app:layout_constraintHeight_percent="1.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 />
+            <Spinner
+                android:id="@+id/toggleSpinnerArr2"
+                android:layout_width="wrap_content"
+                android:entries="@array/t2Arr"
+                android:layout_marginTop="10dp"
+                android:layout_height="0dp"
+                android:layout_gravity="center"
+                android:theme="@style/Spinner"
+                app:layout_constraintHeight_percent="1.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+        </android.support.constraint.ConstraintLayout>
             <Spinner
                 android:id="@+id/toggleSubSpinner"
                 android:entries="@array/opacityArr"
@@ -96,7 +120,7 @@
                 android:layout_marginStart="5dp"
                 app:layout_constraintHeight_percent="0.5"
 
-                app:layout_constraintStart_toEndOf="@id/toggleSpinner"
+                app:layout_constraintStart_toEndOf="@id/toggleSpinnerPanel"
                 app:layout_constraintTop_toTopOf="parent"
                 />
             <TextView
@@ -109,7 +133,7 @@
                 android:textColor="@color/lightBlue"
                 android:textSize="14sp"
                 app:layout_constraintStart_toEndOf="@id/toggleSubSpinner"
-                app:layout_constraintBottom_toBottomOf="@id/toggleSpinner" />
+                app:layout_constraintBottom_toBottomOf="@id/toggleSpinnerPanel" />
             <SeekBar
                 android:id="@+id/toggleSeekBar"
                 android:layout_width="0dp"
@@ -120,7 +144,7 @@
                 app:layout_constraintHeight_percent="0.35"
                 app:layout_constraintWidth_percent="0.9"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/toggleSpinner"/>
+                app:layout_constraintTop_toBottomOf="@id/toggleSpinnerPanel"/>
 
         </android.support.constraint.ConstraintLayout>
 

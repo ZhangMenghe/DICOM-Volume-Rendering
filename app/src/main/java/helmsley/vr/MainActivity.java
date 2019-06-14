@@ -25,7 +25,8 @@ public class MainActivity extends GLActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        uiController = new UIsController(this);
+        uiController = new UIsController(this);
+
         ass_copy_src = "dicom-images";
     }
     protected void setupResource(){
@@ -41,5 +42,10 @@ public class MainActivity extends GLActivity {
 
         //pass down to native
         JNIInterface.JNIsendDCMImgs(dcm_images.toArray(new dcmImage[0]), file_nums);
+    }
+    @Override
+    protected void updateOnFrame(){
+        super.updateOnFrame();
+        uiController.updateFPS();
     }
 }
