@@ -3,6 +3,7 @@
 
 #include <android/asset_manager.h>
 #include <dicomRenderer/texturebasedRenderer.h>
+#include <dicomRenderer/raycastRenderer.h>
 #include <GLES3/gl32.h>
 #include <GLPipeline/Texture.h>
 #include "GLPipeline/Camera.h"
@@ -19,7 +20,7 @@ public:
     static float _screen_w, _screen_h;
     static std::unordered_map<std::string, float> param_value_map;
     static std::unordered_map<std::string, bool > param_bool_map;
-//    static int jui_status[2];
+    static glm::mat4 ModelMat_;
 
     static vrController* instance();
 
@@ -40,30 +41,23 @@ public:
         Mouse_old = glm::fvec2(x, y);
         xoffset *= MOUSE_ROTATE_SENSITIVITY;
         yoffset *= MOUSE_ROTATE_SENSITIVITY;
-        if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) {
-            if (rotate_model)
-                texvrRenderer_->setModelMat(
-                        glm::rotate(texvrRenderer_->ModelMat(), xoffset, glm::vec3(0, 1, 0)));
-            else
-                camera->rotateCamera(3, glm::vec4(texvrRenderer_->ModelMat()[3]), xoffset);
-        } else {
-            if (rotate_model)
-                texvrRenderer_->setModelMat(
-                        glm::rotate(texvrRenderer_->ModelMat(), -yoffset, glm::vec3(1, 0, 0)));
-            else
-                camera->rotateCamera(2, glm::vec4(texvrRenderer_->ModelMat()[3]), -yoffset);
-        }
+        if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h))
+            camera->rotateCamera(3, ModelMat_[3], xoffset);
+         else
+             camera->rotateCamera(2, ModelMat_[3], -yoffset);
+
     }
 
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;
     texvrRenderer* texvrRenderer_ = nullptr;
+    raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
-    bool rotate_model = false;
+
 
 
 };

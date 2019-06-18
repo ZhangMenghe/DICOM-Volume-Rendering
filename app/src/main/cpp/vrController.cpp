@@ -8,7 +8,7 @@ int vrController::VOLUME_TEX_ID=0, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
-//int vrController::jui_status[2] = {0,0};
+glm::mat4 vrController::ModelMat_ = glm::mat4(1.0);
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -33,6 +33,8 @@ void vrController::setTransferColor(const int*colors, int num){
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
+    raycastRenderer_ = new raycastRenderer;
+
     funcRenderer_ = new FuncRenderer;
     funcRenderer_->CreateFunction(COLOR_BAR);
     funcRenderer_->CreateFunction(OPACITY_FUN);
@@ -45,6 +47,9 @@ void vrController::onViewChange(int width, int height){
 }
 void vrController::onDraw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    texvrRenderer_->Draw();
+    if(param_bool_map["raycast"])
+        raycastRenderer_->Draw();
+    else
+        texvrRenderer_->Draw();
     funcRenderer_->Draw();
 }

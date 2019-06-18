@@ -29,6 +29,7 @@ SET(GL_PIPELINE_FILES
         GLPipeline/Texture.cpp)
 SET(DICOM_RENDERERS
         dicomRenderer/funcsRenderer.cpp
+        dicomRenderer/raycastRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp)
 include_directories(${GLM_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
