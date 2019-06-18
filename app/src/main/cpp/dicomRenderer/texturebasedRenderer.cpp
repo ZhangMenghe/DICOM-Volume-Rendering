@@ -30,7 +30,6 @@ texvrRenderer::texvrRenderer() {
 
 }
 void texvrRenderer::Draw(){
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -55,6 +54,7 @@ void texvrRenderer::Draw(){
         shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
         shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 
+        slice_start_idx = (int)m_VAOs.size() * vrController::param_value_map["cutting"];
         if(vrController::camera->getViewDirection().z <0){
             glFrontFace(GL_CW);
             for(int id = 0; id <m_VAOs.size()- slice_start_idx; id++){
