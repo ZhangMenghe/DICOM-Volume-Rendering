@@ -29,9 +29,10 @@ public class MainActivity extends GLActivity {
 
         ass_copy_src = "dicom-images";
     }
-    protected void setupResource(){
+    protected boolean setupResource(){
         super.setupResource();
         setupDCMI();
+        return true;
     }
     private void setupDCMI() {
         file_path_lst = fileUtils.getListFilesFromDir(new File(ass_copy_dst +"/sample/"));

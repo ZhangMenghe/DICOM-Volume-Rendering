@@ -16,19 +16,28 @@ SET(KERNEL_LIBRARIES
         jnigraphics
         log
         m)
+SET(ANDROID_HELPER_FILES
+        AndroidUtils/AndroidHelper.cpp
+        AndroidUtils/perfMonitor.cpp
+        )
+SET(JNI_FILES
+        Jnis/jni_interface.cpp
+        Jnis/jui_interface.cpp)
+SET(GL_PIPELINE_FILES
+        GLPipeline/Shader.cpp
+        GLPipeline/Mesh.cpp
+        GLPipeline/Texture.cpp)
+SET(DICOM_RENDERERS
+        dicomRenderer/texturebasedRenderer.cpp)
 include_directories(${GLM_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(vrNative
         SHARED
-        Jnis/jni_interface.cpp
-        Jnis/jui_interface.cpp
-        AndroidUtils/AndroidHelper.cpp
-#        src/main/cpp/dcmRenderer.cpp
-        #			src/main/cpp/raycastBasedRenderer.cpp
-        #			src/main/cpp/textureBasedRenderer.cpp
-#        src/main/cpp/funcsRenderer.cpp
-#        src/main/cpp/AndroidHelper.cpp
-#        src/main/cpp/perfMonitor.cpp
+        ${JNI_FILES}
+        vrController.cpp
+        ${DICOM_RENDERERS}
+        ${GL_PIPELINE_FILES}
+        ${ANDROID_HELPER_FILES}
         )
 
 target_link_libraries(

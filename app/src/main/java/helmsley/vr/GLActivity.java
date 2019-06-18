@@ -7,6 +7,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import java.io.File;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -73,7 +77,7 @@ public class GLActivity extends AppCompatActivity {
         surfaceView.setRenderer(new GLActivity.Renderer());
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
-    private void copyFromAssets(){
+    protected void copyFromAssets(){
         ass_copy_dst = getFilesDir().getAbsolutePath() + "/" + ass_copy_src;
         //Skip copying if files exist
         if(skipLoadingResource){
@@ -88,15 +92,17 @@ public class GLActivity extends AppCompatActivity {
         }
     }
 
-    protected void setupResource(){
+    protected boolean setupResource(){
         copyFromAssets();
+        return true;
     }
     protected void updateOnFrame(){}
     protected class Renderer implements GLSurfaceView.Renderer {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            setupResource();
-            JNIInterface.JNIonGlSurfaceCreated();
+            if(setupResource()){
+                JNIInterface.JNIonGlSurfaceCreated();
+            }
         }
 
         @Override

@@ -25,11 +25,12 @@ private:
     GLuint GL_createShader(GLenum shaderType, const char *pSource);
 //    GLuint GL_createProgram(const char* vtxSrc, const char* fragSrc);
 
-    bool LoadTextFileFromAssetManager(const char* file_name, std::string* out_file_text_string);
+
 
 public:
     static assetLoader * instance();
     assetLoader(AAssetManager * assetManager);
+    bool LoadTextFileFromAssetManager(const char* file_name, std::string* out_file_text_string);
     GLuint GL_createProgram(const char* vtxSrc, const char* fragSrc);
     GLuint createGLShaderProgramFromFile(const char* vert_file, const char *_frag_file);
 

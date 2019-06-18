@@ -266,22 +266,21 @@ public class UIsController {
         }
     }
     public void updateFPS(){
-        frames++;
-        if(System.nanoTime() - startTime >= 1000000000) {
-            activity.runOnUiThread(new Runnable()  {
-                @Override
-                public void run()  {
-                    FPSlabel.setText(String.format("%2d FPS", frames));
-                }});
-            frames = 0;
-            startTime = System.nanoTime();
-        }
+        activity.runOnUiThread(new Runnable()  {
+            @Override
+            public void run()  {
+                FPSlabel.setText(String.format("%2.2f FPS", JUIgetFPS()));
+            }});
     }
+
     public static native void JUIonSingleTouchDown(float x, float y);
+    public static native void JUIonTouchMove(float x, float y);
 
     public static native void JUIsetInitialValueBool(String key, boolean value);
     public static native void JUIsetInitialValueFloat(String key, float value);
     public static native void JUIsetJavaUIStatus(int item, int id);
     public static native void JUIsetParam(int idx, float value);
     public static native void JUIsetSwitches(int idx, boolean value);
+
+    public static native float JUIgetFPS();
 }

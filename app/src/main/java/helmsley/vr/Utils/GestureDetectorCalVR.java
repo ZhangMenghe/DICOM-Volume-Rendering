@@ -18,7 +18,7 @@ public class GestureDetectorCalVR {
             }
             public void onOneFingerMove(MotionEvent event){
 //                Log.e(TAG, "onOneFingerDown: ======move" );
-//                UIsController.JNIonTouchMove(event.getX(), event.getY());
+                UIsController.JUIonTouchMove(event.getX(), event.getY());
             }
 
             public  void onFling(int pointerNum, float srcx, float srcy, float dstx, float dsty){}
