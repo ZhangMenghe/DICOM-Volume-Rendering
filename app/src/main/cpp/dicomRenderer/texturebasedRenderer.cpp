@@ -26,11 +26,6 @@ texvrRenderer::texvrRenderer() {
         shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
         shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
         shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
-
-        shader_->setBool("u_use_color_transfer", vrController::b_use_color_transfer);
-        shader_->setFloat("uOpacitys.overall", vrController::opa_oa);
-        shader_->setFloat("uOpacitys.low_limit", vrController::opa_ll);
-        shader_->setFloat("uOpacitys.cut_off", vrController::opa_co);
     shader_->unUse();
 
 }
@@ -55,6 +50,10 @@ void texvrRenderer::Draw(){
         shader_->setMat4("uViewMat", vrController::camera->getViewMat());
         shader_->setMat4("uModelMat", modelMat_);
 
+        shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
+        shader_->setFloat("uOpacitys.overall", vrController::param_value_map["overall"]);
+        shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
+        shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 
         if(vrController::camera->getViewDirection().z <0){
             glFrontFace(GL_CW);

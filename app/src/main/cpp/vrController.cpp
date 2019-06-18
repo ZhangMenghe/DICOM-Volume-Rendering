@@ -6,10 +6,10 @@ Camera* vrController::camera = nullptr;
 Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr;
 int vrController::VOLUME_TEX_ID=0, vrController::TRANS_TEX_ID = 1;
 bool vrController::b_use_color_transfer = false;
-float vrController::opa_oa = 1.0f; float vrController::opa_ll = 1.0f; float vrController::opa_co=.0f;
+float vrController::opa_oa = 0.0f; float vrController::opa_ll = 0.0f; float vrController::opa_co=.0f;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
-////std::unordered_map<std::string, float> vrController::param_value_map = {};
-////std::unordered_map<std::string, bool > vrController::param_bool_map = {};
+std::unordered_map<std::string, float> vrController::param_value_map;
+std::unordered_map<std::string, bool > vrController::param_bool_map;
 //int vrController::jui_status[2] = {0,0};
 
 vrController* vrController::instance(){

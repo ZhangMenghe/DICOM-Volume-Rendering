@@ -2,15 +2,12 @@ package helmsley.vr;
 
 import android.app.Activity;
 
-import android.content.Context;
-import android.util.Log;
 import android.util.Pair;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 
-import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
@@ -18,8 +15,6 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -95,15 +90,15 @@ public class UIsController {
                     case R.array.t2Arr:
                     case R.array.bottomArr:
                         toggle_values.put((String)par.first, (Float)par.second);
-                        JUIsetInitialValueFloat((String)par.first, (float)par.second);
+                        JUIsetParam((String)par.first, (float)par.second);
                         break;
                     case R.array.opacityArr:
                         toggle_values_sub.put((String)par.first, (Float)par.second);
-                        JUIsetInitialValueFloat((String)par.first, (float)par.second);
+                        JUIsetParam((String)par.first, (float)par.second);
                         break;
                     case R.array.switchArr:
                         bool_values.put((String)par.first, (Boolean) par.second);
-                        JUIsetInitialValueBool((String)par.first, (boolean)par.second);
+                        JUIsetSwitches((String)par.first, (boolean)par.second);
                         break;
                     default:break;
                 }
@@ -204,7 +199,7 @@ public class UIsController {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                 if(!b) return;
-                JUIsetParam(-1, 1.0f * i / toggle_max_map.get("cutting").second);
+                JUIsetParam("cutting", 1.0f * i / toggle_max_map.get("cutting").second);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -225,7 +220,7 @@ public class UIsController {
                 toggle_values_sub.put((String)cp_sub.first, value);
             float toggle_value = toggle_values_sub.get(cp_sub.first).floatValue();
             seekbar_top.setProgress((int)toggle_value);
-            JUIsetParam(toggle_id + SUB_OFFSET, toggle_value * toggle_max_sub_pair.second / toggle_max_sub_pair.first);
+            JUIsetParam((String) cp_sub.first, toggle_value * toggle_max_sub_pair.first / toggle_max_sub_pair.second);
             spinner_toggle_sub.setVisibility(View.VISIBLE);
         }else{
             spinner_toggle_sub.setVisibility(View.GONE);
@@ -234,7 +229,7 @@ public class UIsController {
                 toggle_values.put((String)cp.first, value);
             float toggle_value = toggle_values.get(cp.first).floatValue();
             seekbar_top.setProgress((int)toggle_value);
-            JUIsetParam(toggle_id, toggle_value * toggle_max_map.get(cp.first).second / toggle_max_map.get(cp.first).first);
+            JUIsetParam((String)cp.first, toggle_value * toggle_max_map.get(cp.first).first / toggle_max_map.get(cp.first).second);
         }
         seekbar_bottom.setMax(toggle_max_map.get("cutting").second);
         seekbar_bottom.setProgress((int)toggle_values.get("cutting").floatValue());
@@ -252,7 +247,7 @@ public class UIsController {
         }
         updateSpinnerEnteries();
         switch_widget.setChecked(cvalue);
-        JUIsetSwitches(switch_id, cvalue);
+        JUIsetSwitches((String)cp.first, cvalue);
     }
 
     public static void ToggleShowView_animate(){
@@ -276,11 +271,9 @@ public class UIsController {
     public static native void JUIonSingleTouchDown(float x, float y);
     public static native void JUIonTouchMove(float x, float y);
 
-    public static native void JUIsetInitialValueBool(String key, boolean value);
-    public static native void JUIsetInitialValueFloat(String key, float value);
     public static native void JUIsetJavaUIStatus(int item, int id);
-    public static native void JUIsetParam(int idx, float value);
-    public static native void JUIsetSwitches(int idx, boolean value);
+    public static native void JUIsetParam(String key, float value);
+    public static native void JUIsetSwitches(String key, boolean value);
 
     public static native float JUIgetFPS();
 }

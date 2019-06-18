@@ -27,6 +27,10 @@ private:
     Shader* shader_;
     glm::mat4 modelMat_;
     std::vector<GLuint> m_VAOs;
+
+    const std::vector<const char*> NEED_UNIFORMS{
+        "overall", "lowbound", "cutoff","colortrans"
+    };
 public:
     texvrRenderer();
     glm::mat4 ModelMat(){return modelMat_;}

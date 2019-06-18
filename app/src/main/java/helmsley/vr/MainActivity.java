@@ -26,7 +26,6 @@ public class MainActivity extends GLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         uiController = new UIsController(this);
-
         ass_copy_src = "dicom-images";
     }
     protected boolean setupResource(){

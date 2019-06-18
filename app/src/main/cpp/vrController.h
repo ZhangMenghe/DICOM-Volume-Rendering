@@ -18,8 +18,8 @@ public:
     static bool b_use_color_transfer;
     static float opa_oa, opa_ll, opa_co;
     static float _screen_w, _screen_h;
-//    static std::unordered_map<std::string, float> param_value_map;
-//    static std::unordered_map<std::string, bool > param_bool_map;
+    static std::unordered_map<std::string, float> param_value_map;
+    static std::unordered_map<std::string, bool > param_bool_map;
 //    static int jui_status[2];
 
     static vrController* instance();
@@ -34,26 +34,27 @@ public:
     void onSingleTouchDown(float x, float y){
         Mouse_old = glm::fvec2(x, y);
     }
-    void onTouchMove(float x, float y){
-        if(!texvrRenderer_) return;
+    void onTouchMove(float x, float y) {
+        if (!texvrRenderer_) return;
         //Camera::instance()->Rotate_Camera(x - Mouse_old.x, Mouse_old.y - y);
         float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
         Mouse_old = glm::fvec2(x, y);
-        xoffset*= MOUSE_ROTATE_SENSITIVITY;
-        yoffset*= MOUSE_ROTATE_SENSITIVITY;
-        if(fabsf(xoffset / _screen_w) > fabsf(yoffset/_screen_h)){
-            if(rotate_model)
-                texvrRenderer_->setModelMat(glm::rotate(texvrRenderer_->ModelMat(), xoffset, glm::vec3(0,1,0)));
+        xoffset *= MOUSE_ROTATE_SENSITIVITY;
+        yoffset *= MOUSE_ROTATE_SENSITIVITY;
+        if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) {
+            if (rotate_model)
+                texvrRenderer_->setModelMat(
+                        glm::rotate(texvrRenderer_->ModelMat(), xoffset, glm::vec3(0, 1, 0)));
             else
                 camera->rotateCamera(3, glm::vec4(texvrRenderer_->ModelMat()[3]), xoffset);
-        }else{
-            if(rotate_model)
-                texvrRenderer_->setModelMat(glm::rotate(texvrRenderer_->ModelMat(), -yoffset, glm::vec3(1,0,0)));
+        } else {
+            if (rotate_model)
+                texvrRenderer_->setModelMat(
+                        glm::rotate(texvrRenderer_->ModelMat(), -yoffset, glm::vec3(1, 0, 0)));
             else
                 camera->rotateCamera(2, glm::vec4(texvrRenderer_->ModelMat()[3]), -yoffset);
         }
     }
-
 
 private:
     static vrController* myPtr_;
@@ -63,6 +64,7 @@ private:
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     bool rotate_model = false;
+
 
 };
 #endif
