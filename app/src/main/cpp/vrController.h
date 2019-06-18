@@ -12,9 +12,9 @@
 
 class vrController:public nEntrance{
 public:
-//    static Texture *tex_volume, *tex_trans;
+    static Texture *tex_volume, *tex_trans;
     static Camera* camera;
-//    static int VOLUME_TEX_ID, TRANS_TEX_ID;
+    static int VOLUME_TEX_ID, TRANS_TEX_ID;
 //    static size_t width_, height_, depth_;
 //    static bool b_use_color_transfer;
 //    static float opa_oa, opa_ll, opa_co;
@@ -36,6 +36,7 @@ public:
         Mouse_old = glm::fvec2(x, y);
     }
     void onTouchMove(float x, float y){
+        if(!texvrRenderer_) return;
         //Camera::instance()->Rotate_Camera(x - Mouse_old.x, Mouse_old.y - y);
         float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
         Mouse_old = glm::fvec2(x, y);
@@ -58,11 +59,11 @@ public:
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;
-    texvrRenderer* texvrRenderer_;
+    texvrRenderer* texvrRenderer_ = nullptr;
 
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
-    bool rotate_model = true;
+    bool rotate_model = false;
 
 };
 #endif

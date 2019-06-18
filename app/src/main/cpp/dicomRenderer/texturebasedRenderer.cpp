@@ -2,6 +2,7 @@
 #include <vrController.h>
 #include "texturebasedRenderer.h"
 texvrRenderer::texvrRenderer() {
+    modelMat_ = glm::mat4(1.0);
     //geometry
     size_t dims = NEED_SLCIES;
     m_VAOs = std::vector<GLuint >(dims);
@@ -21,30 +22,30 @@ texvrRenderer::texvrRenderer() {
     shader_ = new Shader();
     if(!shader_->Create("shaders/textureVolume.vert", "shaders/textureVolume.frag"))
         LOGE("TextureBas===Failed to create shader program===");
-//    shader_->Use();
-//        shader_->setInt("uSampler_tex", GL_TEXTURE0 + vrController::VOLUME_TEX_ID);
+    shader_->Use();
+        shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
 //        shader_->setInt("uSampler_trans", GL_TEXTURE0 + vrController::TRANS_TEX_ID);
-//        shader_->setVec3("uVolumeSize", glm::vec3(vrController::width_,vrController::height_,vrController::depth_));
+        shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
 //        shader_->setBool("u_use_color_transfer", vrController::b_use_color_transfer);
 //
 //        shader_->setFloat("uOpacitys.overall", 1.0f);//vrController::opa_oa);
 //        shader_->setFloat("uOpacitys.low_limit",1.0f);// vrController::opa_ll);
 //        shader_->setFloat("uOpacitys.cut_off",.0f);// vrController::opa_co);
-//    shader_->unUse();
+    shader_->unUse();
 
 }
 void texvrRenderer::Draw(){
 
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
-//
-//    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-//    glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-//    glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+
+    glEnable(GL_DEPTH_TEST);
+
+    glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
+    glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
 
 //    glActiveTexture(GL_TEXTURE1);
 //    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
@@ -53,28 +54,24 @@ void texvrRenderer::Draw(){
         shader_->setMat4("uProjMat", vrController::camera->getProjMat());
         shader_->setMat4("uViewMat", vrController::camera->getViewMat());
         shader_->setMat4("uModelMat", modelMat_);
-    glFrontFace(GL_CCW);
-    for (int id = 0; id <m_VAOs.size(); id++) {
-        glBindVertexArray(m_VAOs[id]);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    }
 
-////        if(vrController::camera->getViewDirection().z <0){
-////            glFrontFace(GL_CCW);
-//            for(int id = 0; id <slices_.size()- slice_start_idx; id++){
-//                slices_[id]->BindVAO();glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-//            }
-////        }
-////        else{
-////            glFrontFace(GL_CW);
-////            for (int id = slices_.size()-1; id >= slice_start_idx; id--) {
-////                slices_[id]->BindVAO();
-////                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-////            }
-////        }
+
+        if(vrController::camera->getViewDirection().z <0){
+            glFrontFace(GL_CW);
+            for(int id = 0; id <m_VAOs.size()- slice_start_idx; id++){
+                glBindVertexArray(m_VAOs[id]);glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            }
+        }
+        else{
+            glFrontFace(GL_CCW);
+            for (int id = m_VAOs.size()-1; id >= slice_start_idx; id--) {
+                glBindVertexArray(m_VAOs[id]);
+                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            }
+        }
     shader_->unUse();
 
-//    glDisable(GL_BLEND);
-//    glDisable(GL_DEPTH_TEST);
-//    glDisable(GL_CULL_FACE);
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 }

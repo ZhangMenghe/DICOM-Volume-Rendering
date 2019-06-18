@@ -2,9 +2,8 @@
 #include "vrController.h"
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-//Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr;
-//int vrController::VOLUME_TEX_ID=0, vrController::TRANS_TEX_ID = 1;
-//size_t vrController::width_ = 0; size_t vrController::height_=0; size_t vrController::depth_ = 0;
+Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr;
+int vrController::VOLUME_TEX_ID=0, vrController::TRANS_TEX_ID = 1;
 //bool vrController::b_use_color_transfer = false;
 //float vrController::opa_oa = .0f; float vrController::opa_ll =.0f; float vrController::opa_co=.0f;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
@@ -23,8 +22,7 @@ vrController::vrController(AAssetManager *assetManager):
 }
 
 void vrController::assembleTexture(GLubyte * data, int width, int height, int depth){
-//    tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth,data);
-//    width_ = width; height_=height; depth_ = depth;
+    tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth,data);
 //    setTransferColor(nullptr, -1);
 
 

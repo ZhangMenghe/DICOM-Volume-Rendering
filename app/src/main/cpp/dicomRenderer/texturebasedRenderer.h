@@ -25,7 +25,7 @@ private:
     int slice_start_idx = 0;
 
     Shader* shader_;
-    glm::mat4 modelMat_ = glm::mat4(1.0);
+    glm::mat4 modelMat_;
     std::vector<GLuint> m_VAOs;
 public:
     texvrRenderer();
