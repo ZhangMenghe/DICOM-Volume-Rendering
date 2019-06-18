@@ -130,7 +130,8 @@ public class UIsController {
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 toggle_id = i;
                 update_toggle_item_display(-1.0f);
-                JUIsetJavaUIStatus(0, toggle_id);
+                Pair cp =(Pair)ui_map.get(current_toggle_id)[toggle_id];
+                JUIsetJavaUIStatus(0, (String)cp.first);
             }
             @Override
             public void onNothingSelected(AdapterView<?> adapterView) {
@@ -158,7 +159,7 @@ public class UIsController {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
                 switch_id = i;
-                JUIsetJavaUIStatus(1, switch_id);
+//                JUIsetJavaUIStatus(1, switch_id);
                 update_switch_item_display();
             }
             @Override
@@ -211,6 +212,8 @@ public class UIsController {
         updateSpinnerEnteries();
         update_switch_item_display();
         update_toggle_item_display(-1);
+        Pair cp =(Pair)ui_map.get(current_toggle_id)[toggle_id];
+        JUIsetJavaUIStatus(0, (String)cp.first);
     }
     private void update_toggle_item_display(float value) {
         Pair cp =(Pair)ui_map.get(current_toggle_id)[toggle_id], cp_sub = (Pair)ui_map.get(R.array.opacityArr)[toggle_id_sub];
@@ -271,7 +274,7 @@ public class UIsController {
     public static native void JUIonSingleTouchDown(float x, float y);
     public static native void JUIonTouchMove(float x, float y);
 
-    public static native void JUIsetJavaUIStatus(int item, int id);
+    public static native void JUIsetJavaUIStatus(int item, String key);
     public static native void JUIsetParam(String key, float value);
     public static native void JUIsetSwitches(String key, boolean value);
 

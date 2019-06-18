@@ -33,6 +33,9 @@ void vrController::setTransferColor(const int*colors, int num){
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
+    funcRenderer_ = new FuncRenderer;
+    funcRenderer_->CreateFunction(COLOR_BAR);
+    funcRenderer_->CreateFunction(OPACITY_FUN);
 }
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
@@ -43,4 +46,5 @@ void vrController::onViewChange(int width, int height){
 void vrController::onDraw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     texvrRenderer_->Draw();
+    funcRenderer_->Draw();
 }

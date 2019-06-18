@@ -7,6 +7,7 @@
 #include <GLPipeline/Texture.h>
 #include "GLPipeline/Camera.h"
 #include "nEntrance.h"
+#include "dicomRenderer/funcsRenderer.h"
 #include <unordered_map>
 #include <vector>
 
@@ -58,6 +59,7 @@ private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;
     texvrRenderer* texvrRenderer_ = nullptr;
+    FuncRenderer* funcRenderer_ = nullptr;
 
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;

@@ -16,7 +16,7 @@ private:
             0.5f, 0.5f, .0,		1.0f, 1.0f, .0,  // bottom left
             -0.5f,  0.5f, .0,	0.0f, 1.0f,  .0  // top left
     };
-    unsigned int indices[6] = {
+    const unsigned int indices[6] = {
             0,3,2,
             2,1,0
     };

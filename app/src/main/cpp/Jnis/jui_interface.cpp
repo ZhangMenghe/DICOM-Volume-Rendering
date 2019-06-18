@@ -24,8 +24,12 @@ JUI_METHOD(void, JUIsetParam)(JNIEnv * env, jclass, jstring key, jfloat value){
     LOGE("====SET %s, %f", dvr::jstring2string(env,key).c_str(), value);
     vrController::param_value_map[dvr::jstring2string(env,key)] = value;
 }
-JUI_METHOD(void, JUIsetJavaUIStatus)(JNIEnv * env, jclass, jint item , jint id){
-//    vrController::jui_status[item] = id;
+JUI_METHOD(void, JUIsetJavaUIStatus)(JNIEnv * env, jclass, jint item , jstring key){
+    if(dvr::jstring2string(env,key) == "Opacity")
+        vrController::param_bool_map["Opacity"] = true;
+    else
+        vrController::param_bool_map["Opacity"] = false;
+    LOGE("====statis: %d",  vrController::param_bool_map["Opacity"]);
 }
 JUI_METHOD(float, JUIgetFPS)(JNIEnv *, jclass){
     return fps_monitor_.Update();
