@@ -50,7 +50,7 @@ public class UIsController {
         put(R.array.bottomArr, new Pair[] {new Pair("cutting", .0f)});
     }};
     final private static Map<String, Pair<Float, Integer>> toggle_max_map = new HashMap<String, Pair<Float, Integer>>(){{
-        put("samplestep", new Pair(800.0f, 800)); put("threshold", new Pair(2.0f, 800)); put("brightness", new Pair(500.0f, 800)); put("cutting", new Pair(1.0f, 800));
+        put("samplestep", new Pair(800.0f, 800)); put("threshold", new Pair(2.0f, 50)); put("brightness", new Pair(500.0f, 500)); put("cutting", new Pair(1.0f, 50));
     }};
 
     final private static Pair<Float, Integer> toggle_max_sub_pair = new Pair(1.0f, 50);
@@ -89,11 +89,11 @@ public class UIsController {
                 switch ((int) entry.getKey()){
                     case R.array.t2Arr:
                     case R.array.bottomArr:
-                        toggle_values.put((String)par.first, (Float)par.second);
+                        toggle_values.put((String)par.first, (Float)par.second / toggle_max_map.get(par.first).first *toggle_max_map.get(par.first).second);
                         JUIsetParam((String)par.first, (float)par.second);
                         break;
                     case R.array.opacityArr:
-                        toggle_values_sub.put((String)par.first, (Float)par.second);
+                        toggle_values_sub.put((String)par.first, (Float)par.second  / toggle_max_sub_pair.first * toggle_max_sub_pair.second);
                         JUIsetParam((String)par.first, (float)par.second);
                         break;
                     case R.array.switchArr:
@@ -241,13 +241,14 @@ public class UIsController {
         Pair cp = (Pair)ui_map.get(R.array.switchArr)[switch_id];
         boolean cvalue = bool_values.get(cp.first);
         if(cp.first == "cutting"){
-            if(cvalue){
-                bottom_panel.setVisibility(View.VISIBLE);
-                Toast.makeText(activity, "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();
-            }else
-                bottom_panel.setVisibility(View.GONE);
+            if(cvalue){bottom_panel.setVisibility(View.VISIBLE);
+                Toast.makeText(activity, "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();}
+            else bottom_panel.setVisibility(View.GONE);
             return;
+        }else{
+            bottom_panel.setVisibility(View.GONE);
         }
+
         updateSpinnerEnteries();
         switch_widget.setChecked(cvalue);
         JUIsetSwitches((String)cp.first, cvalue);

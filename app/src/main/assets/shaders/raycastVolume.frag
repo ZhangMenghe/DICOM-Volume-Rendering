@@ -15,6 +15,12 @@ uniform vec3 uVolumeSize;
 uniform float sample_step_inverse;      // step used to advance the sampling ray
 uniform float val_threshold;
 uniform float brightness;
+struct OpacityAdj{
+    float overall;//0-1
+    float lowbound; //slope adj, 0-1
+    float cutoff;//0,1
+};
+uniform OpacityAdj uOpacitys;
 
 out vec4 gl_FragColor;
 
@@ -56,10 +62,14 @@ void main(void){
         density = max_density;
         density += val_threshold - 0.5;
         density = density * density * density;
+
+        float alpha = max_density * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
+        if(max_density< uOpacitys.cutoff) alpha = 0.0;
+
         if(ub_colortrans)
-            gl_FragColor = vec4(texture(uSampler_trans, vec2(density, 1.0)).rgb, 1.0);
+            gl_FragColor = vec4(texture(uSampler_trans, vec2(density, 1.0)).rgb, alpha * uOpacitys.overall);
         else
-            gl_FragColor = vec4(vec3(density),1.0);
+            gl_FragColor = vec4(vec3(density),alpha * uOpacitys.overall);
     }
     else
     discard;

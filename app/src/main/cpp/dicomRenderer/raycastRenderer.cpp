@@ -42,6 +42,10 @@ void raycastRenderer::Draw(){
         shader_->setFloat("val_threshold", vrController::param_value_map["threshold"]);
         shader_->setFloat("brightness", vrController::param_value_map["brightness"]);
 
+        shader_->setFloat("uOpacitys.overall", vrController::param_value_map["overall"]);
+        shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
+        shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
+
     if(vrController::camera->getViewDirection().z <=0)
         glFrontFace(GL_CCW);
     else

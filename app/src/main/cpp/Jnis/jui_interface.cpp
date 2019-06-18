@@ -16,12 +16,12 @@ JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat x, jfloat y){
 }
 
 JUI_METHOD(void, JUIsetSwitches)(JNIEnv * env, jclass, jstring key, jboolean value){
-//    LOGE("====SET %s, %d", dvr::jstring2string(env,key).c_str(), value);
+    LOGE("====SET %s, %d", dvr::jstring2string(env,key).c_str(), value);
     vrController::param_bool_map[dvr::jstring2string(env,key)] = value;
 
 }
 JUI_METHOD(void, JUIsetParam)(JNIEnv * env, jclass, jstring key, jfloat value){
-//    LOGE("====SET %s, %f", dvr::jstring2string(env,key).c_str(), value);
+    LOGE("====SET %s, %f", dvr::jstring2string(env,key).c_str(), value);
     vrController::param_value_map[dvr::jstring2string(env,key)] = value;
 }
 JUI_METHOD(void, JUIsetJavaUIStatus)(JNIEnv * env, jclass, jint item , jstring key){
