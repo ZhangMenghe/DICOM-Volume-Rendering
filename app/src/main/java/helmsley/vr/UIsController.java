@@ -44,9 +44,9 @@ public class UIsController {
     //Important! Order matters!!Align with the resource file
     final private static Map<Integer, Pair<String,?>[] > ui_map= new HashMap<Integer, Pair<String,?>[]>() {{
         put(R.array.t1Arr, new Pair[] {new Pair("Opacity", -1.0f)});
-        put(R.array.t2Arr, new Pair[] {new Pair("Opacity", -1.0f), new Pair("samplestep", 500.0f), new Pair("threshold", 0.4f), new Pair("brightness", 300.0f)});
+        put(R.array.t2Arr, new Pair[] {new Pair("Opacity", -1.0f), new Pair("samplestep", 400.0f), new Pair("threshold", 0.6f), new Pair("brightness", 300.0f)});
         put(R.array.opacityArr, new Pair[] {new Pair("overall", 1.0f), new Pair("lowbound", 1.0f), new Pair("cutoff", .0f)});
-        put(R.array.switchArr, new Pair[] {new Pair("colortrans", false),new Pair("raycast", true), new Pair("cutting", false), new Pair("simplecube", false)});
+        put(R.array.switchArr, new Pair[] {new Pair("colortrans", false),new Pair("raycast", false), new Pair("cutting", false), new Pair("simplecube", false)});
         put(R.array.bottomArr, new Pair[] {new Pair("cutting", .0f)});
     }};
     final private static Map<String, Pair<Float, Integer>> toggle_max_map = new HashMap<String, Pair<Float, Integer>>(){{
@@ -223,8 +223,10 @@ public class UIsController {
                 toggle_values_sub.put((String)cp_sub.first, value);
             float toggle_value = toggle_values_sub.get(cp_sub.first).floatValue();
             seekbar_top.setProgress((int)toggle_value);
-            JUIsetParam((String) cp_sub.first, toggle_value * toggle_max_sub_pair.first / toggle_max_sub_pair.second);
+            float real_value = toggle_value * toggle_max_sub_pair.first / toggle_max_sub_pair.second;
+            JUIsetParam((String) cp_sub.first, real_value);
             spinner_toggle_sub.setVisibility(View.VISIBLE);
+            toggleValueTex.setText(activity.getString(R.string.text_toggle, real_value));
         }else{
             spinner_toggle_sub.setVisibility(View.GONE);
             seekbar_top.setMax(toggle_max_map.get(cp.first).second);
@@ -232,7 +234,9 @@ public class UIsController {
                 toggle_values.put((String)cp.first, value);
             float toggle_value = toggle_values.get(cp.first).floatValue();
             seekbar_top.setProgress((int)toggle_value);
-            JUIsetParam((String)cp.first, toggle_value * toggle_max_map.get(cp.first).first / toggle_max_map.get(cp.first).second);
+            float real_value2 = toggle_value * toggle_max_map.get(cp.first).first / toggle_max_map.get(cp.first).second;
+            JUIsetParam((String)cp.first, real_value2);
+            toggleValueTex.setText(activity.getString(R.string.text_toggle, real_value2));
         }
         seekbar_bottom.setMax(toggle_max_map.get("cutting").second);
         seekbar_bottom.setProgress((int)toggle_values.get("cutting").floatValue());

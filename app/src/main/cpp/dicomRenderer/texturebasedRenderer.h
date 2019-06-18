@@ -25,12 +25,10 @@ private:
     int slice_start_idx = 0;
 
     Shader* shader_;
-    glm::mat4 modelMat_;
+
     std::vector<GLuint> m_VAOs;
 public:
     texvrRenderer();
-    glm::mat4 ModelMat(){return modelMat_;}
-    void setModelMat(glm::mat4 mat){modelMat_ = mat;}
     void Draw();
 };
 #endif

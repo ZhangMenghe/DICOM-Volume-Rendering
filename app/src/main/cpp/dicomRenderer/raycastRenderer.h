@@ -28,12 +28,9 @@ private:
     };
 
     Shader* shader_;
-    glm::mat4 modelMat_;
     GLuint VAO_;
 public:
     raycastRenderer();
-    glm::mat4 ModelMat(){return modelMat_;}
-    void setModelMat(glm::mat4 mat){modelMat_ = mat;}
     void Draw();
 };
 #endif

@@ -115,11 +115,11 @@
                 android:id="@+id/toggleSubSpinner"
                 android:entries="@array/opacityArr"
                 android:layout_height="0dp"
-                android:layout_width ="wrap_content"
+                android:layout_width ="0dp"
                 android:theme="@style/Spinner"
                 android:layout_marginStart="5dp"
                 app:layout_constraintHeight_percent="0.5"
-
+                app:layout_constraintWidth_percent="0.3"
                 app:layout_constraintStart_toEndOf="@id/toggleSpinnerPanel"
                 app:layout_constraintTop_toTopOf="parent"
                 />
@@ -127,7 +127,7 @@
                 android:id="@+id/toggleText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
+
                 android:layout_marginTop="10dp"
                 android:text="@string/text_toggle"
                 android:textColor="@color/lightBlue"

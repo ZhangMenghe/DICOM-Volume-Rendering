@@ -2,7 +2,6 @@
 #include <vrController.h>
 #include "raycastRenderer.h"
 raycastRenderer::raycastRenderer() {
-    modelMat_ = glm::mat4(1.0);
     //geometry
     Mesh::InitQuadWithTex(VAO_, sVertex, 8, sIndices, 36);
 
@@ -34,7 +33,7 @@ void raycastRenderer::Draw(){
     shader_->Use();
         shader_->setMat4("uProjMat", vrController::camera->getProjMat());
         shader_->setMat4("uViewMat", vrController::camera->getViewMat());
-        shader_->setMat4("uModelMat", modelMat_);
+        shader_->setMat4("uModelMat", vrController::ModelMat_);
 
         shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
