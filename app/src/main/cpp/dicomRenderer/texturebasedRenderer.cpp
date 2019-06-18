@@ -24,13 +24,13 @@ texvrRenderer::texvrRenderer() {
         LOGE("TextureBas===Failed to create shader program===");
     shader_->Use();
         shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
-//        shader_->setInt("uSampler_trans", GL_TEXTURE0 + vrController::TRANS_TEX_ID);
+        shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
         shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
-//        shader_->setBool("u_use_color_transfer", vrController::b_use_color_transfer);
-//
-//        shader_->setFloat("uOpacitys.overall", 1.0f);//vrController::opa_oa);
-//        shader_->setFloat("uOpacitys.low_limit",1.0f);// vrController::opa_ll);
-//        shader_->setFloat("uOpacitys.cut_off",.0f);// vrController::opa_co);
+
+        shader_->setBool("u_use_color_transfer", vrController::b_use_color_transfer);
+        shader_->setFloat("uOpacitys.overall", vrController::opa_oa);
+        shader_->setFloat("uOpacitys.low_limit", vrController::opa_ll);
+        shader_->setFloat("uOpacitys.cut_off", vrController::opa_co);
     shader_->unUse();
 
 }
@@ -47,8 +47,8 @@ void texvrRenderer::Draw(){
     glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
 
-//    glActiveTexture(GL_TEXTURE1);
-//    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
+    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
+    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
 
     shader_->Use();
         shader_->setMat4("uProjMat", vrController::camera->getProjMat());

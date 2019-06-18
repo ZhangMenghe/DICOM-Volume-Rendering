@@ -15,9 +15,8 @@ public:
     static Texture *tex_volume, *tex_trans;
     static Camera* camera;
     static int VOLUME_TEX_ID, TRANS_TEX_ID;
-//    static size_t width_, height_, depth_;
-//    static bool b_use_color_transfer;
-//    static float opa_oa, opa_ll, opa_co;
+    static bool b_use_color_transfer;
+    static float opa_oa, opa_ll, opa_co;
     static float _screen_w, _screen_h;
 //    static std::unordered_map<std::string, float> param_value_map;
 //    static std::unordered_map<std::string, bool > param_bool_map;
@@ -27,7 +26,7 @@ public:
 
     vrController(AAssetManager *assetManager);
     void assembleTexture(GLubyte * data, int width, int height, int depth);
-    void setTransferColor(int*colors, int num = 0);
+    void setTransferColor(const int*colors, int num = 0);
     void onViewCreated();
     void onViewChange(int width, int height);
     void onDraw();

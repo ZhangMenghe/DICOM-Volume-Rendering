@@ -49,6 +49,7 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
 
     vrc->assembleTexture(data, img_width, img_height, dimensions);
     delete[]data;
+    vrc->setTransferColor(nullptr, -1);//default
     nativeApp(nativeAddr)->onViewCreated();
 }
 
