@@ -16,10 +16,15 @@ uniform sampler3D uSampler_tex;
 uniform sampler2D uSampler_trans;
 
 uniform bool ub_colortrans;
+uniform bool ub_simplecube;
 void main(){
+	if(ub_simplecube){
+		gl_FragColor = vec4(vTexcoord, 1.0f);
+		return;
+	}
 	float intensity = texture(uSampler_tex, vTexcoord).r;
 	vec3 sampled_color;
-	if(ub_colortrans == true)
+	if(ub_colortrans)
 		sampled_color = texture(uSampler_trans, vec2(intensity, 1.0)).rgb;
 	else
 		sampled_color = vec3(intensity);

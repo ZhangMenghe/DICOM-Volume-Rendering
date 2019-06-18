@@ -3,8 +3,11 @@
 #include <AndroidUtils/AndroidHelper.h>
 #include "jui_interface.h"
 #include <vrController.h>
+#include "AndroidUtils/perfMonitor.h"
 using namespace dvr;
-
+namespace {
+    perfMonitor fps_monitor_;
+}
 JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
     nativeApp(nativeAddr)->onSingleTouchDown(x, y);
 }
@@ -24,6 +27,6 @@ JUI_METHOD(void, JUIsetParam)(JNIEnv * env, jclass, jstring key, jfloat value){
 JUI_METHOD(void, JUIsetJavaUIStatus)(JNIEnv * env, jclass, jint item , jint id){
 //    vrController::jui_status[item] = id;
 }
-JUI_METHOD(float, JUIgetFPS)(JNIEnv * env, jclass){
-    return 60.0f;
+JUI_METHOD(float, JUIgetFPS)(JNIEnv *, jclass){
+    return fps_monitor_.Update();
 }
