@@ -11,8 +11,8 @@ inline void getRGBAColors(const int* hexValues, float* color, int num){
 	}
 }
 
-const int default_transcolor_num = 25;
-const int default_trans_color[25] = {
+const int default_transcolor_num = 20;
+const int default_trans_color[20] = {
 		//blue
 		0x011f4b,
 		0x03396c,
@@ -35,25 +35,32 @@ const int default_trans_color[25] = {
 
 
 		//GREEN-YELLOS
-		0xa98600,
-		0xdab600,
-		0xf8ed62,
+//		0xa98600,
+//		0xdab600,
+//		0xf8ed62,
 		0xfed601,
 		0xfee402,
 
 		///orange
 		0xf0750f,
 		0xf48020,
-		0xf09537,
-		0xf0a150,
-		0Xf6412D,
-
-//red-orange
-		0xff9a00,
-		0xff4d00,
+//		0xf09537,
+//		0xf0a150,
+//		0Xf6412D,
+//
+////red-orange
+//		0xff9a00,
+//		0xff4d00,
 		0xff7400,
+
+        0xff0000,
 		0xcc0000,
-		0xff0000,
+        0xc20232,
+		0xa3032b,
+        0x530119,
+
+
+
 
 };
 #endif
