@@ -23,7 +23,7 @@ FuncRenderer::FuncRenderer(){
     shader_colorbar.Use();
         shader_colorbar.setVec2("uScale", glm::vec2(2.0f, 0.1f));
         shader_colorbar.setVec2("uOffset", glm::vec2(.0f, -1.0f));
-        shader_colorbar.setInt("uSample_trans", vrController::TRANS_TEX_ID);
+//        shader_colorbar.setInt("uSample_trans", vrController::TRANS_TEX_ID);
     shader_colorbar.unUse();
 }
 

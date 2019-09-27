@@ -4,7 +4,7 @@
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
 Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr;
-int vrController::VOLUME_TEX_ID=0, vrController::TRANS_TEX_ID = 1;
+int vrController::VOLUME_TEX_ID=0;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;

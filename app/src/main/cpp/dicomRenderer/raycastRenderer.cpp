@@ -11,7 +11,7 @@ raycastRenderer::raycastRenderer() {
         LOGE("Raycast===Failed to create shader program===");
     shader_->Use();
         shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
-        shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
+//        shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
         shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
     shader_->unUse();
 }
@@ -27,8 +27,8 @@ void raycastRenderer::Draw(){
     glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
 
-    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
-    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
+//    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
+//    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
 
     shader_->Use();
         shader_->setMat4("uProjMat", vrController::camera->getProjMat());

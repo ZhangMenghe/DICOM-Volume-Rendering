@@ -7,7 +7,6 @@ in vec3 ray_dir;
 in mat3 NormalMatrix;
 
 uniform sampler3D uSampler_tex;
-uniform sampler2D uSampler_trans;
 uniform bool ub_simplecube;
 uniform bool ub_colortrans;
 uniform vec3 uVolumeSize;
@@ -23,6 +22,27 @@ struct OpacityAdj{
 uniform OpacityAdj uOpacitys;
 
 out vec4 gl_FragColor;
+
+float START_H_VALUE = 0.1667;
+float BASE_S_VALUE = 0.7;
+float BASE_S_H = 0.6667;//pure blue
+float BASE_V_VALUE = 0.8;
+
+// All components are in the range [0…1], including hue.
+vec3 hsv2rgb(vec3 c){
+    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+}
+vec3 transfer_scheme(float gray){
+    // transfer a gray-scale from 0-1 to proper rgb value
+    float range = 0.833;
+    float h = (1.0 - START_H_VALUE) * gray + START_H_VALUE;
+    float off_h = h - BASE_S_H;
+    float s = off_h>.0? BASE_S_VALUE + off_h / (1.0 - BASE_S_H) * 0.3: BASE_S_VALUE + off_h / (BASE_S_H - START_H_VALUE) * 0.5;
+    float v = off_h >.0? BASE_V_VALUE: BASE_V_VALUE + off_h / (BASE_S_H - START_H_VALUE)*0.3;
+    return hsv2rgb(vec3(h,s,v));
+}
 
 void main_old(void){
     gl_FragColor = vec4(tex_coord, 1.0f);
@@ -67,7 +87,8 @@ void main(void){
         if(max_density< uOpacitys.cutoff) alpha = 0.0;
 
         if(ub_colortrans)
-            gl_FragColor = vec4(texture(uSampler_trans, vec2(density, 1.0)).rgb, alpha * uOpacitys.overall);
+            gl_FragColor = vec4(transfer_scheme(density), alpha * uOpacitys.overall);
+//            gl_FragColor = vec4(texture(uSampler_trans, vec2(density, 1.0)).rgb, alpha * uOpacitys.overall);
         else
             gl_FragColor = vec4(vec3(density),alpha * uOpacitys.overall);
     }
