@@ -66,11 +66,14 @@ public:
 	void Use(){glUseProgram(mProgram);}
 	void unUse(){glUseProgram(0);}
     bool Create(const char* vert_file, const char *_frag_file);
-private:
+	bool Create( const char* vert_files[], const char* frag_files[], int vert_size=1,int frag_size = 1);
+	private:
     GLuint mProgram;
     bool check_gl_error(const char *funcName);
-    bool create_program(const char* vtxSrc, const char* fragSrc);
-    GLuint create_shader(GLenum shaderType, const char *pSource);
+//    bool create_program(const char* vtxSrc, const char* fragSrc);
+	bool create_program(const char** vtxSrc, const char** fragSrc,
+	        int vert_size = 1, int frag_size = 1, int* vcontent_len = nullptr, int* fcontent_len = nullptr);
+	GLuint create_shader(GLenum shaderType, const char **pSource, int src_size = 1, int* arr_length= nullptr);
 };
 
 #endif
