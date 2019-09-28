@@ -35,6 +35,19 @@ void raycastRenderer::Draw(){
         shader_->setMat4("uViewMat", vrController::camera->getViewMat());
         shader_->setMat4("uModelMat", vrController::ModelMat_);
 
+        glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
+        shader_->setVec3("uCamposObjSpace", glm::vec3(model_inv
+        *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
+        shader_->setVec3("uPlane.p", glm::vec3(model_inv * glm::vec4(vrController::cplane_p, 1.0)));
+        shader_->setVec3("uPlane.normal", vrController::cplane_normal);
+        shader_->setBool("uPlane.upwards", true);
+
+        shader_->setVec3("uSphere.center", glm::vec3(model_inv * glm::vec4(vrController::csphere_c, 1.0)));
+        shader_->setFloat("uSphere.radius", vrController::csphere_radius);
+        shader_->setBool("uSphere.outside", true);
+
+
+
         shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
         shader_->setFloat("sample_step_inverse", vrController::param_value_map["samplestep"]);

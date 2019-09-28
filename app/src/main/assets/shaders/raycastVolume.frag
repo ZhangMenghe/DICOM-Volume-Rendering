@@ -1,12 +1,33 @@
-#version 300 es
+#version 310 es
+
+#extension GL_EXT_shader_io_blocks : require
+
 precision mediump float;
 
-in vec3 frag_position; // in object space
-in vec3 tex_coord;
-in vec3 ray_dir;
-in mat3 NormalMatrix;
+out vec4 gl_FragColor;
+in VS_OUT {
+    vec3 raydir;
+    vec3 screenPos;
+    vec3 FragPos;
+    vec3 TexCoords;
+} fs_in;
+uniform vec3 uCamposObjSpace;
 
-uniform sampler3D uSampler_tex;
+//cutting-plane
+struct Plane{
+    vec3 p;
+    vec3 normal;
+    bool upwards;
+};
+struct Sphere{
+    vec3 center;
+    float radius;
+    bool outside;
+};
+uniform Plane uPlane;
+uniform Sphere uSphere;
+
+//uniform sampler3D uSampler_tex;
 uniform bool ub_simplecube;
 uniform bool ub_colortrans;
 uniform vec3 uVolumeSize;
@@ -20,8 +41,6 @@ struct OpacityAdj{
     float cutoff;//0,1
 };
 uniform OpacityAdj uOpacitys;
-
-out vec4 gl_FragColor;
 
 float START_H_VALUE = 0.1667;
 float BASE_S_VALUE = 0.7;
@@ -44,54 +63,50 @@ vec3 transfer_scheme(float gray){
     return hsv2rgb(vec3(h,s,v));
 }
 
-void main_old(void){
-    gl_FragColor = vec4(tex_coord, 1.0f);
+vec2 RaySphere(vec3 ro, vec3 rd, vec3 center, float radius){
+    vec3 oc = ro - center;
+    float a = dot(rd, rd);
+    float b = 2.0 * dot(oc, rd);
+    float c = dot(oc,oc) - radius*radius;
+    float discriminant = b*b - 4.0*a*c;
+    return discriminant < 1e-5? vec2(1e5, -1e5): vec2(-b - sqrt(discriminant) , -b + sqrt(discriminant)) / (2.0*a);
 }
-
+vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
+    vec3 tMin = (-extents - ro) / rd;
+    vec3 tMax = (extents - ro) / rd;
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+    return vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
+}
+float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
+    float d = dot(planen, rd);
+    float t = dot(planep - ro, planen);
+    return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
+}
+vec4 Volume(){
+    return vec4(fs_in.TexCoords, 1.0);
+}
 void main(void){
-  if(ub_simplecube){
-      gl_FragColor = vec4(tex_coord, 1.0);
-      return;
-  }
-  float sample_step = 1.0/sample_step_inverse;
-  vec3 ray_pos = tex_coord; // the current ray position
-  vec3 pos111 = vec3(1.0, 1.0, 1.0);
-  vec3 pos000 = vec3(0.0, 0.0, 0.0);
+    vec3 ray_origin = uCamposObjSpace;
+    vec3 ray_dir = normalize(fs_in.raydir);
 
-  vec4 frag_color = vec4(0,0,0,0);
-  vec4 color;
-  float density, max_density = -1.0;
-  vec3 best_ray_pos = ray_pos;
+    vec2 intersect = RayCube(ray_origin, ray_dir, vec3(1.0));
+    intersect.x = max(.0, intersect.x);
+    //Ray-plane
 
-  do{
-    ray_pos += ray_dir * sample_step;
-    if (any(greaterThan(ray_pos,pos111)))
-      break;
-    if (any(lessThan(ray_pos,pos000)))
-      break;
-    density = texture(uSampler_tex, ray_pos).r;
+    if(uPlane.upwards)//要上面
+    intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal));
+    else//要下面
+    intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal), intersect.y);
 
-    max_density = max(max_density, density);
-    if(max_density == density)
-        best_ray_pos = ray_pos;
-
-  }while(true);
-
-    if(max_density > -1.0){
-
-        density = max_density;
-        density += val_threshold - 0.5;
-        density = density * density * density;
-
-        float alpha = max_density * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
-        if(max_density< uOpacitys.cutoff) alpha = 0.0;
-
-        if(ub_colortrans)
-            gl_FragColor = vec4(transfer_scheme(density), alpha * uOpacitys.overall);
-//            gl_FragColor = vec4(texture(uSampler_trans, vec2(density, 1.0)).rgb, alpha * uOpacitys.overall);
-        else
-            gl_FragColor = vec4(vec3(density),alpha * uOpacitys.overall);
-    }
-    else
-    discard;
+    //Ray-Sphere
+//    vec2 sphere_limit = RaySphere(ray_origin, ray_dir, uSphere.center, uSphere.radius);//vec3(-0.5,.0,.0), 1.0);
+//    if(uSphere.outside){//要豁口
+//        if(sphere_limit.x < sphere_limit.y)
+//        intersect = vec2(sphere_limit.y, sphere_limit.x);
+//    }else//要球
+//    intersect.y = min(intersect.y, sphere_limit.y);
+    if (intersect.y < intersect.x)
+        discard;
+    gl_FragColor = Volume();
 }

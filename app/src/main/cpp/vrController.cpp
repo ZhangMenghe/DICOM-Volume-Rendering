@@ -8,7 +8,12 @@ int vrController::VOLUME_TEX_ID=0;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
-glm::mat4 vrController::ModelMat_ = glm::scale(glm::mat4(1.0), glm::vec3(1.2f, -1.2f, 0.6f));
+glm::mat4 vrController::ModelMat_ = glm::mat4(1.0);//glm::scale(glm::mat4(1.0), glm::vec3(1.2f, -1.2f, 0.6f));
+
+glm::vec3 vrController::LOOKAT_CENTER = glm::vec3(.0f);
+glm::vec3 vrController::cplane_p = LOOKAT_CENTER, vrController::cplane_normal = glm::vec3(1.0f, 1.0f, .0f);
+glm::vec3 vrController::csphere_c = LOOKAT_CENTER + glm::vec3(-0.5, .0, .0);
+float vrController::csphere_radius = 0.f;
 
 vrController* vrController::instance(){
     return myPtr_;

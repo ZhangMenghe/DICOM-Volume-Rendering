@@ -22,6 +22,11 @@ public:
     static std::unordered_map<std::string, bool > param_bool_map;
     static glm::mat4 ModelMat_;
 
+    static glm::vec3 LOOKAT_CENTER;
+    static glm::vec3 cplane_p, cplane_normal ;
+    static glm::vec3 csphere_c;
+    static float csphere_radius;
+
     static vrController* instance();
 
     vrController(AAssetManager *assetManager);
@@ -42,12 +47,13 @@ public:
         xoffset *= MOUSE_ROTATE_SENSITIVITY;
         yoffset *= MOUSE_ROTATE_SENSITIVITY;
         if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h))
+//            ModelMat_ = glm::rotate(ModelMat_, xoffset, glm::vec3(0,1,0));
             camera->rotateCamera(3, ModelMat_[3], xoffset);
          else
+//            ModelMat_ = glm::rotate(ModelMat_, -yoffset, glm::vec3(1,0,0));
              camera->rotateCamera(2, ModelMat_[3], -yoffset);
 
     }
-
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;
@@ -56,9 +62,7 @@ private:
     FuncRenderer* funcRenderer_ = nullptr;
 
     glm::fvec2 Mouse_old = glm::fvec2(.0);
-    const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
-
-
+    const float MOUSE_ROTATE_SENSITIVITY = 0.001f;
 
 };
 #endif
