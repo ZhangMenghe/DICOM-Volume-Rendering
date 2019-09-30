@@ -117,8 +117,7 @@ void main(void){
 //        if(sphere_limit.x < sphere_limit.y)
 //        intersect = vec2(sphere_limit.y, sphere_limit.x);
 //    }else//要球
-//    intersect.y = min(intersect.y, sphere_limi
-    t.y);
+//    intersect.y = min(intersect.y, sphere_limit.y);
     if (intersect.y < intersect.x)
         discard;
     else
