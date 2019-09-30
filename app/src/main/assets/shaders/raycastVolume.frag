@@ -83,20 +83,37 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
     float t = dot(planep - ro, planen);
     return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
+vec4 Sample(vec3 p){
+    vec4 color;
+    color.rgb = vec3(texture(uSampler_tex, p).r);
+    color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : color.r;
+    return color;
+}
 vec4 Volume(float head, float tail){
     vec3 ro = uCamposObjSpace + 0.5;
     vec3 rd = normalize(fs_in.raydir);
     vec4 sum = vec4(.0);
-    float vc, vmax = .0;
-    for(float t = head; t<tail;t=t+0.1 ){
-        vec3 p = ro + rd * t;
-        vc = texture(uSampler_tex, p).r;
-        if(vc > vmax) vmax = vc;
-    }
+    int steps = 0;
 
-//    return vec4(0.5,0.5,0.8, 1.0);
-//    return vec4(vec3(texture(uSampler_tex, fs_in.TexCoords).r), 1.0);
-    return vec4(vec3(vmax), 1.0);
+    float vc, vmax = .0;
+    for(float t = head; t<tail; ){
+        if(sum.a >= 0.95) break;
+        vec3 p = ro + rd * t;
+        vec4 val_color = Sample(p);
+        if(val_color.a > 0.01){
+            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
+            sum.a += (1.0 - sum.a) * val_color.a;
+        }
+        if(val_color.r > vmax) vmax = val_color.r;
+        t+=sample_step_inverse;//val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
+        steps++;
+    }
+    sum.a = clamp(sum.a, 0.0, 1.0);
+    return sum;
+//    float alpha = sum.a * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
+//    if(sum.r< uOpacitys.cutoff) alpha = 0.0;
+
+//    return vec4(sum.rgb, alpha * uOpacitys.overall);
 }
 void main(void){
     vec3 ray_origin = uCamposObjSpace;
