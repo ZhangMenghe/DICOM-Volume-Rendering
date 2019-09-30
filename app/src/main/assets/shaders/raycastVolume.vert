@@ -23,7 +23,6 @@ void main(void){
     vs_out.FragPos = vec3(uModelMat * vec4(aPos, 1.0f));
     vec4 screen_pos = uProjMat * uViewMat * vec4(vs_out.FragPos, 1.0);
     vs_out.screenPos = screen_pos.xyw;
-    vs_out.TexCoords = aTexCoord;
-
+    vs_out.TexCoords = aPos;
     gl_Position = screen_pos;
 }

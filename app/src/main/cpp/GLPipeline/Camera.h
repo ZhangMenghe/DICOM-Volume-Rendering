@@ -32,12 +32,6 @@ public:
     glm::mat4 getProjMat(){return _projMat;}
     glm::mat4 getViewMat(){return _viewMat;}
     glm::vec3 getCameraPosition(){return _eyePos;}
-    glm::vec3 getCameraPosition(glm::mat4 modelMat){
-        glm::mat4 inv_model = glm::inverse(modelMat);
-        glm::vec4 eye_model = inv_model * glm::vec4(_eyePos.x, _eyePos.y, _eyePos.z, 1.0f);
-        float inv_w = 1.0f / eye_model.w;
-        return glm::vec3(eye_model.x * inv_w, eye_model.y * inv_w, eye_model.z * inv_w);
-    }
     glm::vec3 getViewCenter(){return _center;}
     glm::vec3 getViewDirection(){return _front;}
 

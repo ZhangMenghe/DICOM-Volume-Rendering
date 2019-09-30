@@ -31,6 +31,7 @@ private:
     GLuint VAO_;
 public:
     raycastRenderer();
+    void onCuttingChange(float percent);
     void Draw();
 };
 #endif

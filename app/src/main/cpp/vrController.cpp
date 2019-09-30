@@ -14,6 +14,7 @@ glm::vec3 vrController::LOOKAT_CENTER = glm::vec3(.0f);
 glm::vec3 vrController::cplane_p = LOOKAT_CENTER, vrController::cplane_normal = glm::vec3(1.0f, 1.0f, .0f);
 glm::vec3 vrController::csphere_c = LOOKAT_CENTER + glm::vec3(-0.5, .0, .0);
 float vrController::csphere_radius = 0.f;
+bool vrController::cutDirty = true;
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -51,6 +52,11 @@ void vrController::onViewChange(int width, int height){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void vrController::onDraw() {
+    if(cutDirty){
+        cutDirty = false;
+        texvrRenderer_->onCuttingChange(param_value_map["cutting"]);
+        raycastRenderer_->onCuttingChange(param_value_map["cutting"]);
+    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if(param_bool_map["raycast"])
         raycastRenderer_->Draw();

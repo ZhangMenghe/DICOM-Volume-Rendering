@@ -1,7 +1,7 @@
 #version 310 es
 
 #extension GL_EXT_shader_io_blocks : require
-
+//#define GL_FRAGMENT_PRECISION_HIGH 1
 precision mediump float;
 
 out vec4 gl_FragColor;
@@ -27,7 +27,7 @@ struct Sphere{
 uniform Plane uPlane;
 uniform Sphere uSphere;
 
-//uniform sampler3D uSampler_tex;
+uniform mediump sampler3D uSampler_tex;
 uniform bool ub_simplecube;
 uniform bool ub_colortrans;
 uniform vec3 uVolumeSize;
@@ -83,21 +83,33 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
     float t = dot(planep - ro, planen);
     return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
-vec4 Volume(){
-    return vec4(fs_in.TexCoords, 1.0);
+vec4 Volume(float head, float tail){
+    vec3 ro = uCamposObjSpace + 0.5;
+    vec3 rd = normalize(fs_in.raydir);
+    vec4 sum = vec4(.0);
+    float vc, vmax = .0;
+    for(float t = head; t<tail;t=t+0.1 ){
+        vec3 p = ro + rd * t;
+        vc = texture(uSampler_tex, p).r;
+        if(vc > vmax) vmax = vc;
+    }
+
+//    return vec4(0.5,0.5,0.8, 1.0);
+//    return vec4(vec3(texture(uSampler_tex, fs_in.TexCoords).r), 1.0);
+    return vec4(vec3(vmax), 1.0);
 }
 void main(void){
     vec3 ray_origin = uCamposObjSpace;
     vec3 ray_dir = normalize(fs_in.raydir);
 
-    vec2 intersect = RayCube(ray_origin, ray_dir, vec3(1.0));
-    intersect.x = max(.0, intersect.x);
+    vec2 intersect = RayCube(ray_origin, ray_dir, vec3(0.5));
+//    intersect.x = max(.0, intersect.x);
     //Ray-plane
 
     if(uPlane.upwards)//要上面
-    intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal));
+        intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal));
     else//要下面
-    intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal), intersect.y);
+        intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal), intersect.y);
 
     //Ray-Sphere
 //    vec2 sphere_limit = RaySphere(ray_origin, ray_dir, uSphere.center, uSphere.radius);//vec3(-0.5,.0,.0), 1.0);
@@ -105,8 +117,10 @@ void main(void){
 //        if(sphere_limit.x < sphere_limit.y)
 //        intersect = vec2(sphere_limit.y, sphere_limit.x);
 //    }else//要球
-//    intersect.y = min(intersect.y, sphere_limit.y);
+//    intersect.y = min(intersect.y, sphere_limi
+    t.y);
     if (intersect.y < intersect.x)
         discard;
-    gl_FragColor = Volume();
+    else
+        gl_FragColor = Volume(intersect.x, intersect.y);
 }

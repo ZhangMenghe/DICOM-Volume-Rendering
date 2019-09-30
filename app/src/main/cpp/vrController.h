@@ -26,6 +26,7 @@ public:
     static glm::vec3 cplane_p, cplane_normal ;
     static glm::vec3 csphere_c;
     static float csphere_radius;
+    static bool cutDirty;
 
     static vrController* instance();
 
@@ -62,7 +63,7 @@ private:
     FuncRenderer* funcRenderer_ = nullptr;
 
     glm::fvec2 Mouse_old = glm::fvec2(.0);
-    const float MOUSE_ROTATE_SENSITIVITY = 0.001f;
+    const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
 
 };
 #endif

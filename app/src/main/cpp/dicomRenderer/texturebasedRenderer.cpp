@@ -54,7 +54,6 @@ void texvrRenderer::Draw(){
         shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
         shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 
-        slice_start_idx = (int)m_VAOs.size() * vrController::param_value_map["cutting"];
         if(vrController::camera->getViewDirection().z <0){
             glFrontFace(GL_CW);
             for(int id = 0; id <m_VAOs.size()- slice_start_idx; id++){
@@ -73,4 +72,7 @@ void texvrRenderer::Draw(){
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
+}
+void texvrRenderer::onCuttingChange(float percent){
+    slice_start_idx = (int)(m_VAOs.size() * percent);
 }

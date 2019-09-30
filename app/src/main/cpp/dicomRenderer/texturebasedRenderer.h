@@ -29,6 +29,7 @@ private:
     std::vector<GLuint> m_VAOs;
 public:
     texvrRenderer();
+    void onCuttingChange(float percent);
     void Draw();
 };
 #endif
