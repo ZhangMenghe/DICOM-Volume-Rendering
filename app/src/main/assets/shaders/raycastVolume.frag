@@ -95,7 +95,7 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
 
 
 void getCuttingPlane(vec3 rd){
-    uPlane.p = uStartPoint + normalize(rd) * cut_percent * 2.0; //vec3(.0);
+    uPlane.p = uStartPoint + normalize(rd) * cut_percent * 1.7;
     uPlane.upwards = true;
     uPlane.normal = rd;
 }
@@ -179,5 +179,5 @@ void main(void){
     if (intersect.y < intersect.x)
         discard;
     else
-        gl_FragColor = ub_simplecube? vec4(fs_in.TexCoords, 1.0):Volume(intersect.x, intersect.y);
+        gl_FragColor = ub_simplecube? vec4(0.8,0.8,.0, 1.0):Volume(intersect.x, intersect.y);
 }

@@ -48,11 +48,11 @@ public:
         xoffset *= MOUSE_ROTATE_SENSITIVITY;
         yoffset *= MOUSE_ROTATE_SENSITIVITY;
         if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h))
-//            ModelMat_ = glm::rotate(ModelMat_, xoffset, glm::vec3(0,1,0));
-            camera->rotateCamera(3, ModelMat_[3], xoffset);
+            ModelMat_ = glm::rotate(ModelMat_, xoffset, glm::vec3(0,1,0));
+//            camera->rotateCamera(3, ModelMat_[3], xoffset);
          else
-//            ModelMat_ = glm::rotate(ModelMat_, -yoffset, glm::vec3(1,0,0));
-             camera->rotateCamera(2, ModelMat_[3], -yoffset);
+            ModelMat_ = glm::rotate(ModelMat_, -yoffset, glm::vec3(1,0,0));
+//             camera->rotateCamera(2, ModelMat_[3], -yoffset);
         view_dirDirty = true;
     }
 private:

@@ -97,8 +97,7 @@ void raycastRenderer::onCuttingChange(float percent){
             }
         }
         shader_->Use();
-        shader_->setVec3("uStartPoint", sVertex[0], sVertex[1], sVertex[2]);
-//        shader_->setBool("ub_viewchange",  vrController::camera->getViewDirection().z <0);
+        shader_->setVec3("uStartPoint", sVertex[6*vertex_idx], sVertex[6*vertex_idx + 1], sVertex[6*vertex_idx + 2]);
     }
 
     shader_->Use();//cutting in obj space
