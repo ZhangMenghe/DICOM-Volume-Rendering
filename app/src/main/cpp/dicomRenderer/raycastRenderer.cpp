@@ -47,6 +47,8 @@ void raycastRenderer::Draw(){
 
         shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
+        shader_->setBool("ub_accumulate", vrController::param_bool_map["accumulate"]);
+
         shader_->setFloat("sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
         shader_->setFloat("val_threshold", vrController::param_value_map["threshold"]);
         shader_->setFloat("brightness", vrController::param_value_map["brightness"]);

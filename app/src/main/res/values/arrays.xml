@@ -20,6 +20,7 @@
         <item>Raycast</item>
         <item>Cutting</item>
         <item>SimpleCube</item>
+        <item>AccumulateRay</item>
     </string-array>
 
     <string-array name="opacityArr">

@@ -30,6 +30,7 @@ uniform Sphere uSphere;
 uniform mediump sampler3D uSampler_tex;
 uniform bool ub_simplecube;
 uniform bool ub_colortrans;
+uniform bool ub_accumulate;
 uniform vec3 uVolumeSize;
 
 uniform float sample_step_inverse;      // step used to advance the sampling ray
@@ -95,21 +96,29 @@ vec4 Volume(float head, float tail){
     vec4 sum = vec4(.0);
     int steps = 0;
 
-    float vc, vmax = .0;
+    float vmax = .0;
     for(float t = head; t<tail; ){
         if(sum.a >= 0.95) break;
         vec3 p = ro + rd * t;
         vec4 val_color = Sample(p);
-        if(val_color.a > 0.01){
-            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
-            sum.a += (1.0 - sum.a) * val_color.a;
+        if(ub_accumulate){
+            if(val_color.a > 0.01){
+                sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
+                sum.a += (1.0 - sum.a) * val_color.a;
+            }
+            if(val_color.r > vmax) vmax = val_color.r;
+        }else if(val_color.r > vmax){
+             vmax = val_color.r;
         }
-        if(val_color.r > vmax) vmax = val_color.r;
         t+=sample_step_inverse;//val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
         steps++;
     }
-    sum.a = clamp(sum.a, 0.0, 1.0);
-    return sum;
+
+    if(ub_accumulate)
+        return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
+
+    return vec4(vec3(vmax), 1.0);
+
 //    float alpha = sum.a * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
 //    if(sum.r< uOpacitys.cutoff) alpha = 0.0;
 
