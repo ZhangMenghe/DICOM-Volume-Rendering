@@ -44,7 +44,7 @@ public class UIsController {
     //Important! Order matters!!Align with the resource file
     final private static Map<Integer, Pair<String,?>[] > ui_map= new HashMap<Integer, Pair<String,?>[]>() {{
         put(R.array.t1Arr, new Pair[] {new Pair("Opacity", -1.0f)});
-        put(R.array.t2Arr, new Pair[] {new Pair("Opacity", -1.0f), new Pair("samplestep", 100.0f), new Pair("threshold", 0.6f), new Pair("brightness", 300.0f)});
+        put(R.array.t2Arr, new Pair[] {new Pair("samplestep", 100.0f), new Pair("threshold", 0.6f), new Pair("brightness", 300.0f)});//new Pair("Opacity", -1.0f),
         put(R.array.opacityArr, new Pair[] {new Pair("overall", 1.0f), new Pair("lowbound", 1.0f), new Pair("cutoff", .0f)});
         put(R.array.switchArr, new Pair[] {new Pair("colortrans", false),new Pair("raycast", true), new Pair("cutting", false), new Pair("simplecube", false), new Pair("accumulate", false)});
         put(R.array.bottomArr, new Pair[] {new Pair("cutting", .0f)});
@@ -248,11 +248,9 @@ public class UIsController {
             if(cvalue){bottom_panel.setVisibility(View.VISIBLE);
                 Toast.makeText(activity, "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();}
             else bottom_panel.setVisibility(View.GONE);
-            return;
         }else{
             bottom_panel.setVisibility(View.GONE);
         }
-
         updateSpinnerEnteries();
         switch_widget.setChecked(cvalue);
         JUIsetSwitches((String)cp.first, cvalue);

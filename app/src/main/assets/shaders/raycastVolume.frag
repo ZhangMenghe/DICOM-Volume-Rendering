@@ -95,7 +95,7 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
 
 
 void getCuttingPlane(vec3 rd){
-    uPlane.p = uStartPoint + normalize(rd) * cut_percent * 1.7;
+    uPlane.p = uStartPoint + normalize(rd) * cut_percent * 1.75;
     uPlane.upwards = true;
     uPlane.normal = rd;
 }
@@ -103,10 +103,10 @@ void getCuttingPlane(vec3 rd){
 vec4 Sample(vec3 p){
     vec4 color;
     float intensity = texture(uSampler_tex, p).r;
-//    if(ub_colortrans)
-        color.rgb = vec3(intensity);
-//    else
-//        color.rgb = transfer_scheme(intensity);
+    intensity += val_threshold - 0.5;
+    intensity = clamp(intensity * brightness / 250.0, 0.0, 1.0);
+
+    color.rgb = vec3(intensity);
     color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : color.r;
     return color;
 }
@@ -158,14 +158,12 @@ void main(void){
     intersect.x = max(.0, intersect.x);
     if(cut_percent != .0){
         //Ray-plane
-        //    if(ub_viewfront)
         getCuttingPlane(-uCamposObjSpace);
-        //    else
-        //        getCuttingPlane(uCamposObjSpace);
+
         if(uPlane.upwards)//要上面
-        intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal));
+            intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal));
         else//要下面
-        intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal), intersect.y);
+            intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal), intersect.y);
     }
 
 
