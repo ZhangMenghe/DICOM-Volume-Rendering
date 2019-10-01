@@ -23,10 +23,10 @@ public:
     static glm::mat4 ModelMat_;
 
     static glm::vec3 LOOKAT_CENTER;
-    static glm::vec3 cplane_p, cplane_normal ;
     static glm::vec3 csphere_c;
     static float csphere_radius;
     static bool cutDirty;
+    static bool view_dirDirty;
 
     static vrController* instance();
 
@@ -53,7 +53,7 @@ public:
          else
 //            ModelMat_ = glm::rotate(ModelMat_, -yoffset, glm::vec3(1,0,0));
              camera->rotateCamera(2, ModelMat_[3], -yoffset);
-
+        view_dirDirty = true;
     }
 private:
     static vrController* myPtr_;
