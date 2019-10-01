@@ -86,7 +86,11 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
 }
 vec4 Sample(vec3 p){
     vec4 color;
-    color.rgb = vec3(texture(uSampler_tex, p).r);
+    float intensity = texture(uSampler_tex, p).r;
+//    if(ub_colortrans)
+        color.rgb = vec3(intensity);
+//    else
+//        color.rgb = transfer_scheme(intensity);
     color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : color.r;
     return color;
 }
@@ -113,12 +117,18 @@ vec4 Volume(float head, float tail){
         t+=sample_step_inverse;//val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
         steps++;
     }
-
-    if(ub_accumulate)
-        return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
-
-    return vec4(vec3(vmax), 1.0);
-
+    vec3 sample_color;
+    if(ub_accumulate){
+        if(ub_colortrans)
+            return vec4(transfer_scheme(sum.r), clamp(sum.a, 0.0, 1.0));
+        else
+            return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
+    }else{
+        if(ub_colortrans)
+            return vec4(transfer_scheme(vmax), 1.0);
+        else
+            return vec4(vec3(vmax), 1.0);
+    }
 //    float alpha = sum.a * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
 //    if(sum.r< uOpacitys.cutoff) alpha = 0.0;
 
@@ -147,5 +157,5 @@ void main(void){
     if (intersect.y < intersect.x)
         discard;
     else
-        gl_FragColor = Volume(intersect.x, intersect.y);
+        gl_FragColor = ub_simplecube? vec4(fs_in.TexCoords, 1.0):Volume(intersect.x, intersect.y);
 }
