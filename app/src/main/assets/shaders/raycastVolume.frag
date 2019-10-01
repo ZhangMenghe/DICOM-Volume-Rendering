@@ -22,7 +22,6 @@ struct Plane{
 struct Sphere{
     vec3 center;
     float radius;
-    bool outside;
 };
 //uniform Plane uPlane;
 uniform Sphere uSphere;
@@ -167,10 +166,13 @@ void main(void){
     }
 
     //Ray-Sphere
-    vec2 sphere_limit = RaySphere(ray_origin, ray_dir,vec3(-0.5,0.5,0.5), 0.5); //uSphere.center, uSphere.radius);//
-    if(sphere_limit.x < sphere_limit.y){
-        intersect.x = max(intersect.x, sphere_limit.y);
+    if(dot(uSphere.center, uCamposObjSpace) > .0){
+        vec2 sphere_limit = RaySphere(ray_origin, ray_dir,uSphere.center, uSphere.radius);
+        if(sphere_limit.x < sphere_limit.y){
+            intersect.x = max(intersect.x, sphere_limit.y);
+        }
     }
+
     if (intersect.y < intersect.x)
         discard;
     else

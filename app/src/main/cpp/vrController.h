@@ -22,7 +22,6 @@ public:
     static std::unordered_map<std::string, bool > param_bool_map;
     static glm::mat4 ModelMat_;
 
-    static glm::vec3 LOOKAT_CENTER;
     static glm::vec3 csphere_c;
     static float csphere_radius;
     static bool cutDirty;

@@ -38,9 +38,8 @@ void raycastRenderer::Draw(){
         shader_->setVec3("uCamposObjSpace", glm::vec3(model_inv
         *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
 
-        shader_->setVec3("uSphere.center", glm::vec3(model_inv * glm::vec4(vrController::csphere_c, 1.0)));
+        shader_->setVec3("uSphere.center", glm::vec3(vrController::csphere_c));
         shader_->setFloat("uSphere.radius", vrController::csphere_radius);
-        shader_->setBool("uSphere.outside", true);
 
         shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
