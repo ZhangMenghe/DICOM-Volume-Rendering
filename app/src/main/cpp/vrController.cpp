@@ -10,7 +10,7 @@ std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
 glm::mat4 vrController::ModelMat_ = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, -1.0f, 0.5f));
 
-glm::vec3 vrController::csphere_c = glm::vec3(-0.5, 0.5, 0.5);
+glm::vec3 vrController::csphere_c = glm::vec3(-0.5, 0.5, 0.5); //volume extend 0.5
 float vrController::csphere_radius = 0.5f;
 bool vrController::cutDirty = true;
 bool vrController::view_dirDirty = true;

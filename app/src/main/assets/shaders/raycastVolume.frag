@@ -166,12 +166,15 @@ void main(void){
     }
 
     //Ray-Sphere
-    if(dot(uSphere.center, uCamposObjSpace) > .0){
-        vec2 sphere_limit = RaySphere(ray_origin, ray_dir,uSphere.center, uSphere.radius);
-        if(sphere_limit.x < sphere_limit.y){
+    vec2 sphere_limit = RaySphere(ray_origin, ray_dir,uSphere.center, uSphere.radius);
+
+    if(sphere_limit.x < sphere_limit.y){
+        if(dot(uSphere.center, uCamposObjSpace) > .0)
             intersect.x = max(intersect.x, sphere_limit.y);
-        }
+        else
+            intersect.y = min(intersect.y, sphere_limit.x);
     }
+
 
     if (intersect.y < intersect.x)
         discard;
