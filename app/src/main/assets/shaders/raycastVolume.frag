@@ -166,16 +166,13 @@ void main(void){
             intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal), intersect.y);
     }
 
-
     //Ray-Sphere
-//    vec2 sphere_limit = RaySphere(ray_origin, ray_dir, uSphere.center, uSphere.radius);//vec3(-0.5,.0,.0), 1.0);
-//    if(uSphere.outside){//要豁口
-//        if(sphere_limit.x < sphere_limit.y)
-//        intersect = vec2(sphere_limit.y, sphere_limit.x);
-//    }else//要球
-//    intersect.y = min(intersect.y, sphere_limit.y);
+    vec2 sphere_limit = RaySphere(ray_origin, ray_dir,vec3(-0.5,0.5,0.5), 0.5); //uSphere.center, uSphere.radius);//
+    if(sphere_limit.x < sphere_limit.y){
+        intersect.x = max(intersect.x, sphere_limit.y);
+    }
     if (intersect.y < intersect.x)
         discard;
     else
-        gl_FragColor = ub_simplecube? vec4(0.8,0.8,.0, 1.0):Volume(intersect.x, intersect.y);
+        gl_FragColor = ub_simplecube? vec4(0.8, 0.8, .0, 1.0) : Volume(intersect.x, intersect.y);
 }
