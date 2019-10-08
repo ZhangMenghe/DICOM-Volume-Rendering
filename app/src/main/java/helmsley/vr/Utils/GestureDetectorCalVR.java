@@ -62,6 +62,7 @@ public class GestureDetectorCalVR {
                 gap = new PointF(cf1.x - cf2.x, cf1.y - cf2.y );
 
                 float curr_dist = PointF.length(gap.x, gap.y);
+                float last_span_dist = PointF.length(last_span.x, last_span.y);
                 float dist_ratio, pre = 1.0f;
 
                 if(curr_dist > down_dist){//could be up scaling or move
@@ -77,8 +78,9 @@ public class GestureDetectorCalVR {
                     UIsController.JUIonPan(event.getX(), event.getY());
                 }else{
 //                    Log.e(TAG, "====onScale: " );
-                    Log.e(TAG, "====onScale: " +pre * abs(gap.x/last_span.x));
-                    UIsController.JUIonScale(abs(gap.x /last_span.x ), abs(gap.y /last_span.y ));
+//                    Log.e(TAG, "====onScale: " +pre * abs(gap.x/last_span.x));
+//                    UIsController.JUIonScale(abs(gap.x /last_span.x ), abs(gap.y /last_span.y ));
+                    UIsController.JUIonScale(curr_dist/last_span_dist, curr_dist/last_span_dist);
 
                 }
                 last_span.set(gap);

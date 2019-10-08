@@ -20,7 +20,10 @@ public:
     static float _screen_w, _screen_h;
     static std::unordered_map<std::string, float> param_value_map;
     static std::unordered_map<std::string, bool > param_bool_map;
-    static glm::mat4 ModelMat_;
+    static glm::mat4 ModelMat_, RotateMat_;
+    static glm::vec3 ScaleVec3_, PosVec3_;
+
+
 
     static glm::vec3 csphere_c;
     static float csphere_radius;
@@ -46,12 +49,19 @@ public:
         Mouse_old = glm::fvec2(x, y);
         xoffset *= MOUSE_ROTATE_SENSITIVITY;
         yoffset *= MOUSE_ROTATE_SENSITIVITY;
-        if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h))
-//            ModelMat_ = glm::rotate(ModelMat_, xoffset, glm::vec3(0,1,0));
-            camera->rotateCamera(3, ModelMat_[3], xoffset);
-         else
-//            ModelMat_ = glm::rotate(ModelMat_, -yoffset, glm::vec3(1,0,0));
-             camera->rotateCamera(2, ModelMat_[3], -yoffset);
+
+        if(param_bool_map["spherecut"]){
+            raycastRenderer_->onCuttingChange(param_value_map["spaxis"], xoffset);
+            return;
+        }
+        if(ROTATE_AROUND_CUBE){
+            if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
+            else camera->rotateCamera(2, ModelMat_[3], -yoffset);
+        }else{
+            RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
+                        * glm::rotate(glm::mat4(1.0f), -yoffset, glm::vec3(1,0,0))
+                        * RotateMat_;
+        }
         view_dirDirty = true;
     }
     void onScale(float sx, float sy);
@@ -63,6 +73,7 @@ private:
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
+    bool ROTATE_AROUND_CUBE = false;
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;

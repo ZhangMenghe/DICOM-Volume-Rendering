@@ -9,6 +9,8 @@ float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
 glm::mat4 vrController::ModelMat_ = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 0.5f));
+glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
+glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
 
 glm::vec3 vrController::csphere_c = glm::vec3(-0.5, 0.5, 0.5); //volume extend 0.5
 float vrController::csphere_radius = 0.5f;
@@ -23,6 +25,7 @@ vrController::vrController(AAssetManager *assetManager):
     new assetLoader(assetManager);
     camera = new Camera;
     myPtr_ = this;
+    ScaleVec3_ = DEFAULT_SCALE;
 }
 
 void vrController::assembleTexture(GLubyte * data, int width, int height, int depth){
@@ -51,6 +54,10 @@ void vrController::onViewChange(int width, int height){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void vrController::onDraw() {
+    ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
+               * RotateMat_
+               * glm::scale(glm::mat4(1.0), ScaleVec3_);
+
     if(cutDirty){
         cutDirty = false;
         texvrRenderer_->onCuttingChange(param_value_map["cutting"]);
@@ -64,6 +71,12 @@ void vrController::onDraw() {
     funcRenderer_->Draw();
 }
 void vrController::onScale(float sx, float sy){
+    if(sx == sy){
+        if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
+        else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
+
+        ScaleVec3_ = ScaleVec3_* sx; return;
+    }
     //+ (sy- last_scale.y)*0.05f
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
@@ -71,12 +84,23 @@ void vrController::onScale(float sx, float sy){
     if(sy > 1.0f) sy = 1.0f + (sy - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sy = 1.0f - (1.0f - sy)* MOUSE_SCALE_SENSITIVITY;
 
-    glm::vec3 current_scale  = glm::vec3(last_scale.x * sx, last_scale.y*sy, last_scale.z);
-    ModelMat_ = glm::scale(glm::mat4(1.0), current_scale);
 
-
-    
-    last_scale = current_scale;
+    //todo:change it via view dir
+//    glm::vec3 view_dir = camera->getViewDirection();
+    float x = 1.0, y=1.0, z=1.0;
+    x = sx;y=sy;
+//    float a = glm::dot(camera->getRightDir(), glm::vec3(1.0f, .0f, .0f));
+//    float b = glm::dot(camera->getRightDir(), glm::vec3(.0f, 1.0f, .0f));
+//    float c = glm::dot(camera->getRightDir(), glm::vec3(.0f, .0f, 1.0f));
+//    if(a >=b && a>=c)
+//    {x = sx;y=sy;}
+//    else if(b >= a && b>=c)
+//    {y = sx;x = sy;}
+//    else
+//    {z = sx;y=sy;}
+    ScaleVec3_ = glm::vec3(last_scale.x*x, last_scale.y*y, last_scale.z*z);
+//    ModelMat_ = glm::scale(glm::mat4(1.0), ScaleVec3_);
+    last_scale = ScaleVec3_;
 }
 void vrController::onPan(float x, float y){
 
