@@ -7,7 +7,7 @@ class Camera{
     glm::mat4 _viewMat, _projMat;
     glm::vec3 _eyePos, _center, _up, _front, _right;
 
-    const float NEAR_PLANE = 2.f;//as close as possible
+    const float NEAR_PLANE = 1.8f;//as close as possible
     const float FAR_PLANE = 1000.0f;
     const float FOV = 45.0f;
     const glm::vec3 ORI_CAM_POS = glm::vec3(0.0f, .0f, 2.8f);

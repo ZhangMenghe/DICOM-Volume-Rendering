@@ -117,7 +117,6 @@ public class UIsController {
             spinner_toggle_arr2.setVisibility(View.GONE);
             current_toggle_id = R.array.t1Arr;
         }
-
     }
 
     private void Initialize(){

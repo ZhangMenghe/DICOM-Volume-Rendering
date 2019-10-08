@@ -46,7 +46,9 @@ void texvrRenderer::Draw(){
     shader_->Use();
         shader_->setMat4("uProjMat", vrController::camera->getProjMat());
         shader_->setMat4("uViewMat", vrController::camera->getViewMat());
-        shader_->setMat4("uModelMat", glm::mat4(1.0f));
+        if(vrController::ROTATE_AROUND_CUBE)
+            shader_->setMat4("uModelMat", glm::mat4(1.0));
+        else shader_->setMat4("uModelMat", vrController::ModelMat_);
 
         shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
@@ -54,19 +56,48 @@ void texvrRenderer::Draw(){
         shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
         shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 
-        if(vrController::camera->getViewDirection().z <0){
-            glFrontFace(GL_CW);
-            for(int id = 0; id <m_VAOs.size()- slice_start_idx; id++){
-                glBindVertexArray(m_VAOs[id]);glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        bool clock_wise = false;
+        if(vrController::ROTATE_AROUND_CUBE){
+            if(vrController::camera->getViewDirection().z <0){
+                glFrontFace(GL_CW);
+                for(int id = 0; id <m_VAOs.size()- slice_start_idx; id++){
+                    glBindVertexArray(m_VAOs[id]);glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                }
+            }else{
+                glFrontFace(GL_CCW);
+                for (int id = m_VAOs.size()-1; id >= slice_start_idx; id--) {
+                    glBindVertexArray(m_VAOs[id]);
+                    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+                }
             }
         }
+
+
+
         else{
-            glFrontFace(GL_CCW);
-            for (int id = m_VAOs.size()-1; id >= slice_start_idx; id--) {
-                glBindVertexArray(m_VAOs[id]);
-                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+            glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,1.0,1.0));
+            if(dir.z < 0){
+                glFrontFace(GL_CW);
+            }else{
+                glFrontFace(GL_CCW);
             }
+            for(int id = 0; id <m_VAOs.size()- slice_start_idx; id++)
+            {glBindVertexArray(m_VAOs[id]);glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);}
         }
+
+//        if(clock_wise){
+//            glFrontFace(GL_CW);
+//            for(int id = 0; id <m_VAOs.size()- slice_start_idx; id++){
+//                glBindVertexArray(m_VAOs[id]);glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//            }
+//        }
+//        else{
+//            glFrontFace(GL_CCW);
+//            for (int id = m_VAOs.size()-1; id >= slice_start_idx; id--) {
+//                glBindVertexArray(m_VAOs[id]);
+//                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+//            }
+//        }
     shader_->unUse();
 
     glDisable(GL_BLEND);

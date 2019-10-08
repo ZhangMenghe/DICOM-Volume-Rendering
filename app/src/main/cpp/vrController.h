@@ -22,7 +22,7 @@ public:
     static std::unordered_map<std::string, bool > param_bool_map;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
-
+    static bool ROTATE_AROUND_CUBE;
 
 
     static glm::vec3 csphere_c;
@@ -73,7 +73,7 @@ private:
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
-    bool ROTATE_AROUND_CUBE = false;
+
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;

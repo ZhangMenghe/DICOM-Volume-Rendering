@@ -80,7 +80,6 @@ float shortest_distance(float x1, float y1,
     return d/e;
 }
 void raycastRenderer::onCuttingChange(float percent){
-    return;
     //if view direction change
     if(vrController::view_dirDirty){
         vrController::view_dirDirty = false;
