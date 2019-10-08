@@ -1,6 +1,7 @@
 #include <AndroidUtils/AndroidHelper.h>
 #include "vrController.h"
 #include "dicomRenderer/Color.h"
+#include <AndroidUtils/mathUtils.h>
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
 Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr;
@@ -103,5 +104,14 @@ void vrController::onScale(float sx, float sy){
     last_scale = ScaleVec3_;
 }
 void vrController::onPan(float x, float y){
+    float offx = x / _screen_w, offy = y /_screen_h;
+    PosVec3_.x += offx * ScaleVec3_.x;// * 0.1f;
+    PosVec3_.y += offy * ScaleVec3_.y;// * 0.1f;
 
+//    getScreenToClientPos(x, y, _screen_w, _screen_h);
+//    //get 3d from 2d
+//    glm::mat4 inv_mat = glm::inverse(camera->getProjMat() * camera->getViewMat());
+//    glm::vec4 near_plane_pos = inv_mat * glm::vec4(x, y ,-1.0f, 1.0f);
+//    float inv_w = 1.0f / near_plane_pos.w;
+//    PosVec3_.x = near_plane_pos.x * inv_w; PosVec3_.y = near_plane_pos.y * inv_w;
 }

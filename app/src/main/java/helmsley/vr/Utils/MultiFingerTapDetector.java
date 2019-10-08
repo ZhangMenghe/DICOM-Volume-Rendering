@@ -10,7 +10,7 @@ public abstract class MultiFingerTapDetector {
     protected static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
     protected static final int MIN_DISTANCE = 400;
     protected static final int SAME_POS_THREADHOOD = 20;
-    protected static final float SCALE_DIST_THRESHOLD = 1.1f;
+    protected static final float SCALE_DIST_THRESHOLD = 1.3f;
     // for one finger taps
     private long mFirstDownTimeOne = 0;
     private boolean mSeparateTouchesOne = false;
@@ -26,6 +26,7 @@ public abstract class MultiFingerTapDetector {
     private float sumx, sumy;
 
     protected PointF down_f1 = new PointF(), down_f2= new PointF(), down_span= new PointF(), last_span = new PointF();
+    protected PointF last_pos_pan = new PointF();
     protected boolean hasSkipped = false;
     protected float down_dist;
     //for longpress
