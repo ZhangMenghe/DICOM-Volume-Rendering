@@ -9,5 +9,7 @@ public:
 
     virtual void onSingleTouchDown(float x, float y)=0;
     virtual void onTouchMove(float x, float y) = 0;
+    virtual void onScale(float sx, float sy) = 0;
+    virtual void onPan(float x, float y) = 0;
 };
 #endif

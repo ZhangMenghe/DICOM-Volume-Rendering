@@ -1,14 +1,16 @@
 package helmsley.vr.Utils;
+import android.graphics.PointF;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
 public abstract class MultiFingerTapDetector {
-    private static final String TAG = "MultiFingerTapDetector";
-    private static final int TIMEOUT = ViewConfiguration.getDoubleTapTimeout() + 100;
-    private static final int TRIPLE_TIMEOUT = ViewConfiguration.getDoubleTapTimeout() + 250;
-    private static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
-    private static final int MIN_DISTANCE = 400;
-    private static final int SAME_POS_THREADHOOD = 20;
+    protected static final String TAG = "MultiFingerTapDetector";
+    protected static final int TIMEOUT = ViewConfiguration.getDoubleTapTimeout() + 100;
+    protected static final int TRIPLE_TIMEOUT = ViewConfiguration.getDoubleTapTimeout() + 250;
+    protected static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
+    protected static final int MIN_DISTANCE = 400;
+    protected static final int SAME_POS_THREADHOOD = 20;
+    protected static final float SCALE_DIST_THRESHOLD = 1.1f;
     // for one finger taps
     private long mFirstDownTimeOne = 0;
     private boolean mSeparateTouchesOne = false;
@@ -22,6 +24,10 @@ public abstract class MultiFingerTapDetector {
     private float avgX, avgY;
     private float downX, downY, upX, upY;
     private float sumx, sumy;
+
+    protected PointF down_f1 = new PointF(), down_f2= new PointF(), down_span= new PointF(), last_span = new PointF();
+    protected boolean hasSkipped = false;
+    protected float down_dist;
     //for longpress
     private float lastx, lasty;
 
@@ -194,10 +200,10 @@ public abstract class MultiFingerTapDetector {
                     return true;
                 }
                 // if we have two fingers down and time is longer than the TIMEOUT
-                if (event.getPointerCount() == 2 && event.getEventTime() - event.getDownTime() > LONG_PRESS_TIMEOUT) {
-                    onTwoFingerLongPress(event);
-                    return true;
-                }
+//                if (event.getPointerCount() == 2 && event.getEventTime() - event.getDownTime() > LONG_PRESS_TIMEOUT) {
+//                    onTwoFingerLongPress(event);
+//                    return true;
+//                }
                 // if we have two fingers down and time is longer than the TIMEOUT
                 if (event.getPointerCount() == 3 && event.getEventTime() - event.getDownTime() > LONG_PRESS_TIMEOUT) {
                     onThreeFingerLongPress(event);

@@ -8,7 +8,7 @@ int vrController::VOLUME_TEX_ID=0;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
-glm::mat4 vrController::ModelMat_ = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, -1.0f, 0.5f));
+glm::mat4 vrController::ModelMat_ = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 0.5f));
 
 glm::vec3 vrController::csphere_c = glm::vec3(-0.5, 0.5, 0.5); //volume extend 0.5
 float vrController::csphere_radius = 0.5f;
@@ -62,4 +62,22 @@ void vrController::onDraw() {
     else
         texvrRenderer_->Draw();
     funcRenderer_->Draw();
+}
+void vrController::onScale(float sx, float sy){
+    //+ (sy- last_scale.y)*0.05f
+    if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
+    else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
+
+    if(sy > 1.0f) sy = 1.0f + (sy - 1.0f) * MOUSE_SCALE_SENSITIVITY;
+    else sy = 1.0f - (1.0f - sy)* MOUSE_SCALE_SENSITIVITY;
+
+    glm::vec3 current_scale  = glm::vec3(last_scale.x * sx, last_scale.y*sy, last_scale.z);
+    ModelMat_ = glm::scale(glm::mat4(1.0), current_scale);
+
+
+    
+    last_scale = current_scale;
+}
+void vrController::onPan(float x, float y){
+
 }

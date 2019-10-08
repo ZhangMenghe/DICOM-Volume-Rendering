@@ -5,6 +5,8 @@
 extern "C"{
     JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass, jfloat, jfloat);
     JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat, jfloat);
+    JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat, jfloat);
+    JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat, jfloat);
 
     JUI_METHOD(void, JUIsetJavaUIStatus)(JNIEnv * env, jclass, jint , jstring);
     JUI_METHOD(void, JUIsetParam)(JNIEnv * env, jclass, jstring , jfloat);

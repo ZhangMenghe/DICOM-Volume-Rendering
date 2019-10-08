@@ -276,6 +276,8 @@ public class UIsController {
 
     public static native void JUIonSingleTouchDown(float x, float y);
     public static native void JUIonTouchMove(float x, float y);
+    public static native void JUIonScale(float sx, float sy);
+    public static native void JUIonPan(float x, float y);
 
     public static native void JUIsetJavaUIStatus(int item, String key);
     public static native void JUIsetParam(String key, float value);

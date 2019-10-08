@@ -1,9 +1,14 @@
 package  helmsley.vr.Utils;
 
 import android.content.Context;
+import android.graphics.PointF;
+import android.util.Log;
 import android.view.MotionEvent;
 
 import helmsley.vr.UIsController;
+
+import static java.lang.Math.abs;
+import static java.lang.Math.log;
 
 public class GestureDetectorCalVR {
     private MultiFingerTapDetector multiDetector;
@@ -32,8 +37,52 @@ public class GestureDetectorCalVR {
             // RIGHT SINGLE TOUCH
             public void onMoreFingersDown(int pointerNum, MotionEvent event){
 //                JniInterface.JNIonSingleTouchDown(pointerNum - 1, event.getX(), event.getY());
+                if(pointerNum != 2) return;
+                int id1 = event.findPointerIndex(event.getPointerId(0));
+                int id2 = event.findPointerIndex(event.getPointerId(1));
+                down_f1.set(event.getX(id1), event.getY(id1));
+                down_f2.set(event.getX(id2), event.getY(id2));
+
+                down_span.set(abs(down_f2.x - down_f1.x), abs(down_f2.y-down_f1.y));
+//                Log.e(TAG, "====onMoreFingersDown: " + event.getX(id1) + " " + event.getY(id1) + "p2: " + event.getX(id2) + " " + event.getY(id2));
+//                hasSkipped = false;
+                last_span = down_span;
+                down_dist = PointF.length(down_span.x, down_span.y);
             }
-            public void onTwoFingersMove(MotionEvent event){}
+            public void onTwoFingersMove(MotionEvent event){
+//                Log.e(TAG, "====onTwoFingersMove: " );
+//                if(!hasSkipped && event.getEventTime() - event.getDownTime() <TIMEOUT) return;
+//                hasSkipped = true;
+                PointF cf1, cf2, gap;
+                int id1 = event.findPointerIndex(event.getPointerId(0));
+                int id2 = event.findPointerIndex(event.getPointerId(1));
+                cf1 = new PointF(event.getX(id1), event.getY(id1));
+                cf2 = new PointF(event.getX(id2), event.getY(id2));
+
+                gap = new PointF(cf1.x - cf2.x, cf1.y - cf2.y );
+
+                float curr_dist = PointF.length(gap.x, gap.y);
+                float dist_ratio, pre = 1.0f;
+
+                if(curr_dist > down_dist){//could be up scaling or move
+                    dist_ratio = curr_dist / down_dist;
+                }else{
+                    dist_ratio = down_dist / curr_dist;
+                    pre = -1.0f; //could be down scaling
+                }
+
+                if(dist_ratio<SCALE_DIST_THRESHOLD
+                        && (cf1.x- down_f1.x) *(cf2.x - down_f2.x) + (cf1.y - down_f1.y) * (cf2.y - down_f2.y) > .0f ){
+//                    Log.e(TAG, "===onpan:  " + lenth_value);
+                    UIsController.JUIonPan(event.getX(), event.getY());
+                }else{
+//                    Log.e(TAG, "====onScale: " );
+                    Log.e(TAG, "====onScale: " +pre * abs(gap.x/last_span.x));
+                    UIsController.JUIonScale(abs(gap.x /last_span.x ), abs(gap.y /last_span.y ));
+
+                }
+                last_span.set(gap);
+            }
             public void onThreeFingersMove(MotionEvent event){}
 
             // ONE FINGER (left mouse click)
@@ -51,13 +100,16 @@ public class GestureDetectorCalVR {
             }
 
             public void onTwoFingerTripleTap(){}
-            public void onTwoFingerLongPress(MotionEvent event){}
+            public void onTwoFingerLongPress(MotionEvent event){
+//                Log.e(TAG, "=====onTwoFingerLongPress: ");
+            }
 
             // THREE FINGER TAPS
             public void onThreeFingerDoubleTap(){}
             public void onThreeFingerTripleTap(){}
             public void onThreeFingerLongPress(MotionEvent event){}
         };
+
     }
     public boolean onTouchEvent(MotionEvent event) {
         multiDetector.onTouchEvent(event);

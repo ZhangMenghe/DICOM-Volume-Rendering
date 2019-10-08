@@ -14,6 +14,13 @@ JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
 JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat x, jfloat y){
     nativeApp(nativeAddr)->onTouchMove(x, y);
 }
+JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat sx, jfloat sy){
+    nativeApp(nativeAddr)->onScale(sx, sy);
+}
+JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat x, jfloat y){
+    nativeApp(nativeAddr)->onPan(x,y);
+}
+
 
 JUI_METHOD(void, JUIsetSwitches)(JNIEnv * env, jclass, jstring key, jboolean value){
 //    LOGE("====SET %s, %d", dvr::jstring2string(env,key).c_str(), value);
