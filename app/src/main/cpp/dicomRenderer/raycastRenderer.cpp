@@ -58,6 +58,12 @@ void raycastRenderer::Draw(){
         shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
         shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 
+        if(vrController::param_bool_map["cutting"]){
+            shader_->setFloat("cut_percent", 0.5f);
+        }else{
+            shader_->setFloat("cut_percent", .0f);
+        }
+
     if(vrController::camera->getViewDirection().z <0)
         glFrontFace(GL_CW);
     else
@@ -77,6 +83,8 @@ void raycastRenderer::Draw(){
 }
 
 void raycastRenderer::onCuttingChange(float percent){
+    cplane_percent_ = percent;
+    return;
     //if view direction change
     if(!vrController::ROTATE_AROUND_CUBE && vrController::view_dirDirty){
         vrController::view_dirDirty = false;
@@ -99,7 +107,7 @@ void raycastRenderer::onCuttingChange(float percent){
 
     shader_->Use();//cutting in obj space
     shader_->setFloat("cut_percent", percent);
-    cplane_percent_ = percent;
+
 }
 
 void raycastRenderer::draw_cutting_plane() {

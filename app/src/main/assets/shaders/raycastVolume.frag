@@ -92,7 +92,7 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
     return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
 
-
+//from view dir: getCuttingPlane(-uCamposObjSpace);
 void getCuttingPlane(vec3 rd){
     uPlane.p = uStartPoint + normalize(rd) * cut_percent * 1.75;
     uPlane.upwards = true;
@@ -157,8 +157,6 @@ void main(void){
     intersect.x = max(.0, intersect.x);
     if(cut_percent != .0){
         //Ray-plane
-//        getCuttingPlane(-uCamposObjSpace);
-
         uPlane.p = vec3(.0);//uStartPoint + normalize(rd) * cut_percent * 1.75;
         uPlane.upwards = true;
         uPlane.normal = vec3(1.0,.0,.0);//rd;
