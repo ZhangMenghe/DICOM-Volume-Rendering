@@ -1,9 +1,10 @@
 #include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include "raycastRenderer.h"
+#include <GLPipeline/Primitive.h>
 raycastRenderer::raycastRenderer() {
     //geometry
-    Mesh::InitQuadWithTex(VAO_, sVertex, 8, sIndices, 36);
+    Mesh::InitQuadWithTex(VAO_, cuboid_with_texture, 8, cuboid_indices, 36);
 
     //program
     shader_ = new Shader();
@@ -90,14 +91,14 @@ void raycastRenderer::onCuttingChange(float percent){
 
         float shortest_dist = FLT_MAX; int vertex_idx;
         for(int i=0; i<8; i++){
-            float dist = shortest_distance(sVertex[6*i], sVertex[6*i+1], sVertex[6*i+2], pn.x, pn.y, pn.z, d);
+            float dist = shortest_distance(cuboid_with_texture[6*i], cuboid_with_texture[6*i+1], cuboid_with_texture[6*i+2], pn.x, pn.y, pn.z, d);
             if(dist < shortest_dist){
                 shortest_dist = dist;
                 vertex_idx = i;
             }
         }
         shader_->Use();
-        shader_->setVec3("uStartPoint", sVertex[6*vertex_idx], sVertex[6*vertex_idx + 1], sVertex[6*vertex_idx + 2]);
+        shader_->setVec3("uStartPoint", cuboid_with_texture[6*vertex_idx], cuboid_with_texture[6*vertex_idx + 1], cuboid_with_texture[6*vertex_idx + 2]);
     }
 
     shader_->Use();//cutting in obj space

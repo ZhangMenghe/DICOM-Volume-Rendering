@@ -2,7 +2,7 @@
 #include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include "funcsRenderer.h"
-
+#include <GLPipeline/Primitive.h>
 FuncRenderer::FuncRenderer(){
     vertices_func_ = new GLfloat[MAX_VERTICS * 3];
 
@@ -30,11 +30,11 @@ FuncRenderer::FuncRenderer(){
 void FuncRenderer::CreateFunction(FUNC_TYPE type){
     switch(type){
         case COLOR_BAR:
-            Mesh::InitQuadWithTex(VAO_COLOR_BAR, quad_vertices_tex, 4, indices_func_, 6);
+            Mesh::InitQuadWithTex(VAO_COLOR_BAR, quad_vertices_tex, 4, quad_indices, 6);
             break;
         case OPACITY_FUN:
-            Mesh::InitQuad(VAO_FUNC, VBO_FUNC, indices_func_,6);
-            Mesh::InitQuad(VAO_QUAD, quad_vertices, 4, indices_func_, 6);
+            Mesh::InitQuad(VAO_FUNC, VBO_FUNC, quad_indices,6);
+            Mesh::InitQuad(VAO_QUAD, quad_vertices, 4, quad_indices, 6);
             UpdateFuncPoints(OPACITY_FUN);
             break;
         default:
@@ -105,4 +105,5 @@ void FuncRenderer::draw_opacity_func(){
 void FuncRenderer::Draw(){
     if(vrController::param_bool_map["colortrans"])draw_color_bar();
     if(vrController::param_bool_map["Opacity"])draw_opacity_func();
+
 }

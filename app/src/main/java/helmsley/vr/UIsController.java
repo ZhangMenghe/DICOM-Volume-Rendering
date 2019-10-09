@@ -27,13 +27,15 @@ public class UIsController {
     // UIs
     public static TextView FPSlabel, toggleValueTex;
 
-    private Spinner spinner_toggle_arr1, spinner_toggle_arr2, spinner_toggle_sub, spinner_switch;
+    private Spinner spinner_toggle_arr1, // toggle Opacity, for texturebased
+                    spinner_toggle_arr2, //toggle sample step and so on.. for raycast
+                    spinner_toggle_sub, //toggle subset of opacity
+                    spinner_switch;
     private SeekBar seekbar_top, seekbar_bottom;
     private Switch switch_widget;
 
     private View bottom_panel;
     private int toggle_id = 0, toggle_id_sub = 0, switch_id = 0;
-    final private int SUB_OFFSET = 100;
     private Map<String, Float> toggle_values=new HashMap<>(), toggle_values_sub=new HashMap<>();
     private Map<String, Boolean> bool_values=new HashMap<>();
 
@@ -52,7 +54,6 @@ public class UIsController {
     final private static Map<String, Pair<Float, Integer>> toggle_max_map = new HashMap<String, Pair<Float, Integer>>(){{
         put("samplestep", new Pair(800.0f, 800)); put("threshold", new Pair(2.0f, 50)); put("brightness", new Pair(500.0f, 500)); put("cutting", new Pair(1.0f, 50));
     }};
-
     final private static Pair<Float, Integer> toggle_max_sub_pair = new Pair(1.0f, 50);
 
     private List<String> entry_has_sub_arrs;
@@ -70,15 +71,12 @@ public class UIsController {
                 -1.0f, Animation.RELATIVE_TO_SELF, 0.0f);
         panelShownAction.setDuration(500);
     }
-    static long startTime = System.nanoTime();
-    static int frames = 0;
 
     public UIsController(final Activity activity_) {
         activity = activity_;
         SetupDefaultInitialSetting();
         Initialize();
     }
-
     private void SetupDefaultInitialSetting(){
         entry_has_sub_arrs = Arrays.asList(activity.getResources().getStringArray(R.array.entry_has_sub));
 
@@ -107,7 +105,7 @@ public class UIsController {
     }
     private void updateSpinnerEnteries(){
         Pair<String, ?>[] arr = ui_map.get(R.array.switchArr);
-        boolean arr1_sel = bool_values.get((String) arr[1].first);
+        boolean arr1_sel = bool_values.get((String) arr[1].first);//texture-based and raycast is different
         if(arr1_sel){
             spinner_toggle_arr1.setVisibility(View.GONE);
             spinner_toggle_arr2.setVisibility(View.VISIBLE);

@@ -27,20 +27,7 @@ public:
     void Draw();
 protected:
     const size_t MAX_VERTICS=10;
-    const unsigned int indices_func_[6]= {0,1,2,
-                                    0,2,3};
-    const float quad_vertices[12]={
-            0.5f, 1.0f, .0f,//top-right
-            -0.5f,1.0f, .0f,//top-left
-            -0.5f, .0f, .0f,//bottom-left
-            0.5f, .0f,  .0f//bottom-right
-    };
-    float quad_vertices_tex[24]={
-             0.5f, 1.0, .0f,    1.0, 1.0, .0f,//top-right
-            -0.5f, 1.0, .0f,     .0, 1.0, .0f,//top-left
-            -0.5f, .0f, .0f,     .0,  .0,  .0f,//bottom-left
-             0.5f, .0f, .0f,    1.0,  .0,  .0f,//bottom-right
-    };
+
     GLuint VAO_FUNC, VBO_FUNC,EBO_Func;
     GLuint VAO_QUAD;
     GLuint VAO_COLOR_BAR;
