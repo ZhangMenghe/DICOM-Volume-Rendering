@@ -50,10 +50,6 @@ public:
         xoffset *= MOUSE_ROTATE_SENSITIVITY;
         yoffset *= MOUSE_ROTATE_SENSITIVITY;
 
-        if(param_bool_map["spherecut"]){
-            raycastRenderer_->onCuttingChange(param_value_map["spaxis"], xoffset);
-            return;
-        }
         if(ROTATE_AROUND_CUBE){
             if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
             else camera->rotateCamera(2, ModelMat_[3], -yoffset);
