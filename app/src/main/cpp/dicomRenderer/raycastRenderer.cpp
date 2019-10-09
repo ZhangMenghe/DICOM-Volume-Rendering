@@ -68,7 +68,8 @@ void raycastRenderer::Draw(){
         glBindVertexArray(0);
     shader_->unUse();
 
-    draw_cutting_plane();
+    if(vrController::param_bool_map["cutting"])
+        draw_cutting_plane();
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
