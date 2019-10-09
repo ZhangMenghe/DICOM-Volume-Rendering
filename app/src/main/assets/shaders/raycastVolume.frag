@@ -157,14 +157,16 @@ void main(void){
     intersect.x = max(.0, intersect.x);
     if(cut_percent != .0){
         //Ray-plane
-        getCuttingPlane(-uCamposObjSpace);
+//        getCuttingPlane(-uCamposObjSpace);
 
-//        if(uPlane.upwards)//要上面
-        vec3 plane_n = vec3(1.0,.0,.0);
-        if(dot(plane_n, -uCamposObjSpace) > .0) //plane_n = -plane_n;
-            intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, vec3(.0), plane_n ));//uPlane.p, uPlane.normal));
+        uPlane.p = vec3(.0);//uStartPoint + normalize(rd) * cut_percent * 1.75;
+        uPlane.upwards = true;
+        uPlane.normal = vec3(1.0,.0,.0);//rd;
+
+        if(dot(uPlane.normal, -uCamposObjSpace) > .0) //plane_n = -plane_n;
+            intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal ));//uPlane.p, uPlane.normal));
         else//要下面
-            intersect.y = min(RayPlane(ray_origin, ray_dir, vec3(.0), -plane_n), intersect.y);
+            intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, -uPlane.normal), intersect.y);
     }
 
     //Ray-Sphere
