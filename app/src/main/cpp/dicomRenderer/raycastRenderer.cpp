@@ -2,6 +2,8 @@
 #include <vrController.h>
 #include "raycastRenderer.h"
 #include <GLPipeline/Primitive.h>
+#include <AndroidUtils/mathUtils.h>
+#include <glm/gtx/rotate_vector.hpp>
 raycastRenderer::raycastRenderer() {
     //geometry
     Mesh::InitQuadWithTex(VAO_, cuboid_with_texture, 8, cuboid_indices, 36);
@@ -66,23 +68,16 @@ void raycastRenderer::Draw(){
         glBindVertexArray(0);
     shader_->unUse();
 
+    draw_cutting_plane();
+
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 //    glDisable(GL_CULL_FACE);
 }
-float shortest_distance(float x1, float y1,
-                       float z1, float a,
-                       float b, float c,
-                       float d){
-    d = fabs((a * x1 + b * y1 +
-              c * z1 + d));
-    float e = sqrt(a * a + b *
-                           b + c * c);
-    return d/e;
-}
+
 void raycastRenderer::onCuttingChange(float percent){
     //if view direction change
-    if(vrController::view_dirDirty){
+    if(!vrController::ROTATE_AROUND_CUBE && vrController::view_dirDirty){
         vrController::view_dirDirty = false;
         glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
         glm::vec3 p= glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0));
@@ -103,4 +98,52 @@ void raycastRenderer::onCuttingChange(float percent){
 
     shader_->Use();//cutting in obj space
     shader_->setFloat("cut_percent", percent);
+    cplane_percent_ = percent;
+}
+
+void raycastRenderer::draw_cutting_plane() {
+    if(!cplane_shader_){
+        cplane_shader_ = new Shader();
+        if(!cplane_shader_->Create("shaders/cplane.vert", "shaders/cplane.frag"))
+            LOGE("Raycast===Failed to create cutting plane shader program===");
+    }
+
+    cplane_shader_->Use();
+//    glm::vec3 p = cplane_start_ + glm::normalize(cplane_normal) * cplane_percent_ * 1.75;
+    glm::vec3 p = glm::vec3(.0);
+    cplane_normal = glm::vec3(1.0,.0,.0);
+
+    glm::mat4 model_mat =
+                    glm::translate(glm::mat4(1.0), p + vrController::PosVec3_)*
+                    vrController::RotateMat_* glm::orientation(cplane_normal, glm::vec3(0,0,1))*
+                    glm::scale(glm::mat4(1.0), glm::vec3(1.0) * vrController::ScaleVec3_);
+    cplane_shader_->setMat4("uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*model_mat);
+    cplane_shader_->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
+
+    if (!_cplaneVAO) {
+        float vertices[] = {
+                1.0f,1.0f,.0f,
+                -1.0f,1.0f,.0f,
+                -1.0f,-1.0f,.0f,
+
+                -1.0f,-1.0f,.0f,
+                1.0f,-1.0f,.0f,
+                1.0f,1.0f,.0f,
+        };
+        unsigned int VBO = 0;
+        glGenVertexArrays(1, &_cplaneVAO);
+        glGenBuffers(1, &VBO);
+        // fill buffer
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), vertices, GL_STATIC_DRAW);
+        // link vertex attributes
+        glBindVertexArray(_cplaneVAO);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+    }
+    glBindVertexArray(_cplaneVAO);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    cplane_shader_->unUse();
 }

@@ -60,7 +60,7 @@ void vrController::onDraw() {
                * RotateMat_
                * glm::scale(glm::mat4(1.0), ScaleVec3_);
 
-    if(cutDirty){
+    if(cutDirty){ //panel switch to cutting, update cutting result
         cutDirty = false;
         texvrRenderer_->onCuttingChange(param_value_map["cutting"]);
         raycastRenderer_->onCuttingChange(param_value_map["cutting"]);
