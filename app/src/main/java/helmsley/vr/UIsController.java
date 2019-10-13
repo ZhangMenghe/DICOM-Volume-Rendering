@@ -9,6 +9,8 @@ import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 
 import android.widget.CompoundButton;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -34,7 +36,7 @@ public class UIsController {
     private SeekBar seekbar_top, seekbar_bottom;
     private Switch switch_widget;
 
-    private View bottom_panel;
+    private View bottom_panel, toggle_panel, cut_panel;
     private int toggle_id = 0, toggle_id_sub = 0, switch_id = 0;
     private Map<String, Float> toggle_values=new HashMap<>(), toggle_values_sub=new HashMap<>();
     private Map<String, Boolean> bool_values=new HashMap<>();
@@ -55,6 +57,7 @@ public class UIsController {
         put("samplestep", new Pair(800.0f, 800)); put("threshold", new Pair(2.0f, 50)); put("brightness", new Pair(500.0f, 500)); put("cutting", new Pair(1.0f, 50));
     }};
     final private static Pair<Float, Integer> toggle_max_sub_pair = new Pair(1.0f, 50);
+    final private static int finger_manipulate_id = R.id.radio_vol;
 
     private List<String> entry_has_sub_arrs;
     private int current_toggle_id;
@@ -103,10 +106,12 @@ public class UIsController {
             }
         }
     }
-    private void updateSpinnerEnteries(){
+    private boolean IsRaycast(){
         Pair<String, ?>[] arr = ui_map.get(R.array.switchArr);
-        boolean arr1_sel = bool_values.get((String) arr[1].first);//texture-based and raycast is different
-        if(arr1_sel){
+        return bool_values.get((String) arr[1].first);
+    }
+    private void updateSpinnerEnteries(){
+        if(IsRaycast()){
             spinner_toggle_arr1.setVisibility(View.GONE);
             spinner_toggle_arr2.setVisibility(View.VISIBLE);
             current_toggle_id = R.array.t2Arr;
@@ -189,6 +194,30 @@ public class UIsController {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        //radio group
+        RadioGroup radioGroup = (RadioGroup)activity.findViewById(R.id.cut_radioGroup);
+        radioGroup.check(finger_manipulate_id);
+        JUIsetParam("mobj", 0);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
+            public void onCheckedChanged(RadioGroup group, int checkedId){
+                // This will get the radiobutton that has changed in its check state
+//                RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
+                switch (checkedId){
+                    case R.id.radio_vol:
+                        JUIsetParam("mobj", 0);
+                        break;
+                    case R.id.radio_plane:
+                        JUIsetParam("mobj", 1);
+                        break;
+                    case R.id.radio_sphere:
+                        JUIsetParam("mobj", 2);
+                        break;
+                        default:
+                            break;
+                }
+            }
+        });
+
         //bottom panel
         bottom_panel = (View)activity.findViewById(R.id.bottomPanel);
         bottom_panel.setVisibility(View.GONE);
@@ -205,12 +234,32 @@ public class UIsController {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
+        toggle_panel = (View)activity.findViewById(R.id.togglePanel);
+        cut_panel = (View)activity.findViewById(R.id.cutPanel);
+        cut_panel.setVisibility(View.INVISIBLE);
 
         updateSpinnerEnteries();
         update_switch_item_display();
         update_toggle_item_display(-1);
         Pair cp =(Pair)ui_map.get(current_toggle_id)[toggle_id];
         JUIsetJavaUIStatus(0, (String)cp.first);
+    }
+    private void onCuttingStateChange(boolean change_to_show_cut){
+        if(change_to_show_cut){
+            bottom_panel.setVisibility(View.VISIBLE);
+            //only for raycast
+            if(IsRaycast()){
+                cut_panel.setVisibility(View.VISIBLE);
+                toggle_panel.setVisibility(View.INVISIBLE);
+            }
+            Toast.makeText(activity, "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();
+        }else{
+            bottom_panel.setVisibility(View.INVISIBLE);
+            if(IsRaycast()){
+                cut_panel.setVisibility(View.INVISIBLE);
+                toggle_panel.setVisibility(View.VISIBLE);
+            }
+        }
     }
     private void update_toggle_item_display(float value) {
         Pair cp =(Pair)ui_map.get(current_toggle_id)[toggle_id], cp_sub = (Pair)ui_map.get(R.array.opacityArr)[toggle_id_sub];
@@ -241,13 +290,7 @@ public class UIsController {
     private void update_switch_item_display(){
         Pair cp = (Pair)ui_map.get(R.array.switchArr)[switch_id];
         boolean cvalue = bool_values.get(cp.first);
-        if(cp.first == "cutting"){
-            if(cvalue){bottom_panel.setVisibility(View.VISIBLE);
-                Toast.makeText(activity, "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();}
-            else bottom_panel.setVisibility(View.GONE);
-        }else{
-            bottom_panel.setVisibility(View.GONE);
-        }
+        onCuttingStateChange(cp.first == "cutting"&&cvalue);
         updateSpinnerEnteries();
         switch_widget.setChecked(cvalue);
         JUIsetSwitches((String)cp.first, cvalue);

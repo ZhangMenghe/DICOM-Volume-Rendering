@@ -148,8 +148,63 @@
 
         </android.support.constraint.ConstraintLayout>
 
+        <!--cutpanel-->
+        <android.support.constraint.ConstraintLayout
+            android:id="@+id/cutPanel"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="15dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintTop_toBottomOf="@id/switchPanel">
+            <TextView
+                android:id="@+id/radiogroup_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Finger Control "
+                android:theme="@style/RadioButton"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+            </TextView>
 
+            <RadioGroup
+                android:id="@+id/cut_radioGroup"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/radiogroup_text">
 
+                <RadioButton
+                    android:id="@+id/radio_vol"
+                    android:theme="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text=" Volume  "
+                    android:textColor="@color/brightBlue"
+                    />
+
+                <RadioButton
+                    android:id="@+id/radio_plane"
+                    android:theme="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text=" Plane  "
+                    android:textColor="@color/brightBlue"/>
+
+                <RadioButton
+                    android:id="@+id/radio_sphere"
+                    android:theme="@style/RadioButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:text=" Sphere  "
+                    android:textColor="@color/brightBlue"/>
+            </RadioGroup>
+        </android.support.constraint.ConstraintLayout>
     </android.support.constraint.ConstraintLayout>
 
    <!--bottom panel-->
