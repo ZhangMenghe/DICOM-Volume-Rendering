@@ -103,7 +103,10 @@ vec4 Sample(vec3 p){
     intensity = clamp(intensity * brightness / 250.0, 0.0, 1.0);
 
     color.rgb = vec3(intensity);
-    color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : color.r;
+    if(ub_cuttingplane)
+        color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : color.r;
+    else
+        color.a = color.r;
     return color;
 }
 vec4 Volume(float head, float tail){
@@ -156,7 +159,7 @@ void main(void){
         //Ray-plane
         if(dot(uPlane.normal, -uCamposObjSpace) > .0) //plane_n = -plane_n;
             intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal ));//uPlane.p, uPlane.normal));
-        else//要下面
+        else
             intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, -uPlane.normal), intersect.y);
     }
 
