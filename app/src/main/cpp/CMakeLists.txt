@@ -30,7 +30,8 @@ SET(GL_PIPELINE_FILES
 SET(DICOM_RENDERERS
         dicomRenderer/funcsRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
-        dicomRenderer/texturebasedRenderer.cpp)
+        dicomRenderer/texturebasedRenderer.cpp
+        dicomRenderer/cuttingController.cpp)
 include_directories(${GLM_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(vrNative
