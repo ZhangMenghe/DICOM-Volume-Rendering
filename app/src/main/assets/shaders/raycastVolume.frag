@@ -17,19 +17,19 @@ uniform vec3 uCamposObjSpace;
 struct Plane{
     vec3 p;
     vec3 normal;
-    bool upwards;
 };
 struct Sphere{
     vec3 center;
     float radius;
 };
-//uniform Plane uPlane;
+uniform Plane uPlane;
 uniform Sphere uSphere;
 
 uniform mediump sampler3D uSampler_tex;
 uniform bool ub_simplecube;
 uniform bool ub_colortrans;
 uniform bool ub_accumulate;
+uniform bool ub_cuttingplane;
 //uniform bool ub_viewfront;
 uniform vec3 uVolumeSize;
 
@@ -38,22 +38,19 @@ uniform float val_threshold;
 uniform float brightness;
 
 uniform vec3 uStartPoint;
-uniform float cut_percent;
+//uniform float cut_percent;
 
 struct OpacityAdj{
     float overall;//0-1
     float lowbound; //slope adj, 0-1
     float cutoff;//0,1
 };
-uniform OpacityAdj uOpacitys;
+//uniform OpacityAdj uOpacitys;
 
 float START_H_VALUE = 0.1667;
 float BASE_S_VALUE = 0.7;
 float BASE_S_H = 0.6667;//pure blue
 float BASE_V_VALUE = 0.8;
-
-Plane uPlane;
-
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -93,11 +90,11 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
 }
 
 //from view dir: getCuttingPlane(-uCamposObjSpace);
-void getCuttingPlane(vec3 rd){
-    uPlane.p = uStartPoint + normalize(rd) * cut_percent * 1.75;
-    uPlane.upwards = true;
-    uPlane.normal = rd;
-}
+//void getCuttingPlane(vec3 rd){
+//    uPlane.p = uStartPoint + normalize(rd) * cut_percent * 1.75;
+//    uPlane.upwards = true;
+//    uPlane.normal = rd;
+//}
 
 vec4 Sample(vec3 p){
     vec4 color;
@@ -155,12 +152,8 @@ void main(void){
 
     vec2 intersect = RayCube(ray_origin, ray_dir, vec3(0.5));
     intersect.x = max(.0, intersect.x);
-    if(cut_percent != .0){
+    if(ub_cuttingplane){
         //Ray-plane
-        uPlane.p = vec3(.0);//uStartPoint + normalize(rd) * cut_percent * 1.75;
-        uPlane.upwards = true;
-        uPlane.normal = vec3(1.0,.0,.0);//rd;
-
         if(dot(uPlane.normal, -uCamposObjSpace) > .0) //plane_n = -plane_n;
             intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal ));//uPlane.p, uPlane.normal));
         else//要下面

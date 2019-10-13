@@ -44,25 +44,17 @@ void raycastRenderer::Draw(){
         shader_->setVec3("uSphere.center", glm::vec3(vrController::csphere_c));
         shader_->setFloat("uSphere.radius", vrController::csphere_radius);
 
-        shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
+        shader_->setVec3("uPlane.p", cplane_point);
+        shader_->setVec3("uPlane.normal", cplane_normal);
 
+        shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
         shader_->setBool("ub_accumulate", vrController::param_bool_map["accumulate"]);
-
+        shader_->setBool("ub_cuttingplane", vrController::param_bool_map["cutting"]);
 
         shader_->setFloat("sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
         shader_->setFloat("val_threshold", vrController::param_value_map["threshold"]);
         shader_->setFloat("brightness", vrController::param_value_map["brightness"]);
-
-        shader_->setFloat("uOpacitys.overall", vrController::param_value_map["overall"]);
-        shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
-        shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
-
-        if(vrController::param_bool_map["cutting"]){
-            shader_->setFloat("cut_percent", 0.5f);
-        }else{
-            shader_->setFloat("cut_percent", .0f);
-        }
 
     if(vrController::camera->getViewDirection().z <0)
         glFrontFace(GL_CW);
@@ -84,6 +76,7 @@ void raycastRenderer::Draw(){
 
 void raycastRenderer::onCuttingChange(float percent){
     cplane_percent_ = percent;
+    cplane_point = cplane_start_ + glm::normalize(cplane_normal) * cplane_percent_ * 1.75f;
     return;
     //if view direction change
     if(!vrController::ROTATE_AROUND_CUBE && vrController::view_dirDirty){
@@ -119,11 +112,11 @@ void raycastRenderer::draw_cutting_plane() {
 
     cplane_shader_->Use();
 //    glm::vec3 p = cplane_start_ + glm::normalize(cplane_normal) * cplane_percent_ * 1.75;
-    glm::vec3 p = glm::vec3(.0);
-    cplane_normal = glm::vec3(1.0,.0,.0);
+//    glm::vec3 p = glm::vec3(.0);
+//    cplane_normal = glm::vec3(1.0,.0,.0);
 
     glm::mat4 model_mat =
-                    glm::translate(glm::mat4(1.0), p + vrController::PosVec3_)*
+                    glm::translate(glm::mat4(1.0), cplane_point + vrController::PosVec3_)*
                     vrController::RotateMat_* glm::orientation(cplane_normal, glm::vec3(0,0,1))*
                     glm::scale(glm::mat4(1.0), glm::vec3(1.0) * vrController::ScaleVec3_);
     cplane_shader_->setMat4("uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*model_mat);
