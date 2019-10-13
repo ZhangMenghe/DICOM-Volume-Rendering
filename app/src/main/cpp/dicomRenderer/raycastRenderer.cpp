@@ -75,8 +75,7 @@ void raycastRenderer::Draw(){
 }
 
 void raycastRenderer::onCuttingChange(float percent){
-    cplane_percent_ = percent;
-    cplane_point = cplane_start_ + glm::normalize(cplane_normal) * cplane_percent_ * 1.75f;
+    cplane_point = cplane_start_ + glm::normalize(cplane_normal) * percent * 1.75f;
     return;
     //if view direction change
     if(!vrController::ROTATE_AROUND_CUBE && vrController::view_dirDirty){
@@ -111,9 +110,6 @@ void raycastRenderer::draw_cutting_plane() {
     }
 
     cplane_shader_->Use();
-//    glm::vec3 p = cplane_start_ + glm::normalize(cplane_normal) * cplane_percent_ * 1.75;
-//    glm::vec3 p = glm::vec3(.0);
-//    cplane_normal = glm::vec3(1.0,.0,.0);
 
     glm::mat4 model_mat =
                     glm::translate(glm::mat4(1.0), cplane_point + vrController::PosVec3_)*

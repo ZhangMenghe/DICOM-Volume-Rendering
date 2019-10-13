@@ -16,7 +16,6 @@ private:
     glm::vec3 cplane_start_ = glm::vec3(.0f),
               cplane_normal = glm::vec3(1.0, .0, .0f),
               cplane_point = glm::vec3(.0f); //object space!!!
-    float cplane_percent_ = .0f;
 
     void draw_cutting_plane();
 public:
