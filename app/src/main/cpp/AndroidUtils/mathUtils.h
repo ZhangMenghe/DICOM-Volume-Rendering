@@ -14,4 +14,7 @@ inline float shortest_distance(float x1, float y1,
                            b + c * c);
     return d/e;
 }
+inline glm::vec3 vec3MatNorm(glm::mat4 lmat, glm::vec3 v){
+    return glm::normalize(glm::vec3(lmat * glm::vec4(v, 1.0f)));
+}
 #endif //DICOM_VOLUME_RENDERING_MATHUTILS_H

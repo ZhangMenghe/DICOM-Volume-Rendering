@@ -4,13 +4,16 @@
 #include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include <glm/gtx/rotate_vector.hpp>
+#include <AndroidUtils/mathUtils.h>
+
 cuttingController* cuttingController::_mptr = nullptr;
 cuttingController* cuttingController::instance(){
     if(!_mptr)_mptr = new cuttingController;
     return _mptr;
 }
 cuttingController::cuttingController(){
-    p_start_ = glm::vec3(.0f);p_point_ = glm::vec3(.0f); p_norm_=glm::vec3(1.0, .0, .0f);
+    p_start_ = glm::vec3(.0f);p_point_ = glm::vec3(.0f); //p_norm_=glm::vec3(1.0, .0, .0f);
+    p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(1.0f, .0f, .0f));
 }
 
 void cuttingController::Draw(){
