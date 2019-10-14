@@ -37,7 +37,6 @@ public:
     static cuttingController* _mptr;
     static cuttingController* instance();
     cuttingController();
-    cuttingController(glm::vec3 start_p, glm::vec3 normal);
 
     void Draw();
     void setCuttingParams(Shader* shader);
