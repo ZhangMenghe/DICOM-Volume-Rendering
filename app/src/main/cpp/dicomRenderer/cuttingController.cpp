@@ -85,10 +85,7 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
                         * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))
                         * p_rotate_mat_;
 
-        p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f));
-
-
-//        p_norm_ = glm::vec3(nrotate_mat * glm::vec4(p_norm_, 1.0f));
+        p_norm_ = glm::normalize(vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f))*vrController::ScaleVec3_);
     }
 }
 void cuttingController::onScale(mTarget target, float sx, float sy, float sz){
