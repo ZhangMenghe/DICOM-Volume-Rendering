@@ -54,6 +54,5 @@ private:
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f, 0.5f);
-    glm::vec3 last_scale = DEFAULT_SCALE;
 };
 #endif
