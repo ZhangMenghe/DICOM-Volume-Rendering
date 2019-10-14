@@ -158,7 +158,7 @@ void main(void){
     if(ub_cuttingplane){
         //Ray-plane
         if(dot(uPlane.normal, -uCamposObjSpace) > .0) //plane_n = -plane_n;
-            intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal ));//uPlane.p, uPlane.normal));
+            intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal ));
         else
             intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, -uPlane.normal), intersect.y);
     }

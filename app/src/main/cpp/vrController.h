@@ -39,27 +39,8 @@ public:
     void onViewChange(int width, int height);
     void onDraw();
 
-    void onSingleTouchDown(float x, float y){
-        Mouse_old = glm::fvec2(x, y);
-    }
-    void onTouchMove(float x, float y) {
-        if (!texvrRenderer_) return;
-        //Camera::instance()->Rotate_Camera(x - Mouse_old.x, Mouse_old.y - y);
-        float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
-        Mouse_old = glm::fvec2(x, y);
-        xoffset *= MOUSE_ROTATE_SENSITIVITY;
-        yoffset *= MOUSE_ROTATE_SENSITIVITY;
-
-        if(ROTATE_AROUND_CUBE){
-            if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
-            else camera->rotateCamera(2, ModelMat_[3], -yoffset);
-        }else{
-            RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
-                        * glm::rotate(glm::mat4(1.0f), -yoffset, glm::vec3(1,0,0))
-                        * RotateMat_;
-        }
-        view_dirDirty = true;
-    }
+    void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
+    void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);
 private:
@@ -69,12 +50,10 @@ private:
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
-
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, -1.0f, 0.5f);
     glm::vec3 last_scale = DEFAULT_SCALE;
-
 };
 #endif

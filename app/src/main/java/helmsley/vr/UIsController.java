@@ -197,20 +197,20 @@ public class UIsController {
         //radio group
         RadioGroup radioGroup = (RadioGroup)activity.findViewById(R.id.cut_radioGroup);
         radioGroup.check(finger_manipulate_id);
-        JUIsetParam("mobj", 0);
+        JUIsetParam("mtarget", -1.0f);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener(){
             public void onCheckedChanged(RadioGroup group, int checkedId){
                 // This will get the radiobutton that has changed in its check state
 //                RadioButton checkedRadioButton = (RadioButton)group.findViewById(checkedId);
                 switch (checkedId){
                     case R.id.radio_vol:
-                        JUIsetParam("mobj", 0);
+                        JUIsetParam("mtarget", -1.0f);
                         break;
                     case R.id.radio_plane:
-                        JUIsetParam("mobj", 1);
+                        JUIsetParam("mtarget", 1.0f);
                         break;
                     case R.id.radio_sphere:
-                        JUIsetParam("mobj", 2);
+                        JUIsetParam("mtarget", 2.0f);
                         break;
                         default:
                             break;

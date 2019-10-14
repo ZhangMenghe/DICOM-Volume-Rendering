@@ -72,12 +72,38 @@ void vrController::onDraw() {
         texvrRenderer_->Draw();
     funcRenderer_->Draw();
 }
+
+void vrController::onTouchMove(float x, float y) {
+    float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
+    Mouse_old = glm::fvec2(x, y);
+    xoffset *= MOUSE_ROTATE_SENSITIVITY;
+    yoffset *= -MOUSE_ROTATE_SENSITIVITY;
+
+    //move cutting
+    if(param_value_map["mtarget"] > .0f){
+        mTarget tar = mTarget((int)param_value_map["mtarget"]);
+        LOGE("======target: %d", tar );
+        cuttingController::instance()->onRotate(tar, xoffset, yoffset);
+        return;
+    }
+
+    if(ROTATE_AROUND_CUBE){
+        if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
+        else camera->rotateCamera(2, ModelMat_[3], yoffset);
+    }else{
+        RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
+                     * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
+                     * RotateMat_;
+    }
+//    view_dirDirty = true;
+}
 void vrController::onScale(float sx, float sy){
     if(sx == sy){
         if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
         else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
+        ScaleVec3_ = ScaleVec3_* sx;
 
-        ScaleVec3_ = ScaleVec3_* sx; return;
+        return;
     }
     //+ (sy- last_scale.y)*0.05f
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
