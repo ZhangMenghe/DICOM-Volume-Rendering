@@ -14,6 +14,7 @@ cuttingController* cuttingController::instance(){
 cuttingController::cuttingController(){
     p_start_ = glm::vec3(.0f);p_point_ = glm::vec3(.0f); //p_norm_=glm::vec3(1.0, .0, .0f);
     p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f));
+    _mptr = this;
 }
 
 void cuttingController::Draw(){
