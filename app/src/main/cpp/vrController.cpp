@@ -9,7 +9,7 @@ int vrController::VOLUME_TEX_ID=0;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
-glm::mat4 vrController::ModelMat_ = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 0.5f));
+glm::mat4 vrController::ModelMat_ = glm::mat4(1.0);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
 glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
 bool vrController::ROTATE_AROUND_CUBE = false;

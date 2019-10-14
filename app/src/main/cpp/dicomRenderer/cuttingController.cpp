@@ -81,9 +81,13 @@ void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){}
 void cuttingController::onRotate(mTarget target, float offx, float offy){
     if(target == PLANE){
-//        glm::mat4 nrotate_mat = glm::rotate(glm::mat4(1.0f), offx, glm::vec3(0,1,0))
-//                                * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0));
-//        p_rotate_mat_ = nrotate_mat * p_rotate_mat_;
+        p_rotate_mat_ = glm::rotate(glm::mat4(1.0f), offx, glm::vec3(0,1,0))
+                        * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))
+                        * p_rotate_mat_;
+
+        p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f));
+
+
 //        p_norm_ = glm::vec3(nrotate_mat * glm::vec4(p_norm_, 1.0f));
     }
 }
