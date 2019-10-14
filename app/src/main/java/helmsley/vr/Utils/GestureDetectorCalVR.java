@@ -74,7 +74,7 @@ public class GestureDetectorCalVR {
                     UIsController.JUIonPan(cx - last_pos_pan.x, cy-last_pos_pan.y);
                     last_pos_pan.set( cx, cy );
                 }else{
-                    Log.e(TAG, "===onScale:  " + dist_ratio);
+//                    Log.e(TAG, "===onScale:  " + dist_ratio);
                     UIsController.JUIonScale(curr_dist/last_span_dist, curr_dist/last_span_dist);
                 }
                 last_span.set(gap);

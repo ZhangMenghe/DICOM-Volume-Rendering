@@ -82,11 +82,9 @@ void vrController::onTouchMove(float x, float y) {
     //move cutting
     if(param_value_map["mtarget"] > .0f){
         mTarget tar = mTarget((int)param_value_map["mtarget"]);
-        LOGE("======target: %d", tar );
         cuttingController::instance()->onRotate(tar, xoffset, yoffset);
         return;
     }
-
     if(ROTATE_AROUND_CUBE){
         if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
         else camera->rotateCamera(2, ModelMat_[3], yoffset);
@@ -95,40 +93,50 @@ void vrController::onTouchMove(float x, float y) {
                      * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
                      * RotateMat_;
     }
-//    view_dirDirty = true;
 }
 void vrController::onScale(float sx, float sy){
-    if(sx == sy){
-        if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
-        else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
-        ScaleVec3_ = ScaleVec3_* sx;
-
-        return;
-    }
-    //+ (sy- last_scale.y)*0.05f
+    //unified scaling
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
 
-    if(sy > 1.0f) sy = 1.0f + (sy - 1.0f) * MOUSE_SCALE_SENSITIVITY;
-    else sy = 1.0f - (1.0f - sy)* MOUSE_SCALE_SENSITIVITY;
+    //rotate cutting
+    if(param_value_map["mtarget"] > .0f){
+        mTarget tar = mTarget((int)param_value_map["mtarget"]);
+        cuttingController::instance()->onScale(tar, sx);
+    }else
+        ScaleVec3_ = ScaleVec3_* sx;
 
-
-    //todo:change it via view dir
-//    glm::vec3 view_dir = camera->getViewDirection();
-    float x = 1.0, y=1.0, z=1.0;
-    x = sx;y=sy;
-//    float a = glm::dot(camera->getRightDir(), glm::vec3(1.0f, .0f, .0f));
-//    float b = glm::dot(camera->getRightDir(), glm::vec3(.0f, 1.0f, .0f));
-//    float c = glm::dot(camera->getRightDir(), glm::vec3(.0f, .0f, 1.0f));
-//    if(a >=b && a>=c)
-//    {x = sx;y=sy;}
-//    else if(b >= a && b>=c)
-//    {y = sx;x = sy;}
-//    else
-//    {z = sx;y=sy;}
-    ScaleVec3_ = glm::vec3(last_scale.x*x, last_scale.y*y, last_scale.z*z);
-//    ModelMat_ = glm::scale(glm::mat4(1.0), ScaleVec3_);
-    last_scale = ScaleVec3_;
+//    if(sx == sy){
+//        if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
+//        else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
+//        ScaleVec3_ = ScaleVec3_* sx;
+//
+//        return;
+//    }
+//    //+ (sy- last_scale.y)*0.05f
+//    if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
+//    else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
+//
+//    if(sy > 1.0f) sy = 1.0f + (sy - 1.0f) * MOUSE_SCALE_SENSITIVITY;
+//    else sy = 1.0f - (1.0f - sy)* MOUSE_SCALE_SENSITIVITY;
+//
+//
+//    //todo:change it via view dir
+////    glm::vec3 view_dir = camera->getViewDirection();
+//    float x = 1.0, y=1.0, z=1.0;
+//    x = sx;y=sy;
+////    float a = glm::dot(camera->getRightDir(), glm::vec3(1.0f, .0f, .0f));
+////    float b = glm::dot(camera->getRightDir(), glm::vec3(.0f, 1.0f, .0f));
+////    float c = glm::dot(camera->getRightDir(), glm::vec3(.0f, .0f, 1.0f));
+////    if(a >=b && a>=c)
+////    {x = sx;y=sy;}
+////    else if(b >= a && b>=c)
+////    {y = sx;x = sy;}
+////    else
+////    {z = sx;y=sy;}
+//    ScaleVec3_ = glm::vec3(last_scale.x*x, last_scale.y*y, last_scale.z*z);
+////    ModelMat_ = glm::scale(glm::mat4(1.0), ScaleVec3_);
+//    last_scale = ScaleVec3_;
 }
 void vrController::onPan(float x, float y){
     float offx = x / _screen_w, offy = y /_screen_h;

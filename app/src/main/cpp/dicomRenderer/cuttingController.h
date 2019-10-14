@@ -26,6 +26,7 @@ private:
     GLuint pVAO_ = 0;
     mTarget mtarget = PLANE;
     glm::vec3 p_start_, p_norm_, p_point_;
+    glm::vec3 p_scale = glm::vec3(1.0f);
 
     glm::mat4 p_rotate_mat_;
     void DrawPlane();
