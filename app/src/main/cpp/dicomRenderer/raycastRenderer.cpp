@@ -16,9 +16,9 @@ raycastRenderer::raycastRenderer() {
 //        shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
         shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
     shader_->unUse();
-    cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
-//            vec3MatNorm(glm::inverse(vrController::RotateMat_),
-//            vrController::camera->getViewDirection()));
+    cutter_ = new cuttingController(glm::vec3(0.5f),
+            vec3MatNorm(glm::inverse(vrController::RotateMat_),
+            vrController::camera->getViewDirection()));
 }
 void raycastRenderer::Draw(){
     glEnable(GL_BLEND);
