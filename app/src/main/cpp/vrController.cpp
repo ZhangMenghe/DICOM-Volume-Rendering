@@ -79,8 +79,7 @@ void vrController::onTouchMove(float x, float y) {
     xoffset *= MOUSE_ROTATE_SENSITIVITY;
     yoffset *= -MOUSE_ROTATE_SENSITIVITY;
 
-    //move cutting
-    if(param_value_map["mtarget"] > .0f){
+    if(param_value_map["mtarget"] > .0f && !param_bool_map["pfview"]){//rotate cutting plane when plane is rotable
         mTarget tar = mTarget((int)param_value_map["mtarget"]);
         cuttingController::instance()->onRotate(tar, xoffset, yoffset);
         return;
@@ -140,12 +139,8 @@ void vrController::onScale(float sx, float sy){
 }
 void vrController::onPan(float x, float y){
     float offx = x / _screen_w, offy = -y /_screen_h;
-//    if(param_value_map["mtarget"] > .0f){
-//        mTarget tar = mTarget((int)param_value_map["mtarget"]);
-//        cuttingController::instance()->onTranslate(tar, offx, offy);
-//    }else{
-        PosVec3_.x += offx * ScaleVec3_.x;// * 0.1f;
-        PosVec3_.y += offy * ScaleVec3_.y;// * 0.1f;
-//    }
+    PosVec3_.x += offx * ScaleVec3_.x;
+    PosVec3_.y += offy * ScaleVec3_.y;
+
 
 }
