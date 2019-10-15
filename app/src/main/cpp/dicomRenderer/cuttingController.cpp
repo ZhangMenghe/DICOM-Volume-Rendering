@@ -66,12 +66,18 @@ void cuttingController::DrawPlane(){
         p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
     }
     mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
-//    if(tar == PLANE && vrController::param_bool_map["pfview"])//keep it static
-//        pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
-//    else{
+    if(tar == PLANE && vrController::param_bool_map["pfview"]){//keep it static
+        pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
+        p_rotate_mat_ = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
+        p_norm_ = dirFromRS(p_rotate_mat_,
+                            vrController::ScaleVec3_,
+                            glm::vec3(.0f, .0f, 1.0f));//todo:dont know why...
+        p_p2v_dirty = true;
+    }
+    else{
         p_p2w_mat = vrController::ModelMat_ * p_p2v_mat;
         pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
-//    }
+    }
 
 
     pshader->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
