@@ -56,6 +56,7 @@ void vrController::onViewChange(int width, int height){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void vrController::onDraw() {
+    if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(cutDirty){ //panel switch to cutting, update cutting result
         cutDirty = false;
         texvrRenderer_->onCuttingChange(param_value_map["cutting"]);
@@ -79,10 +80,10 @@ void vrController::onTouchMove(float x, float y) {
         mTarget tar = mTarget((int)param_value_map["mtarget"]);
         if(param_bool_map["pfview"]){
             //todo:rotate volume only
-//            RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
-//                         * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
-//                         * RotateMat_;
-//            updateVolumeModelMat();
+            RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
+                         * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
+                         * RotateMat_;
+            volume_model_dirty = true;
 //            cuttingController::instance()->onRotate(tar);
         }else// rotate the plane only
             cuttingController::instance()->onRotate(tar, xoffset, yoffset);
@@ -96,7 +97,7 @@ void vrController::onTouchMove(float x, float y) {
         RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
                      * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
                      * RotateMat_;
-        updateVolumeModelMat();
+        volume_model_dirty = true;
 
     }
 }
@@ -111,7 +112,7 @@ void vrController::onScale(float sx, float sy){
         cuttingController::instance()->onScale(tar, sx);
     }else{
         ScaleVec3_ = ScaleVec3_* sx;
-        updateVolumeModelMat();
+        volume_model_dirty = true;
     }
 
 
@@ -151,5 +152,5 @@ void vrController::onPan(float x, float y){
     float offx = x / _screen_w, offy = -y /_screen_h;
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
-    updateVolumeModelMat();
+    volume_model_dirty = true;
 }

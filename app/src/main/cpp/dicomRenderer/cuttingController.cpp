@@ -23,12 +23,15 @@ cuttingController::cuttingController(){
     p_point_ = p_start_;
 
     p_rotate_mat_ = rotMatFromDir(p_norm_);
+
+    p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
     _mptr = this;
 }
 cuttingController::cuttingController(glm::vec3 ps, glm::vec3 pn):
 p_start_(ps), p_norm_(pn){
     p_point_ = p_start_;
     p_rotate_mat_ = rotMatFromDir(pn);
+    p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
     _mptr = this;
 }
 void cuttingController::Draw(){
@@ -50,16 +53,18 @@ void cuttingController::DrawPlane(){
 
     pshader->Use();
 
-    glm::mat4 model_mat =
-            glm::translate(glm::mat4(1.0), vrController::PosVec3_ + p_point_)*
-            vrController::RotateMat_* p_rotate_mat_*
-            glm::scale(glm::mat4(1.0), p_scale * vrController::ScaleVec3_);
+    //p_p2v_mat
+    //keep it!
+//    if(vrController::param_bool_map["pfview"]){
+//        p_p2w_mat = vrController::ModelMat_ *
+//                     glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
+//
+//    }
+    //works for move plane only or move both
+    p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
+    pshader->setMat4("uMVP", vrController::camera->getVPMat()* vrController::ModelMat_
+                             * p_p2v_mat);
 
-    glm::mat4 plane_obj_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
-    pshader->setMat4("uMVP",   vrController::camera->getProjMat()
-                             * vrController::camera->getViewMat()
-                             * vrController::ModelMat_
-                             * plane_obj_mat);
     pshader->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
     if (!pVAO_) {
         float vertices[] = {
@@ -109,10 +114,7 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
 }
 void cuttingController::onRotate(mTarget tar){
     if(tar == PLANE){
-        p_norm_ = vec3MatNorm(glm::inverse(vrController::RotateMat_),
-                              vrController::camera->getViewDirection());
-        p_rotate_mat_ = rotMatFromDir(p_norm_);
-
+        //cal p_norm and p_rotate_mat based on original model->world p_p2w_mat
         //camera pos in obj space
 //        glm::vec3 vp_obj = vec3MatNorm(glm::inverse(vrController::ModelMat_),
 //                                       vrController::camera->getCameraPosition());

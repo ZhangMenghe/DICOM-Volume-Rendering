@@ -31,6 +31,8 @@ private:
 
     glm::mat4 p_rotate_mat_ = glm::mat4(1.0f);
 
+    glm::mat4 p_p2w_mat, p_p2v_mat;
+
     void DrawPlane();
     void DrawSphere();
 

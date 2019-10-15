@@ -33,6 +33,9 @@ void raycastRenderer::Draw(){
 //    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
 //    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
 
+    //Update cutting plane and draw
+    cutter_->Draw();
+
     shader_->Use();
         shader_->setMat4("uProjMat", vrController::camera->getProjMat());
         shader_->setMat4("uViewMat", vrController::camera->getViewMat());
@@ -63,7 +66,7 @@ void raycastRenderer::Draw(){
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     shader_->unUse();
-    cutter_->Draw();
+
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
