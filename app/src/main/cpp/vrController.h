@@ -52,7 +52,8 @@ private:
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
-    const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f); //glm::vec3(1.0f, 1.0f, 0.5f);
+    const float MOUSE_PAN_SENSITIVITY = 1.2f;
+    const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f, 1.0f);
 
     bool volume_model_dirty = true;
     void updateVolumeModelMat(){

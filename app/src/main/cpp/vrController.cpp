@@ -103,7 +103,7 @@ void vrController::onScale(float sx, float sy){
     }
 }
 void vrController::onPan(float x, float y){
-    float offx = x / _screen_w, offy = -y /_screen_h;
+    float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
     volume_model_dirty = true;
