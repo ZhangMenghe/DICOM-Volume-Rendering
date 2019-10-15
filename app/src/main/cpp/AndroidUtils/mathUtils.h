@@ -50,4 +50,9 @@ inline glm::vec3 cloestVertexToPlane(glm::vec3 pn, glm::vec3 p){
     }
     return glm::vec3(cuboid_with_texture[6*vertex_idx], cuboid_with_texture[6*vertex_idx + 1], cuboid_with_texture[6*vertex_idx + 2]);
 }
+inline glm::mat4 mouseRotateMat(glm::mat4 bmat, float xoffset, float yoffset){
+    return glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
+           * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
+           * bmat;
+}
 #endif //DICOM_VOLUME_RENDERING_MATHUTILS_H

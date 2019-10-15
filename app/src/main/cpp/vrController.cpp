@@ -76,30 +76,18 @@ void vrController::onTouchMove(float x, float y) {
     xoffset *= MOUSE_ROTATE_SENSITIVITY;
     yoffset *= -MOUSE_ROTATE_SENSITIVITY;
 
-    if(param_value_map["mtarget"] > .0f ){//rotate cutting plane when plane is rotable
-        mTarget tar = mTarget((int)param_value_map["mtarget"]);
-        if(param_bool_map["pfview"]){
-            //todo:rotate volume only
-            RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
-                         * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
-                         * RotateMat_;
-            volume_model_dirty = true;
-//            cuttingController::instance()->onRotate(tar);
-        }else// rotate the plane only
-            cuttingController::instance()->onRotate(tar, xoffset, yoffset);
-        return;
-    }
     if(ROTATE_AROUND_CUBE){
         if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
         else camera->rotateCamera(2, ModelMat_[3], yoffset);
-    }else{
-        //Rotate volume and plane together
-        RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
-                     * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
-                     * RotateMat_;
-        volume_model_dirty = true;
-
+        return;
     }
+    if(param_value_map["mtarget"] > .0f && !param_bool_map["pfview"]){
+        cuttingController::instance()->onRotate(mTarget((int)param_value_map["mtarget"]), xoffset, yoffset);
+        return;
+    }
+
+    RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
+    volume_model_dirty = true;
 }
 void vrController::onScale(float sx, float sy){
     //unified scaling
