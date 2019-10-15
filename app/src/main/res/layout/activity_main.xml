@@ -153,17 +153,18 @@
             android:id="@+id/cutPanel"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginTop="15dp"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            app:layout_constraintHeight_percent="0.5"
-            app:layout_constraintTop_toBottomOf="@id/switchPanel">
+            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintTop_toBottomOf="@id/switchPanel"
+            app:layout_constraintBottom_toBottomOf="parent">
             <TextView
                 android:id="@+id/radiogroup_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Finger Control "
                 android:theme="@style/RadioButton"
+                android:layout_marginTop="10dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
             </TextView>
@@ -204,6 +205,54 @@
                     android:text=" Sphere  "
                     android:textColor="@color/brightBlue"/>
             </RadioGroup>
+
+            <android.support.constraint.ConstraintLayout
+                android:id="@+id/cut_sub_panel"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:alpha="1.0"
+                app:layout_constraintHeight_percent="0.3"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <TextView
+                    android:id="@+id/radiosub_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Direction: "
+                    android:theme="@style/RadioButton"
+                    android:layout_centerVertical="true"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+                <RadioGroup
+                    android:id="@+id/cut_sub_radiogroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    app:layout_constraintStart_toEndOf="@id/radiosub_text"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                    <RadioButton
+                        android:id="@+id/radio_fromview"
+                        android:theme="@style/RadioButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text=" From View "
+                        android:textColor="@color/brightBlue"
+                        />
+
+                    <RadioButton
+                        android:id="@+id/radio_fromany"
+                        android:theme="@style/RadioButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text=" Arbitary  "
+                        android:textColor="@color/brightBlue"/>
+                </RadioGroup>
+            </android.support.constraint.ConstraintLayout>
+
         </android.support.constraint.ConstraintLayout>
     </android.support.constraint.ConstraintLayout>
 
