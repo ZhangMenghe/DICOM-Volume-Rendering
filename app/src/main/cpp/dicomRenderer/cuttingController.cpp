@@ -12,8 +12,17 @@ cuttingController* cuttingController::instance(){
     return _mptr;
 }
 cuttingController::cuttingController(){
-    p_start_ = glm::vec3(.0f);p_point_ = glm::vec3(.0f);
-    p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f));
+    //view dir in obj space
+    p_norm_ = vec3MatNorm(glm::inverse(vrController::RotateMat_),
+                          vrController::camera->getViewDirection());
+    //camera pos in obj space
+    glm::vec3 vp_obj = vec3MatNorm(glm::inverse(vrController::ModelMat_),
+                                   vrController::camera->getCameraPosition());
+    //cloest point
+    p_start_ = glm::vec3(.0f);//cloestVertexToPlane(p_norm_, vp_obj);
+    p_point_ = p_start_;
+
+    p_rotate_mat_ = rotMatFromDir(p_norm_);
     _mptr = this;
 }
 cuttingController::cuttingController(glm::vec3 ps, glm::vec3 pn):
@@ -93,7 +102,23 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
                         * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))
                         * p_rotate_mat_;
 
-        p_norm_ = glm::normalize(vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f))*vrController::ScaleVec3_);
+        p_norm_ = dirFromRS(p_rotate_mat_,
+                            vrController::ScaleVec3_,
+                            glm::vec3(.0f, .0f, 1.0f));//todo:dont know why...
+    }
+}
+void cuttingController::onRotate(mTarget tar){
+    if(tar == PLANE){
+        p_norm_ = vec3MatNorm(glm::inverse(vrController::RotateMat_),
+                              vrController::camera->getViewDirection());
+        p_rotate_mat_ = rotMatFromDir(p_norm_);
+
+        //camera pos in obj space
+//        glm::vec3 vp_obj = vec3MatNorm(glm::inverse(vrController::ModelMat_),
+//                                       vrController::camera->getCameraPosition());
+//        //cloest point
+//        p_start_ = cloestVertexToPlane(p_norm_, vp_obj);
+//        p_point_ = p_start_;
     }
 }
 void cuttingController::onScale(mTarget target, float sx, float sy, float sz){

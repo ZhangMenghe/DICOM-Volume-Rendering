@@ -30,6 +30,7 @@ private:
     glm::vec3 p_scale = glm::vec3(1.0f);
 
     glm::mat4 p_rotate_mat_ = glm::mat4(1.0f);
+
     void DrawPlane();
     void DrawSphere();
 
@@ -47,6 +48,7 @@ public:
     void setCutPlane(glm::vec3 startPoint, glm::vec3 normal);
 
     void onRotate(mTarget target, float offx, float offy);
+    void onRotate(mTarget tar);
     void onScale(mTarget target, float sx, float sy=-1.0f, float sz=-1.0f);
     void onTranslate(mTarget target, float offx, float offy);
 };

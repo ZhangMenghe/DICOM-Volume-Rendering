@@ -56,10 +56,6 @@ void vrController::onViewChange(int width, int height){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void vrController::onDraw() {
-    ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
-               * RotateMat_
-               * glm::scale(glm::mat4(1.0), ScaleVec3_);
-
     if(cutDirty){ //panel switch to cutting, update cutting result
         cutDirty = false;
         texvrRenderer_->onCuttingChange(param_value_map["cutting"]);
@@ -79,18 +75,29 @@ void vrController::onTouchMove(float x, float y) {
     xoffset *= MOUSE_ROTATE_SENSITIVITY;
     yoffset *= -MOUSE_ROTATE_SENSITIVITY;
 
-    if(param_value_map["mtarget"] > .0f && !param_bool_map["pfview"]){//rotate cutting plane when plane is rotable
+    if(param_value_map["mtarget"] > .0f ){//rotate cutting plane when plane is rotable
         mTarget tar = mTarget((int)param_value_map["mtarget"]);
-        cuttingController::instance()->onRotate(tar, xoffset, yoffset);
+        if(param_bool_map["pfview"]){
+            //todo:rotate volume only
+//            RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
+//                         * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
+//                         * RotateMat_;
+//            updateVolumeModelMat();
+//            cuttingController::instance()->onRotate(tar);
+        }else// rotate the plane only
+            cuttingController::instance()->onRotate(tar, xoffset, yoffset);
         return;
     }
     if(ROTATE_AROUND_CUBE){
         if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
         else camera->rotateCamera(2, ModelMat_[3], yoffset);
     }else{
+        //Rotate volume and plane together
         RotateMat_ = glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
                      * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
                      * RotateMat_;
+        updateVolumeModelMat();
+
     }
 }
 void vrController::onScale(float sx, float sy){
@@ -102,8 +109,11 @@ void vrController::onScale(float sx, float sy){
     if(param_value_map["mtarget"] > .0f){
         mTarget tar = mTarget((int)param_value_map["mtarget"]);
         cuttingController::instance()->onScale(tar, sx);
-    }else
+    }else{
         ScaleVec3_ = ScaleVec3_* sx;
+        updateVolumeModelMat();
+    }
+
 
 //    if(sx == sy){
 //        if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
@@ -141,6 +151,5 @@ void vrController::onPan(float x, float y){
     float offx = x / _screen_w, offy = -y /_screen_h;
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
-
-
+    updateVolumeModelMat();
 }

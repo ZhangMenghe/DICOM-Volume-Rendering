@@ -16,9 +16,8 @@ raycastRenderer::raycastRenderer() {
 //        shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
         shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
     shader_->unUse();
-    cutter_ = new cuttingController(glm::vec3(0.5f),
-            vec3MatNorm(glm::inverse(vrController::RotateMat_),
-            vrController::camera->getViewDirection()));
+
+    cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
 }
 void raycastRenderer::Draw(){
     glEnable(GL_BLEND);
@@ -73,29 +72,4 @@ void raycastRenderer::Draw(){
 
 void raycastRenderer::onCuttingChange(float percent){
     cutter_->setCutPlane(percent);
-//    cplane_point = cplane_start_ + glm::normalize(cplane_normal) * percent * 1.75f;
-//    return;
-//    //if view direction change
-//    if(!vrController::ROTATE_AROUND_CUBE && vrController::view_dirDirty){
-//        vrController::view_dirDirty = false;
-//        glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
-//        glm::vec3 p= glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0));
-//        glm::vec3 pn = -p;
-//        float d = -(pn.x * p.x + pn.y * p.y + pn.z * p.z);
-//
-//        float shortest_dist = FLT_MAX; int vertex_idx;
-//        for(int i=0; i<8; i++){
-//            float dist = shortest_distance(cuboid_with_texture[6*i], cuboid_with_texture[6*i+1], cuboid_with_texture[6*i+2], pn.x, pn.y, pn.z, d);
-//            if(dist < shortest_dist){
-//                shortest_dist = dist;
-//                vertex_idx = i;
-//            }
-//        }
-//        shader_->Use();
-//        shader_->setVec3("uStartPoint", cuboid_with_texture[6*vertex_idx], cuboid_with_texture[6*vertex_idx + 1], cuboid_with_texture[6*vertex_idx + 2]);
-//    }
-//
-//    shader_->Use();//cutting in obj space
-//    shader_->setFloat("cut_percent", percent);
-
 }
