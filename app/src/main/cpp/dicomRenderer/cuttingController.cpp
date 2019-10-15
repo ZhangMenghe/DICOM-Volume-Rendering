@@ -35,7 +35,8 @@ p_start_(ps), p_norm_(pn){
     _mptr = this;
 }
 void cuttingController::Draw(){
-    if(vrController::param_bool_map["cutting"])DrawPlane();
+    update();
+    if(vrController::param_bool_map["cutting"])draw_plane();
 }
 void cuttingController::setCuttingParams(Shader* shader){
     shader->setVec3("uSphere.center", glm::vec3(vrController::csphere_c));
@@ -44,30 +45,13 @@ void cuttingController::setCuttingParams(Shader* shader){
     shader->setVec3("uPlane.p", p_point_);
     shader->setVec3("uPlane.normal", p_norm_);
 }
-void cuttingController::DrawPlane(){
-    if(!pshader){
-        pshader = new Shader();
-        if(!pshader->Create("shaders/cplane.vert", "shaders/cplane.frag"))
-            LOGE("Raycast===Failed to create cutting plane shader program===");
-    }
-
-    pshader->Use();
-
-    //p_p2v_mat
-    //keep it!
-//    if(vrController::param_bool_map["pfview"]){
-//        p_p2w_mat = vrController::ModelMat_ *
-//                     glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
-//
-//    }
-    //works for move plane only or move both
+void cuttingController::update(){
     if(p_p2v_dirty){
         p_p2v_dirty = false;
         p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
     }
     mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
     if(tar == PLANE && vrController::param_bool_map["pfview"]){//keep it static
-        pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
         p_rotate_mat_ = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
         p_norm_ = dirFromRS(p_rotate_mat_,
                             vrController::ScaleVec3_,
@@ -76,11 +60,18 @@ void cuttingController::DrawPlane(){
     }
     else{
         p_p2w_mat = vrController::ModelMat_ * p_p2v_mat;
-        pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
     }
+}
 
-
-    pshader->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
+void cuttingController::draw_plane(){
+    if(!pshader){
+        pshader = new Shader();
+        if(!pshader->Create("shaders/cplane.vert", "shaders/cplane.frag"))
+            LOGE("Raycast===Failed to create cutting plane shader program===");
+    }
+    pshader->Use();
+    pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
+    pshader->setVec4("uBaseColor", plane_color_);
     if (!pVAO_) {
         float vertices[] = {
                 1.0f,1.0f,.0f,
@@ -108,9 +99,7 @@ void cuttingController::DrawPlane(){
     glDrawArrays(GL_TRIANGLES, 0, 6);
     pshader->unUse();
 }
-void cuttingController::DrawSphere(){
 
-}
 void cuttingController::setCutPlane(float percent){
     p_point_ = p_start_ + p_norm_* percent * 1.75f;
     p_p2v_dirty = true;
@@ -129,17 +118,7 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
         p_p2v_dirty = true;
     }
 }
-void cuttingController::onRotate(mTarget tar){
-    if(tar == PLANE){
-        //cal p_norm and p_rotate_mat based on original model->world p_p2w_mat
-        //camera pos in obj space
-//        glm::vec3 vp_obj = vec3MatNorm(glm::inverse(vrController::ModelMat_),
-//                                       vrController::camera->getCameraPosition());
-//        //cloest point
-//        p_start_ = cloestVertexToPlane(p_norm_, vp_obj);
-//        p_point_ = p_start_;
-    }
-}
+
 void cuttingController::onScale(mTarget target, float sx, float sy, float sz){
     if(sy < .0f)    p_scale = p_scale * sx;
     else p_scale = p_scale * glm::vec3(sx, sy, sz);

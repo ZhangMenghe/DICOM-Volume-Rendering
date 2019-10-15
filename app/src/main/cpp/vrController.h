@@ -28,7 +28,6 @@ public:
     static glm::vec3 csphere_c;
     static float csphere_radius;
     static bool cutDirty;
-    static bool view_dirDirty;
 
     static vrController* instance();
 

@@ -34,13 +34,13 @@ private:
 
     glm::mat4 p_p2w_mat, p_p2v_mat;
     bool p_p2v_dirty = true;
-    mTarget cur_tar = VOLUME;
 
-    void DrawPlane();
-    void DrawSphere();
+    glm::vec4 plane_color_ = glm::vec4(0.2f, .0f, .0f, 1.0f);
+
+    void update();
+    void draw_plane();
 
 public:
-
     static cuttingController* _mptr;
     static cuttingController* instance();
     cuttingController();
@@ -53,7 +53,6 @@ public:
     void setCutPlane(glm::vec3 startPoint, glm::vec3 normal);
 
     void onRotate(mTarget target, float offx, float offy);
-    void onRotate(mTarget tar);
     void onScale(mTarget target, float sx, float sy=-1.0f, float sz=-1.0f);
     void onTranslate(mTarget target, float offx, float offy);
 };
