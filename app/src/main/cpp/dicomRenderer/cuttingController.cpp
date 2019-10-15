@@ -61,9 +61,18 @@ void cuttingController::DrawPlane(){
 //
 //    }
     //works for move plane only or move both
-    p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
-    pshader->setMat4("uMVP", vrController::camera->getVPMat()* vrController::ModelMat_
-                             * p_p2v_mat);
+    if(p_p2v_dirty){
+        p_p2v_dirty = false;
+        p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
+    }
+    mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
+//    if(tar == PLANE && vrController::param_bool_map["pfview"])//keep it static
+//        pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
+//    else{
+        p_p2w_mat = vrController::ModelMat_ * p_p2v_mat;
+        pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
+//    }
+
 
     pshader->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
     if (!pVAO_) {
@@ -98,6 +107,7 @@ void cuttingController::DrawSphere(){
 }
 void cuttingController::setCutPlane(float percent){
     p_point_ = p_start_ + p_norm_* percent * 1.75f;
+    p_p2v_dirty = true;
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){}
@@ -110,6 +120,7 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
         p_norm_ = dirFromRS(p_rotate_mat_,
                             vrController::ScaleVec3_,
                             glm::vec3(.0f, .0f, 1.0f));//todo:dont know why...
+        p_p2v_dirty = true;
     }
 }
 void cuttingController::onRotate(mTarget tar){
@@ -126,6 +137,7 @@ void cuttingController::onRotate(mTarget tar){
 void cuttingController::onScale(mTarget target, float sx, float sy, float sz){
     if(sy < .0f)    p_scale = p_scale * sx;
     else p_scale = p_scale * glm::vec3(sx, sy, sz);
+    p_p2v_dirty = true;
 }
 void cuttingController::onTranslate(mTarget target, float offx, float offy){
     //do nothing currently

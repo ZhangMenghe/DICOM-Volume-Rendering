@@ -15,7 +15,8 @@ typedef struct{
 }cSphere;
 typedef enum{
     PLANE = 1,
-    SPHERE
+    SPHERE,
+    VOLUME
 }mTarget;
 
 class cuttingController {
@@ -32,6 +33,8 @@ private:
     glm::mat4 p_rotate_mat_ = glm::mat4(1.0f);
 
     glm::mat4 p_p2w_mat, p_p2v_mat;
+    bool p_p2v_dirty = true;
+    mTarget cur_tar = VOLUME;
 
     void DrawPlane();
     void DrawSphere();
