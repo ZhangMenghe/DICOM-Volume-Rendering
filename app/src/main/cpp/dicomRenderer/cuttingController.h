@@ -4,6 +4,7 @@
 
 #include <glm/vec3.hpp>
 #include <GLPipeline/Shader.h>
+
 typedef struct{
     glm::vec3 p;
     glm::vec3 n;
@@ -24,6 +25,7 @@ private:
 
     Shader* pshader = nullptr;
     GLuint pVAO_ = 0;
+
     glm::vec3 p_start_, p_norm_, p_point_;
     glm::vec3 p_scale = glm::vec3(1.0f);
 
@@ -36,7 +38,7 @@ public:
     static cuttingController* _mptr;
     static cuttingController* instance();
     cuttingController();
-
+    cuttingController(glm::vec3 ps, glm::vec3 pn);
     void Draw();
     void setCuttingParams(Shader* shader);
 

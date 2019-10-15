@@ -12,14 +12,18 @@ cuttingController* cuttingController::instance(){
     return _mptr;
 }
 cuttingController::cuttingController(){
-    p_start_ = glm::vec3(.0f);p_point_ = glm::vec3(.0f); //p_norm_=glm::vec3(1.0, .0, .0f);
+    p_start_ = glm::vec3(.0f);p_point_ = glm::vec3(.0f);
     p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f));
     _mptr = this;
 }
-
+cuttingController::cuttingController(glm::vec3 ps, glm::vec3 pn):
+p_start_(ps), p_norm_(pn){
+    p_point_ = p_start_;
+    p_rotate_mat_ = rotMatFromDir(pn);
+    _mptr = this;
+}
 void cuttingController::Draw(){
     if(vrController::param_bool_map["cutting"])DrawPlane();
-
 }
 void cuttingController::setCuttingParams(Shader* shader){
     shader->setVec3("uSphere.center", glm::vec3(vrController::csphere_c));
@@ -38,8 +42,8 @@ void cuttingController::DrawPlane(){
     pshader->Use();
 
     glm::mat4 model_mat =
-            glm::translate(glm::mat4(1.0), p_point_ + vrController::PosVec3_)*
-            vrController::RotateMat_* p_rotate_mat_*//glm::orientation(p_norm_, glm::vec3(0,0,1))*
+            glm::translate(glm::mat4(1.0), vrController::PosVec3_ + p_point_)*
+            vrController::RotateMat_* p_rotate_mat_*
             glm::scale(glm::mat4(1.0), p_scale * vrController::ScaleVec3_);
     pshader->setMat4("uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*model_mat);
     pshader->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
