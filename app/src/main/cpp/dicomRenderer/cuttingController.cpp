@@ -45,9 +45,13 @@ void cuttingController::DrawPlane(){
             glm::translate(glm::mat4(1.0), vrController::PosVec3_ + p_point_)*
             vrController::RotateMat_* p_rotate_mat_*
             glm::scale(glm::mat4(1.0), p_scale * vrController::ScaleVec3_);
-    pshader->setMat4("uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*model_mat);
-    pshader->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
 
+    glm::mat4 plane_obj_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
+    pshader->setMat4("uMVP",   vrController::camera->getProjMat()
+                             * vrController::camera->getViewMat()
+                             * vrController::ModelMat_
+                             * plane_obj_mat);
+    pshader->setVec4("uBaseColor", glm::vec4(0.2f, .0f, .0f, 1.0f));
     if (!pVAO_) {
         float vertices[] = {
                 1.0f,1.0f,.0f,
