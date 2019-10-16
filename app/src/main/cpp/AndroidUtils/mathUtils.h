@@ -30,9 +30,7 @@ inline glm::mat4 rotMatFromDir(glm::vec3 dir){
                       .0f,         .0f,         .0f,  1.0f);
     return rotmat;
 }
-inline glm::vec3 dirFromRS(glm::mat4 rotMat, glm::vec3 s, glm::vec3 ori_dir){
-    return glm::normalize(vec3MatNorm(rotMat, ori_dir)*s);
-}
+
 //check 8 vertices of a standard cube with extend
 inline glm::vec3 cloestVertexToPos(glm::vec3 pos, float extend){
     return glm::vec3(0.5f);
@@ -54,5 +52,8 @@ inline glm::mat4 mouseRotateMat(glm::mat4 bmat, float xoffset, float yoffset){
     return glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))
            * glm::rotate(glm::mat4(1.0f), yoffset, glm::vec3(1,0,0))
            * bmat;
+}
+inline glm::vec3 rotateNormal(glm::mat4 modelMat, glm::vec3 ori_n){
+    return vec3MatNorm(glm::transpose(glm::inverse(modelMat)), ori_n);
 }
 #endif //DICOM_VOLUME_RENDERING_MATHUTILS_H

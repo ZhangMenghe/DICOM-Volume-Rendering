@@ -54,7 +54,7 @@ void cuttingController::update(){
     mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
     if(tar == PLANE && vrController::param_bool_map["pfview"]){//keep it static
         p_rotate_mat_ = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
-        p_norm_ = vec3MatNorm(glm::transpose(glm::inverse(p_rotate_mat_)), glm::vec3(.0f, .0f, 1.0f));
+        p_norm_ = rotateNormal(p_rotate_mat_, glm::vec3(.0,.0,1.0));
         p_p2v_dirty = true;
     }
     else{
@@ -111,7 +111,7 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
                         * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))
                         * p_rotate_mat_;
 
-        p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, 1.0f));//todo:dont know why...
+        p_norm_ = rotateNormal(p_rotate_mat_, glm::vec3(.0f, .0f, 1.0f));
         p_p2v_dirty = true;
     }
 }
