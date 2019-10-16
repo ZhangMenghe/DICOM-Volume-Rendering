@@ -20,8 +20,9 @@ cuttingController::cuttingController(){
     //camera pos in obj space
 //    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
     //cloest point
-    p_start_ = glm::vec3(.0f,.0f,0.5f);//cloestVertexToPlane(p_norm_, vp_obj);
+    p_start_ = glm::vec3(.0f,.0f,0.3f);//cloestVertexToPlane(p_norm_, vp_obj);
     p_point_ = p_start_;
+    p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
 
     p_rotate_mat_ = rotMatFromDir(p_norm_);
 
@@ -53,10 +54,12 @@ void cuttingController::update(){
     }
     if(keep_cutting_position()){//keep it static
         p_p2v_mat = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
+        p_norm_ = rotateNormal(p_p2v_mat, glm::vec3(.0,.0,1.0));
+        p_point_ = glm::vec3(glm::inverse(vrController::ModelMat_) * glm::vec4(p_point_world,1.0f));
         p_rotate_mat_ = inverse(scale(mat4(1.0), p_scale)) * translate(mat4(1.0), -p_point_)*p_p2v_mat;
-        p_norm_ = rotateNormal(p_rotate_mat_, glm::vec3(.0,.0,1.0));
     }
     else{
+        p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
         p_p2w_mat = vrController::ModelMat_ * p_p2v_mat;
     }
 }
