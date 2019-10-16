@@ -39,6 +39,7 @@ private:
 
     void update();
     void draw_plane();
+    bool keep_cutting_position();
 
 public:
     static cuttingController* _mptr;

@@ -20,7 +20,7 @@ cuttingController::cuttingController(){
     //camera pos in obj space
 //    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
     //cloest point
-    p_start_ = glm::vec3(.0f);//cloestVertexToPlane(p_norm_, vp_obj);
+    p_start_ = glm::vec3(.0f,.0f,0.5f);//cloestVertexToPlane(p_norm_, vp_obj);
     p_point_ = p_start_;
 
     p_rotate_mat_ = rotMatFromDir(p_norm_);
@@ -51,8 +51,7 @@ void cuttingController::update(){
         p_p2v_dirty = false;
         p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
     }
-    mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
-    if(tar == PLANE && vrController::param_bool_map["pfview"]){//keep it static
+    if(keep_cutting_position()){//keep it static
         p_p2v_mat = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
         p_rotate_mat_ = inverse(scale(mat4(1.0), p_scale)) * translate(mat4(1.0), -p_point_)*p_p2v_mat;
         p_norm_ = rotateNormal(p_rotate_mat_, glm::vec3(.0,.0,1.0));
@@ -100,8 +99,13 @@ void cuttingController::draw_plane(){
 }
 
 void cuttingController::setCutPlane(float percent){
+    if(keep_cutting_position()) return;
     p_point_ = p_start_ + p_norm_* percent * 1.75f;
     p_p2v_dirty = true;
+}
+bool cuttingController::keep_cutting_position(){
+    mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
+    return (tar == PLANE && vrController::param_bool_map["pfview"]);
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){}
