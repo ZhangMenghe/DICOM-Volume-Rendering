@@ -13,7 +13,7 @@ cuttingController* cuttingController::instance(){
     return _mptr;
 }
 cuttingController::cuttingController(){
-    mat4 vm_inv = glm::inverse(vrController::RotateMat_);
+    mat4 vm_inv = glm::transpose(vrController::ModelMat_);
     //view dir in obj space
     p_norm_ = vec3MatNorm(vm_inv, vrController::camera->getViewDirection());
     LOGE("===INITl %f, %f, %f", p_norm_.x, p_norm_.y, p_norm_.z);
@@ -45,7 +45,8 @@ void cuttingController::setCuttingParams(Shader* shader){
     shader->setFloat("uSphere.radius", vrController::csphere_radius);
 
     shader->setVec3("uPlane.p", p_point_);
-    shader->setVec3("uPlane.normal", p_norm_);
+    shader->setVec3("uPlane.normal", p_norm_* glm::vec3(1.0,1.0,0.5));
+    LOGE("=====value %f, %f, %f", p_norm_.x, p_norm_.y, p_norm_.z);
 }
 void cuttingController::update(){
     if(p_p2v_dirty){
@@ -55,10 +56,13 @@ void cuttingController::update(){
     mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
     if(tar == PLANE && vrController::param_bool_map["pfview"]){//keep it static
         p_rotate_mat_ = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
-        p_norm_ = vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, 1.0f));
 
+        //need to get scale, translate, rotate
+//        glm::mat4 rs = glm::inverse(glm::translate(glm::mat4(1.0), p_point_)) * p_p2v_mat;
+//        p_rotate_mat_ = rs;
+        p_norm_ = glm::normalize(vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, 1.0f)) * glm::vec3(1.0,1.0,0.5));
+        LOGE("=====%f, %f, %f",p_norm_.x, p_norm_.y, p_norm_.z);
         p_p2v_dirty = true;
-
     }
     else{
         p_p2w_mat = vrController::ModelMat_ * p_p2v_mat;
@@ -120,9 +124,9 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
 }
 
 void cuttingController::onScale(mTarget target, float sx, float sy, float sz){
-    if(sy < .0f)    p_scale = p_scale * sx;
-    else p_scale = p_scale * glm::vec3(sx, sy, sz);
-    p_p2v_dirty = true;
+//    if(sy < .0f)    p_scale = p_scale * sx;
+//    else p_scale = p_scale * glm::vec3(sx, sy, sz);
+//    p_p2v_dirty = true;
 }
 void cuttingController::onTranslate(mTarget target, float offx, float offy){
     //do nothing currently
