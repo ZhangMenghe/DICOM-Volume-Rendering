@@ -27,6 +27,7 @@ vrController::vrController(AAssetManager *assetManager):
     camera = new Camera;
     myPtr_ = this;
     ScaleVec3_ = DEFAULT_SCALE;
+    updateVolumeModelMat();
 }
 
 void vrController::assembleTexture(GLubyte * data, int width, int height, int depth){
