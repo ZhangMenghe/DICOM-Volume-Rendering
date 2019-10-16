@@ -16,7 +16,6 @@ cuttingController::cuttingController(){
     mat4 vm_inv = glm::transpose(vrController::ModelMat_);
     //view dir in obj space
     p_norm_ = vec3MatNorm(vm_inv, vrController::camera->getViewDirection());
-    LOGE("===INITl %f, %f, %f", p_norm_.x, p_norm_.y, p_norm_.z);
 
     //camera pos in obj space
 //    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
@@ -45,8 +44,7 @@ void cuttingController::setCuttingParams(Shader* shader){
     shader->setFloat("uSphere.radius", vrController::csphere_radius);
 
     shader->setVec3("uPlane.p", p_point_);
-    shader->setVec3("uPlane.normal", p_norm_* glm::vec3(1.0,1.0,0.5));
-    LOGE("=====value %f, %f, %f", p_norm_.x, p_norm_.y, p_norm_.z);
+    shader->setVec3("uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
 }
 void cuttingController::update(){
     if(p_p2v_dirty){
@@ -56,12 +54,7 @@ void cuttingController::update(){
     mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
     if(tar == PLANE && vrController::param_bool_map["pfview"]){//keep it static
         p_rotate_mat_ = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
-
-        //need to get scale, translate, rotate
-//        glm::mat4 rs = glm::inverse(glm::translate(glm::mat4(1.0), p_point_)) * p_p2v_mat;
-//        p_rotate_mat_ = rs;
-        p_norm_ = glm::normalize(vec3MatNorm(p_rotate_mat_, glm::vec3(.0f, .0f, 1.0f)) * glm::vec3(1.0,1.0,0.5));
-        LOGE("=====%f, %f, %f",p_norm_.x, p_norm_.y, p_norm_.z);
+        p_norm_ = vec3MatNorm(glm::transpose(glm::inverse(p_rotate_mat_)), glm::vec3(.0f, .0f, 1.0f));
         p_p2v_dirty = true;
     }
     else{
