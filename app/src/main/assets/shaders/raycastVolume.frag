@@ -137,7 +137,7 @@ vec4 Volume(float head, float tail){
         vec4 val_color = Sample(p);
         if(ub_accumulate){
             if(val_color.a > 0.01){
-                if(pd < 0.01) subDivide(p, ro, rd, t, sample_step_inverse);
+                if(pd < 0.01) val_color = subDivide(p, ro, rd, t, sample_step_inverse);
                 sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
                 sum.a += (1.0 - sum.a) * val_color.a;
             }
@@ -145,7 +145,7 @@ vec4 Volume(float head, float tail){
         }else if(val_color.r > vmax){
              vmax = val_color.r;
         }
-        t += val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;//sample_step_inverse;//
+        t += val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
         steps++;
         pd = sum.a;
     }

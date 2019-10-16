@@ -29,14 +29,14 @@ private:
 
     glm::vec3 p_start_, p_norm_, p_point_;
     glm::vec3 p_point_world;
-    const glm::vec3 p_scale = glm::vec3(1.0f);
+    glm::vec3 p_scale = glm::vec3(1.0f);
 
     glm::mat4 p_rotate_mat_ = glm::mat4(1.0f);
 
     glm::mat4 p_p2w_mat, p_p2v_mat;
     bool p_p2v_dirty = true;
 
-    glm::vec4 plane_color_ = glm::vec4(0.2f, .0f, .0f, 1.0f);
+    glm::vec4 plane_color_ = glm::vec4(173,213,247,100);
 
     void update();
     void draw_plane();

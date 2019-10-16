@@ -124,9 +124,9 @@ void cuttingController::onRotate(mTarget target, float offx, float offy){
 }
 
 void cuttingController::onScale(mTarget target, float sx, float sy, float sz){
-//    if(sy < .0f)    p_scale = p_scale * sx;
-//    else p_scale = p_scale * glm::vec3(sx, sy, sz);
-//    p_p2v_dirty = true;
+    if(sy < .0f)    p_scale = p_scale * sx;
+    else p_scale = p_scale * glm::vec3(sx, sy, sz);
+    p_p2v_dirty = true;
 }
 void cuttingController::onTranslate(mTarget target, float offx, float offy){
     //do nothing currently
