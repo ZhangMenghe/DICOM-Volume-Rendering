@@ -102,7 +102,7 @@ void cuttingController::draw_plane(){
 }
 
 void cuttingController::setCutPlane(float percent){
-    if(keep_cutting_position()) return;
+//    if(keep_cutting_position()) return;
     p_point_ = p_start_ + p_norm_* percent * 1.75f;
     p_p2v_dirty = true;
 }

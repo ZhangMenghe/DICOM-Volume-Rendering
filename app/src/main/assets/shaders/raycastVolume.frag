@@ -109,11 +109,26 @@ vec4 Sample(vec3 p){
         color.a = color.r;
     return color;
 }
+vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
+    float t0 = t - StepSize * 4.0;
+    float t1 = t;
+    float tm;
+
+    #define BINARY_SUBDIV tm = (t0 + t1) * .5; p = ro + rd * tm; if (Sample(p).a > .01) t1 = tm; else t0 = tm;
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    #undef BINARY_SUBDIV
+
+    t = tm;
+    return Sample(p);
+}
 vec4 Volume(float head, float tail){
     vec3 ro = uCamposObjSpace + 0.5;
     vec3 rd = normalize(fs_in.raydir);
     vec4 sum = vec4(.0);
-    int steps = 0;
+    int steps = 0; float pd = .0;
 
     float vmax = .0;
     for(float t = head; t<tail; ){
@@ -122,6 +137,7 @@ vec4 Volume(float head, float tail){
         vec4 val_color = Sample(p);
         if(ub_accumulate){
             if(val_color.a > 0.01){
+                if(pd < 0.01) subDivide(p, ro, rd, t, sample_step_inverse);
                 sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
                 sum.a += (1.0 - sum.a) * val_color.a;
             }
@@ -129,8 +145,9 @@ vec4 Volume(float head, float tail){
         }else if(val_color.r > vmax){
              vmax = val_color.r;
         }
-        t+=sample_step_inverse;//val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
+        t += val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;//sample_step_inverse;//
         steps++;
+        pd = sum.a;
     }
     vec3 sample_color;
     if(ub_accumulate){
