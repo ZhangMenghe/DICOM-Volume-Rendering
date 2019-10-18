@@ -61,7 +61,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jobject){
     nativeApp(nativeAddr)->onDraw();
 }
 
-void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h ){
+void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int w, int h ){
     AndroidBitmapInfo srcInfo;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
         LOGE("get bitmap info failed");
@@ -72,25 +72,17 @@ void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, i
         LOGE("lock src bitmap failed");
         return;
     }
-    LOGI("width=%d; height=%d; stride=%d; format=%d;flag=%d",
-         srcInfo.width, //  width=2700 (900*3)
-         srcInfo.height, // height=2025 (675*3)
-         srcInfo.stride, // stride=10800 (2700*4)
-         srcInfo.format, // format=1 (ANDROID_BITMAP_FORMAT_RGBA_8888=1)
-         srcInfo.flags); // flags=0 (ANDROID_BITMAP_RESULT_SUCCESS=0)
-    w = srcInfo.width; h = srcInfo.height;
 
-    size_t size = srcInfo.width * srcInfo.height;
-    data = new GLubyte[size];
+    size_t size = w * h;
+    data = new GLubyte[CHANEL_NUM*size];
 
     int x, y, idx = 0;
     for (y = 0; y < h; y++) {
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
-            data[idx++] = line[x].red;
-//            LOGE("=== RGBA: %d, %d, %d, %d", line[x].red, line[x].green,line[x].blue, line[x].alpha);
+            data[CHANEL_NUM*idx+1] = line->red;
+            idx++;
         }
-
         buffer = (char *) buffer + srcInfo.stride;
     }
     AndroidBitmap_unlockPixels(env, bitmap);
@@ -136,9 +128,9 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject,  jobjectArray img_arr, ji
     //get dcmImg class defined in java
     jclass imgClass = env->FindClass("helmsley/vr/Utils/dcmImage");
     jobject img, bitmap;
-    jfieldID bitmap_id, location_id, thickness_id, xspace_id, yspace_id;
-    float location, xspacing, yspacing, thickness;
-    int valid_num = 0, last_valid = -1;
+    jfieldID bitmap_id, location_id, thickness_id;
+    float location, thickness;
+    int valid_num = 0;
     int width, height;
     for(int i=0; i<size; i++) {
         img = env->GetObjectArrayElement(img_arr, i);
@@ -147,7 +139,7 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject,  jobjectArray img_arr, ji
         thickness = env->GetFloatField(img, thickness_id);
         if(thickness == -1)//invalid
             continue;
-        else{last_valid = i; valid_num++;}
+        else{valid_num++;}
 
         location_id = env->GetFieldID(imgClass, "location", "F");
         location = env->GetFloatField(img, location_id);
@@ -156,23 +148,9 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject,  jobjectArray img_arr, ji
         bitmap = env->GetObjectField(img,bitmap_id);
         GLubyte * data = nullptr;
         convert_bitmap(env, bitmap, data, width, height);
+        img_height = height; img_width = width;
         images_.push_back(new dcmImage(
                 data,
                 location));
     }
-    if(last_valid!=-1){
-        img = env->GetObjectArrayElement(img_arr, last_valid);
-        xspace_id = env->GetFieldID(imgClass, "xSpacing", "F");
-        xspacing = env->GetFloatField(img, xspace_id);
-
-        yspace_id = env->GetFieldID(imgClass, "ySpacing", "F");
-        yspacing = env->GetFloatField(img, yspace_id);
-
-        GLubyte * data = nullptr;
-        convert_bitmap(env, bitmap, data, width, height);
-        img_height = height; img_width = width;
-//        nativeApp(nativeAddr)->initDCMIProperty(width, height, thickness*valid_num);
-
-    }
-//    nativeApp(nativeAddr)->assembleTexture();
 }
