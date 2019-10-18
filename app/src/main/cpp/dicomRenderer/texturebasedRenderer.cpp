@@ -75,7 +75,7 @@ void texvrRenderer::Draw(){
 
 
         else{
-            glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,1.0,1.0));
+            glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
             if(dir.z < 0){
                 glFrontFace(GL_CW);
             }else{

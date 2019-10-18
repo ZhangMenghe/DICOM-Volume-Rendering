@@ -78,6 +78,7 @@ public class GLActivity extends AppCompatActivity {
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
     protected void copyFromAssets(){
+        ass_copy_src = getString(R.string.config_voldir);
         ass_copy_dst = getFilesDir().getAbsolutePath() + "/" + ass_copy_src;
         //Skip copying if files exist
         if(skipLoadingResource){

@@ -20,8 +20,8 @@ private:
             0,3,2,
             2,1,0
     };
-    const float scale_inv = 0.3f;
-    const size_t NEED_SLCIES = 90;
+    const float scale_inv = 0.5f;
+    const size_t NEED_SLCIES = 300;
     int slice_start_idx = 0;
 
     Shader* shader_;

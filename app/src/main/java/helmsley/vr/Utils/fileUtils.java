@@ -85,7 +85,7 @@ public class fileUtils {
                 os.write(buffer);
             }
         } catch (Exception e) {
-            Log.e(TAG, "copyAssetFile: fail to copy from asset");
+            Log.e(TAG, "===copyAssetFile: fail to copy from asset"+ e);
         }
     }
 

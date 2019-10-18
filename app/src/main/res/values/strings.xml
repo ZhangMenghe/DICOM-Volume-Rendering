@@ -10,4 +10,7 @@
     <string name="text_opacity_threshold">value: %1$.2f</string>
     <string name="text_toggle">Value: %1$.2f </string>
     <string name="cut_switch">Control Plane</string>
+
+    <string name="config_voldir">dicom-images</string>
+    <string name="config_volname">series24</string>
 </resources>

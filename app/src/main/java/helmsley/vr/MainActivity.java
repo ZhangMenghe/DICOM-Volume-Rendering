@@ -1,6 +1,7 @@
 package helmsley.vr;
 
 import android.os.Bundle;
+import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,7 +27,6 @@ public class MainActivity extends GLActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         uiController = new UIsController(this);
-        ass_copy_src = "dicom-images";
     }
     protected boolean setupResource(){
         super.setupResource();
@@ -34,9 +34,9 @@ public class MainActivity extends GLActivity {
         return true;
     }
     private void setupDCMI() {
-        file_path_lst = fileUtils.getListFilesFromDir(new File(ass_copy_dst +"/sample/"));
+        file_path_lst = fileUtils.getListFilesFromDir(new File(ass_copy_dst+"/"+getString(R.string.config_volname)));
         file_nums = file_path_lst.size();
-
+        Log.e(TAG, ass_copy_dst+": =====num: " + file_nums );
         for(String file_path : file_path_lst)
             dcm_images.add(new dcmImage(file_path));
 
