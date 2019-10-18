@@ -7,14 +7,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import java.io.File;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-import helmsley.vr.Utils.FPSCounter;
 import helmsley.vr.Utils.GestureDetectorCalVR;
 import helmsley.vr.Utils.fileUtils;
 

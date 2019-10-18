@@ -32,7 +32,7 @@ public:
     static vrController* instance();
 
     vrController(AAssetManager *assetManager);
-    void assembleTexture(GLubyte * data, int width, int height, int depth);
+    void assembleTexture(GLubyte * data, int width, int height, int depth, const int channel_num);
     void setTransferColor(const int*colors, int num = 0);
     void onViewCreated();
     void onViewChange(int width, int height);

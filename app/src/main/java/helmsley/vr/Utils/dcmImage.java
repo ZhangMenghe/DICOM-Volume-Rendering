@@ -1,6 +1,7 @@
 package helmsley.vr.Utils;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import com.imebra.CodecFactory;
@@ -16,6 +17,8 @@ import com.imebra.VOILUT;
 import com.imebra.VOIs;
 import com.imebra.drawBitmapType_t;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +27,8 @@ public class dcmImage{
     static {
         System.loadLibrary("imebra_lib");
     }
-    public Bitmap bitmap;
+    public Bitmap bitmap = null;
+    public Bitmap msk = null;
     public float location;
     public float xSpacing;
     public float ySpacing;
@@ -38,8 +42,15 @@ public class dcmImage{
             new com.imebra.TagId(0x0018, 0x0050 );
 
     final static String TAG = "DCM_IMAGE_CLASS";
-
     public dcmImage(String path){
+        load_dcm(path);
+    }
+    public dcmImage(String path, String msk_pth){
+        load_dcm(path);
+        load_mask(msk_pth);
+    }
+
+    private void load_dcm(String path){
         FileStreamInput dcm_stream = new FileStreamInput(path);
         DataSet dcmDataset = CodecFactory.load(new StreamReader(dcm_stream));
 
@@ -104,4 +115,14 @@ public class dcmImage{
 
 //        dcm_bitmaps.add(renderBitmap);
     }
+
+    private void load_mask(String path){
+        try{
+            FileInputStream fis = new FileInputStream(path);
+            msk = BitmapFactory.decodeStream(fis);
+        }catch (IOException e){
+            Log.e(TAG, "===load_mask error from : " + path);
+        }
+    }
+
 }

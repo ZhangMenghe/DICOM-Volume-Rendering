@@ -30,8 +30,18 @@ vrController::vrController(AAssetManager *assetManager):
     updateVolumeModelMat();
 }
 
-void vrController::assembleTexture(GLubyte * data, int width, int height, int depth){
-    tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth,data);
+void vrController::assembleTexture(GLubyte * data, int width, int height, int depth, const int channel_num){
+    switch(channel_num){
+        case 1:
+            tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth, data);
+            break;
+        case 2:
+            tex_volume = new Texture(GL_RG8, GL_RG, GL_UNSIGNED_BYTE, width, height, depth, data);
+            break;
+        default:
+            tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth, data);
+            break;
+    }
 }
 void vrController::setTransferColor(const int*colors, int num){
     if(num <= 0){

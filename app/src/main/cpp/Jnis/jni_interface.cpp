@@ -20,13 +20,13 @@ namespace {
     public:
         GLubyte * data;
         float location;
-
         dcmImage(GLubyte * _data, float _location):
                 data(_data), location(_location){}
 
     };
     std::vector<dcmImage *> images_;
     int img_height, img_width;
+    const int CHANEL_NUM = 2;
 }
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     AAssetManager * cpp_asset_manager = AAssetManager_fromJava(env, asset_manager);
@@ -39,15 +39,15 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
               [](const dcmImage* img1, const dcmImage* img2){return img1->location < img2->location;});
     size_t dimensions = images_.size();
 
-    size_t data_size = img_width * img_height * dimensions;
+    size_t data_size = CHANEL_NUM * img_width * img_height * dimensions;
     auto *data = new GLubyte[data_size];
-    auto each_size = img_height * img_width* sizeof(GLubyte);
+    auto each_size = CHANEL_NUM * img_height * img_width* sizeof(GLubyte);
     for(int i=0; i<dimensions; i++)
         memcpy(data+i*each_size, images_[i]->data, each_size);
 
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
 
-    vrc->assembleTexture(data, img_width, img_height, dimensions);
+    vrc->assembleTexture(data, img_width, img_height, dimensions, CHANEL_NUM);
     delete[]data;
     vrc->setTransferColor(nullptr, -1);//default
     nativeApp(nativeAddr)->onViewCreated();
@@ -61,7 +61,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jobject){
     nativeApp(nativeAddr)->onDraw();
 }
 
-void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h ){
+void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h ){
     AndroidBitmapInfo srcInfo;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
         LOGE("get bitmap info failed");
@@ -88,6 +88,43 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h )
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
             data[idx++] = line[x].red;
+//            LOGE("=== RGBA: %d, %d, %d, %d", line[x].red, line[x].green,line[x].blue, line[x].alpha);
+        }
+
+        buffer = (char *) buffer + srcInfo.stride;
+    }
+    AndroidBitmap_unlockPixels(env, bitmap);
+}
+
+void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h ){
+    AndroidBitmapInfo srcInfo;
+    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
+        LOGE("get bitmap info failed");
+        return;
+    }
+    void * buffer;
+    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_lockPixels(env, bitmap, &buffer)) {
+        LOGE("lock src bitmap failed");
+        return;
+    }
+    LOGI("width=%d; height=%d; stride=%d; format=%d;flag=%d",
+         srcInfo.width, //  width=2700 (900*3)
+         srcInfo.height, // height=2025 (675*3)
+         srcInfo.stride, // stride=10800 (2700*4)
+         srcInfo.format, // format=1 (ANDROID_BITMAP_FORMAT_RGBA_8888=1)
+         srcInfo.flags); // flags=0 (ANDROID_BITMAP_RESULT_SUCCESS=0)
+    w = srcInfo.width; h = srcInfo.height;
+
+    size_t size = srcInfo.width * srcInfo.height;
+    data = new GLubyte[CHANEL_NUM*size];
+
+    int x, y, idx = 0;
+    for (y = 0; y < h; y++) {
+        argb * line = (argb *) buffer;
+        for (x = 0; x < w; x++) {
+            data[CHANEL_NUM*idx] = line[x].red;
+            data[CHANEL_NUM*idx+1] = 0xFF;
+            idx++;
 //            LOGE("=== RGBA: %d, %d, %d, %d", line[x].red, line[x].green,line[x].blue, line[x].alpha);
         }
 
