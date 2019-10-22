@@ -29,6 +29,8 @@ raycastRenderer::raycastRenderer() {
 }
 void raycastRenderer::Draw(){
     precompute();
+    // precompute here, update texture
+
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -38,7 +40,7 @@ void raycastRenderer::Draw(){
 
     glEnable(GL_DEPTH_TEST);
     glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-    glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture()); //bake_tex_->GLTexture());//
+    glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());//
 
 //    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
 //    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
@@ -87,20 +89,26 @@ void raycastRenderer::onCuttingChange(float percent){
     cutter_->setCutPlane(percent);
 }
 void raycastRenderer::precompute() {
-    if(!baked_dirty_) return;
-    baked_dirty_ = false;
-
-    // precompute here, update texture
-    geoshader_->Use();
-
-    geoshader_->setInt("destTex", vrController::VOLUME_TEX_ID);
     Texture* tex_vol = vrController::tex_volume;
-    bake_tex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_vol->Width(), tex_vol->Height(), tex_vol->Depth(), nullptr);
+    if(baked_dirty_) {
+        glEnable(GL_TEXTURE_3D);
+        GLbyte * data = new GLbyte[tex_vol->Width() * tex_vol->Height() * tex_vol->Depth() * 4];
+        memset(data, 0xFF, tex_vol->Width() * tex_vol->Height() * tex_vol->Depth() * 4 * sizeof(GLbyte));
+
+        bake_tex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_vol->Width(), tex_vol->Height(), tex_vol->Depth(), data);
+
+        geoshader_->Use();
+        geoshader_->setInt("destTex", vrController::VOLUME_TEX_ID);
 
     glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());
-    glBindImageTexture(0, bake_tex_->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    glDispatchCompute((GLuint)(tex_vol->Width() + 7) / 8, (GLuint)(tex_vol->Height() + 7) / 8, (GLuint)(tex_vol->Depth() + 7) / 8);
+    glBindImageTexture(0, bake_tex_->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glDispatchCompute((GLuint)(bake_tex_->Width() + 7) / 8, (GLuint)(bake_tex_->Height() + 7) / 8, (GLuint)(bake_tex_->Depth() + 7) / 8);
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
+    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
     geoshader_->unUse();
+    baked_dirty_ = false;
+    }
 }
