@@ -17,7 +17,7 @@ public class MainActivity extends GLActivity {
     }
 
     //dcm
-    List<String> file_path_lst;
+    List<String> file_path_lst, msk_path_lst;
     int file_nums;
     ArrayList<dcmImage> dcm_images = new ArrayList<>();
     //ui
@@ -35,10 +35,11 @@ public class MainActivity extends GLActivity {
     }
     private void setupDCMI() {
         file_path_lst = fileUtils.getListFilesFromDir(new File(ass_copy_dst+"/"+getString(R.string.config_volname)));
+        msk_path_lst = fileUtils.getListFilesFromDir(new File(ass_copy_dst+"/"+getString(R.string.config_volname)+getString(R.string.config_mask_tail)));
         file_nums = file_path_lst.size();
         Log.e(TAG, ass_copy_dst+": =====num: " + file_nums );
-        for(String file_path : file_path_lst)
-            dcm_images.add(new dcmImage(file_path));
+        for(int i=0; i<file_nums; i++)
+            dcm_images.add(new dcmImage(file_path_lst.get(i), msk_path_lst.get(i)));
 
         //pass down to native
         JNIInterface.JNIsendDCMImgs(dcm_images.toArray(new dcmImage[0]), file_nums);

@@ -64,12 +64,12 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jobject){
 void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int w, int h ){
     AndroidBitmapInfo srcInfo;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
-        LOGE("get bitmap info failed");
+        LOGE("====get bitmap info failed");
         return;
     }
     void * buffer;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_lockPixels(env, bitmap, &buffer)) {
-        LOGE("lock src bitmap failed");
+        LOGE("====lock src bitmap failed");
         return;
     }
 
@@ -80,7 +80,7 @@ void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int w, i
     for (y = 0; y < h; y++) {
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
-            data[CHANEL_NUM*idx+1] = line->red;
+            data[CHANEL_NUM*idx+1] = line[x].red;
             idx++;
         }
         buffer = (char *) buffer + srcInfo.stride;
@@ -91,12 +91,12 @@ void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int w, i
 void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h ){
     AndroidBitmapInfo srcInfo;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
-        LOGE("get bitmap info failed");
+        LOGE("====get bitmap info failed");
         return;
     }
     void * buffer;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_lockPixels(env, bitmap, &buffer)) {
-        LOGE("lock src bitmap failed");
+        LOGE("===lock src bitmap failed");
         return;
     }
     LOGI("width=%d; height=%d; stride=%d; format=%d;flag=%d",
@@ -115,9 +115,7 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h )
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
             data[CHANEL_NUM*idx] = line[x].red;
-            data[CHANEL_NUM*idx+1] = 0xFF;
             idx++;
-//            LOGE("=== RGBA: %d, %d, %d, %d", line[x].red, line[x].green,line[x].blue, line[x].alpha);
         }
 
         buffer = (char *) buffer + srcInfo.stride;
@@ -127,8 +125,8 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h )
 JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject,  jobjectArray img_arr, jint size){
     //get dcmImg class defined in java
     jclass imgClass = env->FindClass("helmsley/vr/Utils/dcmImage");
-    jobject img, bitmap;
-    jfieldID bitmap_id, location_id, thickness_id;
+    jobject img, bitmap, bitmap_mask;
+    jfieldID bitmap_id, bm_mask_id, location_id, thickness_id;
     float location, thickness;
     int valid_num = 0;
     int width, height;
@@ -145,10 +143,15 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject,  jobjectArray img_arr, ji
         location = env->GetFloatField(img, location_id);
 
         bitmap_id = env->GetFieldID(imgClass, "bitmap", "Landroid/graphics/Bitmap;");
-        bitmap = env->GetObjectField(img,bitmap_id);
+        bitmap = env->GetObjectField(img, bitmap_id);
+
+        bm_mask_id = env->GetFieldID(imgClass, "bitmap_msk", "Landroid/graphics/Bitmap;");
+        bitmap_mask = env->GetObjectField(img, bm_mask_id);
+
         GLubyte * data = nullptr;
         convert_bitmap(env, bitmap, data, width, height);
         img_height = height; img_width = width;
+        load_mask_from_bitmap(env, bitmap_mask, data, width, height);
         images_.push_back(new dcmImage(
                 data,
                 location));

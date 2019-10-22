@@ -28,7 +28,7 @@ public class dcmImage{
         System.loadLibrary("imebra_lib");
     }
     public Bitmap bitmap = null;
-    public Bitmap msk = null;
+    public Bitmap bitmap_msk = null;
     public float location;
     public float xSpacing;
     public float ySpacing;
@@ -119,7 +119,7 @@ public class dcmImage{
     private void load_mask(String path){
         try{
             FileInputStream fis = new FileInputStream(path);
-            msk = BitmapFactory.decodeStream(fis);
+            bitmap_msk = BitmapFactory.decodeStream(fis);
         }catch (IOException e){
             Log.e(TAG, "===load_mask error from : " + path);
         }
