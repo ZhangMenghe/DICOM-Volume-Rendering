@@ -98,7 +98,7 @@ void raycastRenderer::precompute() {
         bake_tex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_vol->Width(), tex_vol->Height(), tex_vol->Depth(), data);
 
         geoshader_->Use();
-        geoshader_->setInt("destTex", vrController::VOLUME_TEX_ID);
+//        geoshader_->setInt("destTex", vrController::VOLUME_TEX_ID);
 
     glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());
