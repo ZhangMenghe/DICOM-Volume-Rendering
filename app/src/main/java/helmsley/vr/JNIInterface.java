@@ -9,5 +9,5 @@ public class JNIInterface {
     public static native void JNIonSurfaceChanged(int width, int height);
     public static native void JNIdrawFrame();
 
-    public static native void JNIsendDCMImgs(dcmImage img_arr[], int size);
+    public static native void JNIsendDCMImgs(dcmImage img_arr[], int size, boolean with_mask);
 }

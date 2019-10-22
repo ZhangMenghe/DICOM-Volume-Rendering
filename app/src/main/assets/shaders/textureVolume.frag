@@ -42,7 +42,7 @@ void main(){
 		gl_FragColor = vec4(vTexcoord, 1.0f);
 		return;
 	}
-	float intensity = texture(uSampler_tex, vTexcoord).g;
+	float intensity = texture(uSampler_tex, vTexcoord).r;
 	vec3 sampled_color;
 	if(ub_colortrans){
 //		float value =min(intensity + 0.167, 1.0);

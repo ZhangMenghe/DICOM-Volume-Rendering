@@ -38,11 +38,15 @@ public class MainActivity extends GLActivity {
         msk_path_lst = fileUtils.getListFilesFromDir(new File(ass_copy_dst+"/"+getString(R.string.config_volname)+getString(R.string.config_mask_tail)));
         file_nums = file_path_lst.size();
         Log.e(TAG, ass_copy_dst+": =====num: " + file_nums );
-        for(int i=0; i<file_nums; i++)
-            dcm_images.add(new dcmImage(file_path_lst.get(i), msk_path_lst.get(i)));
-
-        //pass down to native
-        JNIInterface.JNIsendDCMImgs(dcm_images.toArray(new dcmImage[0]), file_nums);
+        if(msk_path_lst.size() == 0){
+            for(int i=0; i<file_nums; i++)
+                dcm_images.add(new dcmImage(file_path_lst.get(i)));
+            JNIInterface.JNIsendDCMImgs(dcm_images.toArray(new dcmImage[0]), file_nums, false);
+        }else{
+            for(int i=0; i<file_nums; i++)
+                dcm_images.add(new dcmImage(file_path_lst.get(i), msk_path_lst.get(i)));
+            JNIInterface.JNIsendDCMImgs(dcm_images.toArray(new dcmImage[0]), file_nums, true);
+        }
     }
     @Override
     protected void updateOnFrame(){
