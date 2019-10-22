@@ -9,7 +9,7 @@ raycastRenderer::raycastRenderer() {
 
     //program
     shader_ = new Shader();
-    if(!shader_->Create("shaders/raycastVolume.vert", "shaders/raycastVolume.frag"))
+    if(!shader_->Create("shaders/raycastVolume.vert", "shaders/raycastVolume.frag"))//, "shaders/raycastVolume.glsl"))
         LOGE("Raycast===Failed to create shader program===");
     shader_->Use();
         shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
