@@ -34,6 +34,57 @@ bool Shader::Create(const char* vert_file, const char *_frag_file, const char* _
     }
     return create_program(&vcontent, &fcontent);
 }
+//for geometry shader
+bool Shader::Create(const char* filename){
+    auto loader = assetLoader::instance();
+    std::string GeometryShaderContent;
+    if (!loader->LoadTextFileFromAssetManager(filename, &GeometryShaderContent)) {
+        LOGE("Failed to load file: %s", filename);
+        return false;
+    }
+    const char* content = GeometryShaderContent.c_str();
+    GLuint shader = glCreateShader(GL_COMPUTE_SHADER);//create_shader(GL_GEOMETRY_SHADER, &content, 1, nullptr);
+    if (!shader) {
+        check_gl_error("glCreateShader");
+        return false;
+    }
+    glShaderSource(shader, 1, &content, nullptr);
+    glCompileShader(shader);
+
+    int rvalue;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &rvalue);
+    if (!rvalue) {
+        LOGE("====Error in compiling the compute shader\n");
+        GLchar log[10240];
+        GLsizei length;
+        glGetShaderInfoLog(shader, 10239, &length, log);
+        LOGE("=====Compiler log:\n%s\n", log);
+    }
+
+
+
+    mProgram = glCreateProgram();
+    if(!shader || !mProgram){glDeleteShader(shader); return false;}
+    glAttachShader(mProgram, shader);
+    glLinkProgram(mProgram);
+    GLint linked = GL_FALSE;
+    glGetProgramiv(mProgram, GL_LINK_STATUS, &linked);
+    if(!linked){
+        GLint infoLogLen = 0;
+        glGetProgramiv(mProgram, GL_INFO_LOG_LENGTH, &infoLogLen);
+        if (infoLogLen) {
+            GLchar* infoLog = (GLchar*)malloc(infoLogLen);
+            if (infoLog) {
+                glGetProgramInfoLog(mProgram, infoLogLen, NULL, infoLog);
+                LOGE("===Could not link program:\n%s\n", infoLog);
+                free(infoLog);
+            }
+        }
+        glDeleteShader(shader); glDeleteProgram(mProgram); mProgram = 0; return false;
+    }
+    glDeleteShader(shader);
+    return true;
+}
 
 //bool Shader::Create(const char* vert_files[], const char* frag_files[], int vert_size, int frag_size){
 //    std::string content;
@@ -132,7 +183,7 @@ bool Shader::create_program(const char** vtxSrc, const char** fragSrc, const cha
     glLinkProgram(mProgram);
     glGetProgramiv(mProgram, GL_LINK_STATUS, &linked);
     if (!linked) {
-        LOGE("Could not link program");
+        LOGE("===Could not link program");
         GLint infoLogLen = 0;
         glGetProgramiv(mProgram, GL_INFO_LOG_LENGTH, &infoLogLen);
         if (infoLogLen) {

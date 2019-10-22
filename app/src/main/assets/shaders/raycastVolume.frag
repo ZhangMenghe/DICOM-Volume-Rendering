@@ -166,6 +166,9 @@ vec4 Volume(float head, float tail){
 
 //    return vec4(sum.rgb, alpha * uOpacitys.overall);
 }
+void main_old(void){
+    gl_FragColor = texture(uSampler_tex, fs_in.TexCoords);
+}
 void main(void){
     vec3 ray_origin = uCamposObjSpace;
     vec3 ray_dir = normalize(fs_in.raydir);

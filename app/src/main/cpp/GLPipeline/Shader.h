@@ -66,6 +66,7 @@ public:
 	void Use(){glUseProgram(mProgram);}
 	void unUse(){glUseProgram(0);}
     bool Create(const char* vert_file, const char *_frag_file, const char* _geo_file = nullptr);
+	bool Create(const char* filename);//for geometry shader
 //	bool Create( const char* vert_files[], const char* frag_files[], int vert_size=1,int frag_size = 1);
 private:
     GLuint mProgram;
