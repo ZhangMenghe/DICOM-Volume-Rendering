@@ -73,9 +73,6 @@ void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int w, i
         return;
     }
 
-    size_t size = w * h;
-    data = new GLubyte[CHANEL_NUM*size];
-
     int x, y, idx = 0;
     for (y = 0; y < h; y++) {
         argb * line = (argb *) buffer;
@@ -115,6 +112,7 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h )
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
             data[CHANEL_NUM*idx] = line[x].red;
+            data[CHANEL_NUM*idx + 1] = 0xff;
             idx++;
         }
 

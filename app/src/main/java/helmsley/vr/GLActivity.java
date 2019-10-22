@@ -23,7 +23,7 @@ public class GLActivity extends AppCompatActivity {
     //DST folder that runtime can use, constains what u copied from asset
     protected String ass_copy_dst = null;
 
-    final static boolean skipLoadingResource = false;
+    final static boolean skipLoadingResource = true;
 
     //Surface view
     protected GLSurfaceView surfaceView;
