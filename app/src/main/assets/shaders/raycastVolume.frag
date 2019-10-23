@@ -26,7 +26,6 @@ uniform Plane uPlane;
 uniform Sphere uSphere;
 
 uniform mediump sampler3D uSampler_tex;
-uniform bool ub_simplecube;
 uniform bool ub_colortrans;
 uniform bool ub_accumulate;
 uniform bool ub_cuttingplane;
@@ -202,10 +201,5 @@ void main(void){
 //
     if (intersect.y < intersect.x)
         discard;
-    else{
-        if(ub_simplecube) gl_FragColor = vec4(0.8, 0.8, .0, 1.0);
-        else{
-            gl_FragColor = Volume(intersect.x, intersect.y);
-        }
-    }
+    gl_FragColor = Volume(intersect.x, intersect.y);
 }

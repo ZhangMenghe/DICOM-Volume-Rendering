@@ -9,7 +9,6 @@
     </string-array>
 
     <string-array name="t2Arr">
-        <!--<item>Opacity</item>-->
         <item>Sample Step</item>
         <item>Threshold</item>
         <item>Brightness</item>
@@ -17,10 +16,10 @@
 
     <string-array name="switchArr">
         <item>Color Transfer</item>
-        <item>Raycast</item>
+        <item>Volume</item>
         <item>Cutting</item>
-        <item>SimpleCube</item>
-        <item>AccumulateRay</item>
+        <item>MaskOn</item>
+        <item>AlphaBlending</item>
     </string-array>
 
     <string-array name="opacityArr">

@@ -57,12 +57,10 @@ void raycastRenderer::Draw(){
         shader_->setVec3("uCamposObjSpace", glm::vec3(model_inv
         *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
 
-
-        shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
         shader_->setBool("ub_accumulate", vrController::param_bool_map["accumulate"]);
         shader_->setBool("ub_cuttingplane", vrController::param_bool_map["cutting"]);
-        shader_->setBool("ub_colononly", true);
+        shader_->setBool("ub_colononly", vrController::param_bool_map["maskon"]);
 
         shader_->setFloat("sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
         shader_->setFloat("val_threshold", vrController::param_value_map["threshold"]);

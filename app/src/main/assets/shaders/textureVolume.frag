@@ -15,7 +15,6 @@ uniform OpacityAdj uOpacitys;
 uniform sampler3D uSampler_tex;
 
 uniform bool ub_colortrans;
-uniform bool ub_simplecube;
 uniform bool ub_colononly;
 
 float START_H_VALUE = 0.1667;
@@ -39,10 +38,6 @@ vec3 transfer_scheme(float gray){
 	return hsv2rgb(vec3(h,s,v));
 }
 void main(){
-	if(ub_simplecube){
-		gl_FragColor = vec4(vTexcoord, 1.0f);
-		return;
-	}
 	float intensity = texture(uSampler_tex, vTexcoord).r;
 	if(ub_colononly)
 		intensity = texture(uSampler_tex, vTexcoord).g * intensity;
