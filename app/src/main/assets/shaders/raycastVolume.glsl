@@ -8,7 +8,7 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 layout(binding = 0, rgba8)writeonly uniform mediump image3D destTex;
 
 vec4 Sample(ivec3 pos){
-    return vec4(1.0,.0,.0,1.0);
+    return vec4(1.0, .0, .0, 1.0);
 }
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
