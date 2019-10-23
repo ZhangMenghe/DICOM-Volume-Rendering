@@ -30,6 +30,7 @@ uniform bool ub_simplecube;
 uniform bool ub_colortrans;
 uniform bool ub_accumulate;
 uniform bool ub_cuttingplane;
+uniform bool ub_colononly;
 //uniform bool ub_viewfront;
 uniform vec3 uVolumeSize;
 
@@ -107,6 +108,11 @@ vec4 Sample(vec3 p){
         color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : color.r;
     else
         color.a = color.r;
+    if(ub_colononly){
+        float mask = texture(uSampler_tex, p).g;
+        if(mask < 0.01)
+            color = mask * color;
+    }
     return color;
 }
 vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
@@ -196,6 +202,10 @@ void main(void){
 //
     if (intersect.y < intersect.x)
         discard;
-    else
-        gl_FragColor = ub_simplecube? vec4(0.8, 0.8, .0, 1.0) : Volume(intersect.x, intersect.y);
+    else{
+        if(ub_simplecube) gl_FragColor = vec4(0.8, 0.8, .0, 1.0);
+        else{
+            gl_FragColor = Volume(intersect.x, intersect.y);
+        }
+    }
 }

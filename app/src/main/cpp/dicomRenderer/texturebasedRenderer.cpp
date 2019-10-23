@@ -52,6 +52,7 @@ void texvrRenderer::Draw(){
 
         shader_->setBool("ub_simplecube", vrController::param_bool_map["simplecube"]);
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
+        shader_->setBool("ub_colononly",true);// vrController::param_bool_map["colononly"]);
         shader_->setFloat("uOpacitys.overall", vrController::param_value_map["overall"]);
         shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
         shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);

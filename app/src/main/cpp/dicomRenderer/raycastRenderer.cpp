@@ -28,7 +28,7 @@ raycastRenderer::raycastRenderer() {
     cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
 }
 void raycastRenderer::Draw(){
-    precompute();
+//    precompute();
     // precompute here, update texture
 
 
@@ -40,7 +40,7 @@ void raycastRenderer::Draw(){
 
     glEnable(GL_DEPTH_TEST);
     glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-    glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());//
+    glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());//
 
 //    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
 //    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
@@ -62,6 +62,7 @@ void raycastRenderer::Draw(){
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
         shader_->setBool("ub_accumulate", vrController::param_bool_map["accumulate"]);
         shader_->setBool("ub_cuttingplane", vrController::param_bool_map["cutting"]);
+        shader_->setBool("ub_colononly", true);
 
         shader_->setFloat("sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
         shader_->setFloat("val_threshold", vrController::param_value_map["threshold"]);

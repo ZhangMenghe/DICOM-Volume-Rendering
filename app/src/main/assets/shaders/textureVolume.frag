@@ -16,6 +16,7 @@ uniform sampler3D uSampler_tex;
 
 uniform bool ub_colortrans;
 uniform bool ub_simplecube;
+uniform bool ub_colononly;
 
 float START_H_VALUE = 0.1667;
 float BASE_S_VALUE = 0.7;
@@ -43,6 +44,8 @@ void main(){
 		return;
 	}
 	float intensity = texture(uSampler_tex, vTexcoord).r;
+	if(ub_colononly)
+		intensity = texture(uSampler_tex, vTexcoord).g * intensity;
 	vec3 sampled_color;
 	if(ub_colortrans){
 //		float value =min(intensity + 0.167, 1.0);
@@ -53,7 +56,12 @@ void main(){
 //		sampled_color = texture(uSampler_trans, vec2(intensity, 1.0)).rgb;
 	else
 		sampled_color = vec3(intensity);
-	float alpha = intensity * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
+
+	float alpha;
+	if(ub_colononly)
+		alpha = intensity;//put low bound to 0 in the colon case
+	else
+		alpha = intensity * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
 	if(intensity< uOpacitys.cutoff) alpha = 0.0;
 	gl_FragColor = vec4(sampled_color, alpha * uOpacitys.overall);
 }
