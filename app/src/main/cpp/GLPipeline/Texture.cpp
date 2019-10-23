@@ -49,7 +49,10 @@ Texture::Texture(GLenum internalFormat, GLenum format, GLenum type, unsigned int
 	: mTexture(0), mInternalFormat(internalFormat), mFormat(format), mType(type), mWidth(width), mHeight(height), mDepth(depth) {
 	glGenTextures(1, &mTexture);
 	glBindTexture(GL_TEXTURE_3D, mTexture);
-	glTexImage3D(GL_TEXTURE_3D, 0, mInternalFormat, mWidth, mHeight, mDepth, 0, mFormat, mType, data);
+
+//	glTexImage3D(GL_TEXTURE_3D, 0, mInternalFormat, mWidth, mHeight, mDepth, 0, mFormat, mType, data);
+    glTexStorage3D(GL_TEXTURE_3D, 1, mInternalFormat, mWidth, mHeight, mDepth);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, mWidth, mHeight, mDepth, mFormat, mType, data);
 
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
