@@ -29,8 +29,6 @@ uniform mediump sampler3D uSampler_tex;
 uniform bool ub_colortrans;
 uniform bool ub_accumulate;
 uniform bool ub_cuttingplane;
-uniform bool ub_colononly;
-//uniform bool ub_viewfront;
 uniform vec3 uVolumeSize;
 
 uniform float sample_step_inverse;      // step used to advance the sampling ray
@@ -98,20 +96,17 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
 
 vec4 Sample(vec3 p){
     vec4 color;
-    float intensity = texture(uSampler_tex, p).r;
+    vec4 sc = texture(uSampler_tex, p);
+    float intensity = sc.r;
     intensity += val_threshold - 0.5;
     intensity = clamp(intensity * brightness / 250.0, 0.0, 1.0);
+    if(sc.g < 0.01)    color.rgb = vec3(intensity, .0, .0);
+    else color.rgb = vec3(intensity);
 
-    color.rgb = vec3(intensity);
     if(ub_cuttingplane)
-        color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : color.r;
+        color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : sc.a;
     else
-        color.a = color.r;
-    if(ub_colononly){
-        float mask = texture(uSampler_tex, p).g;
-        if(mask < 0.01)
-            color = mask * color;
-    }
+        color.a = sc.a;
     return color;
 }
 vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){

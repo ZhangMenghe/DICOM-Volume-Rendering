@@ -56,7 +56,6 @@ void raycastRenderer::Draw(){
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
         shader_->setBool("ub_accumulate", vrController::param_bool_map["accumulate"]);
         shader_->setBool("ub_cuttingplane", vrController::param_bool_map["cutting"]);
-        shader_->setBool("ub_colononly", vrController::param_bool_map["maskon"]);
 
         shader_->setFloat("sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
         shader_->setFloat("val_threshold", vrController::param_value_map["threshold"]);
@@ -97,6 +96,10 @@ void raycastRenderer::precompute() {
 
         glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
         glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+        shader_->setBool("ub_maskon", vrController::param_bool_map["maskon"]);
+        shader_->setBool("ub_maskonly", true);//vrController::param_bool_map["maskon"]);
+        shader_->setBool("ub_invert", true);//vrController::param_bool_map["maskon"]);
 
         geoshader_->unUse();
         baked_dirty_ = false;
