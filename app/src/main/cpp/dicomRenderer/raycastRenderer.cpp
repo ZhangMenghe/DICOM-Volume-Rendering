@@ -21,6 +21,7 @@ raycastRenderer::raycastRenderer() {
     geoshader_ = new Shader;
     if(!geoshader_->Create("shaders/raycastVolume.glsl"))
         LOGE("Raycast=====Failed to create geometry shader");
+
     cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
 }
 void raycastRenderer::Draw(){
@@ -34,8 +35,13 @@ void raycastRenderer::Draw(){
 //    glCullFace(GL_BACK);
 
     glEnable(GL_DEPTH_TEST);
-    glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-    glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());
+    if(bake_tex_){
+        glActiveTexture(GL_TEXTURE0+BAKE_TEX_ID);
+        glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());
+    }else{
+        glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
+        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
+    }
 
     //Update cutting plane and draw
     cutter_->Draw();
@@ -86,15 +92,18 @@ void raycastRenderer::precompute() {
             GLbyte * data = new GLbyte[tex_vol->Width() * tex_vol->Height() * tex_vol->Depth() * 4];
             memset(data, 0xff, tex_vol->Width() * tex_vol->Height() * tex_vol->Depth() * 4 * sizeof(GLbyte));
             bake_tex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_vol->Width(), tex_vol->Height(), tex_vol->Depth(), data);
+            BAKE_TEX_ID = vrController::VOLUME_TEX_ID;
         }
 
-        glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());
         geoshader_->Use();
 
+//        glBindImageTexture(0, vrController::tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RG8);
         glBindImageTexture(0, bake_tex_->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
         glDispatchCompute((GLuint)(bake_tex_->Width() + 7) / 8, (GLuint)(bake_tex_->Height() + 7) / 8, (GLuint)(bake_tex_->Depth() + 7) / 8);
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+//        glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RG8);
         glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
         geoshader_->unUse();

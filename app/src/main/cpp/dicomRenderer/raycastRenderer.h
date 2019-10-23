@@ -13,6 +13,7 @@ private:
     GLuint VAO_=0;
     bool baked_dirty_ = true;
     Texture* bake_tex_ = nullptr;
+    int BAKE_TEX_ID;
 
 public:
     raycastRenderer();
