@@ -4,8 +4,8 @@
 #include <AndroidUtils/mathUtils.h>
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr;
-int vrController::VOLUME_TEX_ID=0;//, vrController::TRANS_TEX_ID = 1;
+Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr; Texture* vrController::tex_baked = nullptr;
+int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
@@ -38,10 +38,18 @@ void vrController::assembleTexture(GLubyte * data, int width, int height, int de
         case 2:
             tex_volume = new Texture(GL_RG8, GL_RG, GL_UNSIGNED_BYTE, width, height, depth, data);
             break;
+        case 4:
+            tex_volume = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, data);
+            break;
         default:
             tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth, data);
             break;
     }
+
+    int vsize= width* height* depth;
+    GLbyte * vdata = new GLbyte[vsize * 4];
+    memset(data, 0xff, vsize * 4 * sizeof(GLbyte));
+    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, data);
 }
 void vrController::setTransferColor(const int*colors, int num){
     if(num <= 0){

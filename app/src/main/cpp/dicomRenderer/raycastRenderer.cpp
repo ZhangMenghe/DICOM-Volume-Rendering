@@ -11,12 +11,6 @@ raycastRenderer::raycastRenderer() {
     shader_ = new Shader();
     if(!shader_->Create("shaders/raycastVolume.vert", "shaders/raycastVolume.frag"))
         LOGE("Raycast===Failed to create shader program===");
-    shader_->Use();
-        shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
-//        shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
-        shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
-    shader_->unUse();
-
     //geometry program
     geoshader_ = new Shader;
     if(!geoshader_->Create("shaders/raycastVolume.glsl"))
@@ -26,27 +20,27 @@ raycastRenderer::raycastRenderer() {
 }
 void raycastRenderer::Draw(){
     precompute();
-    // precompute here, update texture
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
 //    glEnable(GL_CULL_FACE);
 //    glCullFace(GL_BACK);
-
     glEnable(GL_DEPTH_TEST);
-    if(bake_tex_){
-        glActiveTexture(GL_TEXTURE0+BAKE_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, bake_tex_->GLTexture());
-    }else{
-        glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-    }
 
     //Update cutting plane and draw
     cutter_->Draw();
 
     shader_->Use();
+    if(vrController::tex_baked){
+        glActiveTexture(GL_TEXTURE0+vrController::BAKED_TEX_ID);
+        glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
+        shader_->setInt("uSampler_tex", vrController::BAKED_TEX_ID);
+    }else{
+        glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
+        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
+        shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
+    }
+
         shader_->setMat4("uProjMat", vrController::camera->getProjMat());
         shader_->setMat4("uViewMat", vrController::camera->getViewMat());
         shader_->setMat4("uModelMat", vrController::ModelMat_);
@@ -54,6 +48,10 @@ void raycastRenderer::Draw(){
         glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
         shader_->setVec3("uCamposObjSpace", glm::vec3(model_inv
         *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
+        shader_->setVec3("uVolumeSize",
+                glm::vec3(vrController::tex_volume->Width(),
+                vrController::tex_volume->Height(),
+                vrController::tex_volume->Depth()));
 
         shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
         shader_->setBool("ub_accumulate", vrController::param_bool_map["accumulate"]);
@@ -88,23 +86,17 @@ void raycastRenderer::onCuttingChange(float percent){
 void raycastRenderer::precompute() {
     Texture* tex_vol = vrController::tex_volume;
     if(baked_dirty_) {
-        if(!bake_tex_){
-            GLbyte * data = new GLbyte[tex_vol->Width() * tex_vol->Height() * tex_vol->Depth() * 4];
-            memset(data, 0xff, tex_vol->Width() * tex_vol->Height() * tex_vol->Depth() * 4 * sizeof(GLbyte));
-            bake_tex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_vol->Width(), tex_vol->Height(), tex_vol->Depth(), data);
-            BAKE_TEX_ID = vrController::VOLUME_TEX_ID;
-        }
 
         geoshader_->Use();
 
-//        glBindImageTexture(0, vrController::tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RG8);
-        glBindImageTexture(0, bake_tex_->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+        glBindImageTexture(0, tex_vol->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+        glBindImageTexture(1, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-        glDispatchCompute((GLuint)(bake_tex_->Width() + 7) / 8, (GLuint)(bake_tex_->Height() + 7) / 8, (GLuint)(bake_tex_->Depth() + 7) / 8);
+        glDispatchCompute((GLuint)(tex_vol->Width() + 7) / 8, (GLuint)(tex_vol->Height() + 7) / 8, (GLuint)(tex_vol->Depth() + 7) / 8);
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-//        glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RG8);
-        glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+        glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+        glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
         geoshader_->unUse();
         baked_dirty_ = false;

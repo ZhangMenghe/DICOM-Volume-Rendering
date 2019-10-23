@@ -26,7 +26,7 @@ namespace {
     };
     std::vector<dcmImage *> images_;
     int img_height, img_width;
-    const int CHANEL_NUM = 2;
+    const int CHANEL_NUM = 4;
 }
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     AAssetManager * cpp_asset_manager = AAssetManager_fromJava(env, asset_manager);
@@ -115,6 +115,8 @@ void convert_bitmap_with_mask(JNIEnv* env, jobject bitmap, jobject mask, GLubyte
         for (x = 0; x < w; x++) {
             data[CHANEL_NUM*idx] = line[x].red;
             data[CHANEL_NUM*idx + 1] = mask_line[x].red;
+            data[CHANEL_NUM*idx + 2] = 0xff;
+            data[CHANEL_NUM*idx + 3] = 0xff;
             idx++;
         }
 
