@@ -1,207 +1,163 @@
 #include "Shader.h"
 #include <string>
 #include "AndroidUtils/AndroidHelper.h"
+#include <sstream>
 using namespace glm;
+using namespace std;
+
 Shader::~Shader() {
-    glDeleteProgram(mProgram);
+    for (const auto& p : mPrograms) {
+        glDeleteProgram(p.second.mProgram);
+        for (const auto& s : p.second.mShaders)
+            glDeleteShader(s);
+    }
 }
-
-bool Shader::Create(const char* vert_file, const char *_frag_file, const char* _geo_file){
-    std::string VertexShaderContent;
-    auto loader = assetLoader::instance();
-    if (!loader->LoadTextFileFromAssetManager(vert_file, &VertexShaderContent)) {
-        LOGE("Failed to load file: %s", vert_file);
+bool Shader::AddShaderFile(GLenum type, const char* filename){
+    string content;
+    if (!assetLoader::instance()->LoadTextFileFromAssetManager(filename, &content)) {
+        LOGE("====Failed to load file: %s", filename);
         return false;
     }
-
-    std::string FragmentShaderContent;
-    if (!loader->LoadTextFileFromAssetManager(_frag_file, &FragmentShaderContent)) {
-        LOGE("Failed to load file: %s", _frag_file);
-        return false;
-    }
-    const char* vcontent = VertexShaderContent.c_str();
-    const char* fcontent = FragmentShaderContent.c_str();
-    const char* gcontent = nullptr;
-
-    if(_geo_file != nullptr) {
-        std::string GeometryShaderContent;
-        if (!loader->LoadTextFileFromAssetManager(_geo_file, &GeometryShaderContent)) {
-            LOGE("Failed to load file: %s", _geo_file);
-            return false;
-        }
-        gcontent = GeometryShaderContent.c_str();
-        return create_program(&vcontent, &fcontent, &gcontent);
-    }
-    return create_program(&vcontent, &fcontent);
+    mShadersToLink.emplace(type, content);
+    return true;
 }
-//for geometry shader
-bool Shader::Create(const char* filename){
-    auto loader = assetLoader::instance();
-    std::string GeometryShaderContent;
-    if (!loader->LoadTextFileFromAssetManager(filename, &GeometryShaderContent)) {
-        LOGE("Failed to load file: %s", filename);
-        return false;
-    }
-    const char* content = GeometryShaderContent.c_str();
-    GLuint shader = glCreateShader(GL_COMPUTE_SHADER);//create_shader(GL_GEOMETRY_SHADER, &content, 1, nullptr);
-    if (!shader) {
-        check_gl_error("glCreateShader");
-        return false;
-    }
-    glShaderSource(shader, 1, &content, nullptr);
-    glCompileShader(shader);
-
-    int rvalue;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &rvalue);
-    if (!rvalue) {
-        LOGE("====Error in compiling the compute shader\n");
-        GLchar log[10240];
-        GLsizei length;
-        glGetShaderInfoLog(shader, 10239, &length, log);
-        LOGE("=====Compiler log:\n%s\n", log);
-    }
-
-
-
-    mProgram = glCreateProgram();
-    if(!shader || !mProgram){glDeleteShader(shader); return false;}
-    glAttachShader(mProgram, shader);
-    glLinkProgram(mProgram);
-    GLint linked = GL_FALSE;
-    glGetProgramiv(mProgram, GL_LINK_STATUS, &linked);
-    if(!linked){
-        GLint infoLogLen = 0;
-        glGetProgramiv(mProgram, GL_INFO_LOG_LENGTH, &infoLogLen);
-        if (infoLogLen) {
-            GLchar* infoLog = (GLchar*)malloc(infoLogLen);
-            if (infoLog) {
-                glGetProgramInfoLog(mProgram, infoLogLen, NULL, infoLog);
-                LOGE("===Could not link program:\n%s\n", infoLog);
-                free(infoLog);
+bool Shader::CompileAndLink(){
+    vector<vector<string>> keywords;
+    keywords.push_back(vector<string>());
+    keywords[0].push_back("");
+    // create keyword variants
+    for (const auto it : mShadersToLink) {
+        istringstream iss(it.second);
+        string line;
+        while(getline(iss, line)){
+            unsigned int kwc = keywords.size();
+            stringstream ss(line);
+            string token;
+            int mode = 0;
+            while (getline(ss, token, ' ')) {
+                if (mode == 2) {
+                    // create variants
+                    for (unsigned int i = 0; i < kwc; i++) {
+                        vector<string> k(keywords[i]);
+                        k.push_back(token);
+                        keywords.push_back(k);
+                    }
+                    mAvailableKeywords.insert(token);
+                } else {
+                    if (token == "#pragma")
+                        mode = 1;
+                    else if (mode == 1 && token == "multi_compile")
+                        mode = 2;
+                }
             }
         }
-        glDeleteShader(shader); glDeleteProgram(mProgram); mProgram = 0; return false;
     }
-    glDeleteShader(shader);
+
+    LOGI("===Compiling %d shader variants\n", (int)keywords.size());
+
+    for (auto& it : keywords) {
+        it.erase(it.begin());
+        string kw = "";
+        for (const auto& k : it)
+            kw += k + " ";
+        ShaderProgram cpr;
+        if(!LinkShader(it, cpr))
+            return false;
+        mPrograms.emplace(kw, cpr);
+    }
     return true;
 }
 
-//bool Shader::Create(const char* vert_files[], const char* frag_files[], int vert_size, int frag_size){
-//    std::string content;
-//    auto loader = assetLoader::instance();
-//    char* vcontent[vert_size]; char* fcontent[frag_size];
-//    int*vcon_len=new int[vert_size], *fcon_len= new int [frag_size];
-//
-//    for(size_t i=0; i<vert_size; i++){
-//        if (!loader->LoadTextFileFromAssetManager(vert_files[i], &content)) {
-//            LOGE("Failed to load file: %s", vert_files[i]);
-//            return false;
-//        }
-//        vcon_len[i] = content.size();
-//        vcontent[i] = new char[vcon_len[i]];
-//        strcpy(vcontent[i], content.c_str());
-//    }
-//    for(int i=0; i<frag_size; i++){
-//        if (!loader->LoadTextFileFromAssetManager(frag_files[i], &content)) {
-//            LOGE("Failed to load file: %s", frag_files[i]);
-//            return false;
-//        }
-//        fcon_len[i] = content.size();
-//        fcontent[i] = new char[fcon_len[i]];
-//        strcpy(fcontent[i], content.c_str());
-//    }
-//
-//    if(vert_size == 1) vcon_len = nullptr;
-//    if(frag_size == 1) fcon_len = nullptr;
-//
-//    return create_program((const char **)&vcontent[0], (const char **)&fcontent[0], vert_size, frag_size, vcon_len, fcon_len);
-//}
+GLuint Shader::Use(){
+    string kw = "";
+    for (const auto& k : mActiveKeywords)
+        kw += k + " ";
+    assert(mPrograms.count(kw));
 
-bool Shader::check_gl_error(const char *funcName){
-    GLint err = glGetError();
-    if (err != GL_NO_ERROR) {
-        LOGE("GL error after %s(): 0x%08x\n", funcName, err);
-        return true;
-    }
-    return false;
+    GLuint p = mPrograms.at(kw).mProgram;
+    glUseProgram(p);
+    return p;
 }
-GLuint Shader::create_shader(GLenum shaderType, const char **pSource, int src_size, int* arr_length){
-    GLuint shader = glCreateShader(shaderType);
-    if (!shader) {
-        check_gl_error("glCreateShader");
-        return 0;
-    }
-    glShaderSource(shader, src_size, pSource, arr_length);
 
-    GLint compiled = GL_FALSE;
+GLuint CompileShader(GLenum type, string content, const vector<string>& keywords) {
+//    stringstream sstr;
+//    // read the first line, check if it's a #version line
+//    // if so, keep it at the top, if not, insert after the #define statements
+//    bool insertLine = false;
+//    string firstLine;
+//
+//    istringstream iss(content);
+//    while(getline(iss, firstLine)){
+//        if (firstLine.substr(0, 8) == "#version")
+//            sstr << firstLine << endl;
+//        else
+//            insertLine = true;
+//    }
+//
+//    for (const auto& kw : keywords){
+//        LOGE("====KEY: %s", kw.c_str());
+//        sstr << "#define " << kw.c_str() << endl;
+//    }
+//
+//    if (insertLine) sstr << firstLine << endl;
+//    sstr << iss.rdbuf();
+//
+//    string str = sstr.str();
+    const char* src = content.c_str();
+
+    GLuint shader = glCreateShader(type);
+    glShaderSource(shader, 1, &src, 0);
     glCompileShader(shader);
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
-    if (!compiled) {
-        GLint infoLogLen = 0;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLogLen);
-        if (infoLogLen > 0) {
-            GLchar* infoLog = (GLchar*)malloc(infoLogLen);
-            if (infoLog) {
-                glGetShaderInfoLog(shader, infoLogLen, NULL, infoLog);
-                LOGE("Could not compile %s shader:\n%s\n",
-                     shaderType == GL_VERTEX_SHADER ? "vertex" : (shaderType == GL_FRAGMENT_SHADER ?"fragment":"geometry"),
-                     infoLog);
-                free(infoLog);
-            }
-        }
+
+    GLint isCompiled = 0;
+    glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
+    if (isCompiled == GL_FALSE) {
+        GLint maxLength = 0;
+        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+
+        vector<GLchar> info(maxLength);
+        glGetShaderInfoLog(shader, maxLength, &maxLength, info.data());
+
+        string kw = "";
+        for (const auto& it : keywords) kw += it + " ";
+        printf("===Error compiling shader with keywords %s: ", kw.c_str());
+
         glDeleteShader(shader);
         return 0;
+    } else {
+        return shader;
     }
-
-    return shader;
 }
-bool Shader::create_program(const char** vtxSrc, const char** fragSrc, const char** geoSrc){
-    GLuint vtxShader = 0;
-    GLuint fragShader = 0;
-    GLuint geoShader = 0;
-    GLint linked = GL_FALSE;
 
-    vtxShader = create_shader(GL_VERTEX_SHADER, vtxSrc, 1, nullptr);
-    if (!vtxShader){glDeleteShader(vtxShader);return false;}
+bool Shader::LinkShader(const std::vector<std::string>& keywords, ShaderProgram& pgm){
+    // compile shaders with keywords
+    for (const auto& it : mShadersToLink){
+        GLuint shader_id = CompileShader(it.first, it.second, keywords);
+        if(!shader_id)
+            return false;
+        pgm.mShaders.push_back(shader_id);
+    }
 
-    fragShader = create_shader(GL_FRAGMENT_SHADER, fragSrc, 1, nullptr);
-    if (!fragShader){glDeleteShader(vtxShader); glDeleteShader(fragShader); return false;}
+    pgm.mProgram = glCreateProgram();
+    for (const auto& s : pgm.mShaders)
+        glAttachShader(pgm.mProgram, s);
+    glLinkProgram(pgm.mProgram);
 
-    if(geoSrc != nullptr){
-        geoShader = create_shader(GL_GEOMETRY_SHADER, geoSrc, 1, nullptr);
-        if(!geoShader){glDeleteShader(vtxShader); glDeleteShader(fragShader);glDeleteShader(geoShader); return false;}
+    GLint isLinked = 0;
+    glGetProgramiv(pgm.mProgram, GL_LINK_STATUS, (int*)&isLinked);
+    if (isLinked == GL_FALSE) {
+        GLint maxLength = 0;
+        glGetProgramiv(pgm.mProgram, GL_INFO_LOG_LENGTH, &maxLength);
+        GLchar* info = (GLchar*)malloc(maxLength);
+        glGetProgramInfoLog(pgm.mProgram, maxLength, &maxLength, info);
+        LOGE("===Could not link program:\n%s\n", info);
+        free(info);
+        glDeleteProgram(pgm.mProgram);
+        for (const auto& s : pgm.mShaders)
+            glDeleteShader(s);
+    } else {
+        for (const auto& s : pgm.mShaders)
+            glDetachShader(pgm.mProgram, s);
     }
-    mProgram = glCreateProgram();
-    if (!mProgram) {
-        check_gl_error("glCreateProgram");
-        glDeleteShader(vtxShader); glDeleteShader(fragShader); return false;
-    }
-    glAttachShader(mProgram, vtxShader);
-    glAttachShader(mProgram, fragShader);
-    if(geoSrc != nullptr)
-        glAttachShader(mProgram, geoShader);
-    glLinkProgram(mProgram);
-    glGetProgramiv(mProgram, GL_LINK_STATUS, &linked);
-    if (!linked) {
-        LOGE("===Could not link program");
-        GLint infoLogLen = 0;
-        glGetProgramiv(mProgram, GL_INFO_LOG_LENGTH, &infoLogLen);
-        if (infoLogLen) {
-            GLchar* infoLog = (GLchar*)malloc(infoLogLen);
-            if (infoLog) {
-                glGetProgramInfoLog(mProgram, infoLogLen, NULL, infoLog);
-                LOGE("Could not link program:\n%s\n", infoLog);
-                free(infoLog);
-            }
-        }
-        glDeleteProgram(mProgram);
-        mProgram = 0;
-        glDeleteShader(vtxShader);
-        glDeleteShader(fragShader);
-        return false;
-    }
-    glDeleteShader(vtxShader);
-    glDeleteShader(fragShader);
     return true;
 }
-

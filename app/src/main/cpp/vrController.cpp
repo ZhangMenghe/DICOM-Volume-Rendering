@@ -63,9 +63,9 @@ void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
     raycastRenderer_ = new raycastRenderer;
 
-    funcRenderer_ = new FuncRenderer;
-    funcRenderer_->CreateFunction(COLOR_BAR);
-    funcRenderer_->CreateFunction(OPACITY_FUN);
+//    funcRenderer_ = new FuncRenderer;
+//    funcRenderer_->CreateFunction(COLOR_BAR);
+//    funcRenderer_->CreateFunction(OPACITY_FUN);
 }
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
@@ -85,7 +85,7 @@ void vrController::onDraw() {
         raycastRenderer_->Draw();
     else
         texvrRenderer_->Draw();
-    funcRenderer_->Draw();
+//    funcRenderer_->Draw();
 }
 
 void vrController::onTouchMove(float x, float y) {

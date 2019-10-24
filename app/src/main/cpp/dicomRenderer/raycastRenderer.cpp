@@ -9,11 +9,14 @@ raycastRenderer::raycastRenderer() {
 
     //program
     shader_ = new Shader();
-    if(!shader_->Create("shaders/raycastVolume.vert", "shaders/raycastVolume.frag"))
-        LOGE("Raycast===Failed to create shader program===");
+    if(!shader_->AddShaderFile(GL_VERTEX_SHADER,"shaders/raycastVolume.vert")
+            ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/raycastVolume.frag")
+            ||!shader_->CompileAndLink())
+        LOGE("Raycast===Failed to create raycast shader program===");
     //geometry program
     geoshader_ = new Shader;
-    if(!geoshader_->Create("shaders/raycastVolume.glsl"))
+    if(!geoshader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastVolume.glsl")
+        ||!geoshader_->CompileAndLink())
         LOGE("Raycast=====Failed to create geometry shader");
 
     cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
@@ -30,36 +33,35 @@ void raycastRenderer::Draw(){
     //Update cutting plane and draw
     cutter_->Draw();
 
-    shader_->Use();
+    GLuint sp = shader_->Use();
     if(vrController::tex_baked){
         glActiveTexture(GL_TEXTURE0+vrController::BAKED_TEX_ID);
         glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
-        shader_->setInt("uSampler_tex", vrController::BAKED_TEX_ID);
+        Shader::Uniform(sp, "uSampler_tex", vrController::BAKED_TEX_ID);
     }else{
         glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
         glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-        shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
+        Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
     }
-
-        shader_->setMat4("uProjMat", vrController::camera->getProjMat());
-        shader_->setMat4("uViewMat", vrController::camera->getViewMat());
-        shader_->setMat4("uModelMat", vrController::ModelMat_);
+    Shader::Uniform(sp, "uProjMat", vrController::camera->getProjMat());
+    Shader::Uniform(sp,"uViewMat", vrController::camera->getViewMat());
+    Shader::Uniform(sp,"uModelMat", vrController::ModelMat_);
 
         glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
-        shader_->setVec3("uCamposObjSpace", glm::vec3(model_inv
+    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
         *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-        shader_->setVec3("uVolumeSize",
+    Shader::Uniform(sp,"uVolumeSize",
                 glm::vec3(vrController::tex_volume->Width(),
                 vrController::tex_volume->Height(),
                 vrController::tex_volume->Depth()));
 
-        shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
-        shader_->setBool("ub_accumulate", vrController::param_bool_map["accumulate"]);
-        shader_->setBool("ub_cuttingplane", vrController::param_bool_map["cutting"]);
+    Shader::Uniform(sp,"ub_colortrans", vrController::param_bool_map["colortrans"]);
+    Shader::Uniform(sp,"ub_accumulate", vrController::param_bool_map["accumulate"]);
+    Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool_map["cutting"]);
 
-        shader_->setFloat("sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
-        shader_->setFloat("val_threshold", vrController::param_value_map["threshold"]);
-        shader_->setFloat("brightness", vrController::param_value_map["brightness"]);
+    Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
+    Shader::Uniform(sp,"val_threshold", vrController::param_value_map["threshold"]);
+    Shader::Uniform(sp,"brightness", vrController::param_value_map["brightness"]);
 
         cutter_->setCuttingParams(shader_);
 
@@ -71,7 +73,7 @@ void raycastRenderer::Draw(){
         glBindVertexArray(VAO_);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-    shader_->unUse();
+    shader_->UnUse();
 
 
     glDisable(GL_BLEND);
@@ -97,12 +99,7 @@ void raycastRenderer::precompute() {
         glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
         glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-        //bool type not working
-//        shader_->setBool("ub_maskon", vrController::param_bool_map["maskon"]);
-//        shader_->setBool("ub_maskonly", true);//vrController::param_bool_map["maskon"]);
-//        shader_->setBool("ub_invert", true);//vrController::param_bool_map["maskon"]);
-
-        geoshader_->unUse();
+        geoshader_->UnUse();
         baked_dirty_ = false;
     }
 }

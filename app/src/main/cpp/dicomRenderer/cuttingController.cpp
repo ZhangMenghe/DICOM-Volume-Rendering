@@ -41,11 +41,12 @@ void cuttingController::Draw(){
     if(vrController::param_bool_map["cutting"])draw_plane();
 }
 void cuttingController::setCuttingParams(Shader* shader){
-    shader->setVec3("uSphere.center", glm::vec3(vrController::csphere_c));
-    shader->setFloat("uSphere.radius", vrController::csphere_radius);
+    GLuint sp = shader->Use();
+    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
+    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
 
-    shader->setVec3("uPlane.p", p_point_);
-    shader->setVec3("uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
+    Shader::Uniform(sp,"uPlane.p", p_point_);
+    Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
 }
 void cuttingController::update(){
     if(p_p2v_dirty){
@@ -67,12 +68,14 @@ void cuttingController::update(){
 void cuttingController::draw_plane(){
     if(!pshader){
         pshader = new Shader();
-        if(!pshader->Create("shaders/cplane.vert", "shaders/cplane.frag"))
+        if(!pshader->AddShaderFile(GL_VERTEX_SHADER,"shaders/cplane.vert")
+           ||!pshader->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/cplane.frag")
+           ||!pshader->CompileAndLink())
             LOGE("Raycast===Failed to create cutting plane shader program===");
     }
-    pshader->Use();
-    pshader->setMat4("uMVP", vrController::camera->getVPMat()* p_p2w_mat);
-    pshader->setVec4("uBaseColor", plane_color_);
+    GLuint sp = pshader->Use();
+    Shader::Uniform(sp,"uMVP", vrController::camera->getVPMat()* p_p2w_mat);
+    Shader::Uniform(sp,"uBaseColor", plane_color_);
     if (!pVAO_) {
         float vertices[] = {
                 1.0f,1.0f,.0f,
@@ -98,7 +101,7 @@ void cuttingController::draw_plane(){
     }
     glBindVertexArray(pVAO_);
     glDrawArrays(GL_TRIANGLES, 0, 6);
-    pshader->unUse();
+    pshader->UnUse();
 }
 
 void cuttingController::setCutPlane(float percent){

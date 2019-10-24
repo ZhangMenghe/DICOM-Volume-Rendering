@@ -1,79 +1,54 @@
 #ifndef GL_SHADER_H
 #define GL_SHADER_H
 
-// Include the latest possible header file( GL version header )
-#if __ANDROID_API__ >= 24
-#include <GLES3/gl32.h>
-#elif __ANDROID_API__ >= 21
-#include <GLES3/gl31.h>
-#else
-#include <GLES3/gl3.h>
-#endif
 #include <glm/glm.hpp>
+#include <GLES3/gl32.h>
+#include <unordered_set>
+#include <unordered_map>
+#include <string>
+#include <vector>
+typedef struct  {
+	GLuint mProgram;
+	std::vector<GLuint> mShaders;
+}ShaderProgram;
 
 class Shader {
 public:
+	Shader(){}
 	~Shader();
+	bool AddShaderFile(GLenum type, const char* filename);
+	bool CompileAndLink();
 
-	// global utility functions
-// utility uniform functions
-	// ------------------------------------------------------------------------
-	void setBool(const char* name, bool value) const{
-		glUniform1i(glGetUniformLocation(mProgram, name), (int)value);
-	}
-	// ------------------------------------------------------------------------
-	void setInt(const char* name, int value) const{
-		glUniform1i(glGetUniformLocation(mProgram, name), value);
-	}
-	// ------------------------------------------------------------------------
-	void setFloat(const char*  name, float value) const{
-		glUniform1f(glGetUniformLocation(mProgram, name), value);
-	}
-	// ------------------------------------------------------------------------
-	void setVec2(const char*  name, const glm::vec2 &value) const{
-		glUniform2fv(glGetUniformLocation(mProgram, name), 1, &value[0]);
-	}
-	void setVec2(const char*  name, float x, float y) const{
-		glUniform2f(glGetUniformLocation(mProgram, name), x, y);
-	}
-	// ------------------------------------------------------------------------
-	void setVec3(const char*  name, const glm::vec3 &value) const{
-		glUniform3fv(glGetUniformLocation(mProgram, name), 1, &value[0]);
-	}
-	void setVec3(const char*  name, float x, float y, float z) const{
-		glUniform3f(glGetUniformLocation(mProgram, name), x, y, z);
-	}
-	// ------------------------------------------------------------------------
-	void setVec4(const char*  name, const glm::vec4 &value) const{
-		glUniform4fv(glGetUniformLocation(mProgram, name), 1, &value[0]);
-	}
-	void setVec4(const char*  name, float x, float y, float z, float w){
-		glUniform4f(glGetUniformLocation(mProgram, name), x, y, z, w);
-	}
-	// ------------------------------------------------------------------------
-	void setMat2(const char*  name, const glm::mat2 &mat) const{
-		glUniformMatrix2fv(glGetUniformLocation(mProgram, name), 1, GL_FALSE, &mat[0][0]);
-	}
-	// ------------------------------------------------------------------------
-	void setMat3(const char*  name, const glm::mat3 &mat) const{
-		glUniformMatrix3fv(glGetUniformLocation(mProgram, name), 1, GL_FALSE, &mat[0][0]);
-	}
-	// ------------------------------------------------------------------------
-	void setMat4(const char*  name, const glm::mat4 &mat) const{
-		glUniformMatrix4fv(glGetUniformLocation(mProgram, name), 1, GL_FALSE, &mat[0][0]);
-	}
+	GLuint Use();
+	void UnUse(){glUseProgram(0);}
 
-	void Use(){glUseProgram(mProgram);}
-	void unUse(){glUseProgram(0);}
-    bool Create(const char* vert_file, const char *_frag_file, const char* _geo_file = nullptr);
-	bool Create(const char* filename);//for geometry shader
-//	bool Create( const char* vert_files[], const char* frag_files[], int vert_size=1,int frag_size = 1);
+	void EnableKeyword(std::string keyword){if (mAvailableKeywords.count(keyword))mActiveKeywords.insert(keyword);}
+	void DisableKeyword(std::string keyword){mActiveKeywords.erase(keyword);}
+
+	// set int
+	static void Uniform(GLuint program, const GLchar* name, int x){glUniform1i(glGetUniformLocation(program, name), x);}
+	//set float
+	static void Uniform(GLuint program, const GLchar* name, float x){glUniform1f(glGetUniformLocation(program, name), x);}
+	//set bool
+    static void Uniform(GLuint program, const GLchar* name, bool x){glUniform1i(glGetUniformLocation(program, name), (int)x);}
+    //set vec3
+	static void Uniform(GLuint program, const GLchar* name, const glm::vec3& v){glUniform3f(glGetUniformLocation(program, name), v.x, v.y, v.z);}
+	static void Uniform(GLuint program, const GLchar* name, const glm::vec4& v){glUniform4f(glGetUniformLocation(program, name), v.x, v.y, v.z, v.w);}
+	//set mat4
+	static void Uniform(GLuint program, const GLchar* name, const glm::mat4& m){glUniformMatrix4fv(glGetUniformLocation(program, name), 1, GL_FALSE, &m[0][0]);}
+
 private:
-    GLuint mProgram;
-    bool check_gl_error(const char *funcName);
-//    bool create_program(const char* vtxSrc, const char* fragSrc);
-	bool create_program(const char** vtxSrc, const char** fragSrc, const char** geoSrc = nullptr);
-	GLuint create_shader(GLenum shaderType, const char **pSource, int src_size = 1, int* arr_length= nullptr);
+
+
+	std::unordered_set<std::string> mAvailableKeywords;
+	std::unordered_set<std::string> mActiveKeywords;
+
+	// indexed by keyword combo
+	std::unordered_map<std::string, ShaderProgram> mPrograms;
+
+	std::unordered_map<GLenum, std::string> mShadersToLink;
+
+	bool LinkShader(const std::vector<std::string>& keywords, ShaderProgram& pgm);
 };
 
 #endif

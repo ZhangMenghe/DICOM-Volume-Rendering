@@ -28,7 +28,7 @@ SET(GL_PIPELINE_FILES
         GLPipeline/Mesh.cpp
         GLPipeline/Texture.cpp)
 SET(DICOM_RENDERERS
-        dicomRenderer/funcsRenderer.cpp
+#        dicomRenderer/funcsRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp
         dicomRenderer/cuttingController.cpp)

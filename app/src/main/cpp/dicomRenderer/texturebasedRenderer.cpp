@@ -19,14 +19,10 @@ texvrRenderer::texvrRenderer() {
 
     //program
     shader_ = new Shader();
-    if(!shader_->Create("shaders/textureVolume.vert", "shaders/textureVolume.frag"))
-        LOGE("TextureBas===Failed to create shader program===");
-    shader_->Use();
-        shader_->setInt("uSampler_tex", vrController::VOLUME_TEX_ID);
-//        shader_->setInt("uSampler_trans", vrController::TRANS_TEX_ID);
-        shader_->setVec3("uVolumeSize", glm::vec3(vrController::tex_volume->Width(), vrController::tex_volume->Height(), vrController::tex_volume->Depth()));
-    shader_->unUse();
-
+    if(!shader_->AddShaderFile(GL_VERTEX_SHADER,"shaders/textureVolume.vert")
+       ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/textureVolume.frag")
+       ||!shader_->CompileAndLink())
+        LOGE("TextureBas===Failed to create raycast shader program===");
 }
 void texvrRenderer::Draw(){
     glEnable(GL_BLEND);
@@ -43,18 +39,23 @@ void texvrRenderer::Draw(){
 //    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
 //    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
 
-    shader_->Use();
-        shader_->setMat4("uProjMat", vrController::camera->getProjMat());
-        shader_->setMat4("uViewMat", vrController::camera->getViewMat());
+    GLuint sp = shader_->Use();
+    Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
+    Shader::Uniform(sp,"uVolumeSize",
+                    glm::vec3(vrController::tex_volume->Width(),
+                              vrController::tex_volume->Height(),
+                              vrController::tex_volume->Depth()));
+    Shader::Uniform(sp,"uProjMat", vrController::camera->getProjMat());
+    Shader::Uniform(sp,"uViewMat", vrController::camera->getViewMat());
         if(vrController::ROTATE_AROUND_CUBE)
-            shader_->setMat4("uModelMat", glm::mat4(1.0));
-        else shader_->setMat4("uModelMat", vrController::ModelMat_);
+            Shader::Uniform(sp,"uModelMat", glm::mat4(1.0));
+        else Shader::Uniform(sp,"uModelMat", vrController::ModelMat_);
 
-        shader_->setBool("ub_colortrans", vrController::param_bool_map["colortrans"]);
-        shader_->setBool("ub_colononly", vrController::param_bool_map["maskon"]);
-        shader_->setFloat("uOpacitys.overall", vrController::param_value_map["overall"]);
-        shader_->setFloat("uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
-        shader_->setFloat("uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
+    Shader::Uniform(sp,"ub_colortrans", vrController::param_bool_map["colortrans"]);
+    Shader::Uniform(sp,"ub_colononly", vrController::param_bool_map["maskon"]);
+    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_value_map["overall"]);
+    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
+    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 
         bool clock_wise = false;
         if(vrController::ROTATE_AROUND_CUBE){
@@ -98,7 +99,7 @@ void texvrRenderer::Draw(){
 //                glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 //            }
 //        }
-    shader_->unUse();
+    shader_->UnUse();
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
