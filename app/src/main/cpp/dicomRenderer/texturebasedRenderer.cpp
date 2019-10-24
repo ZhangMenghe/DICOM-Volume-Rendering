@@ -33,14 +33,17 @@ void texvrRenderer::Draw(){
 
     glEnable(GL_DEPTH_TEST);
 
-    glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-    glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-
-//    glActiveTexture(GL_TEXTURE0 + vrController::TRANS_TEX_ID);
-//    glBindTexture(GL_TEXTURE_2D, vrController::tex_trans->GLTexture());
-
     GLuint sp = shader_->Use();
-    Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
+    if(vrController::tex_baked){
+        glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
+        glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
+        Shader::Uniform(sp, "uSampler_tex", vrController::BAKED_TEX_ID);
+    }else{
+        glActiveTexture(GL_TEXTURE0 + vrController::VOLUME_TEX_ID);
+        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
+        Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
+    }
+
     Shader::Uniform(sp,"uVolumeSize",
                     glm::vec3(vrController::tex_volume->Width(),
                               vrController::tex_volume->Height(),
@@ -51,8 +54,6 @@ void texvrRenderer::Draw(){
             Shader::Uniform(sp,"uModelMat", glm::mat4(1.0));
         else Shader::Uniform(sp,"uModelMat", vrController::ModelMat_);
 
-    Shader::Uniform(sp,"ub_colortrans", vrController::param_bool_map["colortrans"]);
-    Shader::Uniform(sp,"ub_colononly", vrController::param_bool_map["maskon"]);
     Shader::Uniform(sp,"uOpacitys.overall", vrController::param_value_map["overall"]);
     Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);

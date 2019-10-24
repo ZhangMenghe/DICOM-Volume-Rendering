@@ -55,7 +55,7 @@ void raycastRenderer::Draw(){
                 vrController::tex_volume->Height(),
                 vrController::tex_volume->Depth()));
 
-    Shader::Uniform(sp,"ub_colortrans", vrController::param_bool_map["colortrans"]);
+//    Shader::Uniform(sp,"ub_colortrans", vrController::param_bool_map["colortrans"]);
     Shader::Uniform(sp,"ub_accumulate", vrController::param_bool_map["accumulate"]);
     Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool_map["cutting"]);
 
@@ -87,7 +87,7 @@ void raycastRenderer::onCuttingChange(float percent){
 void raycastRenderer::precompute() {
     Texture* tex_vol = vrController::tex_volume;
     if(baked_dirty_) {
-//        geoshader_->EnableKeyword("ORGANS_ONLY");
+//        geoshader_->EnableKeyword("MASKON");
 
         geoshader_->Use();
         glBindImageTexture(0, tex_vol->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
