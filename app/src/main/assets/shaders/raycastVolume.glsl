@@ -1,5 +1,6 @@
 #version 310 es
-#pragma multi_compile MASK
+#pragma multi_compile MASKON ORGANS_ONLY
+//#pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -12,22 +13,24 @@ layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex;
 
 vec4 Sample(ivec3 pos){
     vec2 sc = imageLoad(srcTex, pos).rg;
-    vec4 color = vec4(.0);
-//    if(ub_invert)
-//        sc.r = 1.0 - sc.r;
+    vec4 color = vec4(1.0);
     color.rgb = vec3(sc.r);
-    color.a = 1.0;
+#ifdef MASKON
+    if(sc.g > 0.01) color.gb = vec2(.0);
+#endif
 
-    #ifdef MASK
-        color.gb = vec2(.0);
-    #endif
-//
-//    if(ub_maskonly)
-//        color.a *= sc.g;
+#ifdef ORGANS_ONLY
+    color.a = 0.0;//*= sc.g;
+#endif
     return color;
+}
+
+float Light(vec3 p){
+    return 1.0;
 }
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
     vec4 final_color = Sample(storePos);
+    final_color.rgb *= Light(vec3(storePos));
     imageStore(destTex, storePos, final_color);
 }

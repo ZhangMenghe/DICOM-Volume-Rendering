@@ -53,7 +53,7 @@ bool Shader::CompileAndLink(){
         }
     }
 
-    LOGI("===Compiling %d shader variants\n", (int)keywords.size());
+//    LOGI("===Compiling %d shader variants\n", (int)keywords.size());
 
     for (auto& it : keywords) {
         it.erase(it.begin());
@@ -84,9 +84,8 @@ GLuint CompileShader(GLenum type, string content, const vector<string>& keywords
     string key_word_str = "";
     if(keywords[0].size()){
         key_word_str = "#define";
-        for (const auto& kw : keywords){ key_word_str+=" " + kw;LOGI("====KEY WORDS: %s", kw.c_str());}
-        key_word_str += "\r\n";
-
+        for (const auto& kw : keywords)key_word_str+=" " + kw;
+        key_word_str += "\n";
     }
 
     bool insertLine = false;
@@ -119,8 +118,6 @@ GLuint CompileShader(GLenum type, string content, const vector<string>& keywords
 
         string kw = "";
         for (const auto& it : keywords) kw += it + " ";
-        printf("===Error compiling shader with keywords %s: ", kw.c_str());
-
         glDeleteShader(shader);
         return 0;
     } else {
