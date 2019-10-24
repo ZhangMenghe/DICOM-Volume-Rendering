@@ -6,25 +6,33 @@
 FuncRenderer::FuncRenderer(){
     vertices_func_ = new GLfloat[MAX_VERTICS * 3];
 
-    if(!shader_func.Create("shaders/opaViz.vert", "shaders/opaViz.frag")
-    ||!shader_quad.Create("shaders/opaViz.vert", "shaders/opaViz.frag")
-        ||!shader_colorbar.Create("shaders/colorViz.vert", "shaders/colorViz.frag"))
-        LOGE("Func Renderer===Failed to create shader program===");
-    shader_func.Use();
-        shader_func.setVec2("uScale", glm::vec2(1.8f, .15f));
-        shader_func.setVec4("uColor", 0.678f, 0.839f, 0.969f, 0.5f);
-    shader_func.unUse();
+    if(!shader_func.AddShaderFile(GL_VERTEX_SHADER,"shaders/opaViz.vert")
+       ||!shader_func.AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/opaViz.frag")
+       ||!shader_func.CompileAndLink())
+        LOGE("FuncsVisual===Failed to create opacity shader program===");
+    if(!shader_quad.AddShaderFile(GL_VERTEX_SHADER,"shaders/opaViz.vert")
+       ||!shader_quad.AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/opaViz.frag")
+       ||!shader_quad.CompileAndLink())
+        LOGE("FuncsVisual===Failed to create shader_quad shader program===");
+    if(!shader_colorbar.AddShaderFile(GL_VERTEX_SHADER,"shaders/colorViz.vert")
+       ||!shader_colorbar.AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/colorViz.frag")
+       ||!shader_colorbar.CompileAndLink())
+        LOGE("FuncsVisual===Failed to create shader_colorbar shader program===");
 
-    shader_quad.Use();
-        shader_quad.setVec2("uScale", glm::vec2(2.0f, 0.20f));
-        shader_quad.setVec4("uColor", 0.086f, 0.098f, 0.231f, 1.0f);
-    shader_quad.unUse();
+    GLuint sp = shader_func.Use();
+    Shader::Uniform(sp, "uScale", glm::vec2(1.8f, .15f));
+    Shader::Uniform(sp, "uColor", glm::vec4(0.678f, 0.839f, 0.969f, 0.5f));
+    shader_func.UnUse();
 
-    shader_colorbar.Use();
-        shader_colorbar.setVec2("uScale", glm::vec2(2.0f, 0.1f));
-        shader_colorbar.setVec2("uOffset", glm::vec2(.0f, -1.0f));
-//        shader_colorbar.setInt("uSample_trans", vrController::TRANS_TEX_ID);
-    shader_colorbar.unUse();
+    sp = shader_quad.Use();
+    Shader::Uniform(sp,"uScale", glm::vec2(2.0f, 0.20f));
+    Shader::Uniform(sp,"uColor", glm::vec4(0.086f, 0.098f, 0.231f, 1.0f));
+    shader_quad.UnUse();
+
+    sp = shader_colorbar.Use();
+    Shader::Uniform(sp,"uScale", glm::vec2(2.0f, 0.1f));
+    Shader::Uniform(sp,"uOffset", glm::vec2(.0f, -1.0f));
+    shader_colorbar.UnUse();
 }
 
 void FuncRenderer::CreateFunction(FUNC_TYPE type){
@@ -85,20 +93,20 @@ void FuncRenderer::draw_opacity_func(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    shader_quad.Use();
-        shader_quad.setVec2("uOffset", .0f, -1.0+trans_color_offset);
+    GLuint sp = shader_quad.Use();
+    Shader::Uniform(sp, "uOffset", .0f, -1.0+trans_color_offset);
 
         glBindVertexArray(VAO_QUAD);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-    shader_quad.unUse();
+    shader_quad.UnUse();
 
-    shader_func.Use();
-        shader_func.setVec2("uOffset", .0f, -1.0f+trans_color_offset);
+    sp = shader_func.Use();
+    Shader::Uniform(sp, "uOffset", .0f, -1.0f+trans_color_offset);
         glBindVertexArray(VAO_FUNC);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
-    shader_func.unUse();
+    shader_func.UnUse();
 
     glDisable(GL_BLEND);
 }

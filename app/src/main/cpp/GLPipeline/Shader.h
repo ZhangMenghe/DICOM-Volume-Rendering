@@ -31,8 +31,12 @@ public:
 	static void Uniform(GLuint program, const GLchar* name, float x){glUniform1f(glGetUniformLocation(program, name), x);}
 	//set bool
     static void Uniform(GLuint program, const GLchar* name, bool x){glUniform1i(glGetUniformLocation(program, name), (int)x);}
-    //set vec3
+	//set vec2
+    static void Uniform(GLuint program, const GLchar* name, float x, float y){glUniform2f(glGetUniformLocation(program, name), x, y);}
+    static void Uniform(GLuint program, const GLchar* name, const glm::vec2& v){glUniform2f(glGetUniformLocation(program, name), v.x, v.y);}
+	//set vec3
 	static void Uniform(GLuint program, const GLchar* name, const glm::vec3& v){glUniform3f(glGetUniformLocation(program, name), v.x, v.y, v.z);}
+	//set vec4
 	static void Uniform(GLuint program, const GLchar* name, const glm::vec4& v){glUniform4f(glGetUniformLocation(program, name), v.x, v.y, v.z, v.w);}
 	//set mat4
 	static void Uniform(GLuint program, const GLchar* name, const glm::mat4& m){glUniformMatrix4fv(glGetUniformLocation(program, name), 1, GL_FALSE, &m[0][0]);}

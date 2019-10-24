@@ -47,7 +47,7 @@ private:
     AAssetManager* _asset_manager;
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
-//    FuncRenderer* funcRenderer_ = nullptr;
+    FuncRenderer* funcRenderer_ = nullptr;
 
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
