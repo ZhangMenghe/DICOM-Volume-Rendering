@@ -97,9 +97,10 @@ void raycastRenderer::precompute() {
         glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
         glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-        shader_->setBool("ub_maskon", vrController::param_bool_map["maskon"]);
-        shader_->setBool("ub_maskonly", true);//vrController::param_bool_map["maskon"]);
-        shader_->setBool("ub_invert", true);//vrController::param_bool_map["maskon"]);
+        //bool type not working
+//        shader_->setBool("ub_maskon", vrController::param_bool_map["maskon"]);
+//        shader_->setBool("ub_maskonly", true);//vrController::param_bool_map["maskon"]);
+//        shader_->setBool("ub_invert", true);//vrController::param_bool_map["maskon"]);
 
         geoshader_->unUse();
         baked_dirty_ = false;
