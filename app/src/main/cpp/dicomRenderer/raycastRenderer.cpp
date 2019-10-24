@@ -87,8 +87,9 @@ void raycastRenderer::onCuttingChange(float percent){
 void raycastRenderer::precompute() {
     Texture* tex_vol = vrController::tex_volume;
     if(baked_dirty_) {
-
         geoshader_->Use();
+
+        geoshader_->EnableKeyword("MASK");
 
         glBindImageTexture(0, tex_vol->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
         glBindImageTexture(1, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);

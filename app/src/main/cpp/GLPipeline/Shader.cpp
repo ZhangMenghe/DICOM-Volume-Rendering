@@ -80,29 +80,28 @@ GLuint Shader::Use(){
 }
 
 GLuint CompileShader(GLenum type, string content, const vector<string>& keywords) {
-//    stringstream sstr;
-//    // read the first line, check if it's a #version line
-//    // if so, keep it at the top, if not, insert after the #define statements
-//    bool insertLine = false;
-//    string firstLine;
-//
-//    istringstream iss(content);
-//    while(getline(iss, firstLine)){
-//        if (firstLine.substr(0, 8) == "#version")
-//            sstr << firstLine << endl;
-//        else
-//            insertLine = true;
-//    }
-//
-//    for (const auto& kw : keywords){
-//        LOGE("====KEY: %s", kw.c_str());
-//        sstr << "#define " << kw.c_str() << endl;
-//    }
-//
-//    if (insertLine) sstr << firstLine << endl;
-//    sstr << iss.rdbuf();
-//
-//    string str = sstr.str();
+    //construct key_word line
+    string key_word_str = "";
+    if(keywords[0].size()){
+        key_word_str = "#define";
+        for (const auto& kw : keywords){ key_word_str+=" " + kw;LOGI("====KEY WORDS: %s", kw.c_str());}
+        key_word_str += "\r\n";
+
+    }
+
+    bool insertLine = false;
+    string firstLine;
+    istringstream iss(content);
+    while(getline(iss, firstLine)){
+        if (firstLine.substr(0, 8) == "#version"){
+            content.insert(iss.tellg(), key_word_str);
+            insertLine = true;
+            break;
+        }
+    }
+    if(!insertLine)
+        content.insert(0, key_word_str);
+
     const char* src = content.c_str();
 
     GLuint shader = glCreateShader(type);

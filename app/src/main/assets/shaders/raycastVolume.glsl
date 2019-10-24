@@ -1,4 +1,5 @@
 #version 310 es
+#pragma multi_compile MASK
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -17,8 +18,10 @@ vec4 Sample(ivec3 pos){
     color.rgb = vec3(sc.r);
     color.a = 1.0;
 
-//    if(ub_maskon)
-//        if(sc.g > 0.01) color.gb = vec2(.0);
+    #ifdef MASK
+        color.gb = vec2(.0);
+    #endif
+//
 //    if(ub_maskonly)
 //        color.a *= sc.g;
     return color;

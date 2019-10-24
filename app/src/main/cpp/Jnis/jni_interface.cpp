@@ -107,7 +107,7 @@ void convert_bitmap_with_mask(JNIEnv* env, jobject bitmap, jobject mask, GLubyte
 
     size_t size = srcInfo.width * srcInfo.height;
     data = new GLubyte[CHANEL_NUM*size];
-
+    memset(data, 0xff, CHANEL_NUM * size * 4);
     int x, y, idx = 0;
     for (y = 0; y < h; y++) {
         argb * line = (argb *) buffer;
@@ -115,8 +115,6 @@ void convert_bitmap_with_mask(JNIEnv* env, jobject bitmap, jobject mask, GLubyte
         for (x = 0; x < w; x++) {
             data[CHANEL_NUM*idx] = line[x].red;
             data[CHANEL_NUM*idx + 1] = mask_line[x].red;
-            data[CHANEL_NUM*idx + 2] = 0xff;
-            data[CHANEL_NUM*idx + 3] = 0xff;
             idx++;
         }
 
@@ -147,13 +145,12 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h )
 
     size_t size = srcInfo.width * srcInfo.height;
     data = new GLubyte[CHANEL_NUM*size];
-
+    memset(data, 0xff, CHANEL_NUM * size * 4);
     int x, y, idx = 0;
     for (y = 0; y < h; y++) {
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
             data[CHANEL_NUM*idx] = line[x].red;
-            data[CHANEL_NUM*idx + 1] = 0xff;
             idx++;
         }
 
