@@ -44,7 +44,7 @@ vec4 Sample(ivec3 pos){
 
 
 #ifdef MASKON
-    color.gb = vec2(.0);//if(sc.g > 0.01)
+    if(sc.g > 0.01) color.gb = vec2(.0);
 #endif
 
 #ifdef ORGANS_ONLY

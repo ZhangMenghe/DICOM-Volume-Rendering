@@ -17,9 +17,10 @@ uniform sampler3D uSampler_baked;
 
 void main(){
 	vec4 sampled_color = texture(uSampler_baked, vTexcoord).rgba;
-	float intensity = texture(uSampler_tex, vTexcoord).r * sampled_color.a;
+	float intensity = texture(uSampler_tex, vTexcoord).r;
 
 	float alpha = intensity * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
+	alpha*=sampled_color.a;
 	if(intensity < uOpacitys.cutoff) alpha = 0.0;
 	gl_FragColor = vec4(sampled_color.rgb, alpha * uOpacitys.overall);
 }

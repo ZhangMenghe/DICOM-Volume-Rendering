@@ -133,6 +133,10 @@ void vrController::precompute(){
     if(vrController::param_bool_map["colortrans"]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
     else bakeShader_->DisableKeyword("TRANSFER_COLOR");
 
+    if(vrController::param_bool_map["maskon"]) bakeShader_->EnableKeyword("ORGANS_ONLY");
+    else bakeShader_->DisableKeyword("ORGANS_ONLY");
+
+
 //  bakeShader_->EnableKeyword("MASKON");
 
     bakeShader_->Use();

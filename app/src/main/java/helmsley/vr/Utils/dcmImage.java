@@ -46,6 +46,8 @@ public class dcmImage{
         load_dcm(path);
     }
     public dcmImage(String path, String msk_pth){
+        Log.i(TAG, "====dcmi:  " + path);
+        Log.i(TAG, "====mask:  " + msk_pth);
         load_dcm(path);
         load_mask(msk_pth);
     }
