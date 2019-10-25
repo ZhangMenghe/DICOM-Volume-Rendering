@@ -13,17 +13,9 @@ raycastRenderer::raycastRenderer() {
             ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/raycastVolume.frag")
             ||!shader_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
-    //geometry program
-    geoshader_ = new Shader;
-    if(!geoshader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastVolume.glsl")
-        ||!geoshader_->CompileAndLink())
-        LOGE("Raycast=====Failed to create geometry shader");
-
     cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
 }
 void raycastRenderer::Draw(){
-    precompute();
-
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //    glEnable(GL_CULL_FACE);
@@ -83,23 +75,4 @@ void raycastRenderer::Draw(){
 
 void raycastRenderer::onCuttingChange(float percent){
     cutter_->setCutPlane(percent);
-}
-void raycastRenderer::precompute() {
-    Texture* tex_vol = vrController::tex_volume;
-    if(baked_dirty_) {
-//        geoshader_->EnableKeyword("MASKON");
-
-        geoshader_->Use();
-        glBindImageTexture(0, tex_vol->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
-        glBindImageTexture(1, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
-
-        glDispatchCompute((GLuint)(tex_vol->Width() + 7) / 8, (GLuint)(tex_vol->Height() + 7) / 8, (GLuint)(tex_vol->Depth() + 7) / 8);
-        glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
-        glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
-        glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
-
-        geoshader_->UnUse();
-        baked_dirty_ = false;
-    }
 }

@@ -81,6 +81,7 @@ void vrController::onDraw() {
         raycastRenderer_->onCuttingChange(param_value_map["cutting"]);
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    precompute();
     if(param_bool_map["raycast"])
         raycastRenderer_->Draw();
     else
@@ -126,4 +127,29 @@ void vrController::onPan(float x, float y){
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
     volume_model_dirty = true;
+}
+void vrController::precompute(){
+    if(!baked_dirty_) return;
+    if(!bakeShader_){
+        //geometry program
+        bakeShader_ = new Shader;
+        if(!bakeShader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastVolume.glsl")
+           ||!bakeShader_->CompileAndLink())
+            LOGE("Raycast=====Failed to create geometry shader");
+    }
+
+//  bakeShader_->EnableKeyword("MASKON");
+
+    bakeShader_->Use();
+    glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    bakeShader_->UnUse();
+    baked_dirty_ = false;
 }

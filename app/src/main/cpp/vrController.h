@@ -42,6 +42,11 @@ public:
     void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);
+
+    //ui stuff
+    void onColorTransfer(){
+
+    }
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;
@@ -56,12 +61,16 @@ private:
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f,0.5f);
 
     bool volume_model_dirty = true;
+    bool baked_dirty_ = true;
+
+    Shader* bakeShader_ = nullptr;
+
     void updateVolumeModelMat(){
         ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
                      * RotateMat_
                      * glm::scale(glm::mat4(1.0), ScaleVec3_);
-
     }
+    void precompute();
 
 };
 #endif

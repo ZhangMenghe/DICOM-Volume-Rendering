@@ -8,11 +8,8 @@
 class raycastRenderer{
 private:
     cuttingController* cutter_;
-
-    Shader* shader_= nullptr, *geoshader_ = nullptr;
+    Shader* shader_= nullptr;
     GLuint VAO_=0;
-    bool baked_dirty_ = true;
-
 public:
     raycastRenderer();
     void onCuttingChange(float percent);

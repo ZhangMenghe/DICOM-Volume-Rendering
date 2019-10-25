@@ -1,5 +1,5 @@
 #version 310 es
-#pragma multi_compile MASKON ORGANS_ONLY
+#pragma multi_compile MASKON ORGANS_ONLY TRANSFER_COLOR
 //#pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 
 #extension GL_EXT_shader_io_blocks:require
@@ -36,12 +36,11 @@ vec4 Sample(ivec3 pos){
     vec2 sc = imageLoad(srcTex, pos).rg;
     vec4 color = vec4(1.0);
 
-//    #ifdef COLOR_FUNCTION
+#ifdef TRANSFER_COLOR
     color.rgb = transfer_scheme(sc.r);
-//    #else
-//    color.rgb = vec3(sc.r);
-//    #endif
-
+#else
+    color.rgb = vec3(sc.r);
+#endif
 
 
 #ifdef MASKON
