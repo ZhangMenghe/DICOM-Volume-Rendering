@@ -36,13 +36,7 @@ uniform float val_threshold;
 uniform float brightness;
 
 uniform vec3 uStartPoint;
-//uniform float cut_percent;
 
-struct OpacityAdj{
-    float overall;//0-1
-    float lowbound; //slope adj, 0-1
-    float cutoff;//0,1
-};
 
 vec2 RaySphere(vec3 ro, vec3 rd, vec3 center, float radius){
     vec3 oc = ro - center;
@@ -64,13 +58,6 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
     float t = dot(planep - ro, planen);
     return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
-
-//from view dir: getCuttingPlane(-uCamposObjSpace);
-//void getCuttingPlane(vec3 rd){
-//    uPlane.p = uStartPoint + normalize(rd) * cut_percent * 1.75;
-//    uPlane.upwards = true;
-//    uPlane.normal = rd;
-//}
 
 vec4 Sample(vec3 p){
     vec4 color;
@@ -113,26 +100,25 @@ vec4 Volume(float head, float tail){
         if(sum.a >= 0.95) break;
         vec3 p = ro + rd * t;
         vec4 val_color = Sample(p);
-        if(ub_accumulate){
+//        if(ub_accumulate){
             if(val_color.a > 0.01){
                 if(pd < 0.01) val_color = subDivide(p, ro, rd, t, sample_step_inverse);
                 sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
                 sum.a += (1.0 - sum.a) * val_color.a;
             }
-            if(val_color.r > vmax) vmax = val_color.r;
-        }else if(val_color.r > vmax){
-             vmax = val_color.r;
-        }
+//            if(val_color.r > vmax) vmax = val_color.r;
+//        }else if(val_color.r > vmax){
+//             vmax = val_color.r;
+//        }
         t += val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
         steps++;
         pd = sum.a;
     }
-    vec3 sample_color;
-    if(ub_accumulate){
+//    if(ub_accumulate){
         return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
-    }else{
-        return vec4(vec3(vmax), 1.0);
-    }
+//    }else{
+//        return vec4(vec3(vmax), 1.0);
+//    }
 //    float alpha = sum.a * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
 //    if(sum.r< uOpacitys.cutoff) alpha = 0.0;
 
