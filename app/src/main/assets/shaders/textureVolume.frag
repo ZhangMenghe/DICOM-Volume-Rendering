@@ -13,10 +13,13 @@ struct OpacityAdj{
 uniform OpacityAdj uOpacitys;
 
 uniform sampler3D uSampler_tex;
+uniform sampler3D uSampler_baked;
 
 void main(){
-	vec4 sampled_color = texture(uSampler_tex, vTexcoord).rgba;
-	float alpha = sampled_color.a * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
-	if(sampled_color.a< uOpacitys.cutoff) alpha = 0.0;
+	vec4 sampled_color = texture(uSampler_baked, vTexcoord).rgba;
+	float intensity = texture(uSampler_tex, vTexcoord).r * sampled_color.a;
+
+	float alpha = intensity * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
+	if(intensity < uOpacitys.cutoff) alpha = 0.0;
 	gl_FragColor = vec4(sampled_color.rgb, alpha * uOpacitys.overall);
 }

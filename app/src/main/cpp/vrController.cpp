@@ -4,7 +4,7 @@
 #include <AndroidUtils/mathUtils.h>
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-Texture * vrController::tex_volume= nullptr;Texture * vrController::tex_trans= nullptr; Texture* vrController::tex_baked = nullptr;
+Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr;
 int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
@@ -12,7 +12,7 @@ std::unordered_map<std::string, bool > vrController::param_bool_map;
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
 glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
-bool vrController::ROTATE_AROUND_CUBE = false;
+bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true;
 
 glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
 float vrController::csphere_radius = 0.5f;
@@ -51,14 +51,7 @@ void vrController::assembleTexture(GLubyte * data, int width, int height, int de
     memset(data, 0xff, vsize * 4 * sizeof(GLbyte));
     tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, data);
 }
-void vrController::setTransferColor(const int*colors, int num){
-    if(num <= 0){
-        colors = default_trans_color; num=default_transcolor_num;
-    }
-    float * transfer_color = new float[4 * num];
-    getRGBAColors(colors, transfer_color, num);
-    tex_trans = new Texture(GL_RGBA, GL_RGBA, GL_FLOAT, num, 1, transfer_color);
-}
+
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
     raycastRenderer_ = new raycastRenderer;
@@ -137,6 +130,8 @@ void vrController::precompute(){
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
     }
+    if(vrController::param_bool_map["colortrans"]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
+    else bakeShader_->DisableKeyword("TRANSFER_COLOR");
 
 //  bakeShader_->EnableKeyword("MASKON");
 

@@ -25,8 +25,8 @@ JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat x, jfloat y){
 JUI_METHOD(void, JUIsetSwitches)(JNIEnv * env, jclass, jstring key, jboolean value){
 //    LOGE("====SET %s, %d", dvr::jstring2string(env,key).c_str(), value);
     vrController::param_bool_map[dvr::jstring2string(env,key)] = value;
-
-
+    if(dvr::jstring2string(env,key) == "colortrans")
+        vrController::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIsetParam)(JNIEnv * env, jclass, jstring key, jfloat value){
 //    LOGE("====SET %s, %f", dvr::jstring2string(env,key).c_str(), value);

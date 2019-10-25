@@ -14,15 +14,16 @@
 
 class vrController:public nEntrance{
 public:
-    static Texture *tex_volume, *tex_baked, *tex_trans;
+    static Texture *tex_volume, *tex_baked;
     static Camera* camera;
-    static int VOLUME_TEX_ID, BAKED_TEX_ID;//, TRANS_TEX_ID;
+    static int VOLUME_TEX_ID, BAKED_TEX_ID;
     static float _screen_w, _screen_h;
     static std::unordered_map<std::string, float> param_value_map;
     static std::unordered_map<std::string, bool > param_bool_map;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
     static bool ROTATE_AROUND_CUBE;
+    static bool baked_dirty_;
 
 
     static glm::vec3 csphere_c;
@@ -33,7 +34,6 @@ public:
 
     vrController(AAssetManager *assetManager);
     void assembleTexture(GLubyte * data, int width, int height, int depth, const int channel_num);
-    void setTransferColor(const int*colors, int num = 0);
     void onViewCreated();
     void onViewChange(int width, int height);
     void onDraw();
@@ -43,10 +43,6 @@ public:
     void onScale(float sx, float sy);
     void onPan(float x, float y);
 
-    //ui stuff
-    void onColorTransfer(){
-
-    }
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;
@@ -61,7 +57,7 @@ private:
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f,0.5f);
 
     bool volume_model_dirty = true;
-    bool baked_dirty_ = true;
+
 
     Shader* bakeShader_ = nullptr;
 

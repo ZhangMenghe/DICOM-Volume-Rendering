@@ -37,12 +37,11 @@ void texvrRenderer::Draw(){
     if(vrController::tex_baked){
         glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
         glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::BAKED_TEX_ID);
-    }else{
-        glActiveTexture(GL_TEXTURE0 + vrController::VOLUME_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
+        Shader::Uniform(sp, "uSampler_baked", vrController::BAKED_TEX_ID);
     }
+    glActiveTexture(GL_TEXTURE0 + vrController::VOLUME_TEX_ID);
+    glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
+    Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
 
     Shader::Uniform(sp,"uVolumeSize",
                     glm::vec3(vrController::tex_volume->Width(),
