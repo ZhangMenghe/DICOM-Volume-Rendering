@@ -100,25 +100,24 @@ vec4 Volume(float head, float tail){
         if(sum.a >= 0.95) break;
         vec3 p = ro + rd * t;
         vec4 val_color = Sample(p);
-//        if(ub_accumulate){
+        if(ub_accumulate){
             if(val_color.a > 0.01){
                 if(pd < 0.01) val_color = subDivide(p, ro, rd, t, sample_step_inverse);
                 sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
                 sum.a += (1.0 - sum.a) * val_color.a;
             }
-//            if(val_color.r > vmax) vmax = val_color.r;
-//        }else if(val_color.r > vmax){
-//             vmax = val_color.r;
-//        }
+        }else if(val_color.r > vmax){
+             vmax = val_color.r;
+        }
         t += val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
         steps++;
         pd = sum.a;
     }
-//    if(ub_accumulate){
+    if(ub_accumulate){
         return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
-//    }else{
-//        return vec4(vec3(vmax), 1.0);
-//    }
+    }else{
+        return vec4(vec3(vmax), 1.0);
+    }
 //    float alpha = sum.a * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
 //    if(sum.r< uOpacitys.cutoff) alpha = 0.0;
 
