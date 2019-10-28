@@ -11,8 +11,7 @@ class texvrRenderer{
 private:
     const float scale_inv = 0.5f;
     const float DENSE_FACTOR = 1.0f;
-    int dimensions;
-    int slice_start_idx = 0;
+    int dimensions; float dimension_inv;
 
     Shader* shader_;
     GLuint slice_vao_;

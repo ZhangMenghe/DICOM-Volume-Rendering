@@ -13,8 +13,10 @@ uniform OpacityAdj uOpacitys;
 
 uniform sampler3D uSampler_tex;
 uniform sampler3D uSampler_baked;
+uniform float u_cut_texz;
 
 void main(){
+	if(vTexcoord.z > u_cut_texz) discard;
 	//todo: move computation to computation stage, sampling very expensive
 	vec4 sampled_color = texture(uSampler_baked, vTexcoord).rgba;
 	float intensity = texture(uSampler_tex, vTexcoord).r;

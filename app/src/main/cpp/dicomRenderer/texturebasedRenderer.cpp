@@ -4,7 +4,7 @@
 #include "texturebasedRenderer.h"
 texvrRenderer::texvrRenderer() {
     dimensions = int(vrController::tex_volume->Depth() * DENSE_FACTOR);
-    float dimension_inv = 1.0f / dimensions;
+    dimension_inv = 1.0f / dimensions;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
     float mappedZVal = -scale_inv, zTex = .0f;
@@ -50,6 +50,7 @@ texvrRenderer::texvrRenderer() {
        ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/textureVolume.frag")
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create raycast shader program===");
+    onCuttingChange(.0f);
 }
 void texvrRenderer::Draw(){
     glEnable(GL_BLEND);
@@ -92,5 +93,8 @@ void texvrRenderer::Draw(){
     }
 }
 void texvrRenderer::onCuttingChange(float percent){
-//    slice_start_idx = (int)(m_VAOs.size() * percent);
+    int cut_id = int(dimensions * percent);
+    GLuint sp = shader_->Use();
+        Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
+    shader_->UnUse();
 }
