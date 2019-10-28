@@ -10,12 +10,11 @@
 class texvrRenderer{
 private:
     const float scale_inv = 0.5f;
-    const size_t NEED_SLCIES = 144;
+    const float DENSE_FACTOR = 1.0f;
+    int dimensions;
     int slice_start_idx = 0;
 
     Shader* shader_;
-
-    std::vector<GLuint> m_VAOs;
     GLuint slice_vao_;
 
 public:

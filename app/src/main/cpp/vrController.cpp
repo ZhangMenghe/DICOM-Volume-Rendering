@@ -48,8 +48,9 @@ void vrController::assembleTexture(GLubyte * data, int width, int height, int de
 
     int vsize= width* height* depth;
     GLbyte * vdata = new GLbyte[vsize * 4];
-    memset(data, 0xff, vsize * 4 * sizeof(GLbyte));
-    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, data);
+    memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
+    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, vdata);
+    delete[]vdata;
 }
 
 void vrController::onViewCreated(){
