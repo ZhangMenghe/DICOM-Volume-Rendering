@@ -9,6 +9,12 @@ const float quad_vertices[12]={
         -0.5f, .0f, .0f,//bottom-left
         0.5f, .0f,  .0f//bottom-right
 };
+const float quad_vertices_2d[8]={
+        0.5f, .5f,//top-right
+        -0.5f, .5f,//top-left
+        -0.5f, -.5f,//bottom-left
+        0.5f, -.5f,//bottom-right
+};
 const float quad_vertices_tex[24]={
         0.5f, 1.0, .0f,    1.0, 1.0, .0f,//top-right
         -0.5f, 1.0, .0f,     .0, 1.0, .0f,//top-left

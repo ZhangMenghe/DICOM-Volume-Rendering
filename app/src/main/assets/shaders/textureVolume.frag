@@ -3,7 +3,6 @@ precision mediump float;
 
 out vec4 gl_FragColor;
 in vec3 vTexcoord;
-in vec2 vpos;
 
 struct OpacityAdj{
 	float overall;//0-1
@@ -16,6 +15,7 @@ uniform sampler3D uSampler_tex;
 uniform sampler3D uSampler_baked;
 
 void main(){
+	//todo: move computation to computation stage, sampling very expensive
 	vec4 sampled_color = texture(uSampler_baked, vTexcoord).rgba;
 	float intensity = texture(uSampler_tex, vTexcoord).r;
 
