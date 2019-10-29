@@ -76,3 +76,6 @@ void raycastRenderer::Draw(){
 void raycastRenderer::onCuttingChange(float percent){
     cutter_->setCutPlane(percent);
 }
+void raycastRenderer::updatePrecomputation(GLuint sp){
+
+}

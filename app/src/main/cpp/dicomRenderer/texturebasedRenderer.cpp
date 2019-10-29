@@ -66,18 +66,16 @@ void texvrRenderer::Draw(){
         glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
         glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
         Shader::Uniform(sp, "uSampler_baked", vrController::BAKED_TEX_ID);
+    }else{
+        glActiveTexture(GL_TEXTURE0 + vrController::VOLUME_TEX_ID);
+        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
+        Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
     }
-    glActiveTexture(GL_TEXTURE0 + vrController::VOLUME_TEX_ID);
-    glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-    Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
+
     if(vrController::ROTATE_AROUND_CUBE)
         Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat());
     else
         Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*vrController::ModelMat_);
-
-    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_value_map["overall"]);
-    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
-    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 
     glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
     if(dir.z < 0) glFrontFace(GL_CCW);
@@ -97,4 +95,9 @@ void texvrRenderer::onCuttingChange(float percent){
     GLuint sp = shader_->Use();
         Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
     shader_->UnUse();
+}
+void texvrRenderer::updatePrecomputation(GLuint sp) {
+    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_value_map["overall"]);
+    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
+    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 }

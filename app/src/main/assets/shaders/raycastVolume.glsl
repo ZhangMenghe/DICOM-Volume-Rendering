@@ -1,4 +1,6 @@
 #version 310 es
+
+//#pragma multi_compile UPDATE_RAY_BAKED
 #pragma multi_compile MASKON ORGANS_ONLY
 #pragma multi_compile TRANSFER_COLOR
 
@@ -11,6 +13,16 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 layout(binding = 0, rgba8)readonly uniform mediump image3D srcTex;
 layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex_tex;
 layout(binding = 2, rgba8)writeonly uniform mediump image3D destTex_ray;
+
+//Uniforms for ray_baked
+struct OpacityAdj{
+    float overall;//0-1
+    float lowbound; //slope adj, 0-1
+    float cutoff;//0,1
+};
+uniform OpacityAdj uOpacitys;
+
+float CURRENT_INTENSITY;
 
 float START_H_VALUE = 0.1667;
 float BASE_S_VALUE = 0.7;
@@ -31,10 +43,16 @@ vec3 transfer_scheme(float gray){
     float v = off_h >.0? BASE_V_VALUE: BASE_V_VALUE + off_h / (BASE_S_H - START_H_VALUE)*0.3;
     return hsv2rgb(vec3(h,s,v));
 }
-
+vec4 UpdateTextureBased(vec4 sampled_color){
+    float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
+    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*sampled_color.a;
+    return vec4(sampled_color.rgb, alpha);
+}
 vec4 Sample(ivec3 pos){
     vec2 sc = imageLoad(srcTex, pos).rg;
-    vec4 color = vec4(vec3(sc.r), 1.0);
+    CURRENT_INTENSITY = sc.r;
+    vec4 color = vec4(vec3(CURRENT_INTENSITY), 1.0);
+
 
 #ifdef TRANSFER_COLOR
     color.rgb = transfer_scheme(sc.r);
@@ -48,7 +66,6 @@ vec4 Sample(ivec3 pos){
 #ifdef ORGANS_ONLY
     color.a *= sc.g;
 #endif
-
     return color;
 }
 
@@ -59,6 +76,10 @@ void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
     vec4 final_color = Sample(storePos);
     final_color.rgb *= Light(vec3(storePos));
-    imageStore(destTex_ray, storePos, final_color);
-    imageStore(destTex_tex, storePos, final_color);
+//    #ifdef UPDATE_RAY_BAKED
+        imageStore(destTex_ray, storePos, final_color);
+//    #else
+        vec4 tex_color = UpdateTextureBased(final_color);
+        imageStore(destTex_tex, storePos, tex_color);
+//    #endif
 }

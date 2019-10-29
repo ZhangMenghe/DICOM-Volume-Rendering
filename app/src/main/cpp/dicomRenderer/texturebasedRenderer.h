@@ -20,5 +20,6 @@ public:
     texvrRenderer();
     void onCuttingChange(float percent);
     void Draw();
+    void updatePrecomputation(GLuint sp);
 };
 #endif

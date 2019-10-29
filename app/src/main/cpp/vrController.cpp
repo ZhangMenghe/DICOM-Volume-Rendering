@@ -138,10 +138,10 @@ void vrController::precompute(){
     if(vrController::param_bool_map["maskon"]) bakeShader_->EnableKeyword("ORGANS_ONLY");
     else bakeShader_->DisableKeyword("ORGANS_ONLY");
 
-    bakeShader_->Use();
+    GLuint sp = bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
-    glBindImageTexture(1, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glBindImageTexture(2, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(2, ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -150,7 +150,10 @@ void vrController::precompute(){
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
     glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-
+    if(param_bool_map["raycast"])
+        raycastRenderer_->updatePrecomputation(sp);
+    else
+        texvrRenderer_->updatePrecomputation(sp);
     bakeShader_->UnUse();
     baked_dirty_ = false;
 }

@@ -14,6 +14,6 @@ public:
     raycastRenderer();
     void onCuttingChange(float percent);
     void Draw();
-    void precompute();
+    void updatePrecomputation(GLuint sp);
 };
 #endif
