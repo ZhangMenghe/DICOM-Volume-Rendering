@@ -22,15 +22,15 @@ bool Shader::AddShaderFile(GLenum type, const char* filename){
     return true;
 }
 bool Shader::CompileAndLink(){
-    vector<vector<string>> keywords;
-    keywords.push_back(vector<string>());
-    keywords[0].push_back("");
+//    vector<vector<string>> keywords;
+    available_keywords_.push_back(vector<string>());
+    available_keywords_[0].push_back("");
     // create keyword variants
     for (const auto it : mShadersToLink) {
         istringstream iss(it.second);
         string line;
         while(getline(iss, line)){
-            unsigned int kwc = keywords.size();
+            unsigned int kwc = available_keywords_.size();
             stringstream ss(line);
             string token;
             int mode = 0;
@@ -38,11 +38,10 @@ bool Shader::CompileAndLink(){
                 if (mode == 2) {
                     // create variants
                     for (unsigned int i = 0; i < kwc; i++) {
-                        vector<string> k(keywords[i]);
+                        vector<string> k(available_keywords_[i]);
                         k.push_back(token);
-                        keywords.push_back(k);
+                        available_keywords_.push_back(k);
                     }
-                    mAvailableKeywords.insert(token);
                 } else {
                     if (token == "#pragma")
                         mode = 1;
@@ -55,23 +54,32 @@ bool Shader::CompileAndLink(){
 
 //    LOGI("===Compiling %d shader variants\n", (int)keywords.size());
 
-    for (auto& it : keywords) {
+    for (auto& it : available_keywords_) {
         it.erase(it.begin());
         string kw = "";
-        for (const auto& k : it)
-            kw += k + " ";
+        std::vector<std::string> kwv;
+        for (const auto& k : it){kwv.push_back(k);kw += k + " ";}
+
+//        LOGE("###### kw set: %s", kw.c_str());
+//        if(kwv.size() > 1){
+//            LOGE("====STOP HERE");
+//        }
         ShaderProgram cpr;
-        if(!LinkShader(it, cpr))
+        if(!LinkShader(kwv, cpr))
             return false;
         mPrograms.emplace(kw, cpr);
     }
+    active_keywords_ = vector<unordered_set<string>>(available_keywords_.size());
     return true;
 }
 
 GLuint Shader::Use(){
     string kw = "";
-    for (const auto& k : mActiveKeywords)
-        kw += k + " ";
+    for (auto& it : active_keywords_)
+        for (const auto& k : it)
+            kw += k + " ";
+//    if(kw.size())
+//        LOGE("###### kw: %s", kw.c_str());
     assert(mPrograms.count(kw));
 
     GLuint p = mPrograms.at(kw).mProgram;
@@ -79,13 +87,14 @@ GLuint Shader::Use(){
     return p;
 }
 
-GLuint CompileShader(GLenum type, string content, const vector<string>& keywords) {
+GLuint CompileShader(GLenum type, string content, vector<string> keywords) {
     //construct key_word line
     string key_word_str = "";
-    if(keywords[0].size()){
-        key_word_str = "#define";
-        for (const auto& kw : keywords)key_word_str+=" " + kw;
-        key_word_str += "\n";
+    if(!keywords.empty()){
+//        key_word_str = "#define";
+        for (const auto& kw : keywords){key_word_str+="#define " + kw + "\n";}
+//        key_word_str += "\n";
+//        LOGE("#####DEFINEl %s", key_word_str.c_str());
     }
 
     bool insertLine = false;
@@ -125,8 +134,11 @@ GLuint CompileShader(GLenum type, string content, const vector<string>& keywords
     }
 }
 
-bool Shader::LinkShader(const std::vector<std::string>& keywords, ShaderProgram& pgm){
+bool Shader::LinkShader(std::vector<std::string> keywords, ShaderProgram& pgm){
     // compile shaders with keywords
+//    LOGE("########keywords num :%d", keywords.size());
+//    if(keywords.size() > 1)
+//        LOGE("=====stop here2");
     for (const auto& it : mShadersToLink){
         GLuint shader_id = CompileShader(it.first, it.second, keywords);
         if(!shader_id)
@@ -156,4 +168,20 @@ bool Shader::LinkShader(const std::vector<std::string>& keywords, ShaderProgram&
             glDetachShader(pgm.mProgram, s);
     }
     return true;
+}
+void Shader::EnableKeyword(std::string keyword){
+    int line_level = 0;
+    for (auto& it : available_keywords_) {
+        for (const auto& k : it){
+            if(k == keyword){active_keywords_[line_level].emplace (keyword); return;}
+        }
+        line_level++;
+    }
+}
+void Shader::DisableKeyword(std::string keyword){
+    for(auto& it: active_keywords_){
+        for (auto k = it.begin();k!=it.end();k++){
+            if(*k == keyword){it.erase(k); return;}
+        }
+    }
 }

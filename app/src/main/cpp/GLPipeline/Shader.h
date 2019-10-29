@@ -22,8 +22,8 @@ public:
 	GLuint Use();
 	void UnUse(){glUseProgram(0);}
 
-	void EnableKeyword(std::string keyword){if (mAvailableKeywords.count(keyword))mActiveKeywords.insert(keyword);}
-	void DisableKeyword(std::string keyword){mActiveKeywords.erase(keyword);}
+	void EnableKeyword(std::string keyword);
+	void DisableKeyword(std::string keyword);
 
 	// set int
 	static void Uniform(GLuint program, const GLchar* name, int x){glUniform1i(glGetUniformLocation(program, name), x);}
@@ -42,17 +42,18 @@ public:
 	static void Uniform(GLuint program, const GLchar* name, const glm::mat4& m){glUniformMatrix4fv(glGetUniformLocation(program, name), 1, GL_FALSE, &m[0][0]);}
 
 private:
+	std::vector<std::vector<std::string>> available_keywords_;
+	std::vector<std::unordered_set<std::string>> active_keywords_;
 
-
-	std::unordered_set<std::string> mAvailableKeywords;
-	std::unordered_set<std::string> mActiveKeywords;
+//	std::unordered_set<std::string> mAvailableKeywords;
+//	std::unordered_set<std::string> mActiveKeywords;
 
 	// indexed by keyword combo
 	std::unordered_map<std::string, ShaderProgram> mPrograms;
 
 	std::unordered_map<GLenum, std::string> mShadersToLink;
 
-	bool LinkShader(const std::vector<std::string>& keywords, ShaderProgram& pgm);
+	bool LinkShader(std::vector<std::string> keywords, ShaderProgram& pgm);
 };
 
 #endif

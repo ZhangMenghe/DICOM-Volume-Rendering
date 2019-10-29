@@ -1,8 +1,8 @@
 #version 310 es
 
 #pragma multi_compile UPDATE_RAY_BAKED
-//#pragma multi_compile MASKON ORGANS_ONLY
-//#pragma multi_compile TRANSFER_COLOR
+#pragma multi_compile ORGANS_ONLY
+#pragma multi_compile TRANSFER_COLOR MASKON
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -55,25 +55,22 @@ vec4 UpdateTextureBased(vec4 sampled_color){
 vec4 UpdateRaybased(vec4 sampled_color){
     float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
     alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
-    return vec4(sampled_color.rgb, alpha);
+    return vec4(sampled_color.rgb, alpha*sampled_color.a);
 }
 vec4 Sample(ivec3 pos){
     vec2 sc = imageLoad(srcTex, pos).rg;
     CURRENT_INTENSITY = sc.r;
     vec4 color = vec4(vec3(CURRENT_INTENSITY), 1.0);
 
-//#ifdef TRANSFER_COLOR
-//    color.rgb = transfer_scheme(sc.r);
-//#endif
-//
-//
-//#ifdef MASKON
-//    if(sc.g > 0.01) color.gb = vec2(.0);
-//#endif
-//
-//#ifdef ORGANS_ONLY
-//    color.a *= sc.g;
-//#endif
+#ifdef TRANSFER_COLOR
+    color.rgb = transfer_scheme(sc.r);
+#elif defined MASKON
+    if(sc.g > 0.01) color.gb = vec2(.0);
+#endif
+
+#ifdef ORGANS_ONLY
+    color.a *= sc.g;
+#endif
     return color;
 }
 

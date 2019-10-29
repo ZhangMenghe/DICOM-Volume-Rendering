@@ -144,7 +144,7 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h, 
         size_t size = srcInfo.width * srcInfo.height;
 
         data = new GLubyte[CHANEL_NUM*size];
-        memset(data, 0xff, CHANEL_NUM * size * sizeof(GLubyte));
+        memset(data, 0x00, CHANEL_NUM * size * sizeof(GLubyte));
     }
 
     int x, y, idx = 0;
