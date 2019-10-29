@@ -14,9 +14,9 @@
 
 class vrController:public nEntrance{
 public:
-    static Texture *tex_volume, *tex_baked;
+    static Texture *tex_volume, *tex_baked, *ray_baked;
     static Camera* camera;
-    static int VOLUME_TEX_ID, BAKED_TEX_ID;
+    static int VOLUME_TEX_ID, BAKED_TEX_ID, BAKED_RAY_ID;
     static float _screen_w, _screen_h;
     static std::unordered_map<std::string, float> param_value_map;
     static std::unordered_map<std::string, bool > param_bool_map;

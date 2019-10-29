@@ -26,10 +26,10 @@ void raycastRenderer::Draw(){
     cutter_->Draw();
 
     GLuint sp = shader_->Use();
-    if(vrController::tex_baked){
-        glActiveTexture(GL_TEXTURE0+vrController::BAKED_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::BAKED_TEX_ID);
+    if(vrController::ray_baked){
+        glActiveTexture(GL_TEXTURE0+vrController::BAKED_RAY_ID);
+        glBindTexture(GL_TEXTURE_3D, vrController::ray_baked->GLTexture());
+        Shader::Uniform(sp, "uSampler_tex", vrController::BAKED_RAY_ID);
     }else{
         glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
         glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());

@@ -4,8 +4,8 @@
 #include <AndroidUtils/mathUtils.h>
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr;
-int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1;//, vrController::TRANS_TEX_ID = 1;
+Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr; Texture* vrController::ray_baked = nullptr;
+int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1, vrController::BAKED_RAY_ID = 2;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::unordered_map<std::string, float> vrController::param_value_map;
 std::unordered_map<std::string, bool > vrController::param_bool_map;
@@ -50,6 +50,7 @@ void vrController::assembleTexture(GLubyte * data, int width, int height, int de
     GLbyte * vdata = new GLbyte[vsize * 4];
     memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
     tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, vdata);
+    ray_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, vdata);
     delete[]vdata;
 }
 
@@ -140,12 +141,15 @@ void vrController::precompute(){
     bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(2, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
