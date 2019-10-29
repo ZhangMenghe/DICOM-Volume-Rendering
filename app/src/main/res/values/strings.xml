@@ -12,7 +12,7 @@
     <string name="cut_switch">Control Plane</string>
 
     <string name="config_voldir">dicom-images</string>
-    <string name="config_volname">2016-10-26-series23</string>
+    <string name="config_volname">sample</string>
     <string name="config_mask_tail">_mask</string>
 
 </resources>

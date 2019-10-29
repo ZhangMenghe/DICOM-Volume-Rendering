@@ -21,6 +21,12 @@ const float quad_vertices_tex[24]={
         -0.5f, .0f, .0f,     .0,  .0,  .0f,//bottom-left
         0.5f, .0f, .0f,    1.0,  .0,  .0f,//bottom-right
 };
+const float quad_vertices_tex_standard[24] = {//Word          Texture
+        -1.0f,-1.0f,.0,	0.0f,0.0f,.0,
+        1.0f,-1.0f,	.0,	1.0f,0.0f,.0,
+        1.0f,1.0f,	.0, 1.0f,1.0f,.0,
+        -1.0f,1.0f,	.0, 0.0f,1.0f,.0
+};
 
 const float cuboid[24] = {//World
         -0.5f,-0.5f,0.5f,

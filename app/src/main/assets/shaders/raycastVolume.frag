@@ -55,19 +55,6 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
 
 vec4 Sample(vec3 p){
     return texture(uSampler_tex, p);
-//    vec4 color;
-//    vec4 sc = texture(uSampler_tex, p);
-////    float intensity = sc.r;
-////    intensity += val_threshold - 0.5;
-////    intensity = clamp(intensity * brightness / 250.0, 0.0, 1.0);
-////    if(sc.g < 0.01)    color.rgb = vec3(intensity, .0, .0);
-////    else color.rgb = vec3(intensity);
-//    color.rgb = sc.rgb;
-//    if(ub_cuttingplane)
-//        color.a = (dot((p - .5) - uPlane.p, uPlane.normal) < .0) ? .0 : sc.a;
-//    else
-//        color.a = sc.a;
-//    return color;
 }
 vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
     float t0 = t - StepSize * 4.0;

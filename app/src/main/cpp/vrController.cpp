@@ -78,7 +78,8 @@ void vrController::onDraw() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
     if(param_bool_map["raycast"])
-        raycastRenderer_->Draw();
+        raycastRenderer_->DrawBaked();
+//        raycastRenderer_->Draw();
     else
         texvrRenderer_->Draw();
     funcRenderer_->Draw();
@@ -161,4 +162,5 @@ void vrController::precompute(){
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
+    raycastRenderer_->precompute();
 }

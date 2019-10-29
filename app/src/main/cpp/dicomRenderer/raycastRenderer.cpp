@@ -6,6 +6,7 @@
 raycastRenderer::raycastRenderer() {
     //geometry
     Mesh::InitQuadWithTex(VAO_, cuboid_with_texture, 8, cuboid_indices, 36);
+    Mesh::InitQuadWithTex(vao_screen_, quad_vertices_tex_standard, 4, quad_indices, 6);
 
     //program
     shader_ = new Shader();
@@ -13,7 +14,30 @@ raycastRenderer::raycastRenderer() {
             ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/raycastVolume.frag")
             ||!shader_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
+
+
+    shader_baked_ = new Shader();
+    if(!shader_baked_->AddShaderFile(GL_VERTEX_SHADER,"shaders/quad.vert")
+       ||!shader_baked_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/quad.frag")
+       ||!shader_baked_->CompileAndLink())
+        LOGE("Raycast===Failed to create raycast shader program===");
+
     cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
+
+}
+void raycastRenderer::DrawBaked(){
+    GLuint  sp = shader_baked_->Use();
+
+    glActiveTexture(GL_TEXTURE0+BAKED_RAY_SCREEN_ID);
+    glBindTexture(GL_TEXTURE_2D, ray_baked_screen->GLTexture());
+    Shader::Uniform(sp, "uSampler", BAKED_RAY_SCREEN_ID);
+
+
+    glBindVertexArray(vao_screen_);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
+
+    shader_baked_->UnUse();
 }
 void raycastRenderer::Draw(){
     glEnable(GL_BLEND);
@@ -78,4 +102,39 @@ void raycastRenderer::onCuttingChange(float percent){
 void raycastRenderer::updatePrecomputation(GLuint sp){
     Shader::Uniform(sp, "u_val_threshold", vrController::param_value_map["threshold"]);
     Shader::Uniform(sp, "u_brightness", vrController::param_value_map["brightness"]);
+}
+void raycastRenderer::precompute(){
+    if(!baked_dirty_) return;
+    if(!cshader_){
+        cshader_ = new Shader;
+        if(!cshader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastCompute.glsl")
+           ||!cshader_->CompileAndLink())
+            LOGE("Raycast=====Failed to create raycast geometry shader");
+
+        BAKED_RAY_SCREEN_ID = vrController::BAKED_RAY_ID + 1;
+
+        float width = vrController::_screen_w, height = vrController::_screen_h;
+        int vsize= width* height;
+        GLbyte * vdata = new GLbyte[vsize * 4];
+        memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
+        ray_baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, vdata);
+        delete[]vdata;
+
+        GLuint sp = cshader_->Use();
+            Shader::Uniform(sp, "u_con_size", width, height);
+        cshader_->UnUse();
+    }
+
+    cshader_->Use();
+    glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
+    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    cshader_->UnUse();
+    baked_dirty_ = false;
 }
