@@ -1,8 +1,8 @@
 #version 310 es
 
-//#pragma multi_compile UPDATE_RAY_BAKED
-#pragma multi_compile MASKON ORGANS_ONLY
-#pragma multi_compile TRANSFER_COLOR
+#pragma multi_compile UPDATE_RAY_BAKED
+//#pragma multi_compile MASKON ORGANS_ONLY
+//#pragma multi_compile TRANSFER_COLOR
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -46,26 +46,28 @@ vec3 transfer_scheme(float gray){
 vec4 UpdateTextureBased(vec4 sampled_color){
     float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
     alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*sampled_color.a;
-    return vec4(sampled_color.rgb, alpha);
+    return vec4(sampled_color.rgb, alpha*uOpacitys.overall);
+}
+vec4 UpdateRaybased(vec4 sampled_color){
+    return sampled_color;
 }
 vec4 Sample(ivec3 pos){
     vec2 sc = imageLoad(srcTex, pos).rg;
     CURRENT_INTENSITY = sc.r;
     vec4 color = vec4(vec3(CURRENT_INTENSITY), 1.0);
 
-
-#ifdef TRANSFER_COLOR
-    color.rgb = transfer_scheme(sc.r);
-#endif
-
-
-#ifdef MASKON
-    if(sc.g > 0.01) color.gb = vec2(.0);
-#endif
-
-#ifdef ORGANS_ONLY
-    color.a *= sc.g;
-#endif
+//#ifdef TRANSFER_COLOR
+//    color.rgb = transfer_scheme(sc.r);
+//#endif
+//
+//
+//#ifdef MASKON
+//    if(sc.g > 0.01) color.gb = vec2(.0);
+//#endif
+//
+//#ifdef ORGANS_ONLY
+//    color.a *= sc.g;
+//#endif
     return color;
 }
 
@@ -76,10 +78,11 @@ void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
     vec4 final_color = Sample(storePos);
     final_color.rgb *= Light(vec3(storePos));
-//    #ifdef UPDATE_RAY_BAKED
-        imageStore(destTex_ray, storePos, final_color);
-//    #else
+    #ifdef UPDATE_RAY_BAKED
+        vec4 ray_color = UpdateRaybased(final_color);
+        imageStore(destTex_ray, storePos, ray_color);
+    #else
         vec4 tex_color = UpdateTextureBased(final_color);
         imageStore(destTex_tex, storePos, tex_color);
-//    #endif
+    #endif
 }
