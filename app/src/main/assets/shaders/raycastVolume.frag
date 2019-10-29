@@ -1,7 +1,7 @@
 #version 310 es
 
 #extension GL_EXT_shader_io_blocks : require
-//#define GL_FRAGMENT_PRECISION_HIGH 1
+
 precision mediump float;
 
 out vec4 gl_FragColor;
@@ -30,10 +30,6 @@ uniform bool ub_accumulate;//
 uniform bool ub_cuttingplane;
 
 uniform float sample_step_inverse;      // step used to advance the sampling ray
-uniform float val_threshold;//todo
-uniform float brightness;//todo
-
-uniform vec3 uStartPoint;
 
 
 vec2 RaySphere(vec3 ro, vec3 rd, vec3 center, float radius){

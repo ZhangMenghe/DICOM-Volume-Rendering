@@ -14,7 +14,7 @@ layout(binding = 0, rgba8)readonly uniform mediump image3D srcTex;
 layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex_tex;
 layout(binding = 2, rgba8)writeonly uniform mediump image3D destTex_ray;
 
-//Uniforms for ray_baked
+//Uniforms for texture_baked
 struct OpacityAdj{
     float overall;//0-1
     float lowbound; //slope adj, 0-1
@@ -22,12 +22,16 @@ struct OpacityAdj{
 };
 uniform OpacityAdj uOpacitys;
 
+//Uniforms for ray_baked
+uniform float u_val_threshold;
+uniform float u_brightness;
+
 float CURRENT_INTENSITY;
 
-float START_H_VALUE = 0.1667;
-float BASE_S_VALUE = 0.7;
-float BASE_S_H = 0.6667;//pure blue
-float BASE_V_VALUE = 0.8;
+const float START_H_VALUE = 0.1667;
+const float BASE_S_VALUE = 0.7;
+const float BASE_S_H = 0.6667;//pure blue
+const float BASE_V_VALUE = 0.8;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -49,7 +53,9 @@ vec4 UpdateTextureBased(vec4 sampled_color){
     return vec4(sampled_color.rgb, alpha*uOpacitys.overall);
 }
 vec4 UpdateRaybased(vec4 sampled_color){
-    return sampled_color;
+    float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
+    alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
+    return vec4(sampled_color.rgb, alpha);
 }
 vec4 Sample(ivec3 pos){
     vec2 sc = imageLoad(srcTex, pos).rg;

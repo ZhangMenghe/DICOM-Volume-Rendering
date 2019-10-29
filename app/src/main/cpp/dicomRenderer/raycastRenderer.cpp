@@ -52,8 +52,7 @@ void raycastRenderer::Draw(){
     Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool_map["cutting"]);
 
     Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
-    Shader::Uniform(sp,"val_threshold", vrController::param_value_map["threshold"]);
-    Shader::Uniform(sp,"brightness", vrController::param_value_map["brightness"]);
+
 
         cutter_->setCuttingParams(shader_);
 
@@ -77,5 +76,6 @@ void raycastRenderer::onCuttingChange(float percent){
     cutter_->setCutPlane(percent);
 }
 void raycastRenderer::updatePrecomputation(GLuint sp){
-
+    Shader::Uniform(sp, "u_val_threshold", vrController::param_value_map["threshold"]);
+    Shader::Uniform(sp, "u_brightness", vrController::param_value_map["brightness"]);
 }
