@@ -1,6 +1,8 @@
 package helmsley.vr.Utils;
 
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 
 import java.io.File;
@@ -12,6 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -109,14 +113,35 @@ public class fileUtils {
             for(File file:files){
                 if(file.isDirectory())
                     file_path_lst.addAll(getListFilesFromDir(file));
-//                else if(file_path_lst.isEmpty()){
-//                    String filename = file.getName();
-//                    file_path_lst.add(filename.substring(filename.lastIndexOf(".")));
-//                }
                 else file_path_lst.add(file.getAbsolutePath());
             }
         }
         return file_path_lst;
+    }
+    public static ArrayList<Bitmap> loadImagesFromDir(String dir_path_str){
+        ArrayList<Bitmap> img_list = new ArrayList<>();
+        ArrayList<Integer> name_list = new ArrayList<>();
+        int dir_len = dir_path_str.length();
+
+        File dir_path = new File(dir_path_str);
+        if(!dir_path.exists()) return img_list;
+
+        if (dir_path.exists()) {
+            File[] files = dir_path.listFiles();
+            for(File file:files){
+                String full_name = file.getAbsolutePath();
+                name_list.add(Integer.parseInt(full_name.substring(dir_len+1, full_name.length()-4)));
+                try{
+                    FileInputStream fis = new FileInputStream(full_name);
+                    img_list.add(BitmapFactory.decodeStream(fis));
+                }catch (IOException e){
+                    Log.e(TAG, "===load_mask error from : " + dir_path_str);
+                }
+            }
+        }
+        ArrayList<Bitmap> sorted_img_list = new ArrayList(img_list);
+        Collections.sort(sorted_img_list, Comparator.comparing(s -> name_list.get(img_list.indexOf(s))));
+        return sorted_img_list;
     }
 }
 

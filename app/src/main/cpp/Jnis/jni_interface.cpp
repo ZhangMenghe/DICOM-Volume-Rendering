@@ -35,8 +35,6 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    std::sort(images_.begin(), images_.end(),
-              [](const dcmImage* img1, const dcmImage* img2){return img1->location < img2->location;});
     size_t dimensions = images_.size();
 
     size_t data_size = CHANEL_NUM * img_width * img_height * dimensions;
@@ -123,7 +121,7 @@ void convert_bitmap_with_mask(JNIEnv* env, jobject bitmap, jobject mask, GLubyte
     AndroidBitmap_unlockPixels(env, bitmap);
     AndroidBitmap_unlockPixels(env, mask);
 }
-void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h ){
+void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h, int offset ){
     AndroidBitmapInfo srcInfo;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
         LOGE("====get bitmap info failed");
@@ -134,23 +132,26 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h )
         LOGE("===lock src bitmap failed");
         return;
     }
-    LOGI("width=%d; height=%d; stride=%d; format=%d;flag=%d",
-         srcInfo.width, //  width=2700 (900*3)
-         srcInfo.height, // height=2025 (675*3)
-         srcInfo.stride, // stride=10800 (2700*4)
-         srcInfo.format, // format=1 (ANDROID_BITMAP_FORMAT_RGBA_8888=1)
-         srcInfo.flags); // flags=0 (ANDROID_BITMAP_RESULT_SUCCESS=0)
-    w = srcInfo.width; h = srcInfo.height;
+    if(!data){
+        LOGI("width=%d; height=%d; stride=%d; format=%d;flag=%d",
+             srcInfo.width, //  width=2700 (900*3)
+             srcInfo.height, // height=2025 (675*3)
+             srcInfo.stride, // stride=10800 (2700*4)
+             srcInfo.format, // format=1 (ANDROID_BITMAP_FORMAT_RGBA_8888=1)
+             srcInfo.flags); // flags=0 (ANDROID_BITMAP_RESULT_SUCCESS=0)
+        w = srcInfo.width; h = srcInfo.height;
 
-    size_t size = srcInfo.width * srcInfo.height;
-    data = new GLubyte[CHANEL_NUM*size];
-//    memset(data, 0xff, CHANEL_NUM * size * 4);
+        size_t size = srcInfo.width * srcInfo.height;
+
+        data = new GLubyte[CHANEL_NUM*size];
+        memset(data, 0xff, CHANEL_NUM * size * sizeof(GLubyte));
+    }
+
     int x, y, idx = 0;
     for (y = 0; y < h; y++) {
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
-            data[CHANEL_NUM*idx] = line[x].red;
-            data[CHANEL_NUM*idx + 1] = 0x00;
+            data[CHANEL_NUM*idx + offset] = line[x].red;
             idx++;
         }
 
@@ -158,7 +159,7 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h )
     }
     AndroidBitmap_unlockPixels(env, bitmap);
 }
-JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject,  jobjectArray img_arr, jint size, jboolean with_mask){
+JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject, jobjectArray img_arr, jobjectArray msk_arr, jint size){
     //get dcmImg class defined in java
     jclass imgClass = env->FindClass("helmsley/vr/Utils/dcmImage");
     jobject img, bitmap, bitmap_mask;
@@ -182,15 +183,18 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject,  jobjectArray img_arr, ji
         bitmap = env->GetObjectField(img, bitmap_id);
 
         GLubyte * data = nullptr;
-        if(with_mask){
-            bm_mask_id = env->GetFieldID(imgClass, "bitmap_msk", "Landroid/graphics/Bitmap;");
-            bitmap_mask = env->GetObjectField(img, bm_mask_id);
-            convert_bitmap_with_mask(env, bitmap, bitmap_mask, data, width, height);
-        }else
-            convert_bitmap(env, bitmap, data, width, height);
+        convert_bitmap(env, bitmap, data, width, height, 0);
         img_height = height; img_width = width;
         images_.push_back(new dcmImage(
                 data,
                 location));
+    }
+    std::sort(images_.begin(), images_.end(),
+              [](const dcmImage* img1, const dcmImage* img2){return img1->location < img2->location;});
+    if(env->GetArrayLength(msk_arr)){
+        for(int idx = 0; idx<size; idx++){
+            bitmap_mask = env->GetObjectArrayElement(msk_arr, idx);
+            convert_bitmap(env, bitmap_mask, images_[idx]->data, width, height, 1);
+        }
     }
 }
