@@ -137,9 +137,6 @@ void vrController::precompute(){
     if(vrController::param_bool_map["maskon"]) bakeShader_->EnableKeyword("ORGANS_ONLY");
     else bakeShader_->DisableKeyword("ORGANS_ONLY");
 
-
-//  bakeShader_->EnableKeyword("MASKON");
-
     bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);

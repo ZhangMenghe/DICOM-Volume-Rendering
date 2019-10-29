@@ -1,6 +1,6 @@
 #version 310 es
-#pragma multi_compile MASKON ORGANS_ONLY TRANSFER_COLOR
-//#pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
+#pragma multi_compile MASKON ORGANS_ONLY
+#pragma multi_compile TRANSFER_COLOR
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -34,12 +34,10 @@ vec3 transfer_scheme(float gray){
 
 vec4 Sample(ivec3 pos){
     vec2 sc = imageLoad(srcTex, pos).rg;
-    vec4 color = vec4(1.0);
+    vec4 color = vec4(vec3(sc.r), 1.0);
 
 #ifdef TRANSFER_COLOR
     color.rgb = transfer_scheme(sc.r);
-#else
-    color.rgb = vec3(sc.r);
 #endif
 
 
@@ -50,6 +48,7 @@ vec4 Sample(ivec3 pos){
 #ifdef ORGANS_ONLY
     color.a *= sc.g;
 #endif
+
     return color;
 }
 
