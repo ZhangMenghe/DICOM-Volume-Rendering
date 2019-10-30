@@ -27,6 +27,11 @@ raycastRenderer::raycastRenderer() {
 }
 void raycastRenderer::DrawBaked(){
     precompute();
+
+//    glEnable(GL_BLEND);
+//    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+//    glEnable(GL_DEPTH_TEST);
     GLuint  sp = shader_baked_->Use();
 
     glActiveTexture(GL_TEXTURE0+BAKED_RAY_SCREEN_ID);
@@ -39,6 +44,8 @@ void raycastRenderer::DrawBaked(){
     glBindVertexArray(0);
 
     shader_baked_->UnUse();
+//    glDisable(GL_BLEND);
+//    glDisable(GL_DEPTH_TEST);
 }
 void raycastRenderer::Draw(){
     glEnable(GL_BLEND);
@@ -106,6 +113,7 @@ void raycastRenderer::updatePrecomputation(GLuint sp){
 }
 void raycastRenderer::precompute(){
     if(!baked_dirty_) return;
+    GLenum err;
     if(!cshader_){
         cshader_ = new Shader;
         if(!cshader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastCompute.glsl")
@@ -126,19 +134,22 @@ void raycastRenderer::precompute(){
             Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
         cshader_->UnUse();
     }
-
+    if((err = glGetError()) != GL_NO_ERROR)
+        LOGE("=======error1: %d", err);
     GLuint sp = cshader_->Use();
-    glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(0, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
-    Shader::Uniform(sp, "u_MV_inv", model_inv);
+    Shader::Uniform(sp, "u_WorldToModel", model_inv);
+    Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
                                                      *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
 
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
-
+    if((err = glGetError()) != GL_NO_ERROR)
+        LOGE("=======error2: %d", err);
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 

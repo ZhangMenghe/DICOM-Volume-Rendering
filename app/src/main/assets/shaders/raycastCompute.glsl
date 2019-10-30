@@ -6,16 +6,22 @@
 precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
-layout(binding = 0, rgba8)readonly uniform mediump image3D srcTex;
+layout(binding = 0, rgba8)readonly uniform mediump image3D srcTex;//) uniform mediump sampler3D uSampler; //,
 layout(binding = 1, rgba8)writeonly uniform mediump image2D destTex;
 
 uniform vec2 u_con_size;
 uniform float u_fov;
-uniform mat4 u_MV_inv;
+
+uniform mat4 u_WorldToModel;
+uniform mat4 u_CamToWorld;
+
 uniform vec3 uCamposObjSpace;
+
 
 const float constantNCP = 1.0;
 const float sample_step_inverse = 0.01;
+
+vec3 VolumeSize;
 
 vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
     vec3 tMin = (-extents - ro) / rd;
@@ -25,7 +31,9 @@ vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
     return vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
 }
 vec4 Sample(vec3 p){
-    return imageLoad(srcTex, ivec3(p));
+    return imageLoad(srcTex, ivec3(VolumeSize * p));
+//    return vec4(p, 1.0);
+//    return texture(uSampler, vec3(0.5));
 }
 vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     ro = ro + 0.5;
@@ -49,19 +57,64 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     }
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
+vec4 Volume_new(vec3 ro, vec3 rd, float tnear, float tfar){
+    vec3 first = vec3(ro + rd*tnear);
+    first = vec3(first.x + 0.5f, first.y + 0.5f , 1.0f - (first.z + 0.5f));
+    vec3 last = vec3(ro + rd*tfar);
+    last = vec3(last.x + 0.5f, last.y + 0.5f , 1.0f - (last.z + 0.5f));
 
+    //Get direction of the ray
+    vec3 direction = last - first;
+    float D = length (direction);
+    direction = normalize(direction);
+
+    vec4 color = vec4(.0,.0,.0,1.0);
+    float h = sample_step_inverse;
+
+    vec3 trans = first;
+    vec3 rayStep = direction * h;
+    for(float t =.0; t<=D; t += h){
+
+        vec4 samp = Sample(trans);
+        samp.a = 1.0f - exp(-0.5 * samp.a);
+
+        //Acumulating color and alpha using under operator
+        samp.rgb = samp.rgb * samp.a;
+
+        color.rgb += samp.rgb * color.a;
+        color.a *= 1.0f - samp.a;
+
+        //Do early termination of the ray
+        if(color.a > 0.95) break;
+
+        //Increment ray step
+        trans += rayStep;
+    }
+    return color;
+}
 vec4 tracing(float u, float v){
-    vec4 color = vec4(.0);
+//    vec4 color = vec4(.0);
     // s1: calculate eye ray
     float tangent = tan(u_fov / 2.0); // angle in radians
     float ar = (float(u_con_size.x) / u_con_size.y);
 //    vec4 ro = u_MV_inv * vec4(.0,.0,.0,1.0);
+
+
     vec3 ro = uCamposObjSpace;
-    vec3 rd = vec3(normalize(u_MV_inv * normalize(vec4(u * tangent * ar, v * tangent, -constantNCP, 0.0f))));
+    vec3 rd = vec3(normalize(u_WorldToModel * normalize(vec4(u * tangent * ar, v * tangent, -constantNCP, 0.0f))));
+
+
+
+
     vec2 intersect = RayCube(ro, rd, vec3(0.5));
-    if(intersect.y < intersect.x) return color;
-    return Volume(ro, rd, intersect.x, intersect.y);
-//    return vec4(0.8,0.8,0.0,1.0);
+    if(intersect.y < intersect.x) return vec4(.0);
+
+//    VolumeSize = vec3(imageSize(srcTex));
+//    return Volume_new(ro, rd, intersect.x, intersect.y);
+
+
+//    return Volume(ro, rd, intersect.x, intersect.y);
+    return vec4(0.8,0.8,0.0,1.0);
 //    return Sample(ro+0.5);
 }
 void main() {
