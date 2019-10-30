@@ -32,13 +32,18 @@ vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
     return vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
 }
 vec4 Sample(vec3 p){
-    return imageLoad(srcTex, ivec3(VolumeSize * p));
+    vec3 coord = clamp(p, vec3(sample_step_inverse), vec3(1.0-sample_step_inverse));
+
+    return imageLoad(srcTex, ivec3(VolumeSize *coord));
 //    return vec4(p, 1.0);
 //    return texture(uSampler, vec3(0.5));
 }
 vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
-    ro = ro + 0.5;
-    rd = normalize(rd);
+    if(uViewDir > .0)
+        return Sample(ro + rd* head);
+    else
+        return Sample(ro + rd * tail);
+
     vec4 sum = vec4(.0);
     int steps = 0; float pd = .0;
 
@@ -93,36 +98,22 @@ vec4 Volume_new(vec3 ro, vec3 rd, float tnear, float tfar){
     }
     return color;
 }
-vec4 Volume_test(vec3 p ){
-    return imageLoad(srcTex, ivec3(VolumeSize * p));
-}
+
 vec4 tracing(float u, float v){
 //    vec4 color = vec4(.0);
     // s1: calculate eye ray
     float tangent = tan(u_fov / 2.0); // angle in radians
     float ar = (float(u_con_size.x) / u_con_size.y);
-//    vec4 ro = u_MV_inv * vec4(.0,.0,.0,1.0);
-
 
     vec3 ro = uCamposObjSpace;
     vec3 rd = vec3(normalize(u_WorldToModel * u_CamToWorld *vec4(u* tangent*ar, v*tangent, -1.0, .0)));
-
 
     vec2 intersect = RayCube(ro, rd, vec3(0.5));
     intersect.x = max(.0, intersect.x);
     if(intersect.y < intersect.x) return vec4(.0);
 
     VolumeSize = vec3(imageSize(srcTex));
-//    return Volume_new(ro, rd, intersect.x, intersect.y);
-
-
-//    return Volume(ro, rd, intersect.x, intersect.y);
-//    return vec4(0.8,0.8,0.0,1.0);
-    if(uViewDir > .0)
-        return Volume_test(clamp(ro+0.5 + rd * intersect.x, vec3(.0), vec3(1.0)));
-    else
-        return Volume_test(clamp(ro+0.5 + rd * intersect.y, vec3(sample_step_inverse), vec3(1.0-sample_step_inverse)));
-
+    return Volume(ro + 0.5, rd, intersect.x, intersect.y);
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
