@@ -3,9 +3,9 @@
 #include "raycastRenderer.h"
 #include <GLPipeline/Primitive.h>
 #include <AndroidUtils/mathUtils.h>
-raycastRenderer::raycastRenderer() {
+void raycastRenderer::on_create() {
     //geometry
-    Mesh::InitQuadWithTex(VAO_, cuboid_with_texture, 8, cuboid_indices, 36);
+    Mesh::InitQuadWithTex(vao_cube_, cuboid_with_texture, 8, cuboid_indices, 36);
     Mesh::InitQuadWithTex(vao_screen_, quad_vertices_tex_standard, 4, quad_indices, 6);
 
     //program
@@ -22,32 +22,22 @@ raycastRenderer::raycastRenderer() {
        ||!shader_baked_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
 
-    cutter_ = new cuttingController;//(glm::vec3(.0f), glm::vec3(0,0,-1));
-
+    cutter_ = new cuttingController;
 }
 void raycastRenderer::DrawBaked(){
     precompute();
-
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable(GL_DEPTH_TEST);
-    GLuint  sp = shader_baked_->Use();
-
+    GLuint sp = shader_baked_->Use();
     glActiveTexture(GL_TEXTURE0+BAKED_RAY_SCREEN_ID);
     glBindTexture(GL_TEXTURE_2D, ray_baked_screen->GLTexture());
     Shader::Uniform(sp, "uSampler", BAKED_RAY_SCREEN_ID);
-
-
     glBindVertexArray(vao_screen_);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-
     shader_baked_->UnUse();
-//    glDisable(GL_BLEND);
-//    glDisable(GL_DEPTH_TEST);
 }
 void raycastRenderer::Draw(){
+    if(DRAW_BAKED) {DrawBaked(); return;}
+
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //    glEnable(GL_CULL_FACE);
@@ -79,7 +69,6 @@ void raycastRenderer::Draw(){
                 vrController::tex_volume->Height(),
                 vrController::tex_volume->Depth()));
 
-//    Shader::Uniform(sp,"ub_colortrans", vrController::param_bool_map["colortrans"]);
     Shader::Uniform(sp,"ub_accumulate", vrController::param_bool_map["accumulate"]);
     Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool_map["cutting"]);
 
@@ -91,7 +80,7 @@ void raycastRenderer::Draw(){
     else
         glFrontFace(GL_CCW);
 
-        glBindVertexArray(VAO_);
+        glBindVertexArray(vao_cube_);
         glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     shader_->UnUse();

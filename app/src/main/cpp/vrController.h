@@ -24,6 +24,7 @@ public:
     static glm::vec3 ScaleVec3_, PosVec3_;
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
+    inline static bool isRayCasting(){return param_bool_map["raycast"];}
 
 
     static glm::vec3 csphere_c;
