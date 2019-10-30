@@ -33,6 +33,20 @@ vec4 Sample(vec3 p){
     vec3 coord = clamp(p, vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
     return imageLoad(srcTex, ivec3(VolumeSize *coord));
 }
+vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
+    float t0 = t - StepSize * 4.0;
+    float t1 = t;
+    float tm;
+
+    #define BINARY_SUBDIV tm = (t0 + t1) * .5; p = ro + rd * tm; if (Sample(p).a > .01) t1 = tm; else t0 = tm;
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    #undef BINARY_SUBDIV
+    t = tm;
+    return Sample(p);
+}
 vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     vec4 sum = vec4(.0);
     int steps = 0; float pd = .0;
@@ -43,7 +57,7 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
         vec3 p = ro + rd * t;
         vec4 val_color = Sample(p);
         if(val_color.a > 0.01){
-//            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
+            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
             sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
             sum.a += (1.0 - sum.a) * val_color.a;
         }
