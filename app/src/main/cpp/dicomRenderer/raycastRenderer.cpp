@@ -142,13 +142,11 @@ void raycastRenderer::precompute(){
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
-    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
-                                                     *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
+    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
-    if((err = glGetError()) != GL_NO_ERROR)
-        LOGE("=======error2: %d", err);
+
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
