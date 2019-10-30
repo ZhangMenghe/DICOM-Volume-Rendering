@@ -39,6 +39,8 @@ bool Shader::CompileAndLink(){
                     // create variants
                     for (unsigned int i = 0; i < kwc; i++) {
                         vector<string> k(available_keywords_[i]);
+                        int len = token.size();
+                        if(token[len-1] == '\r') token = token.substr(0, len-1);
                         k.push_back(token);
                         available_keywords_.push_back(k);
                     }
