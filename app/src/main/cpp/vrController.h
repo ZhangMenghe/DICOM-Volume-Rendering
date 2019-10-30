@@ -42,9 +42,6 @@ public:
     void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);
-
-    Shader* getBakeShader(){ return bakeShader_;}
-
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;

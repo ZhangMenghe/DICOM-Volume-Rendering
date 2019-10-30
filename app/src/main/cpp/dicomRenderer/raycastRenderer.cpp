@@ -84,9 +84,7 @@ void raycastRenderer::Draw(){
     Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool_map["cutting"]);
 
     Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
-
-
-        cutter_->setCuttingParams(shader_);
+    cutter_->setCuttingParams(shader_);
 
     if(vrController::camera->getViewDirection().z <0)
         glFrontFace(GL_CW);
@@ -144,6 +142,7 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
+    Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
