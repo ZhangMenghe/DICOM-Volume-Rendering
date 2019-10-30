@@ -16,6 +16,7 @@ uniform mat4 u_WorldToModel;
 uniform mat4 u_CamToWorld;
 
 uniform vec3 uCamposObjSpace;
+uniform float uViewDir;
 
 
 const float constantNCP = 1.0;
@@ -117,7 +118,11 @@ vec4 tracing(float u, float v){
 
 //    return Volume(ro, rd, intersect.x, intersect.y);
 //    return vec4(0.8,0.8,0.0,1.0);
-    return Volume_test(clamp(ro+0.5 + rd * intersect.x, vec3(.0), vec3(1.0)));
+    if(uViewDir > .0)
+        return Volume_test(clamp(ro+0.5 + rd * intersect.x, vec3(.0), vec3(1.0)));
+    else
+        return Volume_test(clamp(ro+0.5 + rd * intersect.y, vec3(sample_step_inverse), vec3(1.0-sample_step_inverse)));
+
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);

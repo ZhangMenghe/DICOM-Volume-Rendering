@@ -144,7 +144,7 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
                                                      *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-
+    Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
     if((err = glGetError()) != GL_NO_ERROR)
