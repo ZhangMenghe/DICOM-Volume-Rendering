@@ -136,7 +136,7 @@ void raycastRenderer::precompute(){
     }
 
     GLuint sp = cshader_->Use();
-    glBindImageTexture(0, vrController::tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);

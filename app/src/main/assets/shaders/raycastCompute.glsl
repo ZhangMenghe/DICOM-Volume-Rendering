@@ -33,15 +33,9 @@ vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
 }
 vec4 Sample(vec3 p){
     vec3 coord = clamp(p, vec3(sample_step_inverse), vec3(1.0-sample_step_inverse));
-    float intensity =  imageLoad(srcTex, ivec3(VolumeSize *coord)).r;
-    return vec4(intensity);
+    return imageLoad(srcTex, ivec3(VolumeSize *coord));
 }
 vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
-//    if(uViewDir > .0)
-//        return Sample(ro + rd* head);
-//    else
-//        return Sample(ro + rd * tail);
-
     vec4 sum = vec4(.0);
     int steps = 0; float pd = .0;
 
