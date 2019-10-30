@@ -15,29 +15,41 @@ uniform mat4 u_MV_inv;
 uniform vec3 uCamposObjSpace;
 
 const float constantNCP = 1.0;
-bool RayCube(vec3 ro, vec3 rd, vec3 extents) {
-    vec3 boxmin = -extents;
-    vec3 boxmax = extents;
+const float sample_step_inverse = 0.01;
 
-    // compute intersection of ray with all six bbox planes
-    vec3 invR = 1.0f / rd;
-    vec3 tbot = invR * (boxmin - ro);
-    vec3 ttop = invR * (boxmax - ro);
-
-    // re-order intersections to find smallest and largest on each axis
-
-    vec3 tmin = vec3(100000.0f);
-    vec3 tmax = vec3(0.0f);
-
-    tmin = min(tmin, min(ttop, tbot));
-    tmax = max(tmax, max(ttop, tbot));
-
-    // find the largest tmin and the smallest tmax
-    float largest_tmin = max(max(tmin.x, tmin.y), max(tmin.x, tmin.z));
-    float smallest_tmax = min(min(tmax.x, tmax.y), min(tmax.x, tmax.z));
-
-    return smallest_tmax > largest_tmin;
+vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
+    vec3 tMin = (-extents - ro) / rd;
+    vec3 tMax = (extents - ro) / rd;
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+    return vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
 }
+vec4 Sample(vec3 p){
+    return imageLoad(srcTex, ivec3(p));
+}
+vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
+    ro = ro + 0.5;
+    rd = normalize(rd);
+    vec4 sum = vec4(.0);
+    int steps = 0; float pd = .0;
+
+    float vmax = .0;
+    for(float t = head; t<tail; ){
+        if(sum.a >= 0.95) break;
+        vec3 p = ro + rd * t;
+        vec4 val_color = Sample(p);
+        if(val_color.a > 0.01){
+//            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, sample_step_inverse);
+            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
+            sum.a += (1.0 - sum.a) * val_color.a;
+        }
+        t += val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
+        steps++;
+        pd = sum.a;
+    }
+    return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
+}
+
 vec4 tracing(float u, float v){
     vec4 color = vec4(.0);
     // s1: calculate eye ray
@@ -46,9 +58,11 @@ vec4 tracing(float u, float v){
 //    vec4 ro = u_MV_inv * vec4(.0,.0,.0,1.0);
     vec3 ro = uCamposObjSpace;
     vec3 rd = vec3(normalize(u_MV_inv * normalize(vec4(u * tangent * ar, v * tangent, -constantNCP, 0.0f))));
-    if(!RayCube(ro, rd, vec3(0.5))) return color;
-
-    return vec4(0.8,0.8,0.0,1.0);
+    vec2 intersect = RayCube(ro, rd, vec3(0.5));
+    if(intersect.y < intersect.x) return color;
+    return Volume(ro, rd, intersect.x, intersect.y);
+//    return vec4(0.8,0.8,0.0,1.0);
+//    return Sample(ro+0.5);
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
