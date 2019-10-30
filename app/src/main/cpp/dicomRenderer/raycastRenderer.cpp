@@ -134,8 +134,7 @@ void raycastRenderer::precompute(){
             Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
         cshader_->UnUse();
     }
-    if((err = glGetError()) != GL_NO_ERROR)
-        LOGE("=======error1: %d", err);
+
     GLuint sp = cshader_->Use();
     glBindImageTexture(0, vrController::tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);

@@ -92,6 +92,9 @@ vec4 Volume_new(vec3 ro, vec3 rd, float tnear, float tfar){
     }
     return color;
 }
+vec4 Volume_test(vec3 p ){
+    return imageLoad(srcTex, ivec3(VolumeSize * p));
+}
 vec4 tracing(float u, float v){
 //    vec4 color = vec4(.0);
     // s1: calculate eye ray
@@ -101,21 +104,20 @@ vec4 tracing(float u, float v){
 
 
     vec3 ro = uCamposObjSpace;
-    vec3 rd = vec3(normalize(u_WorldToModel * normalize(vec4(u * tangent * ar, v * tangent, -constantNCP, 0.0f))));
-
-
+    vec3 rd = vec3(normalize(u_WorldToModel * u_CamToWorld *vec4(u* tangent*ar, v*tangent, -1.0, .0)));
 
 
     vec2 intersect = RayCube(ro, rd, vec3(0.5));
+    intersect.x = max(.0, intersect.x);
     if(intersect.y < intersect.x) return vec4(.0);
 
-//    VolumeSize = vec3(imageSize(srcTex));
+    VolumeSize = vec3(imageSize(srcTex));
 //    return Volume_new(ro, rd, intersect.x, intersect.y);
 
 
 //    return Volume(ro, rd, intersect.x, intersect.y);
-    return vec4(0.8,0.8,0.0,1.0);
-//    return Sample(ro+0.5);
+//    return vec4(0.8,0.8,0.0,1.0);
+    return Volume_test(clamp(ro+0.5 + rd * intersect.x, vec3(.0), vec3(1.0)));
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
