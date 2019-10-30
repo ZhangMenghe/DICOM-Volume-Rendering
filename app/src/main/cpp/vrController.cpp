@@ -105,8 +105,8 @@ void vrController::onTouchMove(float x, float y) {
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
     volume_model_dirty = true;
 
-//    if(param_bool_map["raycast"])
-//        raycastRenderer_->dirtyPrecompute();
+    if(param_bool_map["raycast"])
+        raycastRenderer_->dirtyPrecompute();
 }
 void vrController::onScale(float sx, float sy){
     //unified scaling
@@ -121,12 +121,16 @@ void vrController::onScale(float sx, float sy){
         ScaleVec3_ = ScaleVec3_* sx;
         volume_model_dirty = true;
     }
+    if(param_bool_map["raycast"])
+        raycastRenderer_->dirtyPrecompute();
 }
 void vrController::onPan(float x, float y){
     float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
     volume_model_dirty = true;
+    if(param_bool_map["raycast"])
+        raycastRenderer_->dirtyPrecompute();
 }
 void vrController::precompute(){
     if(!baked_dirty_) return;
@@ -166,5 +170,5 @@ void vrController::precompute(){
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
-//    raycastRenderer_->dirtyPrecompute();
+    raycastRenderer_->dirtyPrecompute();
 }

@@ -21,7 +21,7 @@ public:
     void Draw();
     void DrawBaked();
     void updatePrecomputation(GLuint sp);
-    bool dirtyPrecompute(){baked_dirty_ = true;}
+    void dirtyPrecompute(){baked_dirty_ = true;}
 
 };
 #endif
