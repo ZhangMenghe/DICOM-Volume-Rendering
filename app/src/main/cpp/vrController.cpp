@@ -170,5 +170,6 @@ void vrController::precompute(){
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
-    raycastRenderer_->dirtyPrecompute();
+    if(param_bool_map["raycast"])
+        raycastRenderer_->dirtyPrecompute();
 }
