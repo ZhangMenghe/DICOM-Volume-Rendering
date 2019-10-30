@@ -14,12 +14,14 @@ private:
     Texture* ray_baked_screen;
     bool baked_dirty_ = true;
     int BAKED_RAY_SCREEN_ID;
+    void precompute();
 public:
     raycastRenderer();
     void onCuttingChange(float percent);
     void Draw();
     void DrawBaked();
     void updatePrecomputation(GLuint sp);
-    void precompute();
+    bool dirtyPrecompute(){baked_dirty_ = true;}
+
 };
 #endif

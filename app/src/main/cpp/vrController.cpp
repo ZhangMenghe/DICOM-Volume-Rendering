@@ -77,6 +77,7 @@ void vrController::onDraw() {
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
+
     if(param_bool_map["raycast"])
         raycastRenderer_->DrawBaked();
 //        raycastRenderer_->Draw();
@@ -103,6 +104,9 @@ void vrController::onTouchMove(float x, float y) {
 
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
     volume_model_dirty = true;
+
+//    if(param_bool_map["raycast"])
+//        raycastRenderer_->dirtyPrecompute();
 }
 void vrController::onScale(float sx, float sy){
     //unified scaling
@@ -162,5 +166,5 @@ void vrController::precompute(){
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
-    raycastRenderer_->precompute();
+//    raycastRenderer_->dirtyPrecompute();
 }

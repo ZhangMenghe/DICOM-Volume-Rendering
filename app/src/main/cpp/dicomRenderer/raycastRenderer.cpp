@@ -26,6 +26,7 @@ raycastRenderer::raycastRenderer() {
 
 }
 void raycastRenderer::DrawBaked(){
+    precompute();
     GLuint  sp = shader_baked_->Use();
 
     glActiveTexture(GL_TEXTURE0+BAKED_RAY_SCREEN_ID);
@@ -122,12 +123,18 @@ void raycastRenderer::precompute(){
 
         GLuint sp = cshader_->Use();
             Shader::Uniform(sp, "u_con_size", width, height);
+            Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
         cshader_->UnUse();
     }
 
-    cshader_->Use();
+    GLuint sp = cshader_->Use();
     glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
+    Shader::Uniform(sp, "u_MV_inv", model_inv);
+    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
+                                                     *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
 
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);

@@ -35,6 +35,7 @@ public:
     glm::vec3 getCameraPosition(){return _eyePos;}
     glm::vec3 getViewCenter(){return _center;}
     glm::vec3 getViewDirection(){return _front;}
+    float getFOV(){return FOV * (3.14f / 180.0f);}
 
     void rotateCamera(int axis, glm::vec4 center, float offset){
         glm::vec3 rotateAxis = (axis==3)?glm::vec3(0,1,0):glm::vec3(1,0,0);
