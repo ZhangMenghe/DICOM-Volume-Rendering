@@ -38,7 +38,6 @@ private:
 
     glm::vec4 plane_color_ = glm::vec4(173,213,247,100);
 
-    void update();
     void draw_plane();
     bool keep_cutting_position();
 
@@ -47,7 +46,8 @@ public:
     static cuttingController* instance();
     cuttingController();
     cuttingController(glm::vec3 ps, glm::vec3 pn);
-    void Draw();
+    void Update();
+    void UpdateAndDraw();
     void setCuttingParams(GLuint sp);
 
     void setCutPlane(float percent);

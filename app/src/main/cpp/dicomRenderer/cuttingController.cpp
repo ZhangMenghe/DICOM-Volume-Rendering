@@ -36,8 +36,8 @@ p_start_(ps), p_norm_(pn){
     p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
     _mptr = this;
 }
-void cuttingController::Draw(){
-    update();
+void cuttingController::UpdateAndDraw(){
+    Update();
     if(vrController::param_bool_map["cutting"])draw_plane();
 }
 void cuttingController::setCuttingParams(GLuint sp){
@@ -47,7 +47,7 @@ void cuttingController::setCuttingParams(GLuint sp){
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
 }
-void cuttingController::update(){
+void cuttingController::Update(){
     if(p_p2v_dirty){
         p_p2v_dirty = false;
         p_p2v_mat = glm::translate(glm::mat4(1.0), p_point_)*p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);

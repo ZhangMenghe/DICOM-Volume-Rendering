@@ -45,7 +45,7 @@ void raycastRenderer::Draw(){
     glEnable(GL_DEPTH_TEST);
 
     //Update cutting plane and draw
-    cutter_->Draw();
+    cutter_->UpdateAndDraw();
 
     GLuint sp = shader_->Use();
     if(vrController::ray_baked){
@@ -134,6 +134,7 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
     Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
+    cutter_->Update();
     cutter_->setCuttingParams(sp);
 
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
