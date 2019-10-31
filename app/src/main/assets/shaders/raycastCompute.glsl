@@ -105,24 +105,19 @@ vec4 tracing(float u, float v){
     //plane
     #ifdef CUTTING_PLANE
         float t;
-        vec3 mp;
+
         if(dot(uPlane.normal, -uCamposObjSpace) > .0){
             t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
-            float orix = intersect.x;
+            if(t <= intersect.x) plane_color = vec4(1.0,.0,.0,1.0);
             intersect.x = max(intersect.x, t);
-            if(intersect.x == t){
-                plane_color = vec4(.0,1.0,.0,1.0);mp=ro +rd * t;
-            }else{
-                plane_color = vec4(1.0,.0,.0,1.0);mp=ro+rd*t;
-            }
         }
-        else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);plane_color = vec4(0.8,0.8,.0,1.0);mp = ro + rd * t;}
+        else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);plane_color = vec4(0.8,0.8,.0,1.0);}
 
         if(abs(t) < 1000.0)
-            is_plane_color = intersectRayWithSquare(mp, uPlane.s1, uPlane.s2, uPlane.s3);
+            is_plane_color = intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3);
     #endif
 
-    if(intersect.y < intersect.x || plane_color.x == 1.0) return is_plane_color?plane_color:vec4(.0);
+    if(intersect.y <= intersect.x || plane_color.x == 1.0) return is_plane_color?vec4(0.8,0.8,.0,1.0):vec4(.0);
 
     VolumeSize = vec3(imageSize(srcTex));
     return Volume(ro + 0.5, rd, intersect.x, intersect.y);
