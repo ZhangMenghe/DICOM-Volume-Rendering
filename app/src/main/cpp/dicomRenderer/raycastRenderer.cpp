@@ -135,7 +135,7 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
     Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
     cutter_->Update();
-    cutter_->setCuttingParams(sp);
+    cutter_->setCuttingParams(sp, true);
 
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);

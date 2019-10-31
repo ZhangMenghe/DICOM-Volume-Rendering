@@ -23,6 +23,7 @@ uniform float usample_step_inverse;
 struct Plane{
     vec3 p;
     vec3 normal;
+    vec3 s1, s2, s3;
 };
 uniform Plane uPlane;
 const float constantNCP = 1.0;
@@ -40,6 +41,16 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
     float t = dot(planep - ro, planen);
     return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
+
+bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
+    vec3 dms1 = M-s1;
+    vec3 ds21 = s2 - s1; vec3 ds31 = s3 - s1;
+    float u = dot(dms1, ds21);
+    float v = dot(dms1, ds31);
+    return (u >= 0.0 && u <= dot(ds21, ds21)
+    && v >= 0.0 && v <= dot(ds31,ds31));
+}
+
 vec4 Sample(vec3 p){
     vec3 coord = clamp(p, vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
     return imageLoad(srcTex, ivec3(VolumeSize *coord));
@@ -89,15 +100,29 @@ vec4 tracing(float u, float v){
     vec2 intersect = RayCube(ro, rd, vec3(0.5));
     intersect.x = max(.0, intersect.x);
 
+    bool is_plane_color = false;
+    vec4 plane_color;
     //plane
     #ifdef CUTTING_PLANE
-        if(dot(uPlane.normal, -uCamposObjSpace) > .0)
-            intersect.x = max(intersect.x, RayPlane(ro, rd, uPlane.p, uPlane.normal ));
-        else
-            intersect.y = min(RayPlane(ro, rd, uPlane.p, -uPlane.normal), intersect.y);
+        float t;
+        vec3 mp;
+        if(dot(uPlane.normal, -uCamposObjSpace) > .0){
+            t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
+            float orix = intersect.x;
+            intersect.x = max(intersect.x, t);
+            if(intersect.x == t){
+                plane_color = vec4(.0,1.0,.0,1.0);mp=ro +rd * t;
+            }else{
+                plane_color = vec4(1.0,.0,.0,1.0);mp=ro+rd*t;
+            }
+        }
+        else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);plane_color = vec4(0.8,0.8,.0,1.0);mp = ro + rd * t;}
+
+        if(abs(t) < 1000.0)
+            is_plane_color = intersectRayWithSquare(mp, uPlane.s1, uPlane.s2, uPlane.s3);
     #endif
 
-    if(intersect.y < intersect.x) return vec4(.0);
+    if(intersect.y < intersect.x || plane_color.x == 1.0) return is_plane_color?plane_color:vec4(.0);
 
     VolumeSize = vec3(imageSize(srcTex));
     return Volume(ro + 0.5, rd, intersect.x, intersect.y);

@@ -20,7 +20,7 @@ cuttingController::cuttingController(){
     //camera pos in obj space
 //    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
     //cloest point
-    p_start_ = glm::vec3(.0f,.0f,0.3f);//cloestVertexToPlane(p_norm_, vp_obj);
+    p_start_ = glm::vec3(.0f,.0f,0.4f);//cloestVertexToPlane(p_norm_, vp_obj);
     p_point_ = p_start_;
     p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
 
@@ -40,12 +40,18 @@ void cuttingController::UpdateAndDraw(){
     Update();
     if(vrController::param_bool_map["cutting"])draw_plane();
 }
-void cuttingController::setCuttingParams(GLuint sp){
+void cuttingController::setCuttingParams(GLuint sp,bool includePoints){
 //    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
 //    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
 
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
+    mat4 p2m_mat = inverse(vrController::ModelMat_)*p_p2w_mat;
+    if(includePoints){
+        Shader::Uniform(sp,"uPlane.s1", vec3(p2m_mat * P_S1));
+        Shader::Uniform(sp,"uPlane.s2", vec3(p2m_mat * P_S2));
+        Shader::Uniform(sp,"uPlane.s3", vec3(p2m_mat * P_S3));
+    }
 }
 void cuttingController::Update(){
     if(p_p2v_dirty){
