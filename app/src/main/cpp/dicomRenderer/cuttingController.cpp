@@ -40,10 +40,9 @@ void cuttingController::Draw(){
     update();
     if(vrController::param_bool_map["cutting"])draw_plane();
 }
-void cuttingController::setCuttingParams(Shader* shader){
-    GLuint sp = shader->Use();
-    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
-    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
+void cuttingController::setCuttingParams(GLuint sp){
+//    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
+//    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
 
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));

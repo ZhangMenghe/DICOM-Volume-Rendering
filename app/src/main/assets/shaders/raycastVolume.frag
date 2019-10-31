@@ -18,12 +18,12 @@ struct Plane{
     vec3 p;
     vec3 normal;
 };
-struct Sphere{
-    vec3 center;
-    float radius;
-};
+//struct Sphere{
+//    vec3 center;
+//    float radius;
+//};
 uniform Plane uPlane;
-uniform Sphere uSphere;
+//uniform Sphere uSphere;
 
 uniform mediump sampler3D uSampler_tex;
 uniform bool ub_accumulate;//

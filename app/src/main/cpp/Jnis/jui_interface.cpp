@@ -26,8 +26,7 @@ JUI_METHOD(void, JUIsetSwitches)(JNIEnv * env, jclass, jstring key, jboolean val
 //    LOGE("====SET %s, %d", dvr::jstring2string(env,key).c_str(), value);
     std::string vs = dvr::jstring2string(env,key);
     vrController::param_bool_map[vs] = value;
-//    if(vs == "colortrans"|| vs == "maskon")
-        vrController::baked_dirty_ = true;
+    vrController::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIsetParam)(JNIEnv * env, jclass, jstring key, jfloat value){
 //    LOGE("====SET %s, %f", dvr::jstring2string(env,key).c_str(), value);
@@ -35,8 +34,7 @@ JUI_METHOD(void, JUIsetParam)(JNIEnv * env, jclass, jstring key, jfloat value){
     vrController::param_value_map[vs] = value;
     if( vs == "cutting" )
         vrController::cutDirty = true;
-    else
-        vrController::baked_dirty_ = true;
+    vrController::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIsetJavaUIStatus)(JNIEnv * env, jclass, jint item, jstring key){
     if(dvr::jstring2string(env,key) == "Opacity")

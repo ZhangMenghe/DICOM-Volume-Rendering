@@ -1,5 +1,7 @@
 #version 310 es
 
+#pragma multi_compile CUTTING_PLANE
+
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
 
@@ -18,7 +20,11 @@ uniform mat4 u_CamToWorld;
 uniform vec3 uCamposObjSpace;
 uniform float uViewDir;
 uniform float usample_step_inverse;
-
+struct Plane{
+    vec3 p;
+    vec3 normal;
+};
+uniform Plane uPlane;
 const float constantNCP = 1.0;
 vec3 VolumeSize;
 
@@ -28,6 +34,11 @@ vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
     vec3 t1 = min(tMin, tMax);
     vec3 t2 = max(tMin, tMax);
     return vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
+}
+float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
+    float d = dot(planen, rd);
+    float t = dot(planep - ro, planen);
+    return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
 vec4 Sample(vec3 p){
     vec3 coord = clamp(p, vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
@@ -77,6 +88,15 @@ vec4 tracing(float u, float v){
 
     vec2 intersect = RayCube(ro, rd, vec3(0.5));
     intersect.x = max(.0, intersect.x);
+
+    //plane
+    #ifdef CUTTING_PLANE
+        if(dot(uPlane.normal, -uCamposObjSpace) > .0)
+            intersect.x = max(intersect.x, RayPlane(ro, rd, uPlane.p, uPlane.normal ));
+        else
+            intersect.y = min(RayPlane(ro, rd, uPlane.p, -uPlane.normal), intersect.y);
+    #endif
+
     if(intersect.y < intersect.x) return vec4(.0);
 
     VolumeSize = vec3(imageSize(srcTex));

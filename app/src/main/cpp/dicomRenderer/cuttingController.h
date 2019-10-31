@@ -48,7 +48,7 @@ public:
     cuttingController();
     cuttingController(glm::vec3 ps, glm::vec3 pn);
     void Draw();
-    void setCuttingParams(Shader* shader);
+    void setCuttingParams(GLuint sp);
 
     void setCutPlane(float percent);
     void setCutPlane(glm::vec3 normal);

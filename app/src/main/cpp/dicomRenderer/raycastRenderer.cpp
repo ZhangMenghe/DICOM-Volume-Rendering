@@ -73,7 +73,7 @@ void raycastRenderer::Draw(){
     Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool_map["cutting"]);
 
     Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
-    cutter_->setCuttingParams(shader_);
+    cutter_->setCuttingParams(sp);
 
     if(vrController::camera->getViewDirection().z <0)
         glFrontFace(GL_CW);
@@ -93,6 +93,7 @@ void raycastRenderer::Draw(){
 
 void raycastRenderer::onCuttingChange(float percent){
     cutter_->setCutPlane(percent);
+//    dirtyPrecompute();
 }
 void raycastRenderer::updatePrecomputation(GLuint sp){
     Shader::Uniform(sp, "u_val_threshold", vrController::param_value_map["threshold"]);
@@ -115,16 +116,17 @@ void raycastRenderer::precompute(){
         memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
         ray_baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, vdata);
         delete[]vdata;
-
-        GLuint sp = cshader_->Use();
-            Shader::Uniform(sp, "u_con_size", width, height);
-            Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
-        cshader_->UnUse();
     }
+
+    if(vrController::param_bool_map["cutting"])cshader_->EnableKeyword("CUTTING_PLANE");
+    else cshader_->DisableKeyword("CUTTING_PLANE");
 
     GLuint sp = cshader_->Use();
     glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    Shader::Uniform(sp, "u_con_size", vrController::_screen_w, vrController::_screen_h);
+    Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
@@ -132,6 +134,8 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
     Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_value_map["samplestep"]);
+    cutter_->setCuttingParams(sp);
+
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
