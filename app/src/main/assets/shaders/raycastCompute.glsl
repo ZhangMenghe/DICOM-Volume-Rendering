@@ -114,7 +114,7 @@ vec4 tracing(float u, float v){
 
         if(abs(t) < 1000.0)
             is_plane_color = intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3);
-        if(intersect.y < intersect.x || blocked_by_plane) return is_plane_color?vec4(0.8,0.8,.0,1.0):vec4(.0);
+        if(intersect.y < intersect.x || blocked_by_plane) return is_plane_color?vec4(0.8,0.8,.0,0.3):vec4(.0);
     #else
             if(intersect.y < intersect.x) return vec4(.0);
     #endif

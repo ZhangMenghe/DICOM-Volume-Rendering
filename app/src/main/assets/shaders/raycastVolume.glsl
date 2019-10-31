@@ -54,7 +54,10 @@ vec4 UpdateTextureBased(vec4 sampled_color){
 }
 vec4 UpdateRaybased(vec4 sampled_color){
     float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
-    alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
+    if(sampled_color.r==CURRENT_INTENSITY) {
+        float up_inten = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
+        return vec4(vec3(up_inten), up_inten * sampled_color.a);
+    }
     return vec4(sampled_color.rgb, alpha*sampled_color.a);
 }
 vec4 Sample(ivec3 pos){
