@@ -128,7 +128,7 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "u_con_size", vrController::_screen_w, vrController::_screen_h);
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
-    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
+    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * glm::scale(glm::mat4(1.0), glm::vec3(0.75f)));
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
