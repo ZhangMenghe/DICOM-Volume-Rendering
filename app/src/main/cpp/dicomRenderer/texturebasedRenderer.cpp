@@ -66,8 +66,8 @@ void texvrRenderer::draw_scene(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if(!vrController::param_bool_map["maskon"]){
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+//        glEnable(GL_CULL_FACE);
+//        glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
     }
     GLuint sp = shader_->Use();
@@ -110,8 +110,8 @@ void texvrRenderer::updatePrecomputation(GLuint sp) {
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 }
 void texvrRenderer::draw_screen_quad(){
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDisable(GL_DEPTH_TEST);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glDisable(GL_DEPTH_TEST);
     //render to screen
     GLuint sp = shader_baked_->Use();
     glActiveTexture(GL_TEXTURE0+BAKED_TEX_SCREEN_ID);
@@ -128,13 +128,13 @@ void texvrRenderer::two_pass_draw() {
     if(!baked_dirty_) {draw_screen_quad(); return;}
     if(!frame_buff_){
         float width = vrController::_screen_w, height = vrController::_screen_h;
-//        int vsize= width* height;
-//        GLbyte * vdata = new GLbyte[vsize * 4];
-//        memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
-        baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, nullptr);
+        int vsize= width* height;
+        GLbyte * vdata = new GLbyte[vsize * 4];
+        memset(vdata, 0x00, vsize * 4 * sizeof(GLbyte));
+        baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, vdata);
 
         Texture::initFBO(frame_buff_,
-                         baked_screen, new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, nullptr));
+                         baked_screen, new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, nullptr));//nullptr);//
         if((err = glGetError()) != GL_NO_ERROR){
             LOGE("=====err2 %d, ",err);
         }
@@ -144,6 +144,7 @@ void texvrRenderer::two_pass_draw() {
     //render to texture
     glViewport(0,0,vrController::_screen_w, vrController::_screen_h);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     draw_screen_quad();

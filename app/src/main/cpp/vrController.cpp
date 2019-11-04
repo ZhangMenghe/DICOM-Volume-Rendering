@@ -84,7 +84,7 @@ void vrController::onDraw() {
 }
 
 void vrController::onTouchMove(float x, float y) {
-    if(raycastRenderer_ && isRayCasting()) raycastRenderer_->dirtyPrecompute();
+    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 
     float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
     Mouse_old = glm::fvec2(x, y);
@@ -105,7 +105,7 @@ void vrController::onTouchMove(float x, float y) {
     volume_model_dirty = true;
 }
 void vrController::onScale(float sx, float sy){
-    if(raycastRenderer_ && isRayCasting()) raycastRenderer_->dirtyPrecompute();
+    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     //unified scaling
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
@@ -120,7 +120,7 @@ void vrController::onScale(float sx, float sy){
     }
 }
 void vrController::onPan(float x, float y){
-    if(raycastRenderer_ && isRayCasting()) raycastRenderer_->dirtyPrecompute();
+    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
@@ -164,9 +164,5 @@ void vrController::precompute(){
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
-    if(isRayCasting())
-        raycastRenderer_->dirtyPrecompute();
-    else
-        texvrRenderer_->dirtyPrecompute();
-
+    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }

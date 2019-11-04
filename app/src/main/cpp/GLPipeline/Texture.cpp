@@ -95,10 +95,12 @@ void Texture::initFBO(GLuint& fbo, Texture* colorTex, Texture* depthTex){
             LOGE("=====err0.5 %d, ",err);
         }
 		// use a single renderbuffer object for both a depth AND stencil buffer.
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, depthTex->Width(), depthTex->Height());
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, depthTex->Width(), depthTex->Height());
         if((err = glGetError()) != GL_NO_ERROR){
             LOGE("=====err1 %d, ",err);
         }
+        glBindRenderbuffer( GL_RENDERBUFFER, 0 );
+
 		// now actually attach it
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
 	}
