@@ -56,7 +56,7 @@ void vrController::assembleTexture(GLubyte * data, int width, int height, int de
 
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
-    raycastRenderer_ = new raycastRenderer(true);
+    raycastRenderer_ = new raycastRenderer;
 
     funcRenderer_ = new FuncRenderer;
     funcRenderer_->CreateFunction(COLOR_BAR);
@@ -166,4 +166,7 @@ void vrController::precompute(){
     baked_dirty_ = false;
     if(isRayCasting())
         raycastRenderer_->dirtyPrecompute();
+    else
+        texvrRenderer_->dirtyPrecompute();
+
 }

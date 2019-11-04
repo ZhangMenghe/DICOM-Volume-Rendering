@@ -17,12 +17,10 @@ private:
     bool baked_dirty_ = true;
     int BAKED_RAY_SCREEN_ID;
 
-    void on_create();
     void precompute();
-    void DrawBaked();
+    void draw_baked();
 public:
-    raycastRenderer(){DRAW_BAKED = false;on_create();}
-    raycastRenderer(bool screen_baked){DRAW_BAKED = screen_baked;on_create();}
+    raycastRenderer(bool screen_baked = true);
 
     void onCuttingChange(float percent);
     void Draw();

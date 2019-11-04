@@ -23,6 +23,8 @@ public:
 	unsigned int Depth() const { return mDepth; }
 	GLuint GLTexture() const { return mTexture; }
 
+	static void initFBO(GLuint& fbo, Texture* colorTex, Texture* depthTex);
+
 private:
 	unsigned int mWidth;
 	unsigned int mHeight;

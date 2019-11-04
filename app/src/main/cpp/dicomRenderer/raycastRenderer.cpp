@@ -3,7 +3,8 @@
 #include "raycastRenderer.h"
 #include <GLPipeline/Primitive.h>
 #include <AndroidUtils/mathUtils.h>
-void raycastRenderer::on_create() {
+raycastRenderer::raycastRenderer(bool screen_baked):
+DRAW_BAKED(screen_baked){
     //geometry
     Mesh::InitQuadWithTex(vao_cube_, cuboid_with_texture, 8, cuboid_indices, 36);
     Mesh::InitQuadWithTex(vao_screen_, quad_vertices_tex_standard, 4, quad_indices, 6);
@@ -24,7 +25,7 @@ void raycastRenderer::on_create() {
 
     cutter_ = new cuttingController;
 }
-void raycastRenderer::DrawBaked(){
+void raycastRenderer::draw_baked(){
     precompute();
     GLuint sp = shader_baked_->Use();
     glActiveTexture(GL_TEXTURE0+BAKED_RAY_SCREEN_ID);
@@ -36,7 +37,7 @@ void raycastRenderer::DrawBaked(){
     shader_baked_->UnUse();
 }
 void raycastRenderer::Draw(){
-    if(DRAW_BAKED) {DrawBaked(); return;}
+    if(DRAW_BAKED) {draw_baked(); return;}
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -108,7 +109,7 @@ void raycastRenderer::precompute(){
            ||!cshader_->CompileAndLink())
             LOGE("Raycast=====Failed to create raycast geometry shader");
 
-        BAKED_RAY_SCREEN_ID = vrController::BAKED_RAY_ID + 1;
+        BAKED_RAY_SCREEN_ID = vrController::BAKED_RAY_ID + 2;
 
         float width = vrController::_screen_w, height = vrController::_screen_h;
         int vsize= width* height;
