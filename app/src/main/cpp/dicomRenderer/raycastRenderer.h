@@ -16,6 +16,8 @@ private:
     Texture* ray_baked_screen = nullptr;
     bool baked_dirty_ = true;
     int BAKED_RAY_SCREEN_ID;
+    const float TEX_HEIGHT = 720.0f;
+    float tex_height, tex_width;
 
     void precompute();
     void draw_baked();

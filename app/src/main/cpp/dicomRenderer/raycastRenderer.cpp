@@ -102,7 +102,6 @@ void raycastRenderer::updatePrecomputation(GLuint sp){
 }
 void raycastRenderer::precompute(){
     if(!baked_dirty_) return;
-    GLenum err;
     if(!cshader_){
         cshader_ = new Shader;
         if(!cshader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastCompute.glsl")
@@ -112,10 +111,16 @@ void raycastRenderer::precompute(){
         BAKED_RAY_SCREEN_ID = vrController::BAKED_RAY_ID + 2;
 
         float width = vrController::_screen_w, height = vrController::_screen_h;
-        int vsize= width* height;
+
+        if(height > TEX_HEIGHT){
+            tex_width = width / height * TEX_HEIGHT; tex_height = TEX_HEIGHT;
+        }else{
+            tex_width = width; tex_height = height;
+        }
+        int vsize= tex_width* tex_height;
         GLbyte * vdata = new GLbyte[vsize * 4];
         memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
-        ray_baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, vdata);
+        ray_baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
         delete[]vdata;
     }
 
@@ -126,7 +131,7 @@ void raycastRenderer::precompute(){
     glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    Shader::Uniform(sp, "u_con_size", vrController::_screen_w, vrController::_screen_h);
+    Shader::Uniform(sp, "u_con_size", tex_width, tex_height);
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * glm::scale(glm::mat4(1.0), glm::vec3(0.75f)));

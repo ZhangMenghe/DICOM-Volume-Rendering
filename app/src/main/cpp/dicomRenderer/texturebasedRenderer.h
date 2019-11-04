@@ -22,6 +22,8 @@ private:
     //for screen baking
     bool baked_dirty_ = true;
     int BAKED_TEX_SCREEN_ID;
+    const float TEX_HEIGHT = 720.0f;
+    float tex_width, tex_height;
     Texture* baked_screen;
 
     void draw_screen_quad();

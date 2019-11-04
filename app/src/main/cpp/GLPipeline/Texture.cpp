@@ -72,7 +72,6 @@ Texture::~Texture() {
 	glDeleteTextures(1, &mTexture);
 }
 void Texture::initFBO(GLuint& fbo, Texture* colorTex, Texture* depthTex){
-    GLenum err;
 	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -84,26 +83,22 @@ void Texture::initFBO(GLuint& fbo, Texture* colorTex, Texture* depthTex){
 
 
 	// create a renderbuffer object for depth and stencil attachment (we won't be sampling these)
+	GLuint dw, dh;
 	if(depthTex){
+        dw = depthTex->Width(); dh = depthTex->Height();
+	}else{
+	    dw = colorTex->Width(); dh = colorTex->Height();
+	}
 		GLuint rbo;
 		glGenRenderbuffers(1, &rbo);
-        if((err = glGetError()) != GL_NO_ERROR){
-            LOGE("=====err0 %d, ",err);
-        }
 		glBindRenderbuffer(GL_RENDERBUFFER, rbo);
-        if((err = glGetError()) != GL_NO_ERROR){
-            LOGE("=====err0.5 %d, ",err);
-        }
 		// use a single renderbuffer object for both a depth AND stencil buffer.
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, depthTex->Width(), depthTex->Height());
-        if((err = glGetError()) != GL_NO_ERROR){
-            LOGE("=====err1 %d, ",err);
-        }
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, dw, dh);
         glBindRenderbuffer( GL_RENDERBUFFER, 0 );
 
 		// now actually attach it
 		glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rbo);
-	}
+
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		LOGE("===ERROR::FRAMEBUFFER:: Framebuffer is not complete!");

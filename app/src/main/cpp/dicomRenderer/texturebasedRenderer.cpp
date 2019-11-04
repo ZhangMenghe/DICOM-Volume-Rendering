@@ -66,8 +66,8 @@ void texvrRenderer::draw_scene(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     if(!vrController::param_bool_map["maskon"]){
-//        glEnable(GL_CULL_FACE);
-//        glCullFace(GL_BACK);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
     }
     GLuint sp = shader_->Use();
@@ -110,8 +110,9 @@ void texvrRenderer::updatePrecomputation(GLuint sp) {
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 }
 void texvrRenderer::draw_screen_quad(){
+    glViewport(0,0,vrController::_screen_w, vrController::_screen_h);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glDisable(GL_DEPTH_TEST);
+
     //render to screen
     GLuint sp = shader_baked_->Use();
     glActiveTexture(GL_TEXTURE0+BAKED_TEX_SCREEN_ID);
@@ -123,34 +124,28 @@ void texvrRenderer::draw_screen_quad(){
     shader_baked_->UnUse();
 }
 void texvrRenderer::two_pass_draw() {
-    GLenum err;
-
     if(!baked_dirty_) {draw_screen_quad(); return;}
     if(!frame_buff_){
         float width = vrController::_screen_w, height = vrController::_screen_h;
-        int vsize= width* height;
+        if(height > TEX_HEIGHT){
+            tex_width = width / height * TEX_HEIGHT; tex_height = TEX_HEIGHT;
+        }else{
+            tex_width = width; tex_height = height;
+        }
+        int vsize= tex_width* tex_height;
         GLbyte * vdata = new GLbyte[vsize * 4];
         memset(vdata, 0x00, vsize * 4 * sizeof(GLbyte));
-        baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, vdata);
+        baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
 
-        Texture::initFBO(frame_buff_,
-                         baked_screen, new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, nullptr));//nullptr);//
-        if((err = glGetError()) != GL_NO_ERROR){
-            LOGE("=====err2 %d, ",err);
-        }
+        Texture::initFBO(frame_buff_, baked_screen, nullptr);
         BAKED_TEX_SCREEN_ID = vrController::BAKED_RAY_ID + 1;
     }
-
     //render to texture
-    glViewport(0,0,vrController::_screen_w, vrController::_screen_h);
+    glViewport(0, 0, tex_width, tex_height);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     draw_screen_quad();
     baked_dirty_ = false;
-
-    if((err = glGetError()) != GL_NO_ERROR){
-        LOGE("=====err3 %d, ",err);
-    }
 }
