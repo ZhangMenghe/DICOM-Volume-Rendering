@@ -2,10 +2,10 @@
 #include <vrController.h>
 #include <GLPipeline/Primitive.h>
 #include "texturebasedRenderer.h"
+#include "screenQuad.h"
+
 texvrRenderer::texvrRenderer(bool screen_baked)
 :DRAW_BAKED(screen_baked){
-    Mesh::InitQuadWithTex(vao_screen_, quad_vertices_tex_standard, 4, quad_indices, 6);
-
     dimensions = int(vrController::tex_volume->Depth() * DENSE_FACTOR);
     dimension_inv = 1.0f / dimensions;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
@@ -53,12 +53,6 @@ texvrRenderer::texvrRenderer(bool screen_baked)
        ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/textureVolume.frag")
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
-
-    shader_baked_ = new Shader();
-    if(!shader_baked_->AddShaderFile(GL_VERTEX_SHADER,"shaders/quad.vert")
-       ||!shader_baked_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/quad.frag")
-       ||!shader_baked_->CompileAndLink())
-        LOGE("TextureBas===Failed to create tex-baked shader program===");
     onCuttingChange(.0f);
 }
 void texvrRenderer::draw_scene(){
@@ -109,43 +103,17 @@ void texvrRenderer::updatePrecomputation(GLuint sp) {
     Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
 }
-void texvrRenderer::draw_screen_quad(){
-    glViewport(0,0,vrController::_screen_w, vrController::_screen_h);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //render to screen
-    GLuint sp = shader_baked_->Use();
-    glActiveTexture(GL_TEXTURE0+BAKED_TEX_SCREEN_ID);
-    glBindTexture(GL_TEXTURE_2D, baked_screen->GLTexture());
-    Shader::Uniform(sp, "uSampler", BAKED_TEX_SCREEN_ID);
-    glBindVertexArray(vao_screen_);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-    shader_baked_->UnUse();
-}
 void texvrRenderer::two_pass_draw() {
-    if(!baked_dirty_) {draw_screen_quad(); return;}
-    if(!frame_buff_){
-        float width = vrController::_screen_w, height = vrController::_screen_h;
-        if(height > TEX_HEIGHT){
-            tex_width = width / height * TEX_HEIGHT; tex_height = TEX_HEIGHT;
-        }else{
-            tex_width = width; tex_height = height;
-        }
-        int vsize= tex_width* tex_height;
-        GLbyte * vdata = new GLbyte[vsize * 4];
-        memset(vdata, 0x00, vsize * 4 * sizeof(GLbyte));
-        baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
-
-        Texture::initFBO(frame_buff_, baked_screen, nullptr);
-        BAKED_TEX_SCREEN_ID = vrController::BAKED_RAY_ID + 1;
-    }
+    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
+    if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     //render to texture
-    glViewport(0, 0, tex_width, tex_height);
+    glm::vec2 tsize = screenQuad::instance()->getTexSize();
+    glViewport(0, 0, tsize.x, tsize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    draw_screen_quad();
+    screenQuad::instance()->Draw();
     baked_dirty_ = false;
 }

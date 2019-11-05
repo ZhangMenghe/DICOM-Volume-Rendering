@@ -1,13 +1,13 @@
 #include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include "raycastRenderer.h"
+#include "screenQuad.h"
 #include <GLPipeline/Primitive.h>
 #include <AndroidUtils/mathUtils.h>
 raycastRenderer::raycastRenderer(bool screen_baked):
 DRAW_BAKED(screen_baked){
     //geometry
     Mesh::InitQuadWithTex(vao_cube_, cuboid_with_texture, 8, cuboid_indices, 36);
-    Mesh::InitQuadWithTex(vao_screen_, quad_vertices_tex_standard, 4, quad_indices, 6);
 
     //program
     shader_ = new Shader();
@@ -15,26 +15,11 @@ DRAW_BAKED(screen_baked){
             ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/raycastVolume.frag")
             ||!shader_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
-
-
-    shader_baked_ = new Shader();
-    if(!shader_baked_->AddShaderFile(GL_VERTEX_SHADER,"shaders/quad.vert")
-       ||!shader_baked_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/quad.frag")
-       ||!shader_baked_->CompileAndLink())
-        LOGE("Raycast===Failed to create raycast shader program===");
-
     cutter_ = new cuttingController;
 }
 void raycastRenderer::draw_baked(){
     precompute();
-    GLuint sp = shader_baked_->Use();
-    glActiveTexture(GL_TEXTURE0+BAKED_RAY_SCREEN_ID);
-    glBindTexture(GL_TEXTURE_2D, ray_baked_screen->GLTexture());
-    Shader::Uniform(sp, "uSampler", BAKED_RAY_SCREEN_ID);
-    glBindVertexArray(vao_screen_);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-    shader_baked_->UnUse();
+    screenQuad::instance()->Draw();
 }
 void raycastRenderer::Draw(){
     if(DRAW_BAKED) {draw_baked(); return;}
@@ -107,31 +92,17 @@ void raycastRenderer::precompute(){
         if(!cshader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastCompute.glsl")
            ||!cshader_->CompileAndLink())
             LOGE("Raycast=====Failed to create raycast geometry shader");
-
-        BAKED_RAY_SCREEN_ID = vrController::BAKED_RAY_ID + 2;
-
-        float width = vrController::_screen_w, height = vrController::_screen_h;
-
-        if(height > TEX_HEIGHT){
-            tex_width = width / height * TEX_HEIGHT; tex_height = TEX_HEIGHT;
-        }else{
-            tex_width = width; tex_height = height;
-        }
-        int vsize= tex_width* tex_height;
-        GLbyte * vdata = new GLbyte[vsize * 4];
-        memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
-        ray_baked_screen = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
-        delete[]vdata;
     }
 
     if(vrController::param_bool_map["cutting"])cshader_->EnableKeyword("CUTTING_PLANE");
     else cshader_->DisableKeyword("CUTTING_PLANE");
 
     GLuint sp = cshader_->Use();
+    Texture* ray_baked_screen  = screenQuad::instance()->getTex();
     glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    Shader::Uniform(sp, "u_con_size", tex_width, tex_height);
+    Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * glm::scale(glm::mat4(1.0), glm::vec3(0.75f)));
