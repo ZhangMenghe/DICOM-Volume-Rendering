@@ -99,12 +99,12 @@ vec4 tracing(float u, float v){
 
     vec2 intersect = RayCube(ro, rd, vec3(0.5));
     intersect.x = max(.0, intersect.x);
-
-
+    VolumeSize = vec3(imageSize(srcTex));
+    vec4 plane_color = vec4(0.8,0.8,.0,0.3);
     //plane
     #ifdef CUTTING_PLANE
         float t;
-        bool is_plane_color = false; bool blocked_by_plane = false;
+        bool is_plane_color; bool blocked_by_plane;
         if(dot(uPlane.normal, -uCamposObjSpace) > .0){
             t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
             blocked_by_plane = (t <= intersect.x);
@@ -112,14 +112,20 @@ vec4 tracing(float u, float v){
         }
         else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-        if(abs(t) < 1000.0)
-            is_plane_color = intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3);
-        if(intersect.y < intersect.x || blocked_by_plane) return is_plane_color?vec4(0.8,0.8,.0,0.3):vec4(.0);
+        is_plane_color = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
+//        if(blocked_by_plane) return mix(plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), 0.3);
+//        if(intersect.y < intersect.x || blocked_by_plane) return is_plane_color?mix(plane_color, vec4(.0), 0.3) :vec4(.0);
+
+        if(intersect.y < intersect.x || blocked_by_plane){
+            if(!is_plane_color) return vec4(.0);
+            if(blocked_by_plane) return mix(plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), 0.3);
+            return mix(plane_color, vec4(.0), 0.3);
+        }
     #else
             if(intersect.y < intersect.x) return vec4(.0);
     #endif
 
-    VolumeSize = vec3(imageSize(srcTex));
+
     return Volume(ro + 0.5, rd, intersect.x, intersect.y);
 }
 void main() {
