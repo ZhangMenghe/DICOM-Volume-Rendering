@@ -28,7 +28,11 @@ private:
     GLuint pVAO_ = 0;
 
     glm::vec3 p_start_, p_norm_, p_point_;
-    const glm::vec4 P_S1 = glm::vec4(1.0f,1.0f,.0f,.0f), P_S2 = glm::vec4(-1.0f,1.0f,.0f,.0f), P_S3 = glm::vec4(-1.0f,-1.0f,.0f,.0f);
+    const glm::vec4 P_Points[3] = {
+        glm::vec4(-1.0f,1.0f,.0f,1.0f),
+                glm::vec4(1.0f,1.0f,.0f,1.0f),
+                glm::vec4(-1.0f,-1.0f,.0f,1.0f)
+    };
     glm::vec3 p_point_world;
     glm::vec3 p_scale = glm::vec3(1.0f);
 
