@@ -140,10 +140,11 @@ void cuttingController::update_modelMat_o(){
 void cuttingController::update_plane_(glm::mat4 rotMat){
     p_rotate_mat_ = rotMat;
     p_norm_ = rotateNormal(p_rotate_mat_, glm::vec3(.0f, .0f, 1.0f));
-    mat4 vm_inv = transpose(inverse(vrController::ModelMat_));
-    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
-    //cloest point
-    p_start_ = cloestVertexToPlane(p_norm_, vp_obj);
+//    mat4 vm_inv = transpose(inverse(vrController::ModelMat_));
+//    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
+//    //cloest point
+//    p_start_ = cloestVertexToPlane(p_norm_, vp_obj);
+    //todo: percent of how p_point account for the percent with ro, rd
 }
 void cuttingController::update_plane_(glm::vec3 pNorm){
     p_norm_ = pNorm;
