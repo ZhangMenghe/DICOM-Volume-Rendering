@@ -268,6 +268,8 @@
         app:layout_constraintHeight_percent="0.08"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
+
+
         <SeekBar
             android:id="@+id/cuttingSeekBar"
             android:layout_width="0dp"
@@ -279,14 +281,14 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent"/>
 
-        <Button
+        <android.support.design.widget.FloatingActionButton
             android:id="@+id/cutting_button"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintHeight_percent="0.8"
 
             android:layout_centerInParent="true"
-            android:background="@drawable/button_bg_round"
+            app:backgroundTint="@color/brightBlue"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

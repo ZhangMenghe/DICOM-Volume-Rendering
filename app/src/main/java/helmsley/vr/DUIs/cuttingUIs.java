@@ -1,7 +1,10 @@
 package helmsley.vr.DUIs;
 
 import android.app.Activity;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Pair;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RadioGroup;
@@ -19,7 +22,7 @@ public class cuttingUIs {
 
     private View panel_tune_, panel_set_, panel_set_sub_;
     private SeekBar seek_bar_;
-    private Button button_;
+    private FloatingActionButton button_;
 
     private boolean cut_panel_on = false;
     private static Pair<Float, Integer> seek_value_pair = new Pair<>(1.0f, 50);
@@ -30,6 +33,7 @@ public class cuttingUIs {
         activity = activity_;
         InitPanels();
         InitRadioGroup();
+        InitButton();
     }
     public void onCuttingStateChange(boolean is_ray_cast, boolean change_to_show_cut, View raycast_conflict_panel){
         if(change_to_show_cut){
@@ -114,11 +118,39 @@ public class cuttingUIs {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
-        button_ = activity.findViewById(R.id.cutting_button);
 
         panel_set_ = (View)activity.findViewById(R.id.cutPanel);
         panel_set_.setVisibility(View.INVISIBLE);
         panel_set_sub_ = (View)activity.findViewById(R.id.cut_sub_panel);
         panel_set_sub_.setVisibility(View.INVISIBLE);
+    }
+    private void InitButton(){
+        button_ = activity.findViewById(R.id.cutting_button);
+        button_.setOnTouchListener(new View.OnTouchListener(){
+            float down_v_x, down_e_x;
+            public boolean onTouch(View view, MotionEvent event) {
+                switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        down_v_x = view.getX();
+                        down_e_x = event.getX();
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        view.setX(down_v_x + event.getX() - down_e_x);
+
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        view.setX(down_v_x);
+                        break;
+                    case MotionEvent.ACTION_BUTTON_PRESS:
+
+                    default:
+                        return false;
+                }
+                return true;
+            }
+        });
+
     }
 }
