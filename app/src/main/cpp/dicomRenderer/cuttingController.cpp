@@ -57,6 +57,12 @@ void cuttingController::Update(){
         p_p2o_mat = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
         update_plane_(rotateNormal(p_p2o_mat, glm::vec3(.0,.0,1.0)));
         p_point_ = glm::vec3(glm::inverse(vrController::ModelMat_) * glm::vec4(p_point_world,1.0f));
+        if(cmove_value){
+            p_point_+=cmove_value * p_norm_;
+            p_p2o_mat = glm::translate(glm::mat4(1.0), cmove_value * p_norm_)*p_p2o_mat;
+            p_p2w_mat = vrController::ModelMat_ * p_p2o_mat;
+            p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
+        }
     }
     else{
         p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
@@ -104,7 +110,9 @@ void cuttingController::draw_plane(){
 }
 
 void cuttingController::setCutPlane(float value){
+    if(keep_cutting_position()) {cmove_value =  value * CUTTING_FACTOR; return;}
     p_point_ += p_norm_ * value * CUTTING_FACTOR;
+    cmove_value = .0f;
     p_p2o_dirty = true;
 }
 bool cuttingController::keep_cutting_position(){
