@@ -106,8 +106,8 @@ void cuttingController::draw_plane(){
 
 void cuttingController::setCutPlane(float percent){
 //    if(keep_cutting_position()) return;
-    p_point_ = p_start_ + p_norm_* percent * 1.75f;
-    p_p2o_dirty = true;
+//    p_point_ = p_start_ + p_norm_* percent * 1.75f;
+//    p_p2o_dirty = true;
 }
 bool cuttingController::keep_cutting_position(){
     mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
