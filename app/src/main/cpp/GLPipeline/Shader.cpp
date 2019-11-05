@@ -63,9 +63,9 @@ bool Shader::CompileAndLink(){
         for (const auto& k : it){kwv.push_back(k);kw += k + " ";}
 
         LOGE("###### kw set: %s", kw.c_str());
-        if(kwv.size() == 1){
-            LOGE("====STOP HERE");
-        }
+//        if(kwv.size() == 1){
+//            LOGE("====STOP HERE");
+//        }
         ShaderProgram cpr;
         if(!LinkShader(kwv, cpr))
             return false;

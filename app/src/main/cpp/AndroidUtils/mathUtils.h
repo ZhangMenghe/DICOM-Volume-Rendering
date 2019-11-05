@@ -37,16 +37,23 @@ inline glm::vec3 cloestVertexToPos(glm::vec3 pos, float extend){
 }
 inline glm::vec3 cloestVertexToPlane(glm::vec3 pn, glm::vec3 p){
     float d = -(pn.x * p.x + pn.y * p.y + pn.z * p.z);
-
-    float shortest_dist = FLT_MAX; int vertex_idx;
+    std::vector<int> vertex_idx;
+    float shortest_dist = FLT_MAX;
     for(int i=0; i<8; i++){
         float dist = shortest_distance(cuboid_with_texture[6*i], cuboid_with_texture[6*i+1], cuboid_with_texture[6*i+2], pn.x, pn.y, pn.z, d);
         if(dist < shortest_dist){
             shortest_dist = dist;
-            vertex_idx = i;
+            vertex_idx.clear();
+            vertex_idx.push_back(i);
+        }else if(dist == shortest_dist){
+            vertex_idx.push_back(i);
         }
     }
-    return glm::vec3(cuboid_with_texture[6*vertex_idx], cuboid_with_texture[6*vertex_idx + 1], cuboid_with_texture[6*vertex_idx + 2]);
+    glm::vec3 res = glm::vec3(.0f);
+    for(int id:vertex_idx)
+        res+=glm::vec3(cuboid_with_texture[6*id], cuboid_with_texture[6*id + 1], cuboid_with_texture[6*id + 2]);
+
+    return res * (1.0f / vertex_idx.size());
 }
 inline glm::mat4 mouseRotateMat(glm::mat4 bmat, float xoffset, float yoffset){
     return glm::rotate(glm::mat4(1.0f), xoffset, glm::vec3(0,1,0))

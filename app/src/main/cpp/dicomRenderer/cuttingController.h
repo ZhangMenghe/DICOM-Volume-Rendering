@@ -38,13 +38,16 @@ private:
 
     glm::mat4 p_rotate_mat_ = glm::mat4(1.0f);
 
-    glm::mat4 p_p2w_mat, p_p2v_mat;
-    bool p_p2v_dirty = true;
+    glm::mat4 p_p2w_mat, p_p2o_mat;
+    bool p_p2o_dirty = true;
 
     glm::vec4 plane_color_ = glm::vec4(0.8, 0.8,.0, 0.3);
 
     void draw_plane();
     bool keep_cutting_position();
+    void update_modelMat_o();
+    void update_plane_(glm::mat4 rotMat);
+    void update_plane_(glm::vec3 pNorm);
 
 public:
     static cuttingController* _mptr;
