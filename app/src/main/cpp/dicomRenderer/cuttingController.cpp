@@ -43,25 +43,19 @@ void cuttingController::UpdateAndDraw(){
 void cuttingController::setCuttingParams(GLuint sp,bool includePoints){
 //    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
 //    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
-
-    mat4 p2m_mat = inverse(vrController::ModelMat_)*p_p2w_mat;
-    vec3 pms[3];int i=0;
-    for(vec4 p: P_Points)
-        pms[i++] = vec3(p2m_mat * p);
-
+    Shader::Uniform(sp,"uPlane.p", p_point_);
+    Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
     if(includePoints){
+        mat4 p2m_mat = inverse(vrController::ModelMat_)*p_p2w_mat;
+        vec3 pms[3];int i=0;
+        for(vec4 p: P_Points)
+            pms[i++] = vec3(p2m_mat * p);
 
         Shader::Uniform(sp,"uPlane.s1", pms[0]);
         Shader::Uniform(sp,"uPlane.s2", pms[1]);
         Shader::Uniform(sp,"uPlane.s3", pms[2]);
-        Shader::Uniform(sp,"uPlane.p", (pms[1] + pms[2])*0.5f);
         Shader::Uniform(sp, "u_plane_color", plane_color_);
     }
-    else
-        Shader::Uniform(sp,"uPlane.p", p_point_);
-    Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
-
-
 }
 void cuttingController::Update(){
     if(p_p2v_dirty){
