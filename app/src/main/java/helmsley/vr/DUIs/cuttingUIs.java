@@ -136,8 +136,9 @@ public class cuttingUIs {
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        view.setX(down_v_x + event.getX() - down_e_x);
-
+                        float offset = event.getX() - down_e_x;
+                        view.setX(down_v_x + offset);
+                        JUIsetParam("cutting", offset);
                         break;
 
                     case MotionEvent.ACTION_UP:

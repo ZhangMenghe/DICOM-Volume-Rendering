@@ -104,10 +104,11 @@ void cuttingController::draw_plane(){
     pshader->UnUse();
 }
 
-void cuttingController::setCutPlane(float percent){
+void cuttingController::setCutPlane(float value){
 //    if(keep_cutting_position()) return;
+      p_point_ += p_norm_ * value * CUTTING_FACTOR;
 //    p_point_ = p_start_ + p_norm_* percent * 1.75f;
-//    p_p2o_dirty = true;
+    p_p2o_dirty = true;
 }
 bool cuttingController::keep_cutting_position(){
     mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);

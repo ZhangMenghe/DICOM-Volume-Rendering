@@ -42,6 +42,7 @@ private:
     bool p_p2o_dirty = true;
 
     glm::vec4 plane_color_ = glm::vec4(0.8, 0.8,.0, 0.3);
+    const float CUTTING_FACTOR = 0.00002f;
 
     void draw_plane();
     bool keep_cutting_position();
@@ -58,7 +59,7 @@ public:
     void UpdateAndDraw();
     void setCuttingParams(GLuint sp, bool includePoints = false);
 
-    void setCutPlane(float percent);
+    void setCutPlane(float value);
     void setCutPlane(glm::vec3 normal);
     void setCutPlane(glm::vec3 startPoint, glm::vec3 normal);
 
