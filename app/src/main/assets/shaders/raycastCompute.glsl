@@ -17,6 +17,7 @@ uniform float u_fov;
 uniform mat4 u_WorldToModel;
 uniform mat4 u_CamToWorld;
 
+uniform vec4 u_plane_color;
 uniform vec3 uCamposObjSpace;
 uniform float uViewDir;
 uniform float usample_step_inverse;
@@ -100,11 +101,11 @@ vec4 tracing(float u, float v){
     vec2 intersect = RayCube(ro, rd, vec3(0.5));
     intersect.x = max(.0, intersect.x);
     VolumeSize = vec3(imageSize(srcTex));
-    vec4 plane_color = vec4(0.8,0.8,.0,0.3);
+
+    bool drawed_square=false; bool blocked_by_plane=false;
     //plane
     #ifdef CUTTING_PLANE
         float t;
-        bool is_plane_color; bool blocked_by_plane;
         if(dot(uPlane.normal, -uCamposObjSpace) > .0){
             t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
             blocked_by_plane = (t <= intersect.x);
@@ -112,19 +113,11 @@ vec4 tracing(float u, float v){
         }
         else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-        is_plane_color = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
-//        if(blocked_by_plane) return mix(plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), 0.3);
-//        if(intersect.y < intersect.x || blocked_by_plane) return is_plane_color?mix(plane_color, vec4(.0), 0.3) :vec4(.0);
+        drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
 
-        if(intersect.y < intersect.x || blocked_by_plane){
-            if(!is_plane_color) return vec4(.0);
-            if(blocked_by_plane) return mix(plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), 0.3);
-            return mix(plane_color, vec4(.0), 0.3);
-        }
-    #else
-            if(intersect.y < intersect.x) return vec4(.0);
+        if(blocked_by_plane && intersect.x < intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
     #endif
-
+        if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);
 
     return Volume(ro + 0.5, rd, intersect.x, intersect.y);
 }

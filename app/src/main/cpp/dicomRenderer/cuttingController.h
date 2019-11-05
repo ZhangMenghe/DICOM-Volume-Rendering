@@ -37,7 +37,7 @@ private:
     glm::mat4 p_p2w_mat, p_p2v_mat;
     bool p_p2v_dirty = true;
 
-    glm::vec4 plane_color_ = glm::vec4(173,213,247,100);
+    glm::vec4 plane_color_ = glm::vec4(0.8, 0.8,.0, 0.3);
 
     void draw_plane();
     bool keep_cutting_position();

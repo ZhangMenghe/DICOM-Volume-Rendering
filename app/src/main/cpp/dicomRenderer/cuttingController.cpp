@@ -51,6 +51,8 @@ void cuttingController::setCuttingParams(GLuint sp,bool includePoints){
         Shader::Uniform(sp,"uPlane.s1", vec3(p2m_mat * P_S1));
         Shader::Uniform(sp,"uPlane.s2", vec3(p2m_mat * P_S2));
         Shader::Uniform(sp,"uPlane.s3", vec3(p2m_mat * P_S3));
+
+        Shader::Uniform(sp, "u_plane_color", plane_color_);
     }
 }
 void cuttingController::Update(){
