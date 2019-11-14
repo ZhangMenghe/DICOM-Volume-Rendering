@@ -15,9 +15,12 @@ local.properties
 
 # User-specific configurations
 .idea/libraries/
+.idea/caches/
+.idea/codeStyles/
 .idea/workspace.xml
 .idea/tasks.xml
 .idea/.name
+.idea/gradle.xml
 .idea/compiler.xml
 .idea/copyright/profiles_settings.xml
 .idea/encodings.xml
@@ -25,6 +28,7 @@ local.properties
 .idea/modules.xml
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
+
 *.iml
 
 # OS-specific files
@@ -35,4 +39,7 @@ local.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+*/.externalNativeBuild/
+
+#Other data files
 *dicom-images*
