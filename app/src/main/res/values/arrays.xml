@@ -19,7 +19,7 @@
         <item>Volume</item>
         <item>Cutting</item>
         <item>MaskOn</item>
-        <item>AlphaBlending</item>
+<!--        <item>AlphaBlending</item>-->
     </string-array>
 
     <string-array name="opacityArr">
