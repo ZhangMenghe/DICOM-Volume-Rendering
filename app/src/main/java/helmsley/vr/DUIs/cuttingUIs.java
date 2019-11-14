@@ -3,6 +3,7 @@ package helmsley.vr.DUIs;
 import android.app.Activity;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
@@ -40,14 +41,14 @@ public class cuttingUIs {
             panel_tune_.setVisibility(View.VISIBLE);
             if(is_ray_cast){
                 panel_set_.setVisibility(View.VISIBLE);
-                button_.setVisibility(View.VISIBLE);
+                button_.show();
                 seek_bar_.setVisibility(View.INVISIBLE);
 
                 raycast_conflict_panel.setVisibility(View.INVISIBLE);
                 cut_panel_on = true;
                 Toast.makeText(activity, "Drag Bottom Button to Change", Toast.LENGTH_LONG).show();
             }else{
-                button_.setVisibility(View.INVISIBLE);
+                button_.hide();
                 seek_bar_.setVisibility(View.VISIBLE);
                 Toast.makeText(activity, "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();
             }
@@ -128,17 +129,18 @@ public class cuttingUIs {
         button_ = activity.findViewById(R.id.cutting_button);
         button_.setOnTouchListener(new View.OnTouchListener(){
             float down_v_x, down_e_x;
+            float e_v_offset;
             public boolean onTouch(View view, MotionEvent event) {
                 switch (event.getActionMasked()) {
                     case MotionEvent.ACTION_DOWN:
                         down_v_x = view.getX();
-                        down_e_x = event.getX();
+                        down_e_x = event.getRawX();
+                        e_v_offset = down_v_x - down_e_x;
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        float offset = event.getX() - down_e_x;
-                        view.setX(down_v_x + offset);
-                        JUIsetParam("cutting", offset);
+                        JUIsetParam("cutting", event.getRawX() - down_e_x);
+                        view.setX(e_v_offset + event.getRawX());
                         break;
 
                     case MotionEvent.ACTION_UP:
