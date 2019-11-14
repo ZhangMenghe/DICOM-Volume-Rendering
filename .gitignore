@@ -1,37 +1,45 @@
-# Prerequisites
-*.d
+# Built application files
+/*/build/
 
-# Compiled Object files
-*.slo
-*.lo
-*.o
-*.obj
+# Crashlytics configuations
+com_crashlytics_export_strings.xml
 
-# Precompiled Headers
-*.gch
-*.pch
+# Local configuration file (sdk path, etc)
+local.properties
 
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+# Gradle generated files
+.gradle/
 
-# Fortran module files
-*.mod
-*.smod
+# Signing files
+.signing/
 
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+# User-specific configurations
+.idea/libraries/
+.idea/caches/
+.idea/codeStyles/
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/.name
+.idea/gradle.xml
+.idea/compiler.xml
+.idea/copyright/profiles_settings.xml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
 
-# Executables
-*.exe
-*.out
-*.app
-*.gradle
-*.idea
-*build*
-*Build*
+*.iml
+
+# OS-specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*/.externalNativeBuild/
+
+#Other data files
 *dicom-images*

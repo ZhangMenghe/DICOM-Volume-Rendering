@@ -1,14 +1,10 @@
 cmake_minimum_required(VERSION 3.4.1)
 
 SET( GCC_COVERAGE_LINK_FLAGS    "-v")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror -Wno-unused-function")
-SET( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
 SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
 SET( CMAKE_STATIC_LINKER_FLAGS  "${CMAKE_STATIC_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
 SET( OSG_CPP_EXCEPTIONS_AVAILABLE "Yes")
-SET(GLM_DIRECTORY "D:/OpenGL-Libs/glm")
-
 
 SET(KERNEL_LIBRARIES
         GLESv3
@@ -31,7 +27,8 @@ SET(DICOM_RENDERERS
         dicomRenderer/funcsRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp
-        dicomRenderer/cuttingController.cpp)
+        dicomRenderer/cuttingController.cpp
+        dicomRenderer/screenQuad.cpp)
 include_directories(${GLM_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(vrNative

@@ -24,6 +24,7 @@ public:
     static glm::vec3 ScaleVec3_, PosVec3_;
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
+    inline static bool isRayCasting(){return param_bool_map["raycast"];}
 
 
     static glm::vec3 csphere_c;
@@ -42,9 +43,6 @@ public:
     void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);
-
-    Shader* getBakeShader(){ return bakeShader_;}
-
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;

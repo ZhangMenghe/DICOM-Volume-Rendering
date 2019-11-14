@@ -77,14 +77,15 @@ void vrController::onDraw() {
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
-    if(param_bool_map["raycast"])
-        raycastRenderer_->Draw();
-    else
-        texvrRenderer_->Draw();
+
+    if(isRayCasting())  raycastRenderer_->Draw();
+    else texvrRenderer_->Draw();
     funcRenderer_->Draw();
 }
 
 void vrController::onTouchMove(float x, float y) {
+    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+
     float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
     Mouse_old = glm::fvec2(x, y);
     xoffset *= MOUSE_ROTATE_SENSITIVITY;
@@ -104,6 +105,7 @@ void vrController::onTouchMove(float x, float y) {
     volume_model_dirty = true;
 }
 void vrController::onScale(float sx, float sy){
+    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     //unified scaling
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
@@ -118,6 +120,7 @@ void vrController::onScale(float sx, float sy){
     }
 }
 void vrController::onPan(float x, float y){
+    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
@@ -133,13 +136,13 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
     }
 
-    if(vrController::param_bool_map["raycast"]) bakeShader_->EnableKeyword("UPDATE_RAY_BAKED");
+    if(isRayCasting()) bakeShader_->EnableKeyword("UPDATE_RAY_BAKED");
     else bakeShader_->DisableKeyword("UPDATE_RAY_BAKED");
 
-    if(vrController::param_bool_map["colortrans"]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
+    if(param_bool_map["colortrans"]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
     else bakeShader_->DisableKeyword("TRANSFER_COLOR");
 
-    if(vrController::param_bool_map["maskon"]) bakeShader_->EnableKeyword("ORGANS_ONLY");
+    if(param_bool_map["maskon"]) bakeShader_->EnableKeyword("ORGANS_ONLY");
     else bakeShader_->DisableKeyword("ORGANS_ONLY");
 
     GLuint sp = bakeShader_->Use();
@@ -147,7 +150,7 @@ void vrController::precompute(){
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
     glBindImageTexture(2, ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    if(param_bool_map["raycast"])
+    if(isRayCasting())
         raycastRenderer_->updatePrecomputation(sp);
     else
         texvrRenderer_->updatePrecomputation(sp);
@@ -161,4 +164,5 @@ void vrController::precompute(){
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
+    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }

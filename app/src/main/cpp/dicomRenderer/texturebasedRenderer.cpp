@@ -2,7 +2,10 @@
 #include <vrController.h>
 #include <GLPipeline/Primitive.h>
 #include "texturebasedRenderer.h"
-texvrRenderer::texvrRenderer() {
+#include "screenQuad.h"
+
+texvrRenderer::texvrRenderer(bool screen_baked)
+:DRAW_BAKED(screen_baked){
     dimensions = int(vrController::tex_volume->Depth() * DENSE_FACTOR);
     dimension_inv = 1.0f / dimensions;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
@@ -21,13 +24,13 @@ texvrRenderer::texvrRenderer() {
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * dimensions, zInfos, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    glGenVertexArrays(1, &slice_vao_);
+    glGenVertexArrays(1, &vao_slice);
     unsigned int VBO, EBO;
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray((GLuint)slice_vao_);
+    glBindVertexArray((GLuint)vao_slice);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * 4, quad_vertices_2d, GL_STATIC_DRAW);
@@ -49,10 +52,10 @@ texvrRenderer::texvrRenderer() {
     if(!shader_->AddShaderFile(GL_VERTEX_SHADER,"shaders/textureVolume.vert")
        ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/textureVolume.frag")
        ||!shader_->CompileAndLink())
-        LOGE("TextureBas===Failed to create raycast shader program===");
+        LOGE("TextureBas===Failed to create texture based shader program===");
     onCuttingChange(.0f);
 }
-void texvrRenderer::Draw(){
+void texvrRenderer::draw_scene(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -62,15 +65,10 @@ void texvrRenderer::Draw(){
         glEnable(GL_DEPTH_TEST);
     }
     GLuint sp = shader_->Use();
-    if(vrController::tex_baked){
-        glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
-        Shader::Uniform(sp, "uSampler_baked", vrController::BAKED_TEX_ID);
-    }else{
-        glActiveTexture(GL_TEXTURE0 + vrController::VOLUME_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
-    }
+
+    glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
+    glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
+    Shader::Uniform(sp, "uSampler_baked", vrController::BAKED_TEX_ID);
 
     if(vrController::ROTATE_AROUND_CUBE)
         Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat());
@@ -80,7 +78,7 @@ void texvrRenderer::Draw(){
     glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
     if(dir.z < 0) glFrontFace(GL_CCW);
     else  glFrontFace(GL_CW);
-    glBindVertexArray(slice_vao_); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
+    glBindVertexArray(vao_slice); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
 
     shader_->UnUse();
 
@@ -89,6 +87,10 @@ void texvrRenderer::Draw(){
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
     }
+}
+void texvrRenderer::Draw(){
+    if(DRAW_BAKED) {two_pass_draw(); return;}
+    draw_scene();
 }
 void texvrRenderer::onCuttingChange(float percent){
     int cut_id = int(dimensions * percent);
@@ -100,4 +102,18 @@ void texvrRenderer::updatePrecomputation(GLuint sp) {
     Shader::Uniform(sp,"uOpacitys.overall", vrController::param_value_map["overall"]);
     Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
+}
+
+void texvrRenderer::two_pass_draw() {
+    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
+    if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
+    //render to texture
+    glm::vec2 tsize = screenQuad::instance()->getTexSize();
+    glViewport(0, 0, tsize.x, tsize.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    draw_scene();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    screenQuad::instance()->Draw();
+    baked_dirty_ = false;
 }

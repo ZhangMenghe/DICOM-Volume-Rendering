@@ -62,8 +62,8 @@ bool Shader::CompileAndLink(){
         std::vector<std::string> kwv;
         for (const auto& k : it){kwv.push_back(k);kw += k + " ";}
 
-//        LOGE("###### kw set: %s", kw.c_str());
-//        if(kwv.size() > 1){
+        LOGE("###### kw set: %s", kw.c_str());
+//        if(kwv.size() == 1){
 //            LOGE("====STOP HERE");
 //        }
         ShaderProgram cpr;
@@ -80,8 +80,8 @@ GLuint Shader::Use(){
     for (auto& it : active_keywords_)
         for (const auto& k : it)
             kw += k + " ";
-//    if(kw.size())
-//        LOGE("###### kw: %s", kw.c_str());
+    if(kw.size())
+        LOGE("###### kw: %s", kw.c_str());
     assert(mPrograms.count(kw));
 
     GLuint p = mPrograms.at(kw).mProgram;

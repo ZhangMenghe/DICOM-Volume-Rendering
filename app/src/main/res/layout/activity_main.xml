@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="top"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -261,22 +262,38 @@
         android:id="@+id/bottomPanel"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-
+        android:gravity="center"
         android:orientation="horizontal"
-        android:gravity="center_horizontal"
         android:background="@color/paneColor"
         app:layout_constraintHeight_percent="0.08"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
+
+
         <SeekBar
             android:id="@+id/cuttingSeekBar"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginStart="20dp"
             android:theme="@style/Seekbar"
+            android:visibility="invisible"
             app:layout_constraintWidth_percent="0.9"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="parent"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/cutting_button"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintHeight_percent="0.8"
+
+            android:layout_centerInParent="true"
+            app:backgroundTint="@color/brightBlue"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintDimensionRatio="1:1"/>
     </android.support.constraint.ConstraintLayout>
 
     <!--fps text-->

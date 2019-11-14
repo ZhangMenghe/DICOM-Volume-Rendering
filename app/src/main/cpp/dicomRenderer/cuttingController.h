@@ -28,29 +28,38 @@ private:
     GLuint pVAO_ = 0;
 
     glm::vec3 p_start_, p_norm_, p_point_;
+    const glm::vec4 P_Points[3] = {
+        glm::vec4(-1.0f,1.0f,.0f,1.0f),
+                glm::vec4(1.0f,1.0f,.0f,1.0f),
+                glm::vec4(-1.0f,-1.0f,.0f,1.0f)
+    };
     glm::vec3 p_point_world;
     glm::vec3 p_scale = glm::vec3(1.0f);
 
     glm::mat4 p_rotate_mat_ = glm::mat4(1.0f);
 
-    glm::mat4 p_p2w_mat, p_p2v_mat;
-    bool p_p2v_dirty = true;
+    glm::mat4 p_p2w_mat, p_p2o_mat;
+    bool p_p2o_dirty = true;
+    float cmove_value = .0f;
+    glm::vec4 plane_color_ = glm::vec4(0.8, 0.8,.0, 0.3);
+    const float CUTTING_FACTOR = 0.00002f;
 
-    glm::vec4 plane_color_ = glm::vec4(173,213,247,100);
-
-    void update();
     void draw_plane();
     bool keep_cutting_position();
+    void update_modelMat_o();
+    void update_plane_(glm::mat4 rotMat);
+    void update_plane_(glm::vec3 pNorm);
 
 public:
     static cuttingController* _mptr;
     static cuttingController* instance();
     cuttingController();
     cuttingController(glm::vec3 ps, glm::vec3 pn);
-    void Draw();
-    void setCuttingParams(Shader* shader);
+    void Update();
+    void UpdateAndDraw();
+    void setCuttingParams(GLuint sp, bool includePoints = false);
 
-    void setCutPlane(float percent);
+    void setCutPlane(float value);
     void setCutPlane(glm::vec3 normal);
     void setCutPlane(glm::vec3 startPoint, glm::vec3 normal);
 

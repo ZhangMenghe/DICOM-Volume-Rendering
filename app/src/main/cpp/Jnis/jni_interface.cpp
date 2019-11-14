@@ -81,46 +81,7 @@ void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int w, i
     }
     AndroidBitmap_unlockPixels(env, bitmap);
 }
-void convert_bitmap_with_mask(JNIEnv* env, jobject bitmap, jobject mask, GLubyte*& data, int&w, int &h ){
-    AndroidBitmapInfo srcInfo, maskInfo;
-    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo) ||
-            ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, mask, &maskInfo)) {
-        LOGE("====get bitmap info failed");
-        return;
-    }
-    void * buffer, *buffer_msk;
-    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_lockPixels(env, bitmap, &buffer) ||
-            ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_lockPixels(env, mask, &buffer_msk)) {
-        LOGE("===lock src bitmap failed");
-        return;
-    }
-    LOGI("width=%d; height=%d; stride=%d; format=%d;flag=%d",
-         srcInfo.width, //  width=2700 (900*3)
-         srcInfo.height, // height=2025 (675*3)
-         srcInfo.stride, // stride=10800 (2700*4)
-         srcInfo.format, // format=1 (ANDROID_BITMAP_FORMAT_RGBA_8888=1)
-         srcInfo.flags); // flags=0 (ANDROID_BITMAP_RESULT_SUCCESS=0)
-    w = srcInfo.width; h = srcInfo.height;
 
-    size_t size = srcInfo.width * srcInfo.height;
-    data = new GLubyte[CHANEL_NUM*size];
-//    memset(data, 0xff, CHANEL_NUM * size * 4);
-    int x, y, idx = 0;
-    for (y = 0; y < h; y++) {
-        argb * line = (argb *) buffer;
-        argb* mask_line = (argb*) buffer_msk;
-        for (x = 0; x < w; x++) {
-            data[CHANEL_NUM*idx] = line[x].red;
-            data[CHANEL_NUM*idx + 1] = mask_line[x].red;
-            idx++;
-        }
-
-        buffer = (char *) buffer + srcInfo.stride;
-        buffer_msk = (char *) buffer_msk + srcInfo.stride;
-    }
-    AndroidBitmap_unlockPixels(env, bitmap);
-    AndroidBitmap_unlockPixels(env, mask);
-}
 void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h, int offset ){
     AndroidBitmapInfo srcInfo;
     if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
@@ -151,7 +112,7 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h, 
     for (y = 0; y < h; y++) {
         argb * line = (argb *) buffer;
         for (x = 0; x < w; x++) {
-            data[CHANEL_NUM*idx + offset] = line[x].red;
+            data[CHANEL_NUM*idx + offset] = GLubyte(line[x].red);
             idx++;
         }
 
