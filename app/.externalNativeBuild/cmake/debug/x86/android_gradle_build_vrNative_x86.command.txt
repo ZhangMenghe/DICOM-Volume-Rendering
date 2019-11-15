@@ -1,0 +1,8 @@
+Executable : D:\Android_SDK\cmake\3.10.2.4988404\bin\cmake.exe
+arguments : 
+--build
+C:\Projects\Github\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\debug\x86
+--target
+vrNative
+jvmArgs : 
+

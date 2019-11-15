@@ -1,0 +1,25 @@
+[1/14] Building CXX object CMakeFiles/vrNative.dir/GLPipeline/Mesh.cpp.o
+[2/14] Building CXX object CMakeFiles/vrNative.dir/AndroidUtils/perfMonitor.cpp.o
+[3/14] Building CXX object CMakeFiles/vrNative.dir/GLPipeline/Texture.cpp.o
+[4/14] Building CXX object CMakeFiles/vrNative.dir/AndroidUtils/AndroidHelper.cpp.o
+[5/14] Building CXX object CMakeFiles/vrNative.dir/dicomRenderer/screenQuad.cpp.o
+[6/14] Building CXX object CMakeFiles/vrNative.dir/Jnis/jni_interface.cpp.o
+[7/14] Building CXX object CMakeFiles/vrNative.dir/dicomRenderer/funcsRenderer.cpp.o
+[8/14] Building CXX object CMakeFiles/vrNative.dir/Jnis/jui_interface.cpp.o
+[9/14] Building CXX object CMakeFiles/vrNative.dir/dicomRenderer/texturebasedRenderer.cpp.o
+[10/14] Building CXX object CMakeFiles/vrNative.dir/dicomRenderer/raycastRenderer.cpp.o
+[11/14] Building CXX object CMakeFiles/vrNative.dir/vrController.cpp.o
+[12/14] Building CXX object CMakeFiles/vrNative.dir/dicomRenderer/cuttingController.cpp.o
+[13/14] Building CXX object CMakeFiles/vrNative.dir/GLPipeline/Shader.cpp.o
+[14/14] Linking CXX shared library C:\Projects\Github\DICOM-Volume-Rendering\app\build\intermediates\cmake\debug\obj\x86\libvrNative.so
+Android (5058415 based on r339409) clang version 8.0.2 (https://android.googlesource.com/toolchain/clang 40173bab62ec746213857d083c0e8b0abb568790) (https://android.googlesource.com/toolchain/llvm 7a6618d69e7e8111e1d49dc9e7813767c5ca756a) (based on LLVM 8.0.2svn)
+Target: i686-none-linux-android26
+Thread model: posix
+InstalledDir: D:\Android_SDK\ndk-bundle\toolchains\llvm\prebuilt\windows-x86_64\bin
+Found candidate GCC installation: D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/i686-linux-android\4.9.x
+Found candidate GCC installation: D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/x86_64-linux-android\4.9.x
+Selected GCC installation: D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/i686-linux-android/4.9.x
+Candidate multilib: .;@m32
+Selected multilib: .;@m32
+Found CUDA installation: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v9.0, version 9.0
+ "D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/i686-linux-android/4.9.x/../../../../i686-linux-android/bin\\ld" --sysroot=D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot --enable-new-dtags --eh-frame-hdr -m elf_i386 -shared -o "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\build\\intermediates\\cmake\\debug\\obj\\x86\\libvrNative.so" "D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/i686-linux-android/26\\crtbegin_so.o" "-LD:\\Android_SDK\\ndk-bundle\\toolchains\\llvm\\prebuilt\\windows-x86_64\\lib64\\clang\\8.0.2\\lib\\linux\\i386" -LD:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/i686-linux-android/4.9.x -LD:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/i686-linux-android/26 -LD:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/i686-linux-android -LD:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/lib/gcc/i686-linux-android/4.9.x/../../../../i686-linux-android/lib -LD:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib --exclude-libs libgcc.a --exclude-libs libatomic.a --build-id --warn-shared-textrel --fatal-warnings --no-undefined -z noexecstack -z relro -z now -soname libvrNative.so CMakeFiles/vrNative.dir/Jnis/jni_interface.cpp.o CMakeFiles/vrNative.dir/Jnis/jui_interface.cpp.o CMakeFiles/vrNative.dir/vrController.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/funcsRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/raycastRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/texturebasedRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/cuttingController.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/screenQuad.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Shader.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Mesh.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Texture.cpp.o CMakeFiles/vrNative.dir/AndroidUtils/AndroidHelper.cpp.o CMakeFiles/vrNative.dir/AndroidUtils/perfMonitor.cpp.o -landroid -lmediandk -lGLESv3 -lEGL -ljnigraphics -llog -lm -latomic -lm -Bstatic -lc++ -Bdynamic -lm -lomp -lgcc -ldl -lc -lgcc -ldl "D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot/usr/lib/i686-linux-android/26\\crtend_so.o"
