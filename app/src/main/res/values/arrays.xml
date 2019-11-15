@@ -9,8 +9,8 @@
     </string-array>
 
     <string-array name="t2Arr">
-        <item>Sample Step</item>
-        <item>Threshold</item>
+        <item>Density</item>
+        <item>Contrast</item>
         <item>Brightness</item>
     </string-array>
 

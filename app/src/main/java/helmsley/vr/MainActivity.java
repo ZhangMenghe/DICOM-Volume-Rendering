@@ -40,13 +40,20 @@ public class MainActivity extends GLActivity {
     }
     private void setupDCMI() {
         file_path_lst = fileUtils.getListFilesFromDir(new File(ass_copy_dst+"/"+getString(R.string.config_volname)));
-        ArrayList<Bitmap> masks = loadImagesFromDir(ass_copy_dst+"/"+getString(R.string.config_volname)+getString(R.string.config_mask_tail));
+        ArrayList<Bitmap> masks = loadImagesFromDir(ass_copy_dst+"/"+getString(R.string.config_volname)+getString(R.string.config_mask_tail), true);
 
         file_nums = file_path_lst.size();
         Log.e(TAG, ass_copy_dst+": =====num: " + file_nums );
-        for(int i=0; i<file_nums; i++)
-            dcm_images.add(new dcmImage(file_path_lst.get(i)));
+        if(getString(R.string.config_volname).equals("sample")){
+            for(int i=0; i<file_nums; i++)
+                dcm_images.add(new dcmImage(file_path_lst.get(i), -1.0f));
+        }else{
+            for(int i=0; i<file_nums; i++)
+                dcm_images.add(new dcmImage(file_path_lst.get(i)));
+        }
+
         JNIInterface.JNIsendDCMImgs(dcm_images.toArray(new dcmImage[0]), masks.toArray(), file_nums);
+
     }
     @Override
     protected void updateOnFrame(){

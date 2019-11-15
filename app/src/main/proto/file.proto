@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+
+message Chunk{
+    bytes buffer = 1;
+}
+
+message Request {
+    int64 client_id = 1;
+    string request_data = 2;
+}
+
+message Response {
+    int64 server_id = 1;
+    string response_data = 2;
+}
+
+//should be Bi-directional stream:(in a call, both client and server can send and receive multiple times)
+service fileChunker {
+    rpc upload(stream Chunk) returns (Response);
+
+    rpc download(Request) returns (stream Chunk);
+}
