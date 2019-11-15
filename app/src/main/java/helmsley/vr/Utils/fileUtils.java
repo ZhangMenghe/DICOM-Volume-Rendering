@@ -3,6 +3,7 @@ package helmsley.vr.Utils;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.util.Log;
 
 import java.io.File;
@@ -118,7 +119,7 @@ public class fileUtils {
         }
         return file_path_lst;
     }
-    public static ArrayList<Bitmap> loadImagesFromDir(String dir_path_str){
+    public static ArrayList<Bitmap> loadImagesFromDir(String dir_path_str, boolean flip_vertical){
         ArrayList<Bitmap> img_list = new ArrayList<>();
         ArrayList<Integer> name_list = new ArrayList<>();
         int dir_len = dir_path_str.length();
@@ -133,7 +134,14 @@ public class fileUtils {
                 name_list.add(Integer.parseInt(full_name.substring(dir_len+1, full_name.length()-4)));
                 try{
                     FileInputStream fis = new FileInputStream(full_name);
-                    img_list.add(BitmapFactory.decodeStream(fis));
+
+                    Bitmap mask = BitmapFactory.decodeStream(fis);
+                    if(flip_vertical){
+                        Matrix matrix = new Matrix();
+                        matrix.preScale(1.0f, -1.0f);
+                        mask = Bitmap.createBitmap(mask, 0, 0, mask.getWidth(), mask.getHeight(), matrix, true);
+                    }
+                    img_list.add(mask);
                 }catch (IOException e){
                     Log.e(TAG, "===load_mask error from : " + dir_path_str);
                 }

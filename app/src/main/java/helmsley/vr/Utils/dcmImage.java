@@ -2,6 +2,7 @@ package helmsley.vr.Utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.util.Log;
 
 import com.imebra.CodecFactory;
@@ -41,23 +42,27 @@ public class dcmImage{
     final static private com.imebra.TagId thickness_id =
             new com.imebra.TagId(0x0018, 0x0050 );
 
+    final static private float LOC_PRE_DEFAULT = 1.0f;
     final static String TAG = "DCM_IMAGE_CLASS";
     public dcmImage(String path){
-        load_dcm(path);
+        load_dcm(path, LOC_PRE_DEFAULT);
+    }
+    public dcmImage(String path, float loc_pre){
+        load_dcm(path, loc_pre);
     }
     public dcmImage(String path, String msk_pth){
         Log.i(TAG, "====dcmi:  " + path);
         Log.i(TAG, "====mask:  " + msk_pth);
-        load_dcm(path);
+        load_dcm(path, 1.0f);
         load_mask(msk_pth);
     }
 
-    private void load_dcm(String path){
+    private void load_dcm(String path, float loc_pre){
         FileStreamInput dcm_stream = new FileStreamInput(path);
         DataSet dcmDataset = CodecFactory.load(new StreamReader(dcm_stream));
 
         try{
-            location = Float.parseFloat(dcmDataset.getString(location_id, 0));
+            location = loc_pre * Float.parseFloat(dcmDataset.getString(location_id, 0));
             xSpacing = Float.parseFloat(dcmDataset.getString(Spacing_id, 0));
             ySpacing = Float.parseFloat(dcmDataset.getString(Spacing_id, 1));
             thickness = Float.parseFloat(dcmDataset.getString(thickness_id, 0));
@@ -110,8 +115,15 @@ public class dcmImage{
         ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 
         draw.getBitmap(image, drawBitmapType_t.drawBitmapRGBA, 4 , buffer);
-        bitmap = Bitmap.createBitmap((int) image.getWidth(), (int) image.getHeight(), Bitmap.Config.ARGB_8888);
-        bitmap.copyPixelsFromBuffer(byteBuffer);
+
+
+        Bitmap tmp_bitmap = Bitmap.createBitmap((int) image.getWidth(), (int) image.getHeight(), Bitmap.Config.ARGB_8888);
+        tmp_bitmap.copyPixelsFromBuffer(byteBuffer);
+
+        Matrix matrix = new Matrix();
+        matrix.preScale(1.0f, -1.0f);
+        bitmap = Bitmap.createBitmap(tmp_bitmap, 0, 0, tmp_bitmap.getWidth(), tmp_bitmap.getHeight(), matrix, true);
+
 //        Bitmap renderBitmap = Bitmap.createBitmap((int) image.getWidth(), (int) image.getHeight(), Bitmap.Config.ARGB_8888);
 //        renderBitmap.copyPixelsFromBuffer(byteBuffer);
 
@@ -121,7 +133,12 @@ public class dcmImage{
     private void load_mask(String path){
         try{
             FileInputStream fis = new FileInputStream(path);
-            bitmap_msk = BitmapFactory.decodeStream(fis);
+            Bitmap bitmap_msk_tmp = BitmapFactory.decodeStream(fis);
+
+            Matrix matrix = new Matrix();
+            matrix.preScale(1.0f, -1.0f);
+            bitmap_msk = Bitmap.createBitmap(bitmap_msk_tmp, 0, 0, bitmap_msk_tmp.getWidth(), bitmap_msk_tmp.getHeight(), matrix, true);
+
         }catch (IOException e){
             Log.e(TAG, "===load_mask error from : " + path);
         }

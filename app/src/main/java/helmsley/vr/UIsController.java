@@ -114,12 +114,16 @@ public class UIsController {
     private void updateSpinnerEnteries(){
         if(IsRaycast()){
             spinner_toggle_arr1.setVisibility(View.GONE);
+            spinner_toggle_sub.setVisibility(View.INVISIBLE);
             spinner_toggle_arr2.setVisibility(View.VISIBLE);
             current_toggle_id = R.array.t2Arr;
+            update_toggle_item_display(-1);
         }else{
             spinner_toggle_arr1.setVisibility(View.VISIBLE);
+            spinner_toggle_sub.setVisibility(View.VISIBLE);
             spinner_toggle_arr2.setVisibility(View.GONE);
             current_toggle_id = R.array.t1Arr;
+            update_toggle_item_display(-1);
         }
     }
 

@@ -112,6 +112,6 @@ void FuncRenderer::draw_opacity_func(){
 }
 void FuncRenderer::Draw(){
     if(vrController::param_bool_map["colortrans"])draw_color_bar();
-    if(vrController::param_bool_map["Opacity"])draw_opacity_func();
+    if(!vrController::param_bool_map["raycast"])draw_opacity_func();
 
 }
