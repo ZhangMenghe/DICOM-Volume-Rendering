@@ -1,92 +1,92 @@
 {
   "stringTable": {
-    "0": "C:/Projects/Github/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/arm64-v8a",
-    "1": "--target=aarch64-none-linux-android26 --gcc-toolchain=D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DvrNative_EXPORTS -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O2 -DNDEBUG -fPIC"
+    "0": "E:/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/arm64-v8a",
+    "1": "--target=aarch64-none-linux-android26 --gcc-toolchain=D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=D:/Android_SDK/ndk-bundle/toolchains/llvm/prebuilt/windows-x86_64/sysroot -DvrNative_EXPORTS -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O2 -DNDEBUG -fPIC"
   },
   "buildFiles": [
     "D:\\Android_SDK\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\CMakeLists.txt",
     "D:\\Android_SDK\\ndk-bundle\\build\\cmake\\platforms.cmake"
   ],
   "cleanCommands": [
-    "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\arm64-v8a\" --target clean"
+    "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"E:\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\arm64-v8a\" --target clean"
   ],
   "libraries": {
     "vrNative-Release-arm64-v8a": {
-      "buildCommand": "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\arm64-v8a\" --target vrNative",
+      "buildCommand": "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"E:\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\arm64-v8a\" --target vrNative",
       "buildType": "release",
       "toolchain": "2324445511",
       "abi": "arm64-v8a",
       "artifactName": "vrNative",
       "files": [
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\Jnis\\jni_interface.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\Jnis\\jni_interface.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\Jnis\\jui_interface.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\Jnis\\jui_interface.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\vrController.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\vrController.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\funcsRenderer.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\funcsRenderer.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\raycastRenderer.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\raycastRenderer.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\texturebasedRenderer.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\texturebasedRenderer.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\cuttingController.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\cuttingController.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\screenQuad.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\dicomRenderer\\screenQuad.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\GLPipeline\\Shader.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\GLPipeline\\Shader.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\GLPipeline\\Mesh.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\GLPipeline\\Mesh.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\GLPipeline\\Texture.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\GLPipeline\\Texture.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\AndroidUtils\\AndroidHelper.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\AndroidUtils\\AndroidHelper.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         },
         {
-          "src": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\AndroidUtils\\perfMonitor.cpp",
+          "src": "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\AndroidUtils\\perfMonitor.cpp",
           "flagsOrdinal": 1,
           "workingDirectoryOrdinal": 0
         }
       ],
       "headers": [],
-      "output": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libvrNative.so"
+      "output": "E:\\DICOM-Volume-Rendering\\app\\build\\intermediates\\cmake\\release\\obj\\arm64-v8a\\libvrNative.so"
     }
   },
   "toolchains": {

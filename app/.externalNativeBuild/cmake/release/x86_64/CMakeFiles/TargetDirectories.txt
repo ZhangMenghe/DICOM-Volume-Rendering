@@ -1,3 +1,3 @@
-C:/Projects/Github/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/vrNative.dir
-C:/Projects/Github/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/edit_cache.dir
-C:/Projects/Github/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/rebuild_cache.dir
+E:/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/vrNative.dir
+E:/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/edit_cache.dir
+E:/DICOM-Volume-Rendering/app/.externalNativeBuild/cmake/release/x86_64/CMakeFiles/rebuild_cache.dir

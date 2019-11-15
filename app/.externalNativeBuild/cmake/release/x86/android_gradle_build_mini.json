@@ -1,18 +1,18 @@
 {
   "buildFiles": [
     "D:\\Android_SDK\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\CMakeLists.txt",
     "D:\\Android_SDK\\ndk-bundle\\build\\cmake\\platforms.cmake"
   ],
   "cleanCommands": [
-    "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\x86\" --target clean"
+    "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"E:\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\x86\" --target clean"
   ],
   "libraries": {
     "vrNative-Release-x86": {
       "artifactName": "vrNative",
-      "buildCommand": "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\x86\" --target vrNative",
+      "buildCommand": "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"E:\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\release\\x86\" --target vrNative",
       "abi": "x86",
-      "output": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libvrNative.so"
+      "output": "E:\\DICOM-Volume-Rendering\\app\\build\\intermediates\\cmake\\release\\obj\\x86\\libvrNative.so"
     }
   }
 }

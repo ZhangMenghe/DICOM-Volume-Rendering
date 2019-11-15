@@ -37,95 +37,95 @@ include rules.ninja
 # Order-only phony target for vrNative
 
 build cmake_object_order_depends_target_vrNative: phony
-build CMakeFiles/vrNative.dir/Jnis/jni_interface.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/Jnis/jni_interface.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/Jnis/jni_interface.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/Jnis/jni_interface.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\Jnis\jni_interface.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\Jnis
-build CMakeFiles/vrNative.dir/Jnis/jui_interface.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/Jnis/jui_interface.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/Jnis/jui_interface.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/Jnis/jui_interface.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\Jnis\jui_interface.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\Jnis
-build CMakeFiles/vrNative.dir/vrController.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/vrController.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/vrController.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/vrController.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\vrController.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir
-build CMakeFiles/vrNative.dir/dicomRenderer/funcsRenderer.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/funcsRenderer.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/dicomRenderer/funcsRenderer.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/funcsRenderer.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\dicomRenderer\funcsRenderer.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\dicomRenderer
-build CMakeFiles/vrNative.dir/dicomRenderer/raycastRenderer.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/raycastRenderer.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/dicomRenderer/raycastRenderer.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/raycastRenderer.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\dicomRenderer\raycastRenderer.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\dicomRenderer
-build CMakeFiles/vrNative.dir/dicomRenderer/texturebasedRenderer.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/texturebasedRenderer.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/dicomRenderer/texturebasedRenderer.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/texturebasedRenderer.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\dicomRenderer\texturebasedRenderer.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\dicomRenderer
-build CMakeFiles/vrNative.dir/dicomRenderer/cuttingController.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/cuttingController.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/dicomRenderer/cuttingController.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/cuttingController.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\dicomRenderer\cuttingController.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\dicomRenderer
-build CMakeFiles/vrNative.dir/dicomRenderer/screenQuad.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/screenQuad.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/dicomRenderer/screenQuad.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/dicomRenderer/screenQuad.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\dicomRenderer\screenQuad.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\dicomRenderer
-build CMakeFiles/vrNative.dir/GLPipeline/Shader.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/GLPipeline/Shader.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/GLPipeline/Shader.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/GLPipeline/Shader.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\GLPipeline\Shader.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\GLPipeline
-build CMakeFiles/vrNative.dir/GLPipeline/Mesh.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/GLPipeline/Mesh.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/GLPipeline/Mesh.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/GLPipeline/Mesh.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\GLPipeline\Mesh.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\GLPipeline
-build CMakeFiles/vrNative.dir/GLPipeline/Texture.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/GLPipeline/Texture.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/GLPipeline/Texture.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/GLPipeline/Texture.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\GLPipeline\Texture.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\GLPipeline
-build CMakeFiles/vrNative.dir/AndroidUtils/AndroidHelper.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/AndroidUtils/AndroidHelper.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/AndroidUtils/AndroidHelper.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/AndroidUtils/AndroidHelper.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\AndroidUtils\AndroidHelper.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\AndroidUtils
-build CMakeFiles/vrNative.dir/AndroidUtils/perfMonitor.cpp.o: CXX_COMPILER__vrNative C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/AndroidUtils/perfMonitor.cpp || cmake_object_order_depends_target_vrNative
+build CMakeFiles/vrNative.dir/AndroidUtils/perfMonitor.cpp.o: CXX_COMPILER__vrNative E$:/DICOM-Volume-Rendering/app/src/main/cpp/AndroidUtils/perfMonitor.cpp || cmake_object_order_depends_target_vrNative
   DEFINES = -DvrNative_EXPORTS
   DEP_FILE = CMakeFiles\vrNative.dir\AndroidUtils\perfMonitor.cpp.o.d
   FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info  -fPIC
-  INCLUDES = -ID:/OpenGL-Libs/glm -IC:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp
+  INCLUDES = -ID:/OpenGL-Libs/glm -IE:/DICOM-Volume-Rendering/app/src/main/cpp
   OBJECT_DIR = CMakeFiles\vrNative.dir
   OBJECT_FILE_DIR = CMakeFiles\vrNative.dir\AndroidUtils
 
@@ -134,9 +134,9 @@ build CMakeFiles/vrNative.dir/AndroidUtils/perfMonitor.cpp.o: CXX_COMPILER__vrNa
 
 
 #############################################
-# Link the shared library C:\Projects\Github\DICOM-Volume-Rendering\app\build\intermediates\cmake\debug\obj\x86\libvrNative.so
+# Link the shared library E:\DICOM-Volume-Rendering\app\build\intermediates\cmake\debug\obj\x86\libvrNative.so
 
-build C$:/Projects/Github/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so: CXX_SHARED_LIBRARY_LINKER__vrNative CMakeFiles/vrNative.dir/Jnis/jni_interface.cpp.o CMakeFiles/vrNative.dir/Jnis/jui_interface.cpp.o CMakeFiles/vrNative.dir/vrController.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/funcsRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/raycastRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/texturebasedRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/cuttingController.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/screenQuad.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Shader.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Mesh.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Texture.cpp.o CMakeFiles/vrNative.dir/AndroidUtils/AndroidHelper.cpp.o CMakeFiles/vrNative.dir/AndroidUtils/perfMonitor.cpp.o
+build E$:/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so: CXX_SHARED_LIBRARY_LINKER__vrNative CMakeFiles/vrNative.dir/Jnis/jni_interface.cpp.o CMakeFiles/vrNative.dir/Jnis/jui_interface.cpp.o CMakeFiles/vrNative.dir/vrController.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/funcsRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/raycastRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/texturebasedRenderer.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/cuttingController.cpp.o CMakeFiles/vrNative.dir/dicomRenderer/screenQuad.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Shader.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Mesh.cpp.o CMakeFiles/vrNative.dir/GLPipeline/Texture.cpp.o CMakeFiles/vrNative.dir/AndroidUtils/AndroidHelper.cpp.o CMakeFiles/vrNative.dir/AndroidUtils/perfMonitor.cpp.o
   LANGUAGE_COMPILE_FLAGS = -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -fno-addrsig -Wa,--noexecstack -Wformat -Werror=format-security -stdlib=libc++ -std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security -std=c++17 -O0 -fno-limit-debug-info
   LINK_FLAGS = -Wl,--exclude-libs,libgcc.a -Wl,--exclude-libs,libatomic.a -static-libstdc++ -Wl,--build-id -Wl,--warn-shared-textrel -Wl,--fatal-warnings -Wl,--no-undefined -Qunused-arguments -Wl,-z,noexecstack -Wl,-z,relro -Wl,-z,now  -v
   LINK_LIBRARIES = -landroid -lmediandk -lGLESv3 -lEGL -ljnigraphics -llog -lm -latomic -lm
@@ -145,14 +145,14 @@ build C$:/Projects/Github/DICOM-Volume-Rendering/app/build/intermediates/cmake/d
   PRE_LINK = cd .
   SONAME = libvrNative.so
   SONAME_FLAG = -Wl,-soname,
-  TARGET_FILE = C:\Projects\Github\DICOM-Volume-Rendering\app\build\intermediates\cmake\debug\obj\x86\libvrNative.so
+  TARGET_FILE = E:\DICOM-Volume-Rendering\app\build\intermediates\cmake\debug\obj\x86\libvrNative.so
   TARGET_PDB = vrNative.so.dbg
 
 #############################################
 # Utility command for edit_cache
 
 build CMakeFiles/edit_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D C:\Projects\Github\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\debug\x86 && D:\Android_SDK\cmake\3.10.2.4988404\bin\cmake.exe -E echo "No interactive CMake dialog available.""
+  COMMAND = cmd.exe /C "cd /D E:\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\debug\x86 && D:\Android_SDK\cmake\3.10.2.4988404\bin\cmake.exe -E echo "No interactive CMake dialog available.""
   DESC = No interactive CMake dialog available...
   restat = 1
 build edit_cache: phony CMakeFiles/edit_cache.util
@@ -161,7 +161,7 @@ build edit_cache: phony CMakeFiles/edit_cache.util
 # Utility command for rebuild_cache
 
 build CMakeFiles/rebuild_cache.util: CUSTOM_COMMAND
-  COMMAND = cmd.exe /C "cd /D C:\Projects\Github\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\debug\x86 && D:\Android_SDK\cmake\3.10.2.4988404\bin\cmake.exe -HC:\Projects\Github\DICOM-Volume-Rendering\app\src\main\cpp -BC:\Projects\Github\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\debug\x86"
+  COMMAND = cmd.exe /C "cd /D E:\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\debug\x86 && D:\Android_SDK\cmake\3.10.2.4988404\bin\cmake.exe -HE:\DICOM-Volume-Rendering\app\src\main\cpp -BE:\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\debug\x86"
   DESC = Running CMake to regenerate build system...
   pool = console
   restat = 1
@@ -169,8 +169,8 @@ build rebuild_cache: phony CMakeFiles/rebuild_cache.util
 # =============================================================================
 # Target aliases.
 
-build libvrNative.so: phony C$:/Projects/Github/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so
-build vrNative: phony C$:/Projects/Github/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so
+build libvrNative.so: phony E$:/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so
+build vrNative: phony E$:/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so
 # =============================================================================
 # Folder targets.
 
@@ -182,7 +182,7 @@ build vrNative: phony C$:/Projects/Github/DICOM-Volume-Rendering/app/build/inter
 #############################################
 # The main all target.
 
-build all: phony C$:/Projects/Github/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so
+build all: phony E$:/DICOM-Volume-Rendering/app/build/intermediates/cmake/debug/obj/x86/libvrNative.so
 
 #############################################
 # Make the all target the default.
@@ -192,13 +192,13 @@ default all
 #############################################
 # Re-run CMake if any of its inputs changed.
 
-build build.ninja: RERUN_CMAKE | C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/CMakeLists.txt CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake D$:/Android_SDK/ndk-bundle/build/cmake/android.toolchain.cmake D$:/Android_SDK/ndk-bundle/build/cmake/platforms.cmake
+build build.ninja: RERUN_CMAKE | CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake CMakeFiles/feature_tests.c CMakeFiles/feature_tests.cxx D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake D$:/Android_SDK/ndk-bundle/build/cmake/android.toolchain.cmake D$:/Android_SDK/ndk-bundle/build/cmake/platforms.cmake E$:/DICOM-Volume-Rendering/app/src/main/cpp/CMakeLists.txt
   pool = console
 
 #############################################
 # A missing CMake input file is not an error.
 
-build C$:/Projects/Github/DICOM-Volume-Rendering/app/src/main/cpp/CMakeLists.txt CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake D$:/Android_SDK/ndk-bundle/build/cmake/android.toolchain.cmake D$:/Android_SDK/ndk-bundle/build/cmake/platforms.cmake: phony
+build CMakeCache.txt CMakeFiles/3.10.2/CMakeCCompiler.cmake CMakeFiles/3.10.2/CMakeCXXCompiler.cmake CMakeFiles/3.10.2/CMakeSystem.cmake CMakeFiles/feature_tests.c CMakeFiles/feature_tests.cxx D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompiler.cmake.in D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCCompilerABI.c D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompiler.cmake.in D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXCompilerABI.cpp D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCXXInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeCommonLanguageInclude.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCXXCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompileFeatures.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineCompilerABI.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeDetermineSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeFindBinUtils.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeGenericSystem.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeLanguageInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeParseImplicitLinkInfo.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystem.cmake.in D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInformation.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeSystemSpecificInitialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCXXCompiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/CMakeTestCompilerCommon.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/CMakeCommonCompilerMacros.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C-FeatureTests.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-FeatureTests.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX-TestableFeatures.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang-FindBinUtils.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Compiler/GNU.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Internal/FeatureTesting.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Clang.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-C.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine-CXX.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Determine.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android-Initialize.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Android/Determine-Compiler.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/Linux.cmake D$:/Android_SDK/cmake/3.10.2.4988404/share/cmake-3.10/Modules/Platform/UnixPaths.cmake D$:/Android_SDK/ndk-bundle/build/cmake/android.toolchain.cmake D$:/Android_SDK/ndk-bundle/build/cmake/platforms.cmake E$:/DICOM-Volume-Rendering/app/src/main/cpp/CMakeLists.txt: phony
 
 #############################################
 # Clean all the built files.

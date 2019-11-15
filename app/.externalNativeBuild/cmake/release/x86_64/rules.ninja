@@ -42,7 +42,7 @@ rule CUSTOM_COMMAND
 # Rule for re-running cmake.
 
 rule RERUN_CMAKE
-  command = D:\Android_SDK\cmake\3.10.2.4988404\bin\cmake.exe -HC:\Projects\Github\DICOM-Volume-Rendering\app\src\main\cpp -BC:\Projects\Github\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\release\x86_64
+  command = D:\Android_SDK\cmake\3.10.2.4988404\bin\cmake.exe -HE:\DICOM-Volume-Rendering\app\src\main\cpp -BE:\DICOM-Volume-Rendering\app\.externalNativeBuild\cmake\release\x86_64
   description = Re-running CMake...
   generator = 1
 

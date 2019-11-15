@@ -1,18 +1,18 @@
 {
   "buildFiles": [
     "D:\\Android_SDK\\ndk-bundle\\build\\cmake\\android.toolchain.cmake",
-    "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\CMakeLists.txt",
+    "E:\\DICOM-Volume-Rendering\\app\\src\\main\\cpp\\CMakeLists.txt",
     "D:\\Android_SDK\\ndk-bundle\\build\\cmake\\platforms.cmake"
   ],
   "cleanCommands": [
-    "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\debug\\armeabi-v7a\" --target clean"
+    "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"E:\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\debug\\armeabi-v7a\" --target clean"
   ],
   "libraries": {
     "vrNative-Debug-armeabi-v7a": {
       "artifactName": "vrNative",
-      "buildCommand": "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\debug\\armeabi-v7a\" --target vrNative",
+      "buildCommand": "D:\\Android_SDK\\cmake\\3.10.2.4988404\\bin\\cmake.exe --build \"E:\\DICOM-Volume-Rendering\\app\\.externalNativeBuild\\cmake\\debug\\armeabi-v7a\" --target vrNative",
       "abi": "armeabi-v7a",
-      "output": "C:\\Projects\\Github\\DICOM-Volume-Rendering\\app\\build\\intermediates\\cmake\\debug\\obj\\armeabi-v7a\\libvrNative.so"
+      "output": "E:\\DICOM-Volume-Rendering\\app\\build\\intermediates\\cmake\\debug\\obj\\armeabi-v7a\\libvrNative.so"
     }
   }
 }
