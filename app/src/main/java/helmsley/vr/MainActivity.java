@@ -14,6 +14,7 @@ import helmsley.vr.Utils.dcmImage;
 import helmsley.vr.Utils.fileUtils;
 
 import static helmsley.vr.Utils.fileUtils.loadImagesFromDir;
+import helmsley.vr.proto.fileTransferClient;
 
 public class MainActivity extends GLActivity {
     final static String TAG = "Main_Activity";
@@ -27,15 +28,19 @@ public class MainActivity extends GLActivity {
     ArrayList<dcmImage> dcm_images = new ArrayList<>();
     //ui
     protected UIsController uiController;
+    //downloader
+    fileTransferClient downloader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         uiController = new UIsController(this);
+//        downloader = new fileTransferClient("137.110.112.178","23333");
     }
     protected boolean setupResource(){
         super.setupResource();
         setupDCMI();
+//        downloader.Run();
         return true;
     }
     private void setupDCMI() {
