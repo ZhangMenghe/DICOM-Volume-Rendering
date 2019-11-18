@@ -14,4 +14,7 @@
     <string name="config_voldir">dicom-images</string>
     <string name="config_volname">sample</string>
     <string name="config_mask_tail">_mask</string>
+
+    <string name="host_addr">137.110.112.178</string>
+    <string name="host_port">50051</string>
 </resources>

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import helmsley.vr.DUIs.cuttingUIs;
+import helmsley.vr.proto.fileTransferClient;
 
 public class UIsController {
     public static Activity activity;
@@ -34,6 +35,9 @@ public class UIsController {
                     spinner_switch;
     private SeekBar seekbar_top;
     private Switch switch_widget;
+
+    private static fileTransferClient downloader;
+    private static boolean first_time=true;
 
     private View toggle_panel;
     private int toggle_id = 0, toggle_id_sub = 0, switch_id = 0;
@@ -253,6 +257,12 @@ public class UIsController {
             panel.startAnimation(panelShownAction);
             panel.setVisibility(View.VISIBLE);
         }
+    }
+    public static void debug_create_downloader(){
+        if(first_time)
+            downloader = new fileTransferClient("137.110.112.178","23333");
+        downloader.Run();
+        first_time = false;
     }
     public void updateFPS(){
         activity.runOnUiThread(new Runnable()  {

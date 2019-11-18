@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "helmsley.vr.proto";
+option java_outer_classname = "transManagerProto";
+option objc_class_prefix = "TRP";
+
+package helmsley;
+
+message dcmImage{
+    int32 dcmID = 1;
+    float position = 2;
+    bytes data = 3;
+}
+
+message bundleConfig{
+    string folder_name = 1;
+    int32 file_nums = 2;
+    int32 img_width = 3;
+    int32 img_height = 4;
+    bool order_flipped = 5;
+}
+
+message Request{
+    int32 client_id = 1;
+    string req_msg = 2;
+}
+
+message Response{
+    int32 client_id = 1;
+    string res_msg = 2;
+}
+
+service dataTransfer{
+    rpc getConfig(Request) returns(bundleConfig);
+    rpc Download(Request) returns (stream dcmImage);
+}
