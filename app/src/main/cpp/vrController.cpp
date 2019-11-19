@@ -17,6 +17,7 @@ bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true
 glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
 float vrController::csphere_radius = 0.5f;
 bool vrController::cutDirty = true;
+int vrController::VOLUME_DIMS = 0;
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -53,6 +54,13 @@ void vrController::assembleTexture(GLubyte * data, int width, int height, int de
     ray_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, vdata);
     delete[]vdata;
 }
+void vrController::setVolumeConfig(int width, int height, int dims, const int channel_num){
+    VOLUME_DIMS = dims;
+    //todo
+}
+void vrController::assembleTexture(GLubyte * data){
+    //todo
+}
 
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
@@ -69,6 +77,8 @@ void vrController::onViewChange(int width, int height){
     glClear(GL_COLOR_BUFFER_BIT);
 }
 void vrController::onDraw() {
+    if(!tex_volume) return;
+
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(cutDirty){ //panel switch to cutting, update cutting result
         cutDirty = false;
@@ -84,6 +94,8 @@ void vrController::onDraw() {
 }
 
 void vrController::onTouchMove(float x, float y) {
+    if(!tex_volume) return;
+
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 
     float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
@@ -105,6 +117,8 @@ void vrController::onTouchMove(float x, float y) {
     volume_model_dirty = true;
 }
 void vrController::onScale(float sx, float sy){
+    if(!tex_volume) return;
+
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     //unified scaling
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
@@ -120,6 +134,8 @@ void vrController::onScale(float sx, float sy){
     }
 }
 void vrController::onPan(float x, float y){
+    if(!tex_volume) return;
+
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;

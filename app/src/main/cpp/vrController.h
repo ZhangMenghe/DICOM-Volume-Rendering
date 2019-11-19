@@ -24,6 +24,7 @@ public:
     static glm::vec3 ScaleVec3_, PosVec3_;
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
+    static int VOLUME_DIMS;
     inline static bool isRayCasting(){return param_bool_map["raycast"];}
 
 
@@ -35,6 +36,8 @@ public:
 
     vrController(AAssetManager *assetManager);
     void assembleTexture(GLubyte * data, int width, int height, int depth, const int channel_num);
+    void assembleTexture(GLubyte * data);
+    void setVolumeConfig(int width, int height, int dims, const int channel_num);
     void onViewCreated();
     void onViewChange(int width, int height);
     void onDraw();

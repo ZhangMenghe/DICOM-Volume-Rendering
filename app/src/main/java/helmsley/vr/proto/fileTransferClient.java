@@ -1,43 +1,27 @@
 package helmsley.vr.proto;
 
-import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.google.protobuf.ByteString;
-
-import helmsley.vr.R;
+import helmsley.vr.JNIInterface;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
-import io.grpc.StatusRuntimeException;
-import io.grpc.stub.StreamObserver;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Spliterator;
-import java.util.Spliterators;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Logger;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import helmsley.vr.proto.dataTransferGrpc;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
-
+    public static boolean finished = false;
     private ManagedChannel mChannel;
 //    private final dataTransferGrpc.dataTransferStub mAsyncStub;
 //    private final fileChunkerGrpc.fileChunkerBlockingStub mBlockStub;
 
     public final int CLIENT_ID = 1;
 //    private ArrayList<byte[]> image_arrs;
-    private GrpcTask tsk;
 
     public fileTransferClient(String host, String portStr){
         try{
@@ -50,8 +34,6 @@ public class fileTransferClient {
             Log.e(TAG, "===Failed... : " + sw);
             return;
         }
-
-//        tsk = new GrpcTask(mChannel, this);
     }
 
     public void Run(){new GrpcTask(mChannel, this).execute();}
@@ -75,12 +57,15 @@ public class fileTransferClient {
                 bundleConfig vconfig =  blockingStub.getConfig(req);
                 Log.e(TAG, "===returned configs: " + vconfig.getFolderName() + "nums:" + vconfig.getFileNums());
 
+                JNIInterface.JNIsetupDCMIConfig(vconfig.getImgWidth(), vconfig.getImgHeight(), vconfig.getFileNums());
+
                 Iterator<dcmImage> dcm_img_iterator;
                 dcm_img_iterator = blockingStub.download(req);
                 while(dcm_img_iterator.hasNext()){
                     dcmImage img = dcm_img_iterator.next();
                     //tackle with the image here
                     Log.e(TAG, "====img:" + img.getPosition() );
+                    JNIInterface.JNIsendDCMImg(img.getDcmID(), img.getPosition(), img.getData().toByteArray());
                 }
                 return "===Success!\n";
             } catch (Exception e) {
@@ -104,11 +89,14 @@ public class fileTransferClient {
                 return;
             }
             activity.showResults(result);
+
         }
     }
 
     private void showResults(String txt){
         //do nothing
+        finished = true;
+
     }
 
     public void Shutdown() throws InterruptedException {

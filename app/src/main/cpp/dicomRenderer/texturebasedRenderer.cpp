@@ -6,7 +6,7 @@
 
 texvrRenderer::texvrRenderer(bool screen_baked)
 :DRAW_BAKED(screen_baked){
-    dimensions = int(vrController::tex_volume->Depth() * DENSE_FACTOR);
+    dimensions = int(vrController::VOLUME_DIMS * DENSE_FACTOR);
     dimension_inv = 1.0f / dimensions;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
