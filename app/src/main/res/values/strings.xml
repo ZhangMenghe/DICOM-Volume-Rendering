@@ -17,6 +17,8 @@
 
     <string name="DEFAULT_HOST">137.110.112.178</string>
     <string name="DEFAULT_PORT">23333</string>
+    <string name="card_data_detail">%s(%d)</string>
+
 
 
     <string name="dialog_connect_title">Connect to Server</string>
