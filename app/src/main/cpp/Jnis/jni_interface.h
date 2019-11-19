@@ -10,9 +10,15 @@
 extern "C"{
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager);
 
-JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv*, jobject,  jobjectArray, jobjectArray, jint);
+JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv*, jclass,  jobjectArray, jobjectArray, jint);
 
-JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jobject);
+JNI_METHOD(void, JNIsendDCMImg)(JNIEnv*, jclass, jint,  jfloat, jbyteArray);
+
+JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint, jint, jint);
+
+JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass);
+
+JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass);
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv * env, jclass);
 

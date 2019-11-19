@@ -39,7 +39,7 @@ public class MainActivity extends GLActivity {
     }
     protected boolean setupResource(){
         super.setupResource();
-        setupDCMI();
+//        setupDCMI();
 //        downloader.Run();
         return true;
     }
@@ -62,6 +62,7 @@ public class MainActivity extends GLActivity {
     }
     @Override
     protected void updateOnFrame(){
+        if(fileTransferClient.finished) {JNIInterface.JNIAssembleVolume();fileTransferClient.finished=false;}
         super.updateOnFrame();
         uiController.updateFPS();
     }

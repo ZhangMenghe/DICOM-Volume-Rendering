@@ -27,6 +27,11 @@ namespace {
     std::vector<dcmImage *> images_;
     int img_height, img_width;
     const int CHANEL_NUM = 4;
+
+    //globally
+    GLubyte* g_VolumeTexData = nullptr;
+    int g_img_h, g_img_w, g_vol_dim;
+    size_t g_ssize_schanel, g_ssize = 0;
 }
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     AAssetManager * cpp_asset_manager = AAssetManager_fromJava(env, asset_manager);
@@ -35,18 +40,18 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    size_t dimensions = images_.size();
-
-    size_t data_size = CHANEL_NUM * img_width * img_height * dimensions;
-    auto *data = new GLubyte[data_size];
-    auto each_size = CHANEL_NUM * img_height * img_width* sizeof(GLubyte);
-    for(int i=0; i<dimensions; i++)
-        memcpy(data+i*each_size, images_[i]->data, each_size);
-
-    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-
-    vrc->assembleTexture(data, img_width, img_height, dimensions, CHANEL_NUM);
-    delete[]data;
+//    size_t dimensions = images_.size();
+//
+//    size_t data_size = CHANEL_NUM * img_width * img_height * dimensions;
+//    auto *data = new GLubyte[data_size];
+//    auto each_size = CHANEL_NUM * img_height * img_width* sizeof(GLubyte);
+//    for(int i=0; i<dimensions; i++)
+//        memcpy(data+i*each_size, images_[i]->data, each_size);
+//
+//    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+//
+//    vrc->assembleTexture(data, img_width, img_height, dimensions, CHANEL_NUM);
+//    delete[]data;
     nativeApp(nativeAddr)->onViewCreated();
 }
 
@@ -54,7 +59,7 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
     nativeApp(nativeAddr)->onViewChange(w, h);
 }
 
-JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jobject){
+JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     nativeApp(nativeAddr)->onDraw();
 }
 
@@ -120,7 +125,7 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h, 
     }
     AndroidBitmap_unlockPixels(env, bitmap);
 }
-JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject, jobjectArray img_arr, jobjectArray msk_arr, jint size){
+JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jclass , jobjectArray img_arr, jobjectArray msk_arr, jint size){
     //get dcmImg class defined in java
     jclass imgClass = env->FindClass("helmsley/vr/Utils/dcmImage");
     jobject img, bitmap, bitmap_mask;
@@ -158,4 +163,42 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jobject, jobjectArray img_arr, job
             convert_bitmap(env, bitmap_mask, images_[idx]->data, width, height, 1);
         }
     }
+}
+
+JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jfloat pos, jbyteArray data){
+    if(!g_VolumeTexData) return; //check initialization
+
+    jbyte *c_array = env->GetByteArrayElements(data, 0);
+    GLubyte* buffer = g_VolumeTexData+id*g_ssize;
+
+    int given_channel_num =  env->GetArrayLength(data) * CHANEL_NUM / g_ssize;
+
+    int x, y, idx = 0;
+    for(int offset = 0; offset<given_channel_num; offset++){
+        int offset_img = offset * g_ssize_schanel;
+        for (y = 0; y < g_img_h; y++) {
+            for (x = 0; x < g_img_w; x++) {
+                buffer[CHANEL_NUM* idx + offset] = GLubyte(c_array[offset_img+ idx]);
+                idx++;
+            }
+        }
+    }
+
+}
+
+JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, jint dims){
+    g_img_h = height; g_img_w = width;
+    g_ssize_schanel = width * height;
+    g_vol_dim = dims;
+    g_ssize = CHANEL_NUM * g_ssize_schanel;
+    g_VolumeTexData = new GLubyte[ g_ssize* dims];
+    memset(g_VolumeTexData, 0x00, g_ssize * dims * sizeof(GLubyte));
+
+    //todo: send dim to native
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+    vrc->setVolumeConfig(width, height,dims, CHANEL_NUM);
+}
+JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+    vrc->assembleTexture(g_VolumeTexData, g_img_w, g_img_h, g_vol_dim, CHANEL_NUM);
 }
