@@ -23,6 +23,7 @@ public class fileTransferClient {
 
     public final int CLIENT_ID = 1;
 //    private ArrayList<byte[]> image_arrs;
+    private ArrayList<datasetInfo> data_info_lst;
 
     public fileTransferClient(String host, String portStr){
         try{
@@ -40,7 +41,7 @@ public class fileTransferClient {
     public String Setup(String host, String portStr){
         try{
             mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
-            ArrayList<datasetInfo> data_info_lst = getAvailableDatasetInfos();
+            data_info_lst = getAvailableDatasetInfos();
             return "";
         }catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -50,8 +51,14 @@ public class fileTransferClient {
             return String.format("Failed... : %n%s", sw);
         }
     }
-
-    public ArrayList<datasetInfo> getAvailableDatasetInfos(){
+    public ArrayList<datasetInfo> getAvailableDataset(){
+//        return data_info_lst;
+//        data_info_lst = new ArrayList<>();
+//        for(int i=0; i< 10; i++)
+//            data_info_lst.add(datasetInfo.newBuilder().setFolderName("sample " + i).build());
+        return data_info_lst;
+    }
+    private ArrayList<datasetInfo> getAvailableDatasetInfos(){
         ArrayList<datasetInfo> data_arr = new ArrayList<>();
         Request req = Request.newBuilder().setClientId(1).build();
         dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
@@ -62,9 +69,9 @@ public class fileTransferClient {
             Log.e(TAG, "getAvailableDatasetInfos: " + info.getFolderName() );
         return data_arr;
     }
-    public void Run(){new GrpcTask(mChannel, this).execute();}
+    public void Download(String folder_name){new GrpcTask(mChannel, this).execute(folder_name);}
 
-    private static class GrpcTask extends AsyncTask<Void, Void, String> {
+    private static class GrpcTask extends AsyncTask<String, Void, String> {
         private final ManagedChannel channel;
         private final WeakReference<fileTransferClient> activityReference;
 
@@ -74,9 +81,9 @@ public class fileTransferClient {
         }
 
         @Override
-        protected String doInBackground(Void... nothing) {
+        protected String doInBackground(String... params) {
             try {
-                Request req = Request.newBuilder().setClientId(1).setReqMsg("dicom_sample").build();
+                Request req = Request.newBuilder().setClientId(1).setReqMsg(params[0]).build();
                 dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(channel);
 //                dataTransferGrpc.dataTransferStub asyncStub = dataTransferGrpc.newStub(channel);
 //                bundleConfig config = grpcRunnable.run(req, dataTransferGrpc.newBlockingStub(channel), dataTransferGrpc.newStub(channel));

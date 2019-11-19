@@ -24,9 +24,11 @@ import helmsley.vr.proto.fileTransferClient;
 public class dialogUIs {
     public static Activity activity;
     final static String TAG = "dialogUIs";
-    private fileTransferClient downloader;
+    private static fileTransferClient downloader;
     private TextView errText;
     private Button sendButton;
+
+    private static AlertDialog download_dialog;
 //    private ArrayList<datasetInfo> data_info_lst;
     public dialogUIs(final Activity activity_){
         activity = activity_;
@@ -53,6 +55,7 @@ public class dialogUIs {
         layoutDialog_builder.setView(dialogView);
         AlertDialog dialog = layoutDialog_builder.create();
 
+        dialog.setCanceledOnTouchOutside(false);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,6 +72,7 @@ public class dialogUIs {
                 if(SetupDownloader(host_addr, port_addr)){
                     Log.i(TAG, "====Connect to server successfully=====");
                     dialog.dismiss();
+                    SetupDownloadDialog();
                 }
             }
         });
@@ -80,38 +84,23 @@ public class dialogUIs {
 
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, null);
 
-        TextView dialogText = (TextView) dialogView.findViewById(R.id.dialog_text);
-        Button dialogBtnConfirm = (Button) dialogView.findViewById(R.id.dialog_btn_confirm);
-//        Button dialogBtnCancel = (Button) dialogView.findViewById(R.id.dialog_btn_cancel);
-
         //recycle view
 
         RecyclerView content_view = dialogView.findViewById(R.id.contentRecView);
-        content_view.setHasFixedSize(true);
+//        content_view.setHasFixedSize(true);
         //layout manager
         RecyclerView.LayoutManager layout_manager = new LinearLayoutManager(activity);
         content_view.setLayoutManager(layout_manager);
         //adapter
-//        String[] debug_datas = {"d1","d2","d3"};
-//        content_view.setAdapter(new DialogAdapter(debug_datas));
+        content_view.setAdapter(new DialogAdapter(activity, content_view, downloader.getAvailableDataset()));
 
-
-        layoutDialog_builder.setTitle(activity.getString(R.string.dialog_connect_title));
+        layoutDialog_builder.setTitle(activity.getString(R.string.dialog_select_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
-
         layoutDialog_builder.setView(dialogView);
+        download_dialog = layoutDialog_builder.create();
+        download_dialog.setCanceledOnTouchOutside(false);
 
-        dialogText.setText("我是自定义layout的弹窗！！");
-
-        AlertDialog dialog = layoutDialog_builder.create();
-        dialogBtnConfirm .setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SetupDownloader("137.110.112.178","23333");
-                dialog.dismiss();
-            }
-        });
-        dialog.show();
+        download_dialog.show();
 
     }
 
@@ -126,5 +115,9 @@ public class dialogUIs {
         errText.setVisibility(View.VISIBLE);
         sendButton.setEnabled(true);
         return false;
+    }
+    public static void Download(String folder_name){
+        downloader.Download(folder_name);
+        download_dialog.dismiss();
     }
 }
