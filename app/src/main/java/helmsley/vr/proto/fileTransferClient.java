@@ -9,6 +9,7 @@ import io.grpc.ManagedChannelBuilder;
 
 import java.io.*;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
@@ -35,7 +36,32 @@ public class fileTransferClient {
             return;
         }
     }
+    public fileTransferClient(){}
+    public String Setup(String host, String portStr){
+        try{
+            mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
+            ArrayList<datasetInfo> data_info_lst = getAvailableDatasetInfos();
+            return "";
+        }catch (Exception e) {
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            pw.flush();
+            return String.format("Failed... : %n%s", sw);
+        }
+    }
 
+    public ArrayList<datasetInfo> getAvailableDatasetInfos(){
+        ArrayList<datasetInfo> data_arr = new ArrayList<>();
+        Request req = Request.newBuilder().setClientId(1).build();
+        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+        Iterator<datasetInfo> info_itr = blockingStub.getAvailableDatasetInfos(req);
+        while(info_itr.hasNext())
+            data_arr.add(info_itr.next());
+        for(datasetInfo info:data_arr)
+            Log.e(TAG, "getAvailableDatasetInfos: " + info.getFolderName() );
+        return data_arr;
+    }
     public void Run(){new GrpcTask(mChannel, this).execute();}
 
     private static class GrpcTask extends AsyncTask<Void, Void, String> {

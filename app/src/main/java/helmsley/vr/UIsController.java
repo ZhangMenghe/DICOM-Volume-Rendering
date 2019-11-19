@@ -2,17 +2,22 @@ package helmsley.vr;
 
 import android.app.Activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.util.Pair;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -20,12 +25,14 @@ import java.util.List;
 import java.util.Map;
 
 import helmsley.vr.DUIs.cuttingUIs;
+import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.proto.fileTransferClient;
 
 public class UIsController {
     public static Activity activity;
     final static String TAG = "UIsController";
     protected cuttingUIs cuttingController;
+    protected dialogUIs dialogController;
     // UIs
     public static TextView FPSlabel, toggleValueTex;
 
@@ -36,7 +43,6 @@ public class UIsController {
     private SeekBar seekbar_top;
     private Switch switch_widget;
 
-    private static fileTransferClient downloader;
     private static boolean first_time=true;
 
     private View toggle_panel;
@@ -81,10 +87,12 @@ public class UIsController {
 
     public UIsController(final Activity activity_) {
         activity = activity_;
+        dialogController = new dialogUIs(activity_);
         cuttingController = new cuttingUIs(activity_);
         SetupDefaultInitialSetting();
         Initialize();
     }
+
     private void SetupDefaultInitialSetting(){
         entry_has_sub_arrs = Arrays.asList(activity.getResources().getStringArray(R.array.entry_has_sub));
 
@@ -259,10 +267,7 @@ public class UIsController {
         }
     }
     public static void debug_create_downloader(){
-        if(first_time)
-            downloader = new fileTransferClient("137.110.112.178","23333");
-        downloader.Run();
-        first_time = false;
+
     }
     public void updateFPS(){
         activity.runOnUiThread(new Runnable()  {

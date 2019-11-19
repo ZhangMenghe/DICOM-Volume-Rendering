@@ -6,8 +6,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+
 import java.util.List;
 
 import helmsley.vr.Utils.dcmImage;
@@ -38,7 +37,8 @@ public class MainActivity extends GLActivity {
 //        downloader = new fileTransferClient("137.110.112.178","23333");
     }
     protected boolean setupResource(){
-        super.setupResource();
+        //do nothing in this case
+//        super.setupResource();
 //        setupDCMI();
 //        downloader.Run();
         return true;
