@@ -7,6 +7,13 @@ option objc_class_prefix = "TRP";
 
 package helmsley;
 
+message datasetInfo{
+    string folder_name = 1;
+    string patient_name = 2;
+    string date = 3;
+    int32 file_nums = 4;
+}
+
 message dcmImage{
     int32 dcmID = 1;
     float position = 2;
@@ -32,6 +39,7 @@ message Response{
 }
 
 service dataTransfer{
+    rpc getAvailableDatasetInfos(Request) returns(stream datasetInfo);
     rpc getConfig(Request) returns(bundleConfig);
-    rpc Download(Request) returns (stream dcmImage);
+    rpc Download(Request) returns(stream dcmImage);
 }

@@ -1,0 +1,33 @@
+<LinearLayout android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <EditText
+            android:id="@+id/host_edit_text"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:hint="Enter Host" />
+        <!-- Right side spacer -->
+        <EditText
+            android:id="@+id/port_edit_text"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:hint="Enter Port" />
+    </LinearLayout>
+    <Button
+        android:id="@+id/connect_req_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="Send Grpc Request" />
+    <TextView
+        android:id="@+id/grpc_err_msg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scrollbars = "vertical"
+        android:textSize="16sp" />
+</LinearLayout>
