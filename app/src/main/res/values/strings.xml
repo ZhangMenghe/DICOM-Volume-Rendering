@@ -23,4 +23,5 @@
 
     <string name="dialog_connect_title">Connect to Server</string>
     <string name="dialog_select_title">Select a Dataset</string>
+    <string name="dialog_progress_title">Loading...</string>
 </resources>

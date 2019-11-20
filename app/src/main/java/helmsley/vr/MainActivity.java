@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
 import java.util.List;
 
+import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.Utils.dcmImage;
 import helmsley.vr.Utils.fileUtils;
 
@@ -62,7 +63,7 @@ public class MainActivity extends GLActivity {
     }
     @Override
     protected void updateOnFrame(){
-        if(fileTransferClient.finished) {JNIInterface.JNIAssembleVolume();fileTransferClient.finished=false;}
+        if(fileTransferClient.finished) {JNIInterface.JNIAssembleVolume(); dialogUIs.FinishProgress(); fileTransferClient.finished=false;}
         super.updateOnFrame();
         uiController.updateFPS();
     }
