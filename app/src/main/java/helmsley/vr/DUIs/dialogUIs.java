@@ -2,6 +2,7 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -28,12 +29,11 @@ public class dialogUIs {
     private TextView errText;
     private Button sendButton;
 
-    private static AlertDialog download_dialog;
+    private static AlertDialog download_dialog, progress_dialog;
 //    private ArrayList<datasetInfo> data_info_lst;
     public dialogUIs(final Activity activity_){
         activity = activity_;
         SetupConnectDialog();
-
     }
     private void SetupConnectDialog(){
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
@@ -103,6 +103,20 @@ public class dialogUIs {
         download_dialog.show();
 
     }
+    private static void SetupProgressDialog(String info){
+        final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
+        final View dialogView = LayoutInflater.from(activity).inflate(R.layout.progress_dialog, null);
+        layoutDialog_builder.setTitle(activity.getString(R.string.dialog_progress_title));
+        layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
+        layoutDialog_builder.setView(dialogView);
+
+        TextView tv = dialogView.findViewById(R.id.textProgressInfo);
+        tv.setText(info);
+
+        progress_dialog = layoutDialog_builder.create();
+        progress_dialog.setCanceledOnTouchOutside(false);
+        progress_dialog.show();
+    }
 
     private boolean SetupDownloader(String host, String port){
         downloader = new fileTransferClient();//new fileTransferClient(host, port);
@@ -119,5 +133,7 @@ public class dialogUIs {
     public static void Download(String folder_name){
         downloader.Download(folder_name);
         download_dialog.dismiss();
+        SetupProgressDialog(folder_name);
     }
+    public static void FinishProgress(){progress_dialog.dismiss();}
 }
