@@ -18,9 +18,11 @@ private:
     GLuint frame_buff_ = 0;
     GLuint vao_slice = 0;
     bool DRAW_BAKED;
+    bool b_init_successful = false;
 
     //for screen baking
     bool baked_dirty_ = true;
+    void init_vertices();
     void two_pass_draw();
     void draw_scene();
 

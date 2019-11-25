@@ -6,7 +6,18 @@
 
 texvrRenderer::texvrRenderer(bool screen_baked)
 :DRAW_BAKED(screen_baked){
+    //program
+    shader_ = new Shader();
+    if(!shader_->AddShaderFile(GL_VERTEX_SHADER,"shaders/textureVolume.vert")
+       ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/textureVolume.frag")
+       ||!shader_->CompileAndLink())
+        LOGE("TextureBas===Failed to create texture based shader program===");
+    onCuttingChange(.0f);
+}
+void texvrRenderer::init_vertices(){
     dimensions = int(vrController::VOLUME_DIMS * DENSE_FACTOR);
+    if(dimensions == 0) return;
+
     dimension_inv = 1.0f / dimensions;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
@@ -46,14 +57,7 @@ texvrRenderer::texvrRenderer(bool screen_baked)
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute.
-
-    //program
-    shader_ = new Shader();
-    if(!shader_->AddShaderFile(GL_VERTEX_SHADER,"shaders/textureVolume.vert")
-       ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/textureVolume.frag")
-       ||!shader_->CompileAndLink())
-        LOGE("TextureBas===Failed to create texture based shader program===");
-    onCuttingChange(.0f);
+    b_init_successful = true;
 }
 void texvrRenderer::draw_scene(){
     glEnable(GL_BLEND);
@@ -89,6 +93,7 @@ void texvrRenderer::draw_scene(){
     }
 }
 void texvrRenderer::Draw(){
+    if(!b_init_successful) init_vertices();
     if(DRAW_BAKED) {two_pass_draw(); return;}
     draw_scene();
 }
