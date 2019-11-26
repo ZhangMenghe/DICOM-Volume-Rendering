@@ -55,7 +55,7 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
 //    delete[]data;
     if(b_pre_load){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-        vrc->assembleTexture(g_VolumeTexData, g_img_w, g_img_h, g_vol_dim, CHANEL_NUM);
+        vrc->assembleTexture(g_VolumeTexData);
     }
     nativeApp(nativeAddr)->onViewCreated();
 }
@@ -206,11 +206,11 @@ JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, j
 
     //todo: send dim to native
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-    vrc->setVolumeConfig(width, height,dims, CHANEL_NUM);
+    vrc->setVolumeConfig(width, height, dims, CHANEL_NUM);
 }
 JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-    vrc->assembleTexture(g_VolumeTexData, g_img_w, g_img_h, g_vol_dim, CHANEL_NUM);
+    vrc->assembleTexture(g_VolumeTexData);
 }
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
     jbyteArray gdata = env->NewByteArray(g_vol_len);
