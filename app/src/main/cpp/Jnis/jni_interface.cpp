@@ -180,17 +180,12 @@ JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jfloat pos, jbyteA
     }
 
     GLubyte* buffer = g_VolumeTexData+id*g_ssize;
-
-    int given_channel_num =  env->GetArrayLength(data) * CHANEL_NUM / g_ssize;
-
     int x, y, idx = 0;
-    for(int offset = 0; offset<given_channel_num; offset++){
-        int offset_img = offset * g_ssize_schanel;
-        for (y = 0; y < g_img_h; y++) {
-            for (x = 0; x < g_img_w; x++) {
-                buffer[CHANEL_NUM* idx + offset] = GLubyte(c_array[offset_img+ idx]);
-                idx++;
-            }
+    for (y = 0; y < g_img_h; y++) {
+        for (x = 0; x < g_img_w; x++) {
+            buffer[CHANEL_NUM* idx] = GLubyte(c_array[2*idx]);
+            buffer[CHANEL_NUM* idx + 1] = GLubyte(c_array[2*idx+1]);
+            idx++;
         }
     }
 }
@@ -206,7 +201,7 @@ JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, j
 
     //todo: send dim to native
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-    vrc->setVolumeConfig(width, height, dims, CHANEL_NUM);
+    vrc->setVolumeConfig(width, height, dims);
 }
 JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));

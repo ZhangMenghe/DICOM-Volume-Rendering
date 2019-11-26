@@ -61,8 +61,6 @@ uvec3 transfer_scheme(float gray){
 }
 uvec4 Sample(ivec3 pos){
     uint value = imageLoad(srcTex, pos).r;
-    //upper part as mask
-    uint mask = value>>16;
     //lower part as color
     uvec4 color = uvec4(uvec3(value&uint(0xffff)), 255);
     CURRENT_INTENSITY = float(color.r) * 0.003921;
@@ -71,7 +69,10 @@ uvec4 Sample(ivec3 pos){
 //    #elif defined MASKON
 //        if(sc.g > 0.01) color.gb = vec2(.0);
     #endif
+
     #ifdef ORGANS_ONLY
+        //upper part as mask
+        uint mask = value>>16;
         color.a*=(mask>> uint(0)) & uint(1);
     #endif
     return color;

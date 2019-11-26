@@ -22,7 +22,7 @@ public:
     static std::unordered_map<std::string, bool > param_bool_map;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
-    static glm::uvec4 VOL_DIMS;
+    static glm::uvec3 VOL_DIMS;
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
 
@@ -36,7 +36,8 @@ public:
 
     vrController(AAssetManager *assetManager);
     void assembleTexture(GLubyte * data);
-    void setVolumeConfig(int width, int height, int dims, const int channel_num);
+    void assembleTextureMask(uint16_t* mask);
+    void setVolumeConfig(int width, int height, int dims);
     void onViewCreated();
     void onViewChange(int width, int height);
     void onDraw();
@@ -59,9 +60,9 @@ private:
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f,0.5f);
 
     bool volume_model_dirty = true;
-
-
     Shader* bakeShader_ = nullptr;
+
+    uint32_t* vol_data = nullptr;
 
     void updateVolumeModelMat(){
         ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
