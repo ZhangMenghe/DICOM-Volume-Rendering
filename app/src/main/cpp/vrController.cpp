@@ -12,12 +12,12 @@ std::unordered_map<std::string, bool > vrController::param_bool_map;
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
 glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
+glm::uvec4 vrController::VOL_DIMS = glm::uvec4(0);
 bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true;
 
 glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
 float vrController::csphere_radius = 0.5f;
 bool vrController::cutDirty = true;
-int vrController::VOLUME_DIMS = 0;
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -31,35 +31,31 @@ vrController::vrController(AAssetManager *assetManager):
     updateVolumeModelMat();
 }
 
-void vrController::assembleTexture(GLubyte * data, int width, int height, int depth, const int channel_num){
-    switch(channel_num){
+void vrController::setVolumeConfig(int width, int height, int dims, const int channel_num){
+    VOL_DIMS = glm::vec4(width, height, dims, channel_num);
+}
+void vrController::assembleTexture(GLubyte * data){
+    switch(VOL_DIMS.w){
         case 1:
-            tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth, data);
+            tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
             break;
         case 2:
-            tex_volume = new Texture(GL_RG8, GL_RG, GL_UNSIGNED_BYTE, width, height, depth, data);
+            tex_volume = new Texture(GL_RG8, GL_RG, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
             break;
         case 4:
-            tex_volume = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, data);
+            tex_volume = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
             break;
         default:
-            tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, width, height, depth, data);
+            tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
             break;
     }
 
-    int vsize= width* height* depth;
-    GLbyte * vdata = new GLbyte[vsize * 4];
-    memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
-    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, vdata);
-    ray_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, width, height, depth, vdata);
+    auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
+    auto * vdata = new GLubyte[vsize * 4];
+    memset(vdata, 0xff, vsize * 4 * sizeof(GLubyte));
+    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vdata);
+    ray_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vdata);
     delete[]vdata;
-}
-void vrController::setVolumeConfig(int width, int height, int dims, const int channel_num){
-    VOLUME_DIMS = dims;
-    //todo
-}
-void vrController::assembleTexture(GLubyte * data){
-    //todo
 }
 
 void vrController::onViewCreated(){

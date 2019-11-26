@@ -15,7 +15,7 @@ texvrRenderer::texvrRenderer(bool screen_baked)
     onCuttingChange(.0f);
 }
 void texvrRenderer::init_vertices(){
-    dimensions = int(vrController::VOLUME_DIMS * DENSE_FACTOR);
+    dimensions = int(vrController::VOL_DIMS.z * DENSE_FACTOR);
     if(dimensions == 0) return;
 
     dimension_inv = 1.0f / dimensions;

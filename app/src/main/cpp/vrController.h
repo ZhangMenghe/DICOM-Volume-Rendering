@@ -22,11 +22,11 @@ public:
     static std::unordered_map<std::string, bool > param_bool_map;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
+    static glm::uvec4 VOL_DIMS;
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
-    static int VOLUME_DIMS;
-    inline static bool isRayCasting(){return param_bool_map["raycast"];}
 
+    inline static bool isRayCasting(){return param_bool_map["raycast"];}
 
     static glm::vec3 csphere_c;
     static float csphere_radius;
@@ -35,7 +35,6 @@ public:
     static vrController* instance();
 
     vrController(AAssetManager *assetManager);
-    void assembleTexture(GLubyte * data, int width, int height, int depth, const int channel_num);
     void assembleTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims, const int channel_num);
     void onViewCreated();
