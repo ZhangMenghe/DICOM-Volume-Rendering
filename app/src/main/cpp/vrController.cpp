@@ -42,9 +42,17 @@ void vrController::assembleTexture(GLubyte * data){
         case 2:
             tex_volume = new Texture(GL_RG8, GL_RG, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
             break;
-        case 4:
-            tex_volume = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
+        case 4:{
+//            tex_volume = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
+            auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
+            auto * vdata = new uint32_t[vsize];
+
+            for(auto i=0; i<vsize; i++) vdata[i] = uint32_t (data[4*i]);
+            tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vdata);
+            auto* vdata2 = new uint16_t[vsize * 4];
+            ray_baked = new Texture(GL_RGBA16UI, GL_RGBA_INTEGER, GL_UNSIGNED_SHORT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vdata2);
             break;
+        }
         default:
             tex_volume = new Texture(GL_R8, GL_RED, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, data);
             break;
@@ -54,7 +62,6 @@ void vrController::assembleTexture(GLubyte * data){
     auto * vdata = new GLubyte[vsize * 4];
     memset(vdata, 0xff, vsize * 4 * sizeof(GLubyte));
     tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vdata);
-    ray_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vdata);
     delete[]vdata;
 }
 
@@ -158,9 +165,9 @@ void vrController::precompute(){
     else bakeShader_->DisableKeyword("ORGANS_ONLY");
 
     GLuint sp = bakeShader_->Use();
-    glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);//GL_RGBA16UI);//GL_RGBA8);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glBindImageTexture(2, ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(2, ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16UI);//GL_RGBA16UI);//GL_RGBA8);
 
     if(isRayCasting())
         raycastRenderer_->updatePrecomputation(sp);
@@ -170,9 +177,9 @@ void vrController::precompute(){
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);//GL_RGBA16UI);//GL_RGBA8);
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16UI);//GL_RGBA16UI);//GL_RGBA8);
 
     bakeShader_->UnUse();
     baked_dirty_ = false;

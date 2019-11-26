@@ -8,7 +8,7 @@
 precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
-layout(binding = 0, rgba8)readonly uniform mediump image3D srcTex;
+layout(binding = 0, rgba16ui)readonly uniform mediump uimage3D srcTex;
 layout(binding = 1, rgba8)writeonly uniform mediump image2D destTex;
 
 uniform vec2 u_con_size;
@@ -54,7 +54,8 @@ bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
 
 vec4 Sample(vec3 p){
     vec3 coord = clamp(p, vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
-    return imageLoad(srcTex, ivec3(VolumeSize *coord));
+    uvec4 ucolor = imageLoad(srcTex, ivec3(VolumeSize *coord));
+    return vec4(ucolor)/ 256.0;
 }
 vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
     float t0 = t - StepSize * 4.0;
