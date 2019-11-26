@@ -31,7 +31,8 @@ namespace {
     //globally
     GLubyte* g_VolumeTexData = nullptr;
     int g_img_h, g_img_w, g_vol_dim;
-    size_t g_ssize_schanel, g_ssize = 0;
+    size_t g_ssize_schanel, g_ssize = 0, g_vol_len;
+    bool b_pre_load = false;
 }
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     AAssetManager * cpp_asset_manager = AAssetManager_fromJava(env, asset_manager);
@@ -52,6 +53,10 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
 //
 //    vrc->assembleTexture(data, img_width, img_height, dimensions, CHANEL_NUM);
 //    delete[]data;
+    if(b_pre_load){
+        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+        vrc->assembleTexture(g_VolumeTexData, g_img_w, g_img_h, g_vol_dim, CHANEL_NUM);
+    }
     nativeApp(nativeAddr)->onViewCreated();
 }
 
@@ -167,8 +172,13 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jclass , jobjectArray img_arr, job
 
 JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jfloat pos, jbyteArray data){
     if(!g_VolumeTexData) return; //check initialization
-
     jbyte *c_array = env->GetByteArrayElements(data, 0);
+    if(id == -1){
+        memcpy(g_VolumeTexData, c_array, g_vol_len*sizeof(GLubyte));
+        b_pre_load = true;
+        return;
+    }
+
     GLubyte* buffer = g_VolumeTexData+id*g_ssize;
 
     int given_channel_num =  env->GetArrayLength(data) * CHANEL_NUM / g_ssize;
@@ -183,7 +193,6 @@ JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jfloat pos, jbyteA
             }
         }
     }
-
 }
 
 JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, jint dims){
@@ -191,8 +200,9 @@ JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, j
     g_ssize_schanel = width * height;
     g_vol_dim = dims;
     g_ssize = CHANEL_NUM * g_ssize_schanel;
-    g_VolumeTexData = new GLubyte[ g_ssize* dims];
-    memset(g_VolumeTexData, 0x00, g_ssize * dims * sizeof(GLubyte));
+    g_vol_len = g_ssize* dims;
+    g_VolumeTexData = new GLubyte[ g_vol_len];
+    memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
 
     //todo: send dim to native
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
@@ -201,4 +211,9 @@ JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, j
 JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
     vrc->assembleTexture(g_VolumeTexData, g_img_w, g_img_h, g_vol_dim, CHANEL_NUM);
+}
+JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
+    jbyteArray gdata = env->NewByteArray(g_vol_len);
+    env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
+    return gdata;
 }

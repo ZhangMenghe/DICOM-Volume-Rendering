@@ -2,23 +2,29 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
 
@@ -33,9 +39,52 @@ public class dialogUIs {
 //    private ArrayList<datasetInfo> data_info_lst;
     public dialogUIs(final Activity activity_){
         activity = activity_;
-        SetupConnectDialog();
+        if(LoadCachedData("dicom_sample")) return;
+        SetupConnect();
     }
-    private void SetupConnectDialog(){
+
+    public boolean LoadCachedData(String folder_name){
+        if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_loadcache))) return false;
+        String target_cached_folder_path = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
+        //check exists
+        File destDir = new File(target_cached_folder_path);
+        if(!destDir.exists()) return false;
+        ArrayList<String> config_lines = new ArrayList<>();
+        //config
+        try{
+            InputStream inputStream = new FileInputStream(Paths.get(target_cached_folder_path, folder_name, activity.getString(R.string.cf_config_name)).toString());//target_cached_folder_path + "/sample/config");
+
+            if ( inputStream != null ) {
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+                String receiveString = "";
+
+                while ( (receiveString = bufferedReader.readLine()) != null ) config_lines.add(receiveString);
+                inputStream.close();
+            }
+        }catch (FileNotFoundException e) {
+            Log.e(TAG, "===File not found: " + e.toString());
+            return false;
+        } catch (IOException e) {
+            Log.e(TAG, "===Can not read file: " + e.toString());
+            return false;
+        }
+        if(config_lines.size() < 4) return false;
+        JNIInterface.JNIsetupDCMIConfig(Integer.parseInt(config_lines.get(2)), Integer.parseInt(config_lines.get(3)), Integer.parseInt(config_lines.get(1)));
+
+
+        Path dcm_img = Paths.get(target_cached_folder_path, folder_name, activity.getString(R.string.cf_dcmfolder_name));
+        try{
+            byte[] content = Files.readAllBytes(dcm_img);
+            JNIInterface.JNIsendDCMImg(-1, .0f, content);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+    public void SetupConnect(){
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, null);
         //widgets
@@ -119,7 +168,7 @@ public class dialogUIs {
     }
 
     private boolean SetupDownloader(String host, String port){
-        downloader = new fileTransferClient();//new fileTransferClient(host, port);
+        downloader = new fileTransferClient(activity);//new fileTransferClient(host, port);
 
         String res_msg = downloader.Setup(host, port);
         if(res_msg.equals(""))
