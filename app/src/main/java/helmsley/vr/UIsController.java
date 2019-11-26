@@ -57,13 +57,13 @@ public class UIsController {
     //Important! Order matters!!Align with the resource file
     public static Map<Integer, Pair<String,?>[] > ui_map= new HashMap<Integer, Pair<String,?>[]>() {{
         put(R.array.t1Arr, new Pair[] {new Pair("Opacity", -1.0f)});
-        put(R.array.t2Arr, new Pair[] {new Pair("samplestep", 400.0f), new Pair("threshold", 0.6f), new Pair("brightness", 300.0f)});
+        put(R.array.t2Arr, new Pair[] {new Pair("samplestep", 400.0f), new Pair("threshold", 1.0f), new Pair("brightness", 600.0f)});
         put(R.array.opacityArr, new Pair[] {new Pair("overall", 1.0f), new Pair("lowbound", 1.0f), new Pair("cutoff", .0f)});
         put(R.array.switchArr, new Pair[] {new Pair("colortrans", false),new Pair("raycast", true), new Pair("cutting", false), new Pair("maskon", false), new Pair("accumulate", false)});
         put(R.array.bottomArr, new Pair[] {new Pair("cutting", .0f)});
     }};
     public static Map<String, Pair<Float, Integer>> toggle_max_map = new HashMap<String, Pair<Float, Integer>>(){{
-        put("samplestep", new Pair(800.0f, 800)); put("threshold", new Pair(2.0f, 50)); put("brightness", new Pair(500.0f, 500)); put("cutting", new Pair(1.0f, 50));
+        put("samplestep", new Pair(800.0f, 800)); put("threshold", new Pair(2.0f, 50)); put("brightness", new Pair(1500.0f, 500)); put("cutting", new Pair(1.0f, 50));
     }};
     final private static Pair<Float, Integer> toggle_max_sub_pair = new Pair(1.0f, 50);
 
