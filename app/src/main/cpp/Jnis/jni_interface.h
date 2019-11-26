@@ -18,6 +18,8 @@ JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint, jint, jint);
 
 JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass);
 
+JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv*, jclass);
+
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass);
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv * env, jclass);

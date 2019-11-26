@@ -15,4 +15,5 @@ public class JNIInterface {
     public static native void JNIsendDCMImg(int idx, float position, byte[] data);
     public static native void JNIsetupDCMIConfig(int width, int height, int dims);
     public static native void JNIAssembleVolume();
+    public static native byte[] JNIgetVolumeData();
 }
