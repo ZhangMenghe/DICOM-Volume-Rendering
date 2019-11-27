@@ -135,6 +135,7 @@ public class UIsController {
             spinner_toggle_sub.setVisibility(View.VISIBLE);
             spinner_toggle_arr2.setVisibility(View.GONE);
             current_toggle_id = R.array.t1Arr;
+            //todo:java.lang.ArrayIndexOutOfBoundsException: length=1; index=1
             update_toggle_item_display(-1);
         }
     }

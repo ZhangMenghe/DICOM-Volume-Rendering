@@ -24,6 +24,7 @@
     <string name="cf_cache_folder_name">helmsley_cached</string>
     <string name="cf_config_name">config</string>
     <string name="cf_dcmfolder_name">data</string>
+    <string name="cf_dcmmask_name">mask</string>
 
     <string name="dialog_connect_title">Connect to Server</string>
     <string name="dialog_select_title">Select a Dataset</string>

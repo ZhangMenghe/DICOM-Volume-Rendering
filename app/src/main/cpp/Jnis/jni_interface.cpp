@@ -30,6 +30,7 @@ namespace {
 
     //globally
     GLubyte* g_VolumeTexData = nullptr;
+    uint16_t* g_VolumeMaskData = nullptr;
     int g_img_h, g_img_w, g_vol_dim;
     size_t g_ssize_schanel, g_ssize = 0, g_vol_len;
     bool b_pre_load = false;
@@ -189,6 +190,26 @@ JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jfloat pos, jbyteA
         }
     }
 }
+JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv* env, jclass, jint id,  jfloat pos, jbyteArray data){
+    auto g_mask_size = g_img_w * g_img_h * g_vol_dim;
+    if(!g_VolumeMaskData) g_VolumeMaskData = new uint16_t[g_mask_size];
+
+    jbyte *c_array = env->GetByteArrayElements(data, 0);
+
+    if(id == -1){
+        memcpy(g_VolumeMaskData, c_array, g_mask_size*sizeof(uint16_t));
+    }else{
+        uint16_t* buffer = g_VolumeMaskData+id*g_ssize_schanel;
+        for(int i=0 ;i<g_ssize_schanel; i++){
+            buffer[i] = uint16_t ((((uint16_t)c_array[2*i + 1])<<8)+c_array[2*i]);
+        }
+    }
+
+    if(id == -1 || id == (g_vol_dim - 1)){
+        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+        vrc->assembleTextureMask(g_VolumeMaskData);
+    }
+}
 
 JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, jint dims){
     g_img_h = height; g_img_w = width;
@@ -207,7 +228,13 @@ JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
     vrc->assembleTexture(g_VolumeTexData);
 }
-JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
+JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass, jboolean b_getmask){
+    if(b_getmask){
+        auto msize = g_ssize_schanel * g_vol_dim;
+        jbyteArray gdata = env->NewByteArray(msize);
+        env->SetByteArrayRegion(gdata,0,msize, reinterpret_cast<jbyte*>(g_VolumeMaskData));
+        return gdata;
+    }
     jbyteArray gdata = env->NewByteArray(g_vol_len);
     env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
     return gdata;

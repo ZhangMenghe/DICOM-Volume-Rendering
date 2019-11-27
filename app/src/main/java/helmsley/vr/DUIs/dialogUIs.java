@@ -44,6 +44,7 @@ public class dialogUIs {
     }
 
     public boolean LoadCachedData(String folder_name){
+//            throws FileNotFoundException, IOException{
         if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_loadcache))) return false;
         String target_cached_folder_path = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
         //check exists
@@ -74,9 +75,28 @@ public class dialogUIs {
 
 
         Path dcm_img = Paths.get(target_cached_folder_path, folder_name, activity.getString(R.string.cf_dcmfolder_name));
+//        InputStream in = new FileInputStream(dcm_img.toString());
         try{
             byte[] content = Files.readAllBytes(dcm_img);
+//            byte[] content;
+//            byte[] buf = new byte[1024];
+//            int len;
+//            while ((len = in.read(buf)) > 0) {
+//
+//            }
             JNIInterface.JNIsendDCMImg(-1, .0f, content);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        Path dcm_mask = Paths.get(target_cached_folder_path, folder_name,activity.getString(R.string.cf_dcmmask_name));
+        if (!Files.exists(dcm_mask)) {
+            Log.e(TAG, "=====LoadCachedData: no masks" ); return true;
+        }
+        try{
+            byte[] content = Files.readAllBytes(dcm_mask);
+            JNIInterface.JNIsendDCMIMask(-1, .0f, content);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

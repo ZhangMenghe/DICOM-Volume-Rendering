@@ -42,4 +42,5 @@ service dataTransfer{
     rpc getAvailableDatasetInfos(Request) returns(stream datasetInfo);
     rpc getConfig(Request) returns(bundleConfig);
     rpc Download(Request) returns(stream dcmImage);
+    rpc DownloadMasks(Request) returns(stream dcmImage);
 }
