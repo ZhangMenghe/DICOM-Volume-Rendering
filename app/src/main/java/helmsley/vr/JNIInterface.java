@@ -13,7 +13,8 @@ public class JNIInterface {
 
     public static native void JNIsendDCMImgs(dcmImage img_arr[], Object mask_arr[], int size);
     public static native void JNIsendDCMImg(int idx, float position, byte[] data);
+    public static native void JNIsendDCMIMask(int idx, float position, byte[] data);
     public static native void JNIsetupDCMIConfig(int width, int height, int dims);
     public static native void JNIAssembleVolume();
-    public static native byte[] JNIgetVolumeData();
+    public static native byte[] JNIgetVolumeData(boolean b_getmask);
 }
