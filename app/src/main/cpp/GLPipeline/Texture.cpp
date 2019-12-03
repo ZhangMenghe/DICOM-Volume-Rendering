@@ -105,6 +105,14 @@ void Texture::initFBO(GLuint& fbo, Texture* colorTex, Texture* depthTex){
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 void Texture::Update(void* data){
-	if(mDepth) glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mWidth, mHeight, mFormat, mType, data);
-	else glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, mWidth, mHeight, mDepth, mFormat, mType, data);
+	if(mDepth){
+		glBindTexture(GL_TEXTURE_3D, mTexture);
+		glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, mWidth, mHeight, mDepth, mFormat, mType, data);
+		glBindTexture(GL_TEXTURE_3D, 0);
+	}
+	else{
+		glBindTexture(GL_TEXTURE_2D, mTexture);
+		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, mWidth, mHeight, mFormat, mType, data);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
