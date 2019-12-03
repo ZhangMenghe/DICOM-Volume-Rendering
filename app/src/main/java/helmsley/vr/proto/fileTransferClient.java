@@ -251,14 +251,12 @@ public class fileTransferClient {
                     JNIInterface.JNIsendDCMIMask(id, len, chunk);
                     id++;
                 }
-//                JNIInterface.JNIAssembleMask();
                 return;
             }
             while ((len = instream.read(chunk)) != -1) {
                 JNIInterface.JNIsendDCMImg(id, len, chunk);
                 id++;
             }
-//            JNIInterface.JNIAssembleVolume();
     }
 
     private void saveLargeImageToFile(OutputStream ostream, byte[] data){

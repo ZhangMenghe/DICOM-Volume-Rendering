@@ -2,6 +2,8 @@
 #include "vrController.h"
 #include "dicomRenderer/Color.h"
 #include <AndroidUtils/mathUtils.h>
+#include <bitset>
+
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
 Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr; Texture* vrController::ray_baked = nullptr;
@@ -39,7 +41,11 @@ void vrController::assembleTexture(GLubyte * data){
 
     vol_data = new uint32_t[vsize];
     //fuse volume data
-    for(auto i=0; i<vsize; i++) vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
+    uint16_t tmp = 1;
+    for(auto i=0; i<vsize; i++) {
+        vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
+        vol_data[i] = uint32_t((((uint32_t)tmp)<<16)+vol_data[i]);
+    }
     tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vol_data);
 
     auto* rb_data = new uint16_t[vsize * 4];
@@ -51,15 +57,19 @@ void vrController::assembleTexture(GLubyte * data){
     delete[]tb_data;
 }
 void vrController::assembleTextureMask(uint16_t* mask){
+    uint16_t tmp = 1;
+
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     if(!vol_data)   vol_data = new uint32_t[vsize];
-    for(auto i=0; i<vsize; i++) vol_data[i] = uint32_t((((uint32_t)mask[i])<<16)+vol_data[i]);
-    tex_volume->Update(vol_data);
-    LOGE("=======cpp finish assembling mask");
-    if(vol_data){
-        delete[]vol_data;//todo:delete or not?
-        vol_data = nullptr;
-    }
+    for(auto i=0; i<vsize; i++) vol_data[i] = uint32_t((((uint32_t)tmp)<<16)+vol_data[i]);
+//    std::bitset<32> x(vol_data[0]);
+//    LOGE("=====bits: %s", x.to_string().c_str());
+//    tex_volume->Update(vol_data);
+//    LOGE("=======cpp finish assembling mask");
+//    if(vol_data){
+//        delete[]vol_data;//todo:delete or not?
+//        vol_data = nullptr;
+//    }
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
