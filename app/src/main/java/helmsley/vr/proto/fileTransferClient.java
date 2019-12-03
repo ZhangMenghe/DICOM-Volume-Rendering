@@ -9,11 +9,13 @@ import helmsley.vr.R;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
-
+import helmsley.vr.proto.datasetResponse.datasetInfo;
+import helmsley.vr.proto.volumeResponse.volumeInfo;
 import java.io.*;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
@@ -22,11 +24,9 @@ public class fileTransferClient {
     public static boolean finished = false;
 
     private ManagedChannel mChannel;
-//    private final dataTransferGrpc.dataTransferStub mAsyncStub;
-//    private final fileChunkerGrpc.fileChunkerBlockingStub mBlockStub;
 
     public final int CLIENT_ID = 1;
-    private ArrayList<datasetInfo> data_info_lst;
+    private String target_ds, target_vol;
 
     private final WeakReference<Activity> activityReference;
 
@@ -36,7 +36,6 @@ public class fileTransferClient {
     public String Setup(String host, String portStr){
         try{
             mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
-            data_info_lst = getAvailableDatasetInfos();
             return "";
         }catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -46,48 +45,46 @@ public class fileTransferClient {
             return String.format("Failed... : %n%s", sw);
         }
     }
-    public ArrayList<datasetInfo> getAvailableDataset(){
-        return data_info_lst;
-    }
-    private ArrayList<datasetInfo> getAvailableDatasetInfos(){
-        ArrayList<datasetInfo> data_arr = new ArrayList<>();
-        Request req = Request.newBuilder().setClientId(1).build();
+    public List<datasetInfo> getAvailableDataset(){
+        Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
         dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-        Iterator<datasetInfo> info_itr = blockingStub.getAvailableDatasetInfos(req);
-        while(info_itr.hasNext())
-            data_arr.add(info_itr.next());
-        for(datasetInfo info:data_arr)
-            Log.e(TAG, "getAvailableDatasetInfos: " + info.getFolderName() );
-        return data_arr;
+        return blockingStub.getAvailableDatasets(req).getDatasetsList();
     }
-    public void Download(String folder_name){
-        new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(folder_name);
-    }
-    public void DownloadMasks(String folder_name){
-        new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(folder_name);
-    }
-    public void SaveDatasetToFile(bundleConfig config_, String target_path, String folder_name, String config_name, String data_name)
-            throws IOException {
-        String targetLocation = target_path + "/"+folder_name;
-        File destDir = new File(targetLocation);
-        if(!destDir.exists()) destDir.mkdirs();
 
-        OutputStream out_config = new FileOutputStream(targetLocation + "/" + config_name);
-        OutputStreamWriter config_writer = new OutputStreamWriter(out_config);
-        //save config
-        String content = config_.getFolderName() + "\n"
-                +config_.getFileNums() + "\n"
-                +config_.getImgHeight() + "\n"
-                +config_.getImgWidth();
-        config_writer.write(content);
-        config_writer.close();
-        out_config.close();
-
-        String targetLocation_img = targetLocation + "/" + data_name;
-        OutputStream out_img = new FileOutputStream(targetLocation_img);
-        out_img.write(JNIInterface.JNIgetVolumeData(false));
-        out_img.close();
+    public List<volumeInfo> requestVolumesFromDataset(String dataset_name){
+        target_ds = dataset_name;
+        Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(target_ds).build();
+        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+        return blockingStub.getVolumeFromDataset(req).getVolumesList();
     }
+    public void Download(String target_volume){
+        new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds, target_volume).toString());
+    }
+    public void DownloadMasks(String target_volume){
+        new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(Paths.get(target_ds, target_volume).toString());
+    }
+//    public void SaveDatasetToFile(bundleConfig config_, String target_path, String folder_name, String config_name, String data_name)
+//            throws IOException {
+//        String targetLocation = target_path + "/"+folder_name;
+//        File destDir = new File(targetLocation);
+//        if(!destDir.exists()) destDir.mkdirs();
+//
+//        OutputStream out_config = new FileOutputStream(targetLocation + "/" + config_name);
+//        OutputStreamWriter config_writer = new OutputStreamWriter(out_config);
+//        //save config
+//        String content = config_.getFolderName() + "\n"
+//                +config_.getFileNums() + "\n"
+//                +config_.getImgHeight() + "\n"
+//                +config_.getImgWidth();
+//        config_writer.write(content);
+//        config_writer.close();
+//        out_config.close();
+//
+//        String targetLocation_img = targetLocation + "/" + data_name;
+//        OutputStream out_img = new FileOutputStream(targetLocation_img);
+//        out_img.write(JNIInterface.JNIgetVolumeData(false));
+//        out_img.close();
+//    }
 
     public void SaveImagesToFile(String target_path, String folder_name, String data_name, boolean b_mask)throws IOException {
         String targetLocation = target_path + "/"+folder_name;
@@ -96,12 +93,12 @@ public class fileTransferClient {
         out_img.write(JNIInterface.JNIgetVolumeData(b_mask));
         out_img.close();
     }
+
     private static class GrpcTask extends AsyncTask<String, Void, String> {
         private final GrpcRunnable grpcRunnable;
         private final ManagedChannel channel;
         private final WeakReference<fileTransferClient> activityReference;
         private String folder_name;
-
 
         GrpcTask(GrpcRunnable grpcRunnable, ManagedChannel channel, fileTransferClient activity) {
             this.grpcRunnable = grpcRunnable;
@@ -140,18 +137,10 @@ public class fileTransferClient {
         void onPostExecute(fileTransferClient activity);
     }
     private static class DownloadDICOMRunnable implements GrpcRunnable{
-        private bundleConfig dataset_config;
-        private String folder_name_;
         @Override
-        public String run(String folder_name, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
+        public String run(String folder_path, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
-            folder_name_ = folder_name;
-            Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_name).build();
-            dataset_config =  blockingStub.getConfig(req);
-            Log.e(TAG, "===returned configs: " + dataset_config.getFolderName() + "nums:" + dataset_config.getFileNums());
-
-            JNIInterface.JNIsetupDCMIConfig(dataset_config.getImgWidth(), dataset_config.getImgHeight(), dataset_config.getFileNums());
-
+            Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_path).build();
             Iterator<dcmImage> dcm_img_iterator;
             dcm_img_iterator = blockingStub.download(req);
             while(dcm_img_iterator.hasNext()){
@@ -164,7 +153,7 @@ public class fileTransferClient {
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
-            activity.saveResults(folder_name_, dataset_config);
+            activity.saveResults();
             //todo
 
 //            activity.DownloadMasks(folder_name_);
@@ -216,20 +205,22 @@ public class fileTransferClient {
             }
         }
     }
-    private void saveResults(String folder_name, bundleConfig config){
-        Activity activity = activityReference.get();
-        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
-            try{
-                SaveDatasetToFile(
-                        config,
-                        activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name),
-                        folder_name,
-                        activity.getString(R.string.cf_config_name),
-                        activity.getString(R.string.cf_dcmfolder_name));
-            }catch (Exception e){
-                Log.e(TAG, "====Failed to Save Results to file");
-            }
-        }
+    private void saveResults(){
+        //todo: save results
+
+//        Activity activity = activityReference.get();
+//        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
+//            try{
+//                SaveDatasetToFile(
+//                        config,
+//                        activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name),
+//                        folder_name,
+//                        activity.getString(R.string.cf_config_name),
+//                        activity.getString(R.string.cf_dcmfolder_name));
+//            }catch (Exception e){
+//                Log.e(TAG, "====Failed to Save Results to file");
+//            }
+//        }
         finished = true;
     }
 
