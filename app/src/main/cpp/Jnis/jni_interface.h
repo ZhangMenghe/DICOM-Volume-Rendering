@@ -12,7 +12,7 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager);
 
 JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv*, jclass,  jobjectArray, jobjectArray, jint);
 
-JNI_METHOD(void, JNIsendDCMImg)(JNIEnv*, jclass, jint,  jfloat, jbyteArray);
+JNI_METHOD(void, JNIsendDCMImg)(JNIEnv*, jclass, jint, jint, jbyteArray);
 
 JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv*, jclass, jint,  jfloat, jbyteArray);
 

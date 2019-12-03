@@ -26,16 +26,24 @@ public class fileTransferClient {
     private ManagedChannel mChannel;
 
     public final int CLIENT_ID = 1;
-    private String target_ds, target_vol;
+    private String target_ds;
+    private volumeInfo target_vol;
 
     private final WeakReference<Activity> activityReference;
+    private final String target_root_dir;
+    private List<datasetInfo> available_remote_datasets;
 
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
+        target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
     }
     public String Setup(String host, String portStr){
         try{
             mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
+            Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
+            dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+            available_remote_datasets =  blockingStub.getAvailableDatasets(req).getDatasetsList();
+
             return "";
         }catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -46,9 +54,7 @@ public class fileTransferClient {
         }
     }
     public List<datasetInfo> getAvailableDataset(){
-        Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
-        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-        return blockingStub.getAvailableDatasets(req).getDatasetsList();
+        return available_remote_datasets;
     }
 
     public List<volumeInfo> requestVolumesFromDataset(String dataset_name){
@@ -57,41 +63,14 @@ public class fileTransferClient {
         dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
         return blockingStub.getVolumeFromDataset(req).getVolumesList();
     }
-    public void Download(String target_volume){
-        new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds, target_volume).toString());
+    public void Download(volumeInfo target_volume){
+        target_vol = target_volume;
+        if(!LoadCachedData())
+            new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds, target_volume.getFolderName()).toString());
     }
-    public void DownloadMasks(String target_volume){
-        new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(Paths.get(target_ds, target_volume).toString());
-    }
-//    public void SaveDatasetToFile(bundleConfig config_, String target_path, String folder_name, String config_name, String data_name)
-//            throws IOException {
-//        String targetLocation = target_path + "/"+folder_name;
-//        File destDir = new File(targetLocation);
-//        if(!destDir.exists()) destDir.mkdirs();
-//
-//        OutputStream out_config = new FileOutputStream(targetLocation + "/" + config_name);
-//        OutputStreamWriter config_writer = new OutputStreamWriter(out_config);
-//        //save config
-//        String content = config_.getFolderName() + "\n"
-//                +config_.getFileNums() + "\n"
-//                +config_.getImgHeight() + "\n"
-//                +config_.getImgWidth();
-//        config_writer.write(content);
-//        config_writer.close();
-//        out_config.close();
-//
-//        String targetLocation_img = targetLocation + "/" + data_name;
-//        OutputStream out_img = new FileOutputStream(targetLocation_img);
-//        out_img.write(JNIInterface.JNIgetVolumeData(false));
-//        out_img.close();
-//    }
-
-    public void SaveImagesToFile(String target_path, String folder_name, String data_name, boolean b_mask)throws IOException {
-        String targetLocation = target_path + "/"+folder_name;
-        String targetLocation_img = targetLocation + "/" + data_name;
-        OutputStream out_img = new FileOutputStream(targetLocation_img);
-        out_img.write(JNIInterface.JNIgetVolumeData(b_mask));
-        out_img.close();
+    public void DownloadMasks(String target_path){
+        Log.e(TAG, "====DownloadMasks: " + target_path );
+        new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(target_path);
     }
 
     private static class GrpcTask extends AsyncTask<String, Void, String> {
@@ -137,40 +116,39 @@ public class fileTransferClient {
         void onPostExecute(fileTransferClient activity);
     }
     private static class DownloadDICOMRunnable implements GrpcRunnable{
+        private String target_path;
         @Override
         public String run(String folder_path, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
-            Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_path).build();
+            target_path = folder_path;
+            Request req = Request.newBuilder().setClientId(1).setReqMsg(target_path).build();
             Iterator<dcmImage> dcm_img_iterator;
             dcm_img_iterator = blockingStub.download(req);
             while(dcm_img_iterator.hasNext()){
                 dcmImage img = dcm_img_iterator.next();
                 //tackle with the image here
                 Log.e(TAG, "====img:" + img.getPosition() );
-                JNIInterface.JNIsendDCMImg(img.getDcmID(), img.getPosition(), img.getData().toByteArray());
+                JNIInterface.JNIsendDCMImg(img.getDcmID(), 0, img.getData().toByteArray());
             }
             return "===Success!\n";
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
-            activity.saveResults();
-            //todo
-
-//            activity.DownloadMasks(folder_name_);
+            activity.saveDCMIData();
+            //todo:ignore currently
+//            activity.DownloadMasks(target_path);
         }
     }
     private static class DownloadMasksRunnable implements GrpcRunnable{
-        private String folder_name_;
         @Override
         public String run(String folder_name, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
-            folder_name_ = folder_name;
-            Request req = Request.newBuilder().setClientId(1).build();
+            Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_name).build();
             StreamObserver<dcmImage> mask_observer = new StreamObserver<dcmImage>() {
                 @Override
                 public void onNext(dcmImage value) {
 //                    Log.e(TAG, "==========onNext: "+ value.getPosition() );
-                    JNIInterface.JNIsendDCMIMask(value.getDcmID(), value.getPosition(), value.getData().toByteArray());
+                    JNIInterface.JNIsendDCMIMask(value.getDcmID(), 0, value.getData().toByteArray());
                 }
 
                 @Override
@@ -188,42 +166,101 @@ public class fileTransferClient {
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
-            activity.SaveMasks(folder_name_);
+            activity.SaveMasks();
         }
     }
-    private void SaveMasks(String folder_name){
+
+    private void SaveMasks(){
+        File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
+        if(!destDir.exists()) destDir.mkdirs();
+
+        Activity activity = activityReference.get();
+        if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))) return;
+
+        try {
+            OutputStream out_data = new FileOutputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name)));
+            saveLargeImageToFile(out_data, JNIInterface.JNIgetVolumeData(true));
+        } catch (Exception e) {
+            Log.e(TAG, "====Failed to Save Masks to file");
+        }
+    }
+    private void saveDCMIData(){
         Activity activity = activityReference.get();
         if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
             try{
-                SaveImagesToFile(
-                        activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name),
-                        folder_name,
-                        activity.getString(R.string.cf_dcmmask_name),
-                        true);
+                File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
+                if(!destDir.exists()) destDir.mkdirs();
+
+
+                OutputStream out_config = new FileOutputStream(new File(destDir, activity.getString(R.string.cf_config_name)));
+                OutputStreamWriter config_writer = new OutputStreamWriter(out_config);
+                //save config
+                String content = target_vol.getFolderName() + "\n"
+                                +target_vol.getFileNums() + "\n"
+                                +target_vol.getImgHeight() + "\n"
+                                +target_vol.getImgWidth();
+                config_writer.write(content);
+                config_writer.close();
+                out_config.close();
+
+                OutputStream out_data = new FileOutputStream(new File(destDir, activity.getString(R.string.cf_dcm_name)));
+                saveLargeImageToFile(out_data, JNIInterface.JNIgetVolumeData(false));
             }catch (Exception e){
-                Log.e(TAG, "====Failed to Save Masks to file");
+                Log.e(TAG, "====Failed to Save Results to file");
             }
         }
-    }
-    private void saveResults(){
-        //todo: save results
-
-//        Activity activity = activityReference.get();
-//        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
-//            try{
-//                SaveDatasetToFile(
-//                        config,
-//                        activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name),
-//                        folder_name,
-//                        activity.getString(R.string.cf_config_name),
-//                        activity.getString(R.string.cf_dcmfolder_name));
-//            }catch (Exception e){
-//                Log.e(TAG, "====Failed to Save Results to file");
-//            }
-//        }
         finished = true;
     }
+    private boolean LoadCachedData(){
+        Activity activity = activityReference.get();
+        if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_loadcache))) return false;
+        //target folder exist
+        File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
+        if(!destDir.exists()) return false;
+        //load data
+        try{
+            loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcm_name))), false);
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
 
+        //load mask
+        try{
+            loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name))), true);
+        }catch(Exception e){
+            //do nothing
+        }
+        finished = true;
+        return true;
+    }
+    private void loadVolumeData(InputStream instream, boolean isMask)
+        throws IOException{
+            byte[] chunk = new byte[1024];
+            int id = 0;
+            int len;
+            if(isMask){
+                while ((len = instream.read(chunk)) != -1) {
+                    JNIInterface.JNIsendDCMIMask(id, len, chunk);
+                    id++;
+                }
+                return;
+            }
+            while ((len = instream.read(chunk)) != -1) {
+                JNIInterface.JNIsendDCMImg(id, len, chunk);
+                id++;
+            }
+    }
+
+    private void saveLargeImageToFile(OutputStream ostream, byte[] data){
+        try{
+            //todo: save by chuncks
+            ostream.write(data);
+            ostream.close();
+        }catch (IOException e){
+            Log.e(TAG, "====Failed to Save Large Image to file");
+        }
+    }
     public void Shutdown() throws InterruptedException {
         mChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
