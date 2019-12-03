@@ -7,25 +7,32 @@ option objc_class_prefix = "TRP";
 
 package helmsley;
 
-message datasetInfo{
-    string folder_name = 1;
-    string patient_name = 2;
-    string date = 3;
-    int32 file_nums = 4;
+
+message datasetResponse{
+    message datasetInfo{
+        string folder_name = 1;
+        string patient_name = 2;
+        string date = 3;
+        string default_folder = 4;
+    }
+    repeated datasetInfo datasets = 1;
+}
+
+message volumeResponse{
+    message volumeInfo{
+        string folder_name = 1;
+        int32 file_nums = 2;
+        int32 img_width = 3;
+        int32 img_height = 4;
+        bool order_flipped = 5;
+    }
+    repeated volumeInfo volumes = 1;
 }
 
 message dcmImage{
     int32 dcmID = 1;
     float position = 2;
     bytes data = 3;
-}
-
-message bundleConfig{
-    string folder_name = 1;
-    int32 file_nums = 2;
-    int32 img_width = 3;
-    int32 img_height = 4;
-    bool order_flipped = 5;
 }
 
 message Request{
@@ -39,8 +46,8 @@ message Response{
 }
 
 service dataTransfer{
-    rpc getAvailableDatasetInfos(Request) returns(stream datasetInfo);
-    rpc getConfig(Request) returns(bundleConfig);
-    rpc Download(Request) returns(stream dcmImage);
+    rpc getAvailableDatasets(Request) returns(datasetResponse);
+    rpc getVolumeFromDataset(Request) returns(volumeResponse);
+    rpc Download(Request) returns (stream dcmImage);
     rpc DownloadMasks(Request) returns(stream dcmImage);
 }

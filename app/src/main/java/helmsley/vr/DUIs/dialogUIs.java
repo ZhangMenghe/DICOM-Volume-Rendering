@@ -23,10 +23,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.proto.volumeResponse;
 
 public class dialogUIs {
     public static Activity activity;
@@ -36,7 +38,6 @@ public class dialogUIs {
     private Button sendButton;
 
     private static AlertDialog download_dialog, progress_dialog;
-//    private ArrayList<datasetInfo> data_info_lst;
     public dialogUIs(final Activity activity_){
         activity = activity_;
         if(LoadCachedData("dicom_sample")) return;
@@ -129,8 +130,6 @@ public class dialogUIs {
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
-//                        .hideSoftInputFromWindow(hostEdit.getWindowToken(), 0);
                 sendButton.setEnabled(false);
                 errText.setText("");
                 String host_addr = hostEdit.getText().toString();
@@ -161,7 +160,7 @@ public class dialogUIs {
         RecyclerView.LayoutManager layout_manager = new LinearLayoutManager(activity);
         content_view.setLayoutManager(layout_manager);
         //adapter
-        content_view.setAdapter(new DialogAdapter(activity, content_view, downloader.getAvailableDataset()));
+        content_view.setAdapter(new DialogAdapter(activity, content_view, downloader));
 
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_select_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
@@ -199,10 +198,22 @@ public class dialogUIs {
         sendButton.setEnabled(true);
         return false;
     }
-    public static void Download(String folder_name){
-        downloader.Download(folder_name);
+    public static void Download(String target_vol){
+        downloader.Download(target_vol);
         download_dialog.dismiss();
-        SetupProgressDialog(folder_name);
+        SetupProgressDialog(target_vol);
+    }
+    public static void RequestVolumeFromDataset(String dataset_name){
+        List<volumeResponse.volumeInfo>vol_lst = downloader.requestVolumesFromDataset(dataset_name);
+        //todo:some ui stuff->inflat a listview, wait to select
+        int tar_id = 0;
+        volumeResponse.volumeInfo tar_vol = vol_lst.get(tar_id);
+        JNIInterface.JNIsetupDCMIConfig(tar_vol.getImgWidth(), tar_vol.getImgHeight(), tar_vol.getFileNums());
+
+        //downloading...
+        downloader.Download(tar_vol.getFolderName());
+        download_dialog.dismiss();
+        SetupProgressDialog(tar_vol.getFolderName());
     }
     public static void FinishProgress(){progress_dialog.dismiss();}
 }
