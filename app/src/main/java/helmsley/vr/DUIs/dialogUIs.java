@@ -40,71 +40,9 @@ public class dialogUIs {
     private static AlertDialog download_dialog, progress_dialog;
     public dialogUIs(final Activity activity_){
         activity = activity_;
-        if(LoadCachedData("dicom_sample")) return;
         SetupConnect();
     }
 
-    public boolean LoadCachedData(String folder_name){
-//            throws FileNotFoundException, IOException{
-        if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_loadcache))) return false;
-        String target_cached_folder_path = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
-        //check exists
-        File destDir = new File(target_cached_folder_path);
-        if(!destDir.exists()) return false;
-        ArrayList<String> config_lines = new ArrayList<>();
-        //config
-        try{
-            InputStream inputStream = new FileInputStream(Paths.get(target_cached_folder_path, folder_name, activity.getString(R.string.cf_config_name)).toString());//target_cached_folder_path + "/sample/config");
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) config_lines.add(receiveString);
-                inputStream.close();
-            }
-        }catch (FileNotFoundException e) {
-            Log.e(TAG, "===File not found: " + e.toString());
-            return false;
-        } catch (IOException e) {
-            Log.e(TAG, "===Can not read file: " + e.toString());
-            return false;
-        }
-        if(config_lines.size() < 4) return false;
-        JNIInterface.JNIsetupDCMIConfig(Integer.parseInt(config_lines.get(2)), Integer.parseInt(config_lines.get(3)), Integer.parseInt(config_lines.get(1)));
-
-
-        Path dcm_img = Paths.get(target_cached_folder_path, folder_name, activity.getString(R.string.cf_dcmfolder_name));
-//        InputStream in = new FileInputStream(dcm_img.toString());
-        try{
-            byte[] content = Files.readAllBytes(dcm_img);
-//            byte[] content;
-//            byte[] buf = new byte[1024];
-//            int len;
-//            while ((len = in.read(buf)) > 0) {
-//
-//            }
-            JNIInterface.JNIsendDCMImg(-1, .0f, content);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        Path dcm_mask = Paths.get(target_cached_folder_path, folder_name,activity.getString(R.string.cf_dcmmask_name));
-        if (!Files.exists(dcm_mask)) {
-            Log.e(TAG, "=====LoadCachedData: no masks" ); return true;
-        }
-        try{
-            byte[] content = Files.readAllBytes(dcm_mask);
-            JNIInterface.JNIsendDCMIMask(-1, .0f, content);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-
-        return true;
-    }
     public void SetupConnect(){
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, null);
@@ -198,11 +136,6 @@ public class dialogUIs {
         sendButton.setEnabled(true);
         return false;
     }
-    public static void Download(String target_vol){
-        downloader.Download(target_vol);
-        download_dialog.dismiss();
-        SetupProgressDialog(target_vol);
-    }
     public static void RequestVolumeFromDataset(String dataset_name){
         List<volumeResponse.volumeInfo>vol_lst = downloader.requestVolumesFromDataset(dataset_name);
         //todo:some ui stuff->inflat a listview, wait to select
@@ -211,9 +144,10 @@ public class dialogUIs {
         JNIInterface.JNIsetupDCMIConfig(tar_vol.getImgWidth(), tar_vol.getImgHeight(), tar_vol.getFileNums());
 
         //downloading...
-        downloader.Download(tar_vol.getFolderName());
+        downloader.Download(tar_vol);
         download_dialog.dismiss();
         SetupProgressDialog(tar_vol.getFolderName());
     }
+
     public static void FinishProgress(){progress_dialog.dismiss();}
 }

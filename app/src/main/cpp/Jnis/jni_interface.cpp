@@ -171,16 +171,19 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jclass , jobjectArray img_arr, job
     }
 }
 
-JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jfloat pos, jbyteArray data){
+JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jint chunk_size, jbyteArray data){
+    size_t singe_size = (chunk_size==0)?g_ssize:chunk_size;
+
     if(!g_VolumeTexData) return; //check initialization
     jbyte *c_array = env->GetByteArrayElements(data, 0);
-    if(id == -1){
-        memcpy(g_VolumeTexData, c_array, g_vol_len*sizeof(GLubyte));
+    GLubyte* buffer = g_VolumeTexData+id*singe_size;
+
+    if(chunk_size!=0){
+        memcpy(buffer, c_array, singe_size);
         b_pre_load = true;
         return;
     }
 
-    GLubyte* buffer = g_VolumeTexData+id*g_ssize;
     int x, y, idx = 0;
     for (y = 0; y < g_img_h; y++) {
         for (x = 0; x < g_img_w; x++) {
@@ -190,9 +193,11 @@ JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jfloat pos, jbyteA
         }
     }
 }
-JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv* env, jclass, jint id,  jfloat pos, jbyteArray data){
+JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv* env, jclass, jint id,  jint chunk_size, jbyteArray data){
+    //todo:
+    return;
     auto g_mask_size = g_img_w * g_img_h * g_vol_dim;
-    if(!g_VolumeMaskData) g_VolumeMaskData = new uint16_t[g_mask_size];
+    if(!g_VolumeMaskData) g_VolumeMaskData = new uint16_t[g_img_w * g_img_h * g_vol_dim];
 
     jbyte *c_array = env->GetByteArrayElements(data, 0);
 

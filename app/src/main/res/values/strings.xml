@@ -19,11 +19,11 @@
     <string name="DEFAULT_PORT">23333</string>
 <!--    <string name="card_data_detail">%s(%d)</string>-->
 
-    <string name="cf_b_loadcache">false</string>
-    <string name="cf_b_cache">false</string>
+    <string name="cf_b_loadcache">true</string>
+    <string name="cf_b_cache">true</string>
     <string name="cf_cache_folder_name">helmsley_cached</string>
     <string name="cf_config_name">config</string>
-    <string name="cf_dcmfolder_name">data</string>
+    <string name="cf_dcm_name">data</string>
     <string name="cf_dcmmask_name">mask</string>
 
     <string name="dialog_connect_title">Connect to Server</string>
