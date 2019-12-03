@@ -72,7 +72,7 @@ uvec4 Sample(ivec3 pos){
 
     #ifdef ORGANS_ONLY
         //upper part as mask
-        uint mask = value>>16;
+        uint mask = value>>uint(16);
         color.a*=(mask>> uint(0)) & uint(1);
     #endif
     return color;
