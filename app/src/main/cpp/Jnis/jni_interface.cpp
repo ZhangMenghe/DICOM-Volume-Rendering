@@ -42,22 +42,6 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-//    size_t dimensions = images_.size();
-//
-//    size_t data_size = CHANEL_NUM * img_width * img_height * dimensions;
-//    auto *data = new GLubyte[data_size];
-//    auto each_size = CHANEL_NUM * img_height * img_width* sizeof(GLubyte);
-//    for(int i=0; i<dimensions; i++)
-//        memcpy(data+i*each_size, images_[i]->data, each_size);
-//
-//    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-//
-//    vrc->assembleTexture(data, img_width, img_height, dimensions, CHANEL_NUM);
-//    delete[]data;
-    if(b_pre_load){
-        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-        vrc->assembleTexture(g_VolumeTexData);
-    }
     nativeApp(nativeAddr)->onViewCreated();
 }
 
@@ -194,25 +178,18 @@ JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jint chunk_size, j
     }
 }
 JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv* env, jclass, jint id,  jint chunk_size, jbyteArray data){
-    //todo:
-    return;
-    auto g_mask_size = g_img_w * g_img_h * g_vol_dim;
     if(!g_VolumeMaskData) g_VolumeMaskData = new uint16_t[g_img_w * g_img_h * g_vol_dim];
 
+    size_t singe_size = (chunk_size==0)?g_ssize_schanel:chunk_size;
     jbyte *c_array = env->GetByteArrayElements(data, 0);
+    uint16_t* buffer = g_VolumeMaskData+id*singe_size;
 
-    if(id == -1){
-        memcpy(g_VolumeMaskData, c_array, g_mask_size*sizeof(uint16_t));
+    if(chunk_size != 0 ){
+        memcpy(buffer, c_array, chunk_size);
     }else{
-        uint16_t* buffer = g_VolumeMaskData+id*g_ssize_schanel;
         for(int i=0 ;i<g_ssize_schanel; i++){
             buffer[i] = uint16_t ((((uint16_t)c_array[2*i + 1])<<8)+c_array[2*i]);
         }
-    }
-
-    if(id == -1 || id == (g_vol_dim - 1)){
-        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-        vrc->assembleTextureMask(g_VolumeMaskData);
     }
 }
 
@@ -229,9 +206,18 @@ JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, j
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
     vrc->setVolumeConfig(width, height, dims);
 }
+JNI_METHOD(void, JNIAssembleMask)(JNIEnv*, jclass){
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+    vrc->assembleTextureMask(g_VolumeMaskData);
+}
 JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
     vrc->assembleTexture(g_VolumeTexData);
+
+    if(g_VolumeMaskData){
+        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+        vrc->assembleTextureMask(g_VolumeMaskData);
+    }
 }
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass, jboolean b_getmask){
     if(b_getmask){

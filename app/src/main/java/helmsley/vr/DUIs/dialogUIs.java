@@ -149,5 +149,5 @@ public class dialogUIs {
         SetupProgressDialog(tar_vol.getFolderName());
     }
 
-    public static void FinishProgress(){progress_dialog.dismiss();}
+    public static void FinishProgress(){if(progress_dialog!=null)progress_dialog.dismiss();}
 }

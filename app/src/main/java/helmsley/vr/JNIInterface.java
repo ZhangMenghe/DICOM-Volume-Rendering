@@ -16,5 +16,6 @@ public class JNIInterface {
     public static native void JNIsendDCMIMask(int idx, int chunk_size, byte[] data);
     public static native void JNIsetupDCMIConfig(int width, int height, int dims);
     public static native void JNIAssembleVolume();
+    public static native void JNIAssembleMask();
     public static native byte[] JNIgetVolumeData(boolean b_getmask);
 }

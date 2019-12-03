@@ -14,6 +14,7 @@ import helmsley.vr.proto.volumeResponse.volumeInfo;
 import java.io.*;
 import java.lang.ref.WeakReference;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
+    public static WeakReference<fileTransferClient> selfReference;
     public static boolean finished = false;
 
     private ManagedChannel mChannel;
@@ -36,6 +38,7 @@ public class fileTransferClient {
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
         target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
+        selfReference = new WeakReference<>(this);
     }
     public String Setup(String host, String portStr){
         try{
@@ -135,19 +138,21 @@ public class fileTransferClient {
         @Override
         public void onPostExecute(fileTransferClient activity){
             activity.saveDCMIData();
-            //todo:ignore currently
-//            activity.DownloadMasks(target_path);
+//            JNIInterface.JNIAssembleVolume();
+            activity.DownloadMasks(target_path);
         }
     }
     private static class DownloadMasksRunnable implements GrpcRunnable{
         @Override
         public String run(String folder_name, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
+//            ArrayList<dcmImage> lst = new ArrayList<>();
             Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_name).build();
+
             StreamObserver<dcmImage> mask_observer = new StreamObserver<dcmImage>() {
                 @Override
                 public void onNext(dcmImage value) {
-//                    Log.e(TAG, "==========onNext: "+ value.getPosition() );
+                    Log.e(TAG, "==========onNext: "+ value.getPosition() );
                     JNIInterface.JNIsendDCMIMask(value.getDcmID(), 0, value.getData().toByteArray());
                 }
 
@@ -159,6 +164,8 @@ public class fileTransferClient {
                 @Override
                 public void onCompleted() {
                     Log.i(TAG, "==============Finish Loading Masks========= " );
+                    JNIInterface.JNIAssembleMask();
+                    selfReference.get().SaveMasks();
                 }
             };
             asyncStub.downloadMasks(req, mask_observer);
@@ -166,11 +173,11 @@ public class fileTransferClient {
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
-            activity.SaveMasks();
+//            activity.SaveMasks();
         }
     }
 
-    private void SaveMasks(){
+    public void SaveMasks(){
         File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
         if(!destDir.exists()) destDir.mkdirs();
 
@@ -244,12 +251,14 @@ public class fileTransferClient {
                     JNIInterface.JNIsendDCMIMask(id, len, chunk);
                     id++;
                 }
+//                JNIInterface.JNIAssembleMask();
                 return;
             }
             while ((len = instream.read(chunk)) != -1) {
                 JNIInterface.JNIsendDCMImg(id, len, chunk);
                 id++;
             }
+//            JNIInterface.JNIAssembleVolume();
     }
 
     private void saveLargeImageToFile(OutputStream ostream, byte[] data){

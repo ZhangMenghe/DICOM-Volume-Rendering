@@ -14,11 +14,13 @@ JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv*, jclass,  jobjectArray, jobjectArray, j
 
 JNI_METHOD(void, JNIsendDCMImg)(JNIEnv*, jclass, jint, jint, jbyteArray);
 
-JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv*, jclass, jint,  jfloat, jbyteArray);
+JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv*, jclass, jint,  jint, jbyteArray);
 
 JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint, jint, jint);
 
 JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass);
+
+JNI_METHOD(void, JNIAssembleMask)(JNIEnv*, jclass);
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv*, jclass, jboolean);
 
