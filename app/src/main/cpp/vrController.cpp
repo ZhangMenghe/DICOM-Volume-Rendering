@@ -55,7 +55,11 @@ void vrController::assembleTextureMask(uint16_t* mask){
     if(!vol_data)   vol_data = new uint32_t[vsize];
     for(auto i=0; i<vsize; i++) vol_data[i] = uint32_t((((uint32_t)mask[i])<<16)+vol_data[i]);
     tex_volume->Update(vol_data);
-    delete[]vol_data;//todo:delete or not?
+    LOGE("=======cpp finish assembling mask");
+    if(vol_data){
+        delete[]vol_data;//todo:delete or not?
+        vol_data = nullptr;
+    }
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;

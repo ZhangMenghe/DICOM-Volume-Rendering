@@ -63,7 +63,7 @@ public class MainActivity extends GLActivity {
     }
     @Override
     protected void updateOnFrame(){
-        if(fileTransferClient.finished) {JNIInterface.JNIAssembleVolume(); dialogUIs.FinishProgress(); fileTransferClient.finished=false;}
+        if(fileTransferClient.finished) {JNIInterface.JNIAssembleVolume();dialogUIs.FinishProgress(); fileTransferClient.finished=false;}
         super.updateOnFrame();
         uiController.updateFPS();
     }
