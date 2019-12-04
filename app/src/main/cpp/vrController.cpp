@@ -54,12 +54,15 @@ void vrController::assembleTexture(GLubyte * data){
     tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, tb_data);
     delete[]tb_data;
 }
-void vrController::assembleTextureMask(uint16_t* mask){
+void vrController::assembleTextureMask(GLubyte* mask){
     if(!vol_data)   return;
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     LOGE("===size %d", vsize);
-
-    for(auto i=0; i<vsize; i++) vol_data[i] = uint32_t((((uint32_t)mask[i])<<16)+vol_data[i]);
+    uint16_t tm;
+    for(auto i=0; i<vsize; i++){
+        tm= uint16_t((((uint16_t)mask[2*i + 1])<<8)+mask[2*i]);
+        vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
+    }
 
     tex_volume->Update(vol_data);
     baked_dirty_ = true;
