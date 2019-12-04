@@ -56,8 +56,6 @@ void vrController::assembleTexture(GLubyte * data){
 }
 void vrController::assembleTextureMask(uint16_t* mask){
     if(!vol_data)   return;
-
-    uint16_t  tmp = 1;
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     LOGE("===size %d", vsize);
 

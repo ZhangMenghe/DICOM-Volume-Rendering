@@ -138,7 +138,6 @@ public class fileTransferClient {
         @Override
         public void onPostExecute(fileTransferClient activity){
             activity.saveDCMIData();
-//            JNIInterface.JNIAssembleVolume();
             activity.DownloadMasks(target_path);
         }
     }
@@ -173,7 +172,6 @@ public class fileTransferClient {
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
-//            activity.SaveMasks();
         }
     }
 
@@ -232,14 +230,12 @@ public class fileTransferClient {
             return false;
         }
 
-        finished_mask = true;
         //load mask
         try{
             loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name))), true);
         }catch(Exception e){
-            finished_mask = false;
+            Log.e(TAG, "===LoadCachedData: no masks found" );
         }
-        finished = true;
         return true;
     }
     private void loadVolumeData(InputStream instream, boolean isMask)
@@ -252,21 +248,24 @@ public class fileTransferClient {
                     JNIInterface.JNIsendDCMIMask(id, len, chunk);
                     id++;
                 }
-
-                return;
+                finished_mask = true;
             }
-            while ((len = instream.read(chunk)) != -1) {
-                JNIInterface.JNIsendDCMImg(id, len, chunk);
-                id++;
+            else{
+                while ((len = instream.read(chunk)) != -1) {
+                    JNIInterface.JNIsendDCMImg(id, len, chunk);
+                    id++;
+                }
+                finished = true;
             }
     }
 
     private void saveLargeImageToFile(OutputStream ostream, byte[] data){
         try{
-            //todo: save by chuncks
             ostream.write(data);
+            ostream.flush();
             ostream.close();
         }catch (IOException e){
+            e.printStackTrace();
             Log.e(TAG, "====Failed to Save Large Image to file");
         }
     }
