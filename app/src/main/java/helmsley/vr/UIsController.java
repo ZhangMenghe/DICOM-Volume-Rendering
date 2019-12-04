@@ -2,22 +2,17 @@ package helmsley.vr;
 
 import android.app.Activity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.util.Pair;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,13 +21,17 @@ import java.util.Map;
 
 import helmsley.vr.DUIs.cuttingUIs;
 import helmsley.vr.DUIs.dialogUIs;
-import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.DUIs.raycastUIs;
+import helmsley.vr.DUIs.texUIs;
 
 public class UIsController {
     public static Activity activity;
     final static String TAG = "UIsController";
     protected cuttingUIs cuttingController;
     protected dialogUIs dialogController;
+    protected raycastUIs raycastController;
+    protected texUIs texController;
+
     // UIs
     public static TextView FPSlabel, toggleValueTex;
 
