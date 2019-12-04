@@ -221,17 +221,6 @@ JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*env, jclass){
     n_data_offset = 0;
 }
 
-//JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass, jboolean b_getmask){
-//    if(b_getmask){
-//        auto msize = g_ssize_schanel * g_vol_dim;
-//        jbyteArray gdata = env->NewByteArray(msize);
-//        env->SetByteArrayRegion(gdata,0,msize, reinterpret_cast<jbyte*>(g_VolumeMaskData));
-//        return gdata;
-//    }
-//    jbyteArray gdata = env->NewByteArray(g_vol_len);
-//    env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
-//    return gdata;
-//}
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass, jboolean b_getmask){
     jbyteArray gdata;
     if(b_getmask){

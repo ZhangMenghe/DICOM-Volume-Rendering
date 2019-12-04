@@ -43,8 +43,6 @@ public class UIsController {
     private SeekBar seekbar_top;
     private Switch switch_widget;
 
-    private static boolean first_time=true;
-
     private View toggle_panel;
     private int toggle_id = 0, toggle_id_sub = 0, switch_id = 0;
     private Map<String, Float> toggle_values=new HashMap<>(), toggle_values_sub=new HashMap<>();
@@ -223,7 +221,9 @@ public class UIsController {
     }
 
     private void update_toggle_item_display(float value) {
-        Pair cp =(Pair)ui_map.get(current_toggle_id)[toggle_id], cp_sub = (Pair)ui_map.get(R.array.opacityArr)[toggle_id_sub];
+        Pair cp =(Pair)ui_map.get(current_toggle_id)[toggle_id],
+                cp_sub = (Pair)ui_map.get(R.array.opacityArr)[toggle_id_sub];
+
         if(entry_has_sub_arrs.contains(cp.first)){//sub
             seekbar_top.setMax(toggle_max_sub_pair.second);
             if(value >= .0f)

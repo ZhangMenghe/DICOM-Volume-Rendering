@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -150,4 +151,11 @@ public class dialogUIs {
     }
 
     public static void FinishProgress(){if(progress_dialog!=null)progress_dialog.dismiss();}
+    public static void FinishMaskLoading(){
+        activity.runOnUiThread(new Runnable()  {
+            @Override
+            public void run()  {
+                Toast.makeText(activity, "Masks Loaded!", Toast.LENGTH_LONG).show();
+            }});
+    }
 }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import io.grpc.ManagedChannel;
@@ -176,6 +177,7 @@ public class fileTransferClient {
     }
 
     public void SaveMasks(){
+        dialogUIs.FinishMaskLoading();
         File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
         if(!destDir.exists()) destDir.mkdirs();
 
