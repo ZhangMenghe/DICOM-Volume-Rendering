@@ -37,8 +37,8 @@ void vrController::setVolumeConfig(int width, int height, int dims){
 }
 void vrController::assembleTexture(GLubyte * data){
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
-
     vol_data = new uint32_t[vsize];
+
     //fuse volume data
     for(auto i=0; i<vsize; i++) {
         vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
@@ -55,16 +55,20 @@ void vrController::assembleTexture(GLubyte * data){
     delete[]tb_data;
 }
 void vrController::assembleTextureMask(uint16_t* mask){
+    if(!vol_data)   return;
+
+    uint16_t  tmp = 1;
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     LOGE("===size %d", vsize);
-    if(!vol_data)   vol_data = new uint32_t[vsize];
+
     for(auto i=0; i<vsize; i++) vol_data[i] = uint32_t((((uint32_t)mask[i])<<16)+vol_data[i]);
+
     tex_volume->Update(vol_data);
     baked_dirty_ = true;
-    if(vol_data){
-        delete[]vol_data;//todo:delete or not?
-        vol_data = nullptr;
-    }
+//    if(vol_data){
+//        delete[]vol_data;//todo:delete or not?
+//        vol_data = nullptr;
+//    }
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
