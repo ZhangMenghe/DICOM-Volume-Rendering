@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
     public static WeakReference<fileTransferClient> selfReference;
-    public static boolean finished = false;
+    public static boolean finished = false, finished_mask=false;
 
     private ManagedChannel mChannel;
 
@@ -164,8 +164,8 @@ public class fileTransferClient {
                 @Override
                 public void onCompleted() {
                     Log.i(TAG, "==============Finish Loading Masks========= " );
-                    JNIInterface.JNIAssembleMask();
                     selfReference.get().SaveMasks();
+                    finished_mask = true;
                 }
             };
             asyncStub.downloadMasks(req, mask_observer);
@@ -232,11 +232,12 @@ public class fileTransferClient {
             return false;
         }
 
+        finished_mask = true;
         //load mask
         try{
             loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name))), true);
         }catch(Exception e){
-            //do nothing
+            finished_mask = false;
         }
         finished = true;
         return true;
@@ -251,6 +252,7 @@ public class fileTransferClient {
                     JNIInterface.JNIsendDCMIMask(id, len, chunk);
                     id++;
                 }
+
                 return;
             }
             while ((len = instream.read(chunk)) != -1) {

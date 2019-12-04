@@ -188,7 +188,7 @@ JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv* env, jclass, jint id,  jint chunk_size
         memcpy(buffer, c_array, chunk_size);
     }else{
         for(int i=0 ;i<g_ssize_schanel; i++){
-            buffer[i] = uint16_t ((((uint16_t)c_array[2*i + 1])<<8)+c_array[2*i]);
+            buffer[i] = uint16_t (1);//uint16_t((((uint16_t)c_array[2*i + 1])<<8)+c_array[2*i]);
         }
     }
 }
@@ -213,11 +213,11 @@ JNI_METHOD(void, JNIAssembleMask)(JNIEnv*, jclass){
 JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
     vrc->assembleTexture(g_VolumeTexData);
-
-    if(g_VolumeMaskData){
-        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-        vrc->assembleTextureMask(g_VolumeMaskData);
-    }
+//
+//    if(g_VolumeMaskData){
+//        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+//        vrc->assembleTextureMask(g_VolumeMaskData);
+//    }
 }
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass, jboolean b_getmask){
     if(b_getmask){
