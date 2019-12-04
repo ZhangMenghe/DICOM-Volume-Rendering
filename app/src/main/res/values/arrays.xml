@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string-array name="checkParams">
+        <item>Raycast</item>
+        <item>Color Transfer</item>
+        <item>Cutting</item>
+        <item>MaskOn</item>
+    </string-array>
+
+    <string-array name="raycastParams">
+        <item>Density</item>
+        <item>Contrast</item>
+        <item>Brightness</item>
+    </string-array>
+    <string-array name="texParams">
+        <item>Overall Opacity</item>
+        <item>Lowest Opacity</item>
+        <item>Cut-off Opacity</item>
+    </string-array>
+
+
     <string-array name="entry_has_sub">
         <item>Opacity</item>
     </string-array>

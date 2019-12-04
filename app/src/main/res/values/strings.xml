@@ -1,15 +1,7 @@
 <resources>
     <string name="app_name">DICOM Viewer</string>
     <string name="fps">0.0 FPS</string>
-    <string name="change_renderer">Next Renderer</string>
-    <string name="use_transfer">Transfer Color</string>
-    <string name="use_lighting">Phong Lighting</string>
-    <string name="text_sample">Sample Step Inv: %1$.2f </string>
-    <string name="text_threshold">Value Threshold: %1$.2f</string>
-    <string name="text_brightness">Brightness: %1$.2f</string>
-    <string name="text_opacity_threshold">value: %1$.2f</string>
     <string name="text_toggle">Value: %1$.2f </string>
-    <string name="cut_switch">Control Plane</string>
 
     <string name="config_voldir">dicom-images</string>
     <string name="config_volname">sample</string>
@@ -17,7 +9,6 @@
 
     <string name="DEFAULT_HOST">137.110.112.178</string>
     <string name="DEFAULT_PORT">23333</string>
-<!--    <string name="card_data_detail">%s(%d)</string>-->
 
     <string name="cf_b_loadcache">true</string>
     <string name="cf_b_cache">true</string>
