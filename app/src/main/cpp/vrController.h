@@ -36,7 +36,7 @@ public:
 
     vrController(AAssetManager *assetManager);
     void assembleTexture(GLubyte * data);
-    void assembleTextureMask(uint16_t* mask);
+    void assembleTextureMask(GLubyte* mask);
     void setVolumeConfig(int width, int height, int dims);
     void onViewCreated();
     void onViewChange(int width, int height);
