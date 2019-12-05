@@ -12,10 +12,7 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import helmsley.vr.DUIs.SeekbarAdapter;
 
@@ -50,6 +47,7 @@ public class UIsManager {
         //check spinner
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
         setupTuneSpinner();
+        setupCheckBoxSpinner();
     }
 
 
@@ -57,5 +55,10 @@ public class UIsManager {
         spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
         SeekbarAdapter seekbarAdapter = new SeekbarAdapter(actRef.get());
         spinner_tune.setAdapter(seekbarAdapter.createListAdapter(raycast_id));
+    }
+    private void setupCheckBoxSpinner(){
+        spinner_check =  (Spinner)actRef.get().findViewById(R.id.checkSpinner);
+        SeekbarAdapter seekbarAdapter = new SeekbarAdapter(actRef.get());
+        spinner_check.setAdapter(seekbarAdapter.createListAdapter(tex_id));
     }
 }
