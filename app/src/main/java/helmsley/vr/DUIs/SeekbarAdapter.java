@@ -1,8 +1,10 @@
 package helmsley.vr.DUIs;
 
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,18 +15,61 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import helmsley.vr.R;
 
 public class SeekbarAdapter {
-    private WeakReference<listAdapter> mAdapterRef = null;
+    private ArrayList<WeakReference<listAdapter>> mAdapterRefs= new ArrayList<>();
+    private final WeakReference<Context> contexRef;
 
-    public listAdapter getListAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values,float[] item_value_max, int[] item_seek_max, String title) {
-        if(mAdapterRef==null){
-            listAdapter adapter = new listAdapter(context, item_names, item_values,item_value_max, item_seek_max, title);
-            mAdapterRef = new WeakReference<>(adapter);
+    private final static String[] TuneTitles = {"Opacity", "Tunes"};
+    private ArrayList<float[]>tune_maxs = new ArrayList<>();
+    private ArrayList<int[]>tune_seek_max= new ArrayList<>();
+    private ArrayList<LinkedHashMap<String, Float>> tune_maps= new ArrayList<>();
+
+    public SeekbarAdapter(Context context){
+        contexRef = new WeakReference<>(context);
+        //setup initial values
+        Resources res = contexRef.get().getResources();
+        //setup tune values
+        setupTuneMapValue(res, R.array.texParams);
+        setupTuneMapValue(res, R.array.raycastParams);
+    }
+    private void setupTuneMapValue(Resources res, int paramID) {
+        TypedArray params = res.obtainTypedArray(paramID);
+        int item_numbers = params.length();
+        LinkedHashMap<String, Float> value_map = new LinkedHashMap<>();
+        float[] max_values = new float[item_numbers];
+        int[] max_seeks = new int[item_numbers];
+
+        for (int i = 0; i < params.length(); i++) {
+            int resId = params.getResourceId(i, -1);
+            if (resId == -1) continue;
+            String param[] = res.getStringArray(resId);
+            value_map.put(param[0], Float.valueOf(param[1]));
+            max_values[i] = Float.valueOf(param[2]);
+            max_seeks[i] = Integer.valueOf(param[3]);
         }
-        return mAdapterRef.get();
+        tune_maxs.add(max_values); tune_seek_max.add(max_seeks);tune_maps.add(value_map);
+    }
+    public listAdapter createListAdapter(int index){
+        if(index > TuneTitles.length) return null;
+        LinkedHashMap vmap = tune_maps.get(index);
+        listAdapter adapter = new listAdapter(
+                contexRef.get(),
+                new ArrayList<>(vmap.keySet()),
+                new ArrayList<>(vmap.values()),
+                tune_maxs.get(index),
+                tune_seek_max.get(index),
+                TuneTitles[index]);
+        mAdapterRefs.add(new WeakReference<>(adapter));
+        return adapter;
+    }
+    public listAdapter createListAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values,float[] item_value_max, int[] item_seek_max, String title) {
+        listAdapter adapter = new listAdapter(context, item_names, item_values,item_value_max, item_seek_max, title);
+        mAdapterRefs.add(new WeakReference<>(adapter));
+        return adapter;
     }
 
     public class listAdapter extends BaseAdapter {
@@ -38,7 +83,6 @@ public class SeekbarAdapter {
         private int dropview_width;
         private final WeakReference<Context> contexRef;
         public listAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values, float[] item_value_max, int[]  item_seek_max,String title) {
-            //todo : set initial value
             contexRef = new WeakReference<>(context);
             mInflater = LayoutInflater.from(context);
             this.item_names = item_names;

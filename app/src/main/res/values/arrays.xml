@@ -84,7 +84,7 @@
     <string-array name="t2Arr">
         <item>Density</item>
         <item>Contrast</item>
-        <item>Brightness</item>
+        <item>Bright</item>
     </string-array>
 
     <string-array name="switchArr">
