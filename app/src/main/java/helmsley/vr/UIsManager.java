@@ -4,9 +4,11 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.util.Log;
 import android.util.Pair;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
@@ -75,7 +77,7 @@ public class UIsManager {
     private void InitUIs(){
         //check spinner
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
-        setupTuneSpinner(TuneTitles[tex_id], tune_maps.get(tex_id));
+        setupTuneSpinner(TuneTitles[tex_id], tune_maps.get(tex_id), tune_maxs.get(tex_id), tune_seek_max.get(tex_id));
         UpdateCheckBoxesValue();
         UpdateTuneSeekBarsValue();
     }
@@ -86,19 +88,15 @@ public class UIsManager {
 
     }
 
-    private void setupTuneSpinner(String title, LinkedHashMap vmap){
+    private void setupTuneSpinner(String title, LinkedHashMap vmap, float[] tune_max, int[] seek_max){
         spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
-
-        ArrayList<String> keys = new ArrayList<>(vmap.keySet());
-
         SeekbarAdapter seekbarAdapter = new SeekbarAdapter();
-
         spinner_tune.setAdapter(seekbarAdapter.getListAdapter(
                 actRef.get(),
                 new ArrayList<>(vmap.keySet()),
                 new ArrayList<>(vmap.values()),
+                tune_max,
+                seek_max,
                 title));
-
-
     }
 }
