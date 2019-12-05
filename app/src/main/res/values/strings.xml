@@ -20,4 +20,8 @@
     <string name="dialog_connect_title">Connect to Server</string>
     <string name="dialog_select_title">Select a Dataset</string>
     <string name="dialog_progress_title">Loading...</string>
+
+    <string name="check_group_name">Checks</string>
+    <string name="tune_group_name">Tunes</string>
+
 </resources>

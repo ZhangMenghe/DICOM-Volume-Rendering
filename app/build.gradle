@@ -31,6 +31,17 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    sourceSets {
+        main{
+            res.srcDirs = [
+                'src/main/res/layouts/basics',
+                'src/main/res/layouts/dialogs',
+                'src/main/res/layouts/activities',
+                'src/main/res/layouts/',
+                'src/main/res'
+            ]
+        }
+    }
     externalNativeBuild {
         cmake {
             path "src/main/cpp/CMakeLists.txt"

@@ -21,17 +21,13 @@ import java.util.Map;
 
 import helmsley.vr.DUIs.cuttingUIs;
 import helmsley.vr.DUIs.dialogUIs;
-import helmsley.vr.DUIs.raycastUIs;
-import helmsley.vr.DUIs.texUIs;
+
 
 public class UIsController {
     public static Activity activity;
     final static String TAG = "UIsController";
     protected cuttingUIs cuttingController;
     protected dialogUIs dialogController;
-    protected raycastUIs raycastController;
-    protected texUIs texController;
-
     // UIs
     public static TextView FPSlabel, toggleValueTex;
 
