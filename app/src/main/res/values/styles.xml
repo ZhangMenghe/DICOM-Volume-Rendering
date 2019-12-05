@@ -32,20 +32,33 @@
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
     </style>
-    <style name="Spinner" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
-        <item name="android:paddingStart">0dp</item>
-        <item name="android:paddingEnd">0dp</item>
-        <item name="android:textColor">@color/brightBlue</item>
-        <item name ="android:colorBackground">@color/colorPrimary</item>
-        <item name="android:backgroundTint">@color/lightBlue</item>
-        <item name="android:textSize">18sp</item>
-        <item name="android:textStyle">bold</item>
-    </style>
+
     <style name="Seekbar" parent="Widget.AppCompat.SeekBar">
         <item name="android:thickness">4dp</item>
         <item name="android:progressBackgroundTint">@color/middleGrey</item>
         <item name="android:progressTint">@color/lightBlue</item>
         <item name="android:thumbOffset">10dp</item>
         <item name="android:thumbTint">@color/brightBlue</item>
+    </style>
+
+    <style name="Spinner" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
+        <item name="android:paddingStart">0dp</item>
+        <item name="android:paddingEnd">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:dropDownVerticalOffset">50dp</item>
+        <item name="android:textColor">@color/brightBlue</item>
+        <item name ="android:colorBackground">@color/colorPrimary</item>
+        <item name="android:backgroundTint">@color/lightBlue</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SpinnerButtonStyle" parent="android:Widget.Holo.Spinner">
+        <item name="android:textColor">@color/brightBlue</item>
+        <item name ="android:colorBackground">@color/colorPrimary</item>
+        <item name="android:backgroundTint">@color/lightBlue</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
 </resources>

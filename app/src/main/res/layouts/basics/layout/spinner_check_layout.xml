@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/checkSpinnerLayout"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1">
+    <TextView
+        android:id="@+id/checkSpinnerName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/white"
+        app:layout_constraintWidth_percent="0.6"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <CheckBox
+        android:id="@+id/checkSpinnerCheckBox"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:theme="@style/Seekbar"
+        android:visibility="invisible"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintStart_toEndOf="@+id/checkSpinnerName" />
+</android.support.constraint.ConstraintLayout>
