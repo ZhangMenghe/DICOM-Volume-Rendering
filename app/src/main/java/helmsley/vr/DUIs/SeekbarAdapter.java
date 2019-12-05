@@ -3,6 +3,7 @@ package helmsley.vr.DUIs;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,41 +17,34 @@ import java.util.ArrayList;
 import helmsley.vr.R;
 
 public class SeekbarAdapter {
-    private SeekBarListener mListener;
+    private WeakReference<listAdapter> mAdapterRef = null;
 
-    public interface SeekBarListener {
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser, int positionInList);
-
-        public void onStartTrackingTouch(SeekBar seekBar, int positionInList);
-
-        public void onStopTrackingTouch(SeekBar seekBar, int positionInList);
-    }
-
-    public listAdapter getListAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values, String title) {
-        return new listAdapter(context, item_names, item_values, title);
-    }
-
-    public void setSeekBarListener(SeekBarListener listener) {
-        mListener = listener;
+    public listAdapter getListAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values,float[] item_value_max, int[] item_seek_max, String title) {
+        if(mAdapterRef==null){
+            listAdapter adapter = new listAdapter(context, item_names, item_values,item_value_max, item_seek_max, title);
+            mAdapterRef = new WeakReference<>(adapter);
+        }
+        return mAdapterRef.get();
     }
 
     public class listAdapter extends BaseAdapter {
         private LayoutInflater mInflater;
-        private onSeekbarChange mSeekListener;
         private ArrayList<String> item_names;
         private ArrayList<Float> item_values;
+        private float[] item_value_max;
+        private int[] item_seek_max;
+
         private String title;
         private int dropview_width;
         private final WeakReference<Context> contexRef;
-        public listAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values, String title) {
+        public listAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values, float[] item_value_max, int[]  item_seek_max,String title) {
             //todo : set initial value
             contexRef = new WeakReference<>(context);
             mInflater = LayoutInflater.from(context);
-            if (mSeekListener == null) {
-                mSeekListener = new onSeekbarChange();
-            }
             this.item_names = item_names;
             this.item_values = item_values;
+            this.item_value_max = item_value_max;
+            this.item_seek_max = item_seek_max;
             this.title = title;
             dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels *Float.valueOf(context.getString(R.string.cf_drop_tune_w)) );
         }
@@ -99,15 +93,29 @@ public class SeekbarAdapter {
                 holder.text_name = (TextView) convertView.findViewById(R.id.tuneName);
                 holder.text_value = (TextView) convertView.findViewById(R.id.tuneValue);
                 holder.seekbar = (SeekBar) convertView.findViewById(R.id.tuneSeekbar);
+                holder.seekbar.setMax(item_seek_max[position]);
 
                 convertView.setTag(R.layout.spinner_tune_layout, holder);
             } else {
                 holder = (ViewHolder) convertView.getTag(R.layout.spinner_tune_layout);
             }
             holder.text_name.setText(item_names.get(position));
-            holder.text_value.setText(contexRef.get().getString(R.string.text_value, item_values.get(position)));
-            holder.seekbar.setOnSeekBarChangeListener(mSeekListener);
+            float value = item_values.get(position);
+
+            holder.text_value.setText(contexRef.get().getString(R.string.text_value, value));
+            holder.seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                @Override
+                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                    item_values.set(position, (float)i / item_seek_max[position] * item_value_max[position]);
+                    holder.text_value.setText(contexRef.get().getString(R.string.text_value, item_values.get(position)));
+                }
+                @Override
+                public void onStartTrackingTouch(SeekBar seekBar) {}
+                @Override
+                public void onStopTrackingTouch(SeekBar seekBar) {}
+            });
             holder.seekbar.setTag(position);
+            holder.seekbar.setProgress((int)(value / item_value_max[position] * item_seek_max[position] ));
             convertView.setMinimumWidth(dropview_width);
             return convertView;
         }
@@ -122,34 +130,5 @@ public class SeekbarAdapter {
 
     static class ViewHolder2 {
         TextView text_title;
-    }
-
-
-    public class onSeekbarChange implements SeekBar.OnSeekBarChangeListener {
-
-        @Override
-        public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            int position = (Integer) seekBar.getTag();
-            if (mListener != null) {
-                mListener.onProgressChanged(seekBar, progress, fromUser, position);
-            }
-        }
-
-        @Override
-        public void onStartTrackingTouch(SeekBar seekBar) {
-            int position = (Integer) seekBar.getTag();
-            if (mListener != null) {
-                mListener.onStartTrackingTouch(seekBar, position);
-            }
-        }
-
-        @Override
-        public void onStopTrackingTouch(SeekBar seekBar) {
-            int position = (Integer) seekBar.getTag();
-            if (mListener != null) {
-                mListener.onStopTrackingTouch(seekBar, position);
-            }
-        }
-
     }
 }

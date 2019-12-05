@@ -61,7 +61,7 @@
     </string-array>
     <string-array name="tex_cutoff">
         <item>Cut-off</item>
-        <item>1.0</item>
+        <item>0.0</item>
         <item>1.0</item>
         <item>50</item>
     </string-array>
