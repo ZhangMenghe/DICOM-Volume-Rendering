@@ -8,23 +8,20 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/brightBlue"
-        android:textSize="14sp"/>
+        style="@style/itemText"/>
     <SeekBar
         android:id="@+id/tuneSeekbar"
         android:layout_width="0dp"
         android:layout_weight="3"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:theme="@style/Seekbar"/>
+        android:theme="@style/Seekbar_top"/>
     <TextView
         android:id="@+id/tuneValue"
         android:layout_width="0dp"
-        android:layout_weight="1"
+        android:layout_weight="0.5"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@color/brightBlue"
-        android:textSize="12sp"/>
+        android:textSize="12sp"
+        style="@style/itemText"/>
 </LinearLayout>

@@ -47,20 +47,20 @@
         <item>@array/tex_cutoff</item>
     </string-array>
     <string-array name="tex_overall">
-        <item>Overall Opacity</item>
+        <item>Overall</item>
         <item>1.0</item>
         <item>1.0</item>
         <item>50</item>
     </string-array>
 
     <string-array name="tex_lowest">
-        <item>Lowest Opacity</item>
+        <item>Lowest</item>
         <item>1.0</item>
         <item>1.0</item>
         <item>50</item>
     </string-array>
     <string-array name="tex_cutoff">
-        <item>Cut-off Opacity</item>
+        <item>Cut-off</item>
         <item>1.0</item>
         <item>1.0</item>
         <item>50</item>

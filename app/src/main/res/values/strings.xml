@@ -2,6 +2,8 @@
     <string name="app_name">DICOM Viewer</string>
     <string name="fps">0.0 FPS</string>
     <string name="text_toggle">Value: %1$.2f </string>
+    <string name="text_value">%1$.2f </string>
+
 
     <string name="config_voldir">dicom-images</string>
     <string name="config_volname">sample</string>
@@ -24,7 +26,7 @@
     <string name="check_group_name">Checks</string>
     <string name="tune_group_name">Tunes</string>
 
-    <string name="cf_drop_tune_w">0.8</string>
+    <string name="cf_drop_tune_w">1.0</string>
 
 
 

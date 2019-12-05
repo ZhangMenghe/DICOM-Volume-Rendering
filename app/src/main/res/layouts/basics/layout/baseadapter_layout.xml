@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:background="@color/midBlue"
+    android:gravity="center">
     <TextView
         android:id="@+id/tuneHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/tune_group_name"
-        style="@style/titleTex"/>
+        style="@style/titleText"/>
 </RelativeLayout>

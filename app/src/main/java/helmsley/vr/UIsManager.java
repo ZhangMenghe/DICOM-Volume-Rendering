@@ -33,7 +33,7 @@ public class UIsManager {
     private ArrayList<int[]>tune_seek_max= new ArrayList<>();
 
     final private int tex_id=0, raycast_id=1;
-
+    private final static String[] TuneTitles = {"Opacity", "Tunes"};
     public UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         SetupDefaultInitialSetting();
@@ -75,7 +75,7 @@ public class UIsManager {
     private void InitUIs(){
         //check spinner
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
-        setupTuneSpinner(tune_maps.get(tex_id));
+        setupTuneSpinner(TuneTitles[tex_id], tune_maps.get(tex_id));
         UpdateCheckBoxesValue();
         UpdateTuneSeekBarsValue();
     }
@@ -86,14 +86,18 @@ public class UIsManager {
 
     }
 
-    private void setupTuneSpinner(LinkedHashMap vmap){
+    private void setupTuneSpinner(String title, LinkedHashMap vmap){
         spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
 
         ArrayList<String> keys = new ArrayList<>(vmap.keySet());
 
         SeekbarAdapter seekbarAdapter = new SeekbarAdapter();
 
-        spinner_tune.setAdapter(seekbarAdapter.getListAdapter(actRef.get(), new ArrayList<>(vmap.keySet()), new ArrayList<>(vmap.values()), "asdfad" ));
+        spinner_tune.setAdapter(seekbarAdapter.getListAdapter(
+                actRef.get(),
+                new ArrayList<>(vmap.keySet()),
+                new ArrayList<>(vmap.values()),
+                title));
 
 
     }

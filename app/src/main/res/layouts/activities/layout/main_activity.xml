@@ -51,32 +51,28 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:theme="@style/Spinner"
-                android:spinnerMode="dropdown"
-                android:dropDownVerticalOffset="40dp"
-                style="@style/SpinnerButtonStyle"/>
+
+                style="@style/Spinner"/>
             <Spinner
                 android:id="@+id/checkSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:theme="@style/Spinner"
                 android:spinnerMode="dropdown"
                 android:dropDownVerticalOffset="40dp"
-                style="@style/SpinnerButtonStyle"/>
+                style="@style/Spinner"/>
             <Spinner
                 android:id="@+id/funcSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:theme="@style/Spinner"
                 android:spinnerMode="dropdown"
                 android:dropDownVerticalOffset="40dp"
                 android:dropDownHorizontalOffset="5dp"
                 android:entries="@array/functions"
-                style="@style/SpinnerButtonStyle"/>
+                style="@style/Spinner"/>
 
         </LinearLayout>
         <!--Hidden panel-->
