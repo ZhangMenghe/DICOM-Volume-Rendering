@@ -25,6 +25,12 @@
         <!-- inactive track color (30% transparency) -->
         <item name="android:colorForeground">#D8464242</item>
     </style>
+    <style name="titleTex" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/brightBlue</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
     <style name="RadioButton" parent="Theme.AppCompat.Light">
         <item name="colorControlNormal">@color/brightBlue</item>
         <item name="colorControlActivated">@color/colorAccent</item>
@@ -49,7 +55,7 @@
         <item name="android:textColor">@color/brightBlue</item>
         <item name ="android:colorBackground">@color/colorPrimary</item>
         <item name="android:backgroundTint">@color/lightBlue</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
     </style>
 
@@ -57,7 +63,7 @@
         <item name="android:textColor">@color/brightBlue</item>
         <item name ="android:colorBackground">@color/colorPrimary</item>
         <item name="android:backgroundTint">@color/lightBlue</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:textSize">25sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textAppearance">?android:attr/textAppearanceMedium</item>
     </style>
