@@ -34,7 +34,7 @@
         <item>50</item>
     </string-array>
     <string-array name="raycast_bright">
-        <item>Brightness</item>
+        <item>Bright</item>
         <item>600.0</item>
         <item>1500.0</item>
         <item>500</item>
@@ -84,7 +84,7 @@
     <string-array name="t2Arr">
         <item>Density</item>
         <item>Contrast</item>
-        <item>Bright</item>
+        <item>Brightness</item>
     </string-array>
 
     <string-array name="switchArr">

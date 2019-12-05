@@ -16,8 +16,8 @@ import java.util.LinkedHashMap;
 
 import helmsley.vr.R;
 
-public class SeekbarAdapter {
-    private ArrayList<WeakReference<listAdapter>> mAdapterRefs= new ArrayList<>();
+public class checkboxAdapter {
+    private ArrayList<WeakReference<listAdapter>> mAdapterRefs = new ArrayList<>();
     private final WeakReference<Context> contexRef;
 
     private final static String[] TuneTitles = {"Opacity", "Tunes"};
@@ -25,12 +25,8 @@ public class SeekbarAdapter {
     private ArrayList<int[]>tune_seek_max= new ArrayList<>();
     private ArrayList<LinkedHashMap<String, Float>> tune_maps= new ArrayList<>();
 
-    public SeekbarAdapter(Context context){
+    public checkboxAdapter(Context context){
         contexRef = new WeakReference<>(context);
-        for(int i=0; i<TuneTitles.length; i++){
-            mAdapterRefs.add(null);
-        }
-
         //setup initial values
         Resources res = contexRef.get().getResources();
         //setup tune values
@@ -56,7 +52,6 @@ public class SeekbarAdapter {
     }
     public listAdapter createListAdapter(int index){
         if(index > TuneTitles.length) return null;
-        if(mAdapterRefs.get(index)!=null) return mAdapterRefs.get(index).get();
         LinkedHashMap vmap = tune_maps.get(index);
         listAdapter adapter = new listAdapter(
                 contexRef.get(),
@@ -65,7 +60,7 @@ public class SeekbarAdapter {
                 tune_maxs.get(index),
                 tune_seek_max.get(index),
                 TuneTitles[index]);
-        mAdapterRefs.set(index, new WeakReference<>(adapter));
+        mAdapterRefs.add(new WeakReference<>(adapter));
         return adapter;
     }
 

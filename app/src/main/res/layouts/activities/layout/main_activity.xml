@@ -17,7 +17,7 @@
         android:id="@+id/topPanel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/paneColor"
+        android:background="@color/brightBlue"
         android:alpha="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -51,7 +51,6 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-
                 style="@style/Spinner"/>
             <Spinner
                 android:id="@+id/checkSpinner"
@@ -200,4 +199,5 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintDimensionRatio="1:1"/>
     </android.support.constraint.ConstraintLayout>
+
 </android.support.constraint.ConstraintLayout>
