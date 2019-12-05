@@ -24,4 +24,8 @@
     <string name="check_group_name">Checks</string>
     <string name="tune_group_name">Tunes</string>
 
+    <string name="cf_drop_tune_w">0.8</string>
+
+
+
 </resources>

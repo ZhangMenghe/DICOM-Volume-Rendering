@@ -28,27 +28,48 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:orientation="horizontal">
-            <Button
-                android:id="@+id/checkGroupButton"
+
+<!--            <Button-->
+<!--                android:id="@+id/tuneGroupButton"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/tune_group_name"-->
+<!--                android:gravity="center"-->
+<!--                style="@style/SpinnerButtonStyle"/>-->
+<!--            <Button-->
+<!--                android:id="@+id/checkGroupButton"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_weight="1"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/check_group_name"-->
+<!--                android:gravity="center"-->
+<!--                style="@style/SpinnerButtonStyle" />-->
+            <Spinner
+                android:id="@+id/tuneSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="@string/check_group_name"
                 android:gravity="center"
-                style="@style/SpinnerButtonStyle" />
-            <Button
-                android:id="@+id/tuneGroupButton"
+                android:theme="@style/Spinner"
+                android:spinnerMode="dropdown"
+                android:dropDownVerticalOffset="40dp"
+                style="@style/SpinnerButtonStyle"/>
+            <Spinner
+                android:id="@+id/checkSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
-                android:text="@string/tune_group_name"
                 android:gravity="center"
+                android:theme="@style/Spinner"
+                android:spinnerMode="dropdown"
+                android:dropDownVerticalOffset="40dp"
                 style="@style/SpinnerButtonStyle"/>
             <Spinner
                 android:id="@+id/funcSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:theme="@style/Spinner"
                 android:spinnerMode="dropdown"

@@ -29,7 +29,7 @@ public class checkSpinnerAdapter extends RecyclerView.Adapter<checkSpinnerAdapte
         public itemHolder(View view) {
             super(view);
             this.textViewName = (TextView) itemView.findViewById(R.id.checkSpinnerName);
-            this.checkbox = (CheckBox) itemView.findViewById(R.id.checkSpinnerCheckBox);
+//            this.checkbox = (CheckBox) itemView.findViewById(R.id.checkSpinnerCheckBox);
         }
     }
     public checkSpinnerAdapter(UIsManager manager){
@@ -41,17 +41,17 @@ public class checkSpinnerAdapter extends RecyclerView.Adapter<checkSpinnerAdapte
         // create a new view
         View item_view = (View) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.spinner_check_layout, parent, false);
-        CheckBox cb = (CheckBox) item_view.findViewById(R.id.checkSpinnerCheckBox);
-        cb.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(((CompoundButton) view).isChecked()){
-                    System.out.println("Checked");
-                } else {
-                    System.out.println("Un-Checked");
-                }
-            }
-        });
+//        CheckBox cb = (CheckBox) item_view.findViewById(R.id.checkSpinnerCheckBox);
+//        cb.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(((CompoundButton) view).isChecked()){
+//                    System.out.println("Checked");
+//                } else {
+//                    System.out.println("Un-Checked");
+//                }
+//            }
+//        });
 
         return new itemHolder(item_view);
     }
