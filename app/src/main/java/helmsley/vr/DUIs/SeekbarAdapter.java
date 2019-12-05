@@ -10,6 +10,7 @@ import android.widget.BaseAdapter;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
 import helmsley.vr.R;
@@ -36,18 +37,20 @@ public class SeekbarAdapter {
     public class listAdapter extends BaseAdapter {
         private LayoutInflater mInflater;
         private onSeekbarChange mSeekListener;
-//        private ArrayList<String> itemsList;
         private ArrayList<String> item_names;
+        private ArrayList<Float> item_values;
         private String title;
         private int dropview_width;
-
+        private final WeakReference<Context> contexRef;
         public listAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values, String title) {
             //todo : set initial value
+            contexRef = new WeakReference<>(context);
             mInflater = LayoutInflater.from(context);
             if (mSeekListener == null) {
                 mSeekListener = new onSeekbarChange();
             }
             this.item_names = item_names;
+            this.item_values = item_values;
             this.title = title;
             dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels *Float.valueOf(context.getString(R.string.cf_drop_tune_w)) );
         }
@@ -93,24 +96,27 @@ public class SeekbarAdapter {
             if (convertView == null) {
                 holder = new ViewHolder();
                 convertView = mInflater.inflate(R.layout.spinner_tune_layout, null);
-                holder.text = (TextView) convertView.findViewById(R.id.tuneName);
+                holder.text_name = (TextView) convertView.findViewById(R.id.tuneName);
+                holder.text_value = (TextView) convertView.findViewById(R.id.tuneValue);
                 holder.seekbar = (SeekBar) convertView.findViewById(R.id.tuneSeekbar);
+
                 convertView.setTag(R.layout.spinner_tune_layout, holder);
             } else {
                 holder = (ViewHolder) convertView.getTag(R.layout.spinner_tune_layout);
             }
-            holder.text.setText(item_names.get(position));
+            holder.text_name.setText(item_names.get(position));
+            holder.text_value.setText(contexRef.get().getString(R.string.text_value, item_values.get(position)));
             holder.seekbar.setOnSeekBarChangeListener(mSeekListener);
             holder.seekbar.setTag(position);
             convertView.setMinimumWidth(dropview_width);
             return convertView;
-
         }
 
     }
 
     static class ViewHolder {
-        TextView text;
+        TextView text_name;
+        TextView text_value;
         SeekBar seekbar;
     }
 
