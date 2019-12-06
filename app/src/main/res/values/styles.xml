@@ -27,10 +27,11 @@
     </style>
     <style name="titleText" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/brightBlue</item>
+        <item name="android:gravity">center</item>
         <item name="android:textSize">18sp</item>
         <item name="android:textStyle">bold</item>
-        <item name="android:paddingTop">8dp</item>
-        <item name="android:paddingBottom">8dp</item>
+        <item name="android:paddingTop">12dp</item>
+        <item name="android:paddingBottom">12dp</item>
     </style>
 
     <style name="itemText" parent="TextAppearance.AppCompat">
