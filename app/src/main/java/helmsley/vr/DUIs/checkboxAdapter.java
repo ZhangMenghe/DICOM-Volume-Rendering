@@ -46,7 +46,6 @@ public class checkboxAdapter {
         return mAdapterRef.get();
     }
     public class checkboxListAdapter extends ListAdapter{
-        private ArrayList<String> item_names;
         private ArrayList<Boolean> item_values;
 
         public checkboxListAdapter(Context context,
@@ -56,10 +55,7 @@ public class checkboxAdapter {
             this.item_names = item_names;
             this.item_values = item_values;
         }
-        @Override
-        public int getCount() {
-            return item_names.size();
-        }
+
 
         public View getDropDownView(int position, View convertView, ViewGroup parent){
             ViewContentHolder holder;

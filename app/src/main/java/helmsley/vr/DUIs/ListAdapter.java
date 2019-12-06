@@ -8,6 +8,7 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 import helmsley.vr.R;
 
@@ -17,13 +18,18 @@ public abstract class ListAdapter extends BaseAdapter {
     protected String title;
     protected final WeakReference<Context> contexRef;
 
+    protected ArrayList<String> item_names;
+
+
     public ListAdapter(Context context, String title) {
         contexRef = new WeakReference<>(context);
         mInflater = LayoutInflater.from(context);
         this.title = title;
     }
-    protected void setViewWidth(float percent){
-//        dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels * percent);
+
+    @Override
+    public int getCount() {
+        return item_names.size();
     }
 
     @Override
