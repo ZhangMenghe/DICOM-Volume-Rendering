@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 import helmsley.vr.R;
 
 public class SeekbarAdapter {
-    private ArrayList<WeakReference<listAdapter>> mAdapterRefs= new ArrayList<>();
+    private ArrayList<WeakReference<seekbarListAdapter>> mAdapterRefs= new ArrayList<>();
     private final WeakReference<Context> contexRef;
 
     private final static String[] TuneTitles = {"Opacity", "Tunes"};
@@ -54,11 +54,11 @@ public class SeekbarAdapter {
         }
         tune_maxs.add(max_values); tune_seek_max.add(max_seeks);tune_maps.add(value_map);
     }
-    public listAdapter createListAdapter(int index){
+    public seekbarListAdapter createListAdapter(int index){
         if(index > TuneTitles.length) return null;
         if(mAdapterRefs.get(index)!=null) return mAdapterRefs.get(index).get();
         LinkedHashMap vmap = tune_maps.get(index);
-        listAdapter adapter = new listAdapter(
+        seekbarListAdapter adapter = new seekbarListAdapter(
                 contexRef.get(),
                 new ArrayList<>(vmap.keySet()),
                 new ArrayList<>(vmap.values()),
@@ -69,60 +69,24 @@ public class SeekbarAdapter {
         return adapter;
     }
 
-    public class listAdapter extends BaseAdapter {
-        private LayoutInflater mInflater;
-        private ArrayList<String> item_names;
+    public class seekbarListAdapter extends ListAdapter {
         private ArrayList<Float> item_values;
         private float[] item_value_max;
         private int[] item_seek_max;
-
-        private String title;
         private int dropview_width;
-        private final WeakReference<Context> contexRef;
-        public listAdapter(Context context, ArrayList<String> item_names, ArrayList<Float> item_values, float[] item_value_max, int[]  item_seek_max,String title) {
-            contexRef = new WeakReference<>(context);
-            mInflater = LayoutInflater.from(context);
+
+        public seekbarListAdapter(Context context,
+                                  ArrayList<String> item_names, ArrayList<Float> item_values,
+                                  float[] item_value_max, int[]  item_seek_max,
+                                  String title) {
+            super(context, title);
+
             this.item_names = item_names;
             this.item_values = item_values;
             this.item_value_max = item_value_max;
             this.item_seek_max = item_seek_max;
-            this.title = title;
-            dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels *Float.valueOf(context.getString(R.string.cf_drop_tune_w)) );
+            this.dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels *Float.valueOf(context.getString(R.string.cf_drop_tune_w)) );
         }
-
-        @Override
-        public int getCount() {
-            return item_names.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public long getItemId(int position) {
-            // TODO Auto-generated method stub
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder2 holder;
-
-            if (convertView == null) {
-                holder = new ViewHolder2();
-                convertView = mInflater.inflate(R.layout.baseadapter_layout, null);
-                holder.text_title = (TextView) convertView.findViewById(R.id.nameHeader);
-                convertView.setTag(R.layout.baseadapter_layout, holder);
-            } else {
-                holder = (ViewHolder2) convertView.getTag(R.layout.baseadapter_layout);
-            }
-            holder.text_title.setText(title);
-            return convertView;
-        }
-
 
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
@@ -160,16 +124,12 @@ public class SeekbarAdapter {
             convertView.setMinimumWidth(dropview_width);
             return convertView;
         }
-
+        class ViewHolder {
+            TextView text_name;
+            TextView text_value;
+            SeekBar seekbar;
+        }
     }
 
-    static class ViewHolder {
-        TextView text_name;
-        TextView text_value;
-        SeekBar seekbar;
-    }
 
-    static class ViewHolder2 {
-        TextView text_title;
-    }
 }
