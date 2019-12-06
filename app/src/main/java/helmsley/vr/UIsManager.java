@@ -15,6 +15,7 @@ import java.lang.ref.WeakReference;
 import java.util.LinkedHashMap;
 
 import helmsley.vr.DUIs.SeekbarAdapter;
+import helmsley.vr.DUIs.checkboxAdapter;
 
 public class UIsManager {
     private final WeakReference<Activity> actRef;
@@ -25,24 +26,16 @@ public class UIsManager {
     private Button button_checkg, button_tuneg;
 
     // value maps
-    private LinkedHashMap<String, Boolean> check_map=new LinkedHashMap<>();
+
 
 
     final private int tex_id=0, raycast_id=1;
     public UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
-        SetupDefaultInitialSetting();
         InitUIs();
     }
 
-    private void SetupDefaultInitialSetting(){
-        Resources res = actRef.get().getResources();
-        //setup check map values
-        String check_items[] = res.getStringArray(R.array.checkParams);
-        TypedArray check_values = res.obtainTypedArray(R.array.checkValues);
-        for(int i=0; i<check_items.length; i++)
-            check_map.put(check_items[i], check_values.getBoolean(i, false));
-    }
+
     private void InitUIs(){
         //check spinner
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
@@ -58,7 +51,7 @@ public class UIsManager {
     }
     private void setupCheckBoxSpinner(){
         spinner_check =  (Spinner)actRef.get().findViewById(R.id.checkSpinner);
-        SeekbarAdapter seekbarAdapter = new SeekbarAdapter(actRef.get());
-        spinner_check.setAdapter(seekbarAdapter.createListAdapter(tex_id));
+        checkboxAdapter cbAdapter = new checkboxAdapter(actRef.get());
+        spinner_check.setAdapter(cbAdapter.createListAdapter(tex_id));
     }
 }
