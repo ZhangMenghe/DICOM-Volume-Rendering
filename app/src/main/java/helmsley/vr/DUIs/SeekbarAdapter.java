@@ -114,7 +114,7 @@ public class SeekbarAdapter {
             if (convertView == null) {
                 holder = new ViewHolder2();
                 convertView = mInflater.inflate(R.layout.baseadapter_layout, null);
-                holder.text_title = (TextView) convertView.findViewById(R.id.tuneHeader);
+                holder.text_title = (TextView) convertView.findViewById(R.id.nameHeader);
                 convertView.setTag(R.layout.baseadapter_layout, holder);
             } else {
                 holder = (ViewHolder2) convertView.getTag(R.layout.baseadapter_layout);
