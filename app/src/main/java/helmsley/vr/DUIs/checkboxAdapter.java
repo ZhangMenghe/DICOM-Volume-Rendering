@@ -41,6 +41,7 @@ public class checkboxAdapter {
             check_map.put(check_items[i], values[i]);
         }
         raycast_name = res.getString(R.string.texray_check_name);
+        mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
     public static boolean isRaycast(){return check_map.get(raycast_name);}

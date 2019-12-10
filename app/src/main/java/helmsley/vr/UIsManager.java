@@ -23,6 +23,7 @@ public class UIsManager {
     SeekbarAdapter seekbarAdapter;
 
     final static private int tex_id=0, raycast_id=1;
+    static private int current_texray_id = -1;
     public UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);
@@ -33,19 +34,20 @@ public class UIsManager {
 
     private void InitUIs(){
         setupTopPanelSpinners();
-
     }
 
     private void setupTopPanelSpinners(){
+        //Tune spinners
+        spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
+        seekbarAdapter = new SeekbarAdapter(actRef.get(), this);
+
         //checkbox spinners
         spinner_check =  (Spinner)actRef.get().findViewById(R.id.checkSpinner);
         checkboxAdapter cbAdapter = new checkboxAdapter(actRef.get(), this);
         spinner_check.setAdapter(cbAdapter.getListAdapter());
 
-        //Tune spinners
-        spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
-        seekbarAdapter = new SeekbarAdapter(actRef.get(), this);
-        spinner_tune.setAdapter(seekbarAdapter.getListAdapter(getTexRayIdx()));
+
+//        spinner_tune.setAdapter(seekbarAdapter.getListAdapter(getTexRayIdx()));
         //function spinners
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
         funcAdapter fAdapter = new funcAdapter(actRef.get(), this);
@@ -55,10 +57,11 @@ public class UIsManager {
         dialogController.SetupConnect();
     }
     public static int getTexRayIdx(){
-        return checkboxAdapter.isRaycast()?raycast_id : tex_id;
+        return current_texray_id;
     }
     public void onTexRaySwitch(boolean isRaycast){
         spinner_tune.setAdapter(seekbarAdapter.getListAdapter(isRaycast?raycast_id:tex_id));
+        current_texray_id = isRaycast?raycast_id:tex_id;
     }
 
 }
