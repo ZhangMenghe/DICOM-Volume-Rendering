@@ -106,32 +106,38 @@ public class SeekbarAdapter {
                 convertView = mInflater.inflate(R.layout.spinner_tune_layout, null);
                 holder.text_name = (TextView) convertView.findViewById(R.id.tuneName);
                 holder.text_value = (TextView) convertView.findViewById(R.id.tuneValue);
+
                 holder.seekbar = (SeekBar) convertView.findViewById(R.id.tuneSeekbar);
                 holder.seekbar.setMax(item_seek_max[position]);
+                holder.seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+                    @Override
+                    public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                        float value = (float)i / item_seek_max[position] * item_value_max[position];
+                        if(value == item_values.get(position)) return;
+                        item_values.set(position, value);
+                        holder.text_value.setText(contexRef.get().getString(R.string.text_value, item_values.get(position)));
+                        JUIInterface.JUIsetTuneParam(UIsManager.getTexRayIdx(), item_names.get(position), item_values.get(position));
+                    }
+                    @Override
+                    public void onStartTrackingTouch(SeekBar seekBar) {}
+                    @Override
+                    public void onStopTrackingTouch(SeekBar seekBar) {}
+                });
+                holder.seekbar.setTag(position);
+                holder.seekbar.setProgress((int)(item_values.get(position) / item_value_max[position] * item_seek_max[position] ));
+                convertView.setMinimumWidth(dropview_width);
+
 
                 convertView.setTag(R.layout.spinner_tune_layout, holder);
             } else {
                 holder = (ViewHolder) convertView.getTag(R.layout.spinner_tune_layout);
             }
+
             holder.text_name.setText(item_names.get(position));
             float value = item_values.get(position);
 
             holder.text_value.setText(contexRef.get().getString(R.string.text_value, value));
-            holder.seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-                @Override
-                public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                    item_values.set(position, (float)i / item_seek_max[position] * item_value_max[position]);
-                    holder.text_value.setText(contexRef.get().getString(R.string.text_value, item_values.get(position)));
-                    JUIInterface.JUIsetTuneParam(UIsManager.getTexRayIdx(), item_names.get(position), item_values.get(position));
-                }
-                @Override
-                public void onStartTrackingTouch(SeekBar seekBar) {}
-                @Override
-                public void onStopTrackingTouch(SeekBar seekBar) {}
-            });
-            holder.seekbar.setTag(position);
-            holder.seekbar.setProgress((int)(value / item_value_max[position] * item_seek_max[position] ));
-            convertView.setMinimumWidth(dropview_width);
+
             return convertView;
         }
         class ViewHolder {
