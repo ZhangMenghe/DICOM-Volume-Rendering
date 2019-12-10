@@ -8,8 +8,8 @@ Camera* vrController::camera = nullptr;
 Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr; Texture* vrController::ray_baked = nullptr;
 int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1, vrController::BAKED_RAY_ID = 2;//, vrController::TRANS_TEX_ID = 1;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
-std::unordered_map<std::string, float> vrController::param_value_map;
-std::unordered_map<std::string, bool > vrController::param_bool_map;
+//std::unordered_map<std::string, float> vrController::param_value_map;
+//std::unordered_map<std::string, bool > vrController::param_bool_map;
 
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
@@ -97,8 +97,8 @@ void vrController::onDraw() {
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(cutDirty){ //panel switch to cutting, update cutting result
         cutDirty = false;
-        texvrRenderer_->onCuttingChange(param_value_map["cutting"]);
-        raycastRenderer_->onCuttingChange(param_value_map["cutting"]);
+        texvrRenderer_->onCuttingChange(param_tex[dvr::TUNE_CUTTING_TEX]);
+        raycastRenderer_->onCuttingChange(param_ray[dvr::TUNE_CUTTING_RAY]);
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
@@ -123,10 +123,11 @@ void vrController::onTouchMove(float x, float y) {
         else camera->rotateCamera(2, ModelMat_[3], yoffset);
         return;
     }
-    if(param_value_map["mtarget"] > .0f && !param_bool_map["pfview"]){
-        cuttingController::instance()->onRotate(mTarget((int)param_value_map["mtarget"]), xoffset, yoffset);
-        return;
-    }
+    //Todo!!!
+//    if(param_value_map["mtarget"] > .0f && !param_bool_map["pfview"]){
+//        cuttingController::instance()->onRotate(mTarget((int)param_value_map["mtarget"]), xoffset, yoffset);
+//        return;
+//    }
 
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
     volume_model_dirty = true;
@@ -139,14 +140,15 @@ void vrController::onScale(float sx, float sy){
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
 
-    //rotate cutting
-    if(param_value_map["mtarget"] > .0f){
-        mTarget tar = mTarget((int)param_value_map["mtarget"]);
-        cuttingController::instance()->onScale(tar, sx);
-    }else{
+    //Todo!!!
+//    //rotate cutting
+//    if(param_value_map["mtarget"] > .0f){
+//        mTarget tar = mTarget((int)param_value_map["mtarget"]);
+//        cuttingController::instance()->onScale(tar, sx);
+//    }else{
         ScaleVec3_ = ScaleVec3_* sx;
         volume_model_dirty = true;
-    }
+//    }
 }
 void vrController::onPan(float x, float y){
     if(!tex_volume) return;
@@ -170,10 +172,10 @@ void vrController::precompute(){
     if(isRayCasting()) bakeShader_->EnableKeyword("UPDATE_RAY_BAKED");
     else bakeShader_->DisableKeyword("UPDATE_RAY_BAKED");
 
-    if(param_bool_map["colortrans"]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
+    if(param_bool[dvr::CHECK_COLOR_TRANS]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
     else bakeShader_->DisableKeyword("TRANSFER_COLOR");
 
-    if(param_bool_map["maskon"]) bakeShader_->EnableKeyword("ORGANS_ONLY");
+    if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("ORGANS_ONLY");
     else bakeShader_->DisableKeyword("ORGANS_ONLY");
 
     GLuint sp = bakeShader_->Use();

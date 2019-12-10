@@ -63,7 +63,7 @@ void texvrRenderer::draw_scene(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    if(!vrController::param_bool_map["maskon"]){
+    if(!vrController::param_bool[dvr::CHECK_MASKON]){
         glEnable(GL_CULL_FACE);
         glCullFace(GL_BACK);
         glEnable(GL_DEPTH_TEST);
@@ -87,7 +87,7 @@ void texvrRenderer::draw_scene(){
     shader_->UnUse();
 
     glDisable(GL_BLEND);
-    if(!vrController::param_bool_map["maskon"]){
+    if(!vrController::param_bool[dvr::CHECK_MASKON]){
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
     }
@@ -104,9 +104,9 @@ void texvrRenderer::onCuttingChange(float percent){
     shader_->UnUse();
 }
 void texvrRenderer::updatePrecomputation(GLuint sp) {
-    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_value_map["overall"]);
-    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_value_map["lowbound"]);
-    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_value_map["cutoff"]);
+    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_tex[dvr::TUNE_OVERALL]);
+    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_tex[dvr::TUNE_LOWEST]);
+    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_tex[dvr::TUNE_CUTOFF]);
 }
 
 void texvrRenderer::two_pass_draw() {

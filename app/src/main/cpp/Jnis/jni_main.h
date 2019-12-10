@@ -3,6 +3,7 @@
 
 #include <jni.h>
 #include <string>
+#include <vector>
 #include "nEntrance.h"
 
 #define JNI_METHOD(returnType, funcName)\
@@ -20,6 +21,24 @@
 namespace dvr{
     inline jlong nativeAddr;
 
+    enum PARAM_BOOL{
+        CHECK_RAYCAST=0,
+        CHECK_COLOR_TRANS,
+        CHECK_CUTTING,
+        CHECK_MASKON
+    };
+    enum PARAM_TEX{
+        TUNE_OVERALL=0,
+        TUNE_LOWEST,
+        TUNE_CUTOFF,
+        TUNE_CUTTING_TEX
+    };
+    enum PARAM_RAYCAST{
+        TUNE_DENSITY = 0,
+        TUNE_CONTRAST,
+        TUNE_BRIGHT,
+        TUNE_CUTTING_RAY
+    };
     inline jlong getNativeClassAddr(nEntrance * native_controller){
         return reinterpret_cast<intptr_t>(native_controller);
     }
