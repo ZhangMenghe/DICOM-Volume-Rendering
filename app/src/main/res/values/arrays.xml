@@ -2,7 +2,7 @@
 <resources>
 <!--    check params and value-->
     <string-array name="checkParams">
-        <item>Raycast</item>
+        <item>@string/texray_check_name</item>
         <item>Color Transfer</item>
         <item>Cutting</item>
         <item>MaskOn</item>

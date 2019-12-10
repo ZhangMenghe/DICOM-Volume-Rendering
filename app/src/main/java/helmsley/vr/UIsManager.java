@@ -18,6 +18,9 @@ public class UIsManager {
     private cutplaneUIs cuttingController;
     protected dialogUIs dialogController;
 
+    //Spinner adapter
+    SeekbarAdapter seekbarAdapter;
+
     final static private int tex_id=0, raycast_id=1;
     public UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
@@ -33,16 +36,17 @@ public class UIsManager {
     }
 
     private void setupTopPanelSpinners(){
-        //Tune spinners
-        spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
-        SeekbarAdapter seekbarAdapter = new SeekbarAdapter(actRef.get());
-        spinner_tune.setAdapter(seekbarAdapter.createListAdapter(raycast_id));
-
         //checkbox spinners
         spinner_check =  (Spinner)actRef.get().findViewById(R.id.checkSpinner);
-        checkboxAdapter cbAdapter = new checkboxAdapter(actRef.get());
-        spinner_check.setAdapter(cbAdapter.createListAdapter(tex_id));
+        checkboxAdapter cbAdapter = new checkboxAdapter(actRef.get(), this);
+        spinner_check.setAdapter(cbAdapter.getListAdapter());
 
+        //Tune spinners
+        spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
+        seekbarAdapter = new SeekbarAdapter(actRef.get(), this);
+        seekbarAdapter.getListAdapter(tex_id);
+        seekbarAdapter.getListAdapter(raycast_id);
+        onTexRaySwitch(getTexRayIdx() == raycast_id);
         //function spinners
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
         funcAdapter fAdapter = new funcAdapter(actRef.get(), this);
@@ -53,6 +57,9 @@ public class UIsManager {
     }
     public static int getTexRayIdx(){
         return checkboxAdapter.isRaycast()?raycast_id : tex_id;
+    }
+    public void onTexRaySwitch(boolean isRaycast){
+        spinner_tune.setAdapter(seekbarAdapter.getListAdapter(isRaycast?raycast_id:tex_id));
     }
 
 }
