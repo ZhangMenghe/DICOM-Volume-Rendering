@@ -22,6 +22,7 @@ DUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobje
         tvec->push_back(values[i]);
         LOGE("======SET INIT %s, %f", key.c_str(), values[i]);
     }
+    vrController::baked_dirty_ = true;
 }
 DUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     jboolean* values = env->GetBooleanArrayElements(jvalues, 0);
@@ -32,6 +33,7 @@ DUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray
         vrController::param_bool.push_back(values[i]);
         LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
+    vrController::baked_dirty_ = true;
 }
 
 DUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jfloat value){
@@ -40,9 +42,12 @@ DUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jf
     auto it = std::find (vec->begin(), vec->end(), key);
     if (it != vec->end()){
         (id == TEX_ID)? vrController::param_tex[it - vec->begin()] = value : vrController::param_ray[it-vec->begin()] = value;
+        vrController::baked_dirty_ = true;
         LOGE("======SET %s, %f", key.c_str(), value);
     }else{
         LOGE("======not find %s", key.c_str());
+        vec->push_back(key);
+        (id == TEX_ID)? vrController::param_tex.push_back(value) : vrController::param_ray.push_back(value);
     }
 }
 DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
@@ -51,6 +56,7 @@ DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
+        vrController::baked_dirty_ = true;
         LOGE("======SET  %s, %d", key.c_str(), value);
     }else{
         LOGE("======not find %s", key.c_str());
@@ -61,20 +67,20 @@ DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
 //namespace {
 //    perfMonitor fps_monitor_;
 //}
-//JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
-//    nativeApp(nativeAddr)->onSingleTouchDown(x, y);
-//}
-//JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat x, jfloat y){
-//    nativeApp(nativeAddr)->onTouchMove(x, y);
-//}
-//JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat sx, jfloat sy){
-//    nativeApp(nativeAddr)->onScale(sx, sy);
-//}
-//JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat x, jfloat y){
-//    nativeApp(nativeAddr)->onPan(x,y);
-//}
-//
-//
+DUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
+    nativeApp(nativeAddr)->onSingleTouchDown(x, y);
+}
+DUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat x, jfloat y){
+    nativeApp(nativeAddr)->onTouchMove(x, y);
+}
+DUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat sx, jfloat sy){
+    nativeApp(nativeAddr)->onScale(sx, sy);
+}
+DUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat x, jfloat y){
+    nativeApp(nativeAddr)->onPan(x,y);
+}
+
+
 
 //JUI_METHOD(void, JUIsetJavaUIStatus)(JNIEnv * env, jclass, jint item, jstring key){
 //    if(dvr::jstring2string(env,key) == "Opacity")
