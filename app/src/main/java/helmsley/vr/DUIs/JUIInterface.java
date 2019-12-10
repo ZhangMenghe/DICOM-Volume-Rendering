@@ -6,4 +6,10 @@ public class JUIInterface {
 
     public static native void JUIsetTuneParam(int id, String key, float value);
     public static native void JUIsetChecks(String key, boolean value);
+
+    //touch action
+    public static native void JUIonSingleTouchDown(float x, float y);
+    public static native void JUIonTouchMove(float x, float y);
+    public static native void JUIonScale(float sx, float sy);
+    public static native void JUIonPan(float x, float y);
 }

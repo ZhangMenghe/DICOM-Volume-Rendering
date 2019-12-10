@@ -5,6 +5,7 @@ import android.graphics.PointF;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import helmsley.vr.DUIs.JUIInterface;
 import helmsley.vr.UIsController;
 
 import static java.lang.Math.abs;
@@ -18,11 +19,14 @@ public class GestureDetectorCalVR {
             //public abstract void testing();
             public void onOneFingerDown(MotionEvent event){
 //                Log.e(TAG, "onOneFingerDown: ======down" );
-                UIsController.JUIonSingleTouchDown(event.getX(), event.getY());
+//                UIsController.JUIonSingleTouchDown(event.getX(), event.getY());
+                JUIInterface.JUIonSingleTouchDown(event.getX(), event.getY());
             }
             public void onOneFingerMove(MotionEvent event){
 //                Log.e(TAG, "onOneFingerDown: ======move" );
-                UIsController.JUIonTouchMove(event.getX(), event.getY());
+//                UIsController.JUIonTouchMove(event.getX(), event.getY());
+                JUIInterface.JUIonTouchMove(event.getX(), event.getY());
+
             }
 
             public  void onFling(int pointerNum, float srcx, float srcy, float dstx, float dsty){}
@@ -71,11 +75,15 @@ public class GestureDetectorCalVR {
                 if(dist_ratio<SCALE_DIST_THRESHOLD
                         && (cf1.x- down_f1.x) *(cf2.x - down_f2.x) + (cf1.y - down_f1.y) * (cf2.y - down_f2.y) > .0f ){
                     float cx = event.getX(), cy = event.getY();///UIsController.screen_height;
-                    UIsController.JUIonPan(cx - last_pos_pan.x, cy-last_pos_pan.y);
+                    JUIInterface.JUIonPan(cx - last_pos_pan.x, cy-last_pos_pan.y);
+
+//                    UIsController.JUIonPan(cx - last_pos_pan.x, cy-last_pos_pan.y);
                     last_pos_pan.set( cx, cy );
                 }else{
 //                    Log.e(TAG, "===onScale:  " + dist_ratio);
-                    UIsController.JUIonScale(curr_dist/last_span_dist, curr_dist/last_span_dist);
+//                    UIsController.JUIonScale(curr_dist/last_span_dist, curr_dist/last_span_dist);
+                    JUIInterface.JUIonScale(curr_dist/last_span_dist, curr_dist/last_span_dist);
+
                 }
                 last_span.set(gap);
             }
@@ -92,7 +100,6 @@ public class GestureDetectorCalVR {
             // TWO FINGER DOUBLE: right double
             public void onTwoFingerDoubleTap(float ex, float ey){
 //                JNIInterface.JNIonDoubleTouch(1, ex, ey);
-                UIsController.debug_create_downloader();
             }
 
             public void onTwoFingerTripleTap(){}
