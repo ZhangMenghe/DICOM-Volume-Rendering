@@ -18,7 +18,7 @@ public class UIsManager {
     private cutplaneUIs cuttingController;
     protected dialogUIs dialogController;
 
-    final private int tex_id=0, raycast_id=1;
+    final static private int tex_id=0, raycast_id=1;
     public UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);
@@ -50,6 +50,9 @@ public class UIsManager {
     }
     public void RequestSetupServerConnection(){
         dialogController.SetupConnect();
+    }
+    public static int getTexRayIdx(){
+        return checkboxAdapter.isRaycast()?raycast_id : tex_id;
     }
 
 }
