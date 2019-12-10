@@ -41,7 +41,6 @@ public class dialogUIs {
     private static AlertDialog download_dialog, progress_dialog;
     public dialogUIs(final Activity activity_){
         activity = activity_;
-        SetupConnect();
     }
 
     public void SetupConnect(){

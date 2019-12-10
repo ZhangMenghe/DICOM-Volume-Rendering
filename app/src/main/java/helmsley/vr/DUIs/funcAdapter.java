@@ -1,6 +1,7 @@
 package helmsley.vr.DUIs;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -10,14 +11,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import helmsley.vr.R;
+import helmsley.vr.UIsManager;
 
 public class funcAdapter{
     private WeakReference<funcListAdapter> mAdapterRef = null;
 
+    private final WeakReference<UIsManager> mUIManagerRef;
     private final WeakReference<Context> contexRef;
 
-    public funcAdapter(Context context){
+    public funcAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
+        mUIManagerRef = new WeakReference<>(manager);
     }
     public funcListAdapter createFuncAdapter(){
         if(mAdapterRef == null) mAdapterRef = new WeakReference<>(new funcListAdapter(
@@ -42,11 +46,28 @@ public class funcAdapter{
                 holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
             }
             holder.text_name.setText(item_names.get(position));
+            holder.text_name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    switch (position){
+                        case 0:onClickResetButton();break;
+                        case 1:onClickDataChangeButton();break;
+                        default:break;
+                    }
+                }
+            });
+
             return convertView;
         }
         private class ViewContentHolder{
             TextView text_name;
         }
+    }
+    private void onClickDataChangeButton(){
+        mUIManagerRef.get().RequestSetupServerConnection();
+        //todo: unfinish!
+    }
+    private void onClickResetButton(){
     }
 }
 

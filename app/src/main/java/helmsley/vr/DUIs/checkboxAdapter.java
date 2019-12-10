@@ -30,9 +30,13 @@ public class checkboxAdapter {
         //setup check map values
         String check_items[] = res.getStringArray(R.array.checkParams);
         TypedArray check_values = res.obtainTypedArray(R.array.checkValues);
+        boolean values[] = new boolean[check_items.length];
 
-        for(int i=0; i<check_items.length; i++)
-            check_map.put(check_items[i], check_values.getBoolean(i, false));
+        for(int i=0; i<check_items.length; i++){
+            values[i] = check_values.getBoolean(i, false);
+            check_map.put(check_items[i], values[i]);
+        }
+        JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
     public checkboxListAdapter createListAdapter(int index){
         if(mAdapterRef == null){

@@ -9,7 +9,7 @@
     <string name="config_volname">sample</string>
     <string name="config_mask_tail">_mask</string>
 
-    <string name="DEFAULT_HOST">137.110.112.178</string>
+    <string name="DEFAULT_HOST">137.110.111.226</string>
     <string name="DEFAULT_PORT">23333</string>
 
     <string name="cf_b_loadcache">true</string>
@@ -25,7 +25,7 @@
 
     <string name="check_group_name">Checks</string>
     <string name="tune_group_name">Tunes</string>
-    <string name="fund_group_name">Others</string>
+    <string name="fund_group_name">Setting</string>
 
 
     <string name="cf_drop_tune_w">1.0</string>
