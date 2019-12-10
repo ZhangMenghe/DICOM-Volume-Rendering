@@ -3,6 +3,7 @@ package helmsley.vr.DUIs;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +20,7 @@ import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
 public class SeekbarAdapter {
-    private ArrayList<WeakReference<seekbarListAdapter>> mAdapterRefs= new ArrayList<>();
+    private ArrayList<seekbarListAdapter> mAdapters = new ArrayList<>();
     private final WeakReference<Context> contexRef;
     private final WeakReference<UIsManager> mUIManagerRef;
     private final static String[] TuneTitles = {"Opacity", "Tunes"};
@@ -29,15 +30,23 @@ public class SeekbarAdapter {
 
     public SeekbarAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
-        for(int i=0; i<TuneTitles.length; i++){
-            mAdapterRefs.add(null);
-        }
         mUIManagerRef = new WeakReference<>(manager);
         //setup initial values
         Resources res = contexRef.get().getResources();
         //setup tune values
         setupTuneMapValue(res, R.array.texParams, 0 );
         setupTuneMapValue(res, R.array.raycastParams, 1);
+
+        for(int i=0; i<TuneTitles.length; i++){
+            LinkedHashMap vmap = tune_maps.get(i);
+            mAdapters.add(new seekbarListAdapter(
+                    contexRef.get(),
+                    new ArrayList<>(vmap.keySet()),
+                    new ArrayList<>(vmap.values()),
+                    tune_maxs.get(i),
+                    tune_seek_max.get(i),
+                    TuneTitles[i]));
+        }
     }
     private void setupTuneMapValue(Resources res, int paramID, int tex_ray_id) {
         TypedArray params = res.obtainTypedArray(paramID);
@@ -65,17 +74,7 @@ public class SeekbarAdapter {
     }
     public seekbarListAdapter getListAdapter(int index){
         if(index > TuneTitles.length) return null;
-        if(mAdapterRefs.get(index)!=null) return mAdapterRefs.get(index).get();
-        LinkedHashMap vmap = tune_maps.get(index);
-        seekbarListAdapter adapter = new seekbarListAdapter(
-                contexRef.get(),
-                new ArrayList<>(vmap.keySet()),
-                new ArrayList<>(vmap.values()),
-                tune_maxs.get(index),
-                tune_seek_max.get(index),
-                TuneTitles[index]);
-        mAdapterRefs.set(index, new WeakReference<>(adapter));
-        return adapter;
+        return mAdapters.get(index);
     }
 
     public class seekbarListAdapter extends ListAdapter {
