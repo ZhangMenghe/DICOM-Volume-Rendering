@@ -67,10 +67,8 @@
     </string-array>
 <!--other functions-->
     <string-array name="functions">
-        <item>Others</item>
-        <item>f1</item>
-        <item>f2</item>
-        <item>f3</item>
+        <item>Reset</item>
+        <item>Change Data</item>
     </string-array>
 
     <string-array name="entry_has_sub">
