@@ -14,16 +14,19 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
 import helmsley.vr.R;
+import helmsley.vr.UIsManager;
 
 public class checkboxAdapter {
     private WeakReference<checkboxListAdapter> mAdapterRef = null;
     private final WeakReference<Context> contexRef;
+    private final WeakReference<UIsManager> mUIManagerRef;
 
     private static LinkedHashMap<String, Boolean> check_map=new LinkedHashMap<>();
     private static String raycast_name;
 
-    public checkboxAdapter(Context context){
+    public checkboxAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
+        mUIManagerRef = new WeakReference<>(manager);
         //setup initial values
         setupCheckMapValue(contexRef.get().getResources());
     }
@@ -37,11 +40,11 @@ public class checkboxAdapter {
             values[i] = check_values.getBoolean(i, false);
             check_map.put(check_items[i], values[i]);
         }
-        raycast_name = check_items[0];
+        raycast_name = res.getString(R.string.texray_check_name);
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
     public static boolean isRaycast(){return check_map.get(raycast_name);}
-    public checkboxListAdapter createListAdapter(int index){
+    public checkboxListAdapter getListAdapter(){
         if(mAdapterRef == null){
             checkboxListAdapter adapter = new checkboxListAdapter(
                     contexRef.get(),
@@ -72,22 +75,25 @@ public class checkboxAdapter {
                 holder.text_name = (TextView) convertView.findViewById(R.id.checkName);
                 holder.checkBox = (CheckBox) convertView.findViewById(R.id.checkCheckBox);
                 convertView.setTag(R.layout.spinner_check_layout, holder);
+
+                holder.checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView,
+                                                 boolean isChecked) {
+                        if(item_values.get(position) == isChecked) return;
+
+                        if(item_names.get(position).equals(raycast_name)) mUIManagerRef.get().onTexRaySwitch(isChecked);
+                        item_values.set(position, isChecked);
+                        JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
+                    }
+                });
+                holder.checkBox.setTag(position);
+                holder.checkBox.setChecked(item_values.get(position));
+
             } else {
                 holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
             }
             holder.text_name.setText(item_names.get(position));
-
-            holder.checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView,
-                                             boolean isChecked) {
-                    item_values.set(position, isChecked);
-                    JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
-                }
-            });
-            holder.checkBox.setTag(position);
-            holder.checkBox.setChecked(item_values.get(position));
-
             return convertView;
         }
 

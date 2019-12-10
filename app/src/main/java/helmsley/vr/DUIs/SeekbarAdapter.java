@@ -21,18 +21,18 @@ import helmsley.vr.UIsManager;
 public class SeekbarAdapter {
     private ArrayList<WeakReference<seekbarListAdapter>> mAdapterRefs= new ArrayList<>();
     private final WeakReference<Context> contexRef;
-
+    private final WeakReference<UIsManager> mUIManagerRef;
     private final static String[] TuneTitles = {"Opacity", "Tunes"};
     private ArrayList<float[]>tune_maxs = new ArrayList<>();
     private ArrayList<int[]>tune_seek_max= new ArrayList<>();
     private ArrayList<LinkedHashMap<String, Float>> tune_maps= new ArrayList<>();
 
-    public SeekbarAdapter(Context context){
+    public SeekbarAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
         for(int i=0; i<TuneTitles.length; i++){
             mAdapterRefs.add(null);
         }
-
+        mUIManagerRef = new WeakReference<>(manager);
         //setup initial values
         Resources res = contexRef.get().getResources();
         //setup tune values
@@ -63,7 +63,7 @@ public class SeekbarAdapter {
 
         JUIInterface.JUIInitTuneParam(tex_ray_id, item_numbers, names, values);
     }
-    public seekbarListAdapter createListAdapter(int index){
+    public seekbarListAdapter getListAdapter(int index){
         if(index > TuneTitles.length) return null;
         if(mAdapterRefs.get(index)!=null) return mAdapterRefs.get(index).get();
         LinkedHashMap vmap = tune_maps.get(index);
