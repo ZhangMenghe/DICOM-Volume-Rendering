@@ -19,7 +19,8 @@ public class checkboxAdapter {
     private WeakReference<checkboxListAdapter> mAdapterRef = null;
     private final WeakReference<Context> contexRef;
 
-    private LinkedHashMap<String, Boolean> check_map=new LinkedHashMap<>();
+    private static LinkedHashMap<String, Boolean> check_map=new LinkedHashMap<>();
+    private static String raycast_name;
 
     public checkboxAdapter(Context context){
         contexRef = new WeakReference<>(context);
@@ -36,8 +37,10 @@ public class checkboxAdapter {
             values[i] = check_values.getBoolean(i, false);
             check_map.put(check_items[i], values[i]);
         }
+        raycast_name = check_items[0];
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
+    public static boolean isRaycast(){return check_map.get(raycast_name);}
     public checkboxListAdapter createListAdapter(int index){
         if(mAdapterRef == null){
             checkboxListAdapter adapter = new checkboxListAdapter(
@@ -79,7 +82,7 @@ public class checkboxAdapter {
                 public void onCheckedChanged(CompoundButton buttonView,
                                              boolean isChecked) {
                     item_values.set(position, isChecked);
-                    //todo:jnis
+                    JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
                 }
             });
             holder.checkBox.setTag(position);

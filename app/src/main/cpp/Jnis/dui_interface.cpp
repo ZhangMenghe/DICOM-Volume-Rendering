@@ -40,6 +40,9 @@ DUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jf
     auto it = std::find (vec->begin(), vec->end(), key);
     if (it != vec->end()){
         (id == TEX_ID)? vrController::param_tex[it - vec->begin()] = value : vrController::param_ray[it-vec->begin()] = value;
+        LOGE("======SET %s, %f", key.c_str(), value);
+    }else{
+        LOGE("======not find %s", key.c_str());
     }
 }
 DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
@@ -48,6 +51,9 @@ DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
+        LOGE("======SET  %s, %d", key.c_str(), value);
+    }else{
+        LOGE("======not find %s", key.c_str());
     }
 }
 

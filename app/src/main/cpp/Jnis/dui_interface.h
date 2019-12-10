@@ -13,7 +13,7 @@ extern "C"{
     DUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint, jobjectArray, jbooleanArray);
 
     DUI_METHOD(void, JUIsetTuneParam)(JNIEnv *, jclass, jint, jstring , jfloat);
-    DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring , jboolean);
+    DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring, jboolean);
 
 
 
