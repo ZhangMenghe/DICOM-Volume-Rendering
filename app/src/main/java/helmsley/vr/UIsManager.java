@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 
 import helmsley.vr.DUIs.SeekbarAdapter;
 import helmsley.vr.DUIs.checkboxAdapter;
+import helmsley.vr.DUIs.funcAdapter;
 
 public class UIsManager {
     private final WeakReference<Activity> actRef;
@@ -23,7 +24,6 @@ public class UIsManager {
 
     // UIs
     private Spinner spinner_tune, spinner_check, spinner_func;
-    private Button button_checkg, button_tuneg;
 
     // value maps
 
@@ -38,9 +38,12 @@ public class UIsManager {
 
     private void InitUIs(){
         //check spinner
-        spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
         setupTuneSpinner();
         setupCheckBoxSpinner();
+        //function spinner
+        spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
+        funcAdapter fAdapter = new funcAdapter(actRef.get());
+        spinner_func.setAdapter(fAdapter.createFuncAdapter());
     }
 
 
