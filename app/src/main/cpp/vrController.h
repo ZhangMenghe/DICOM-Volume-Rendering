@@ -11,6 +11,7 @@
 #include "dicomRenderer/funcsRenderer.h"
 #include <unordered_map>
 #include <vector>
+#include <Jnis/jni_main.h>
 
 class vrController:public nEntrance{
 public:
@@ -19,8 +20,8 @@ public:
     static int VOLUME_TEX_ID, BAKED_TEX_ID, BAKED_RAY_ID;
     static float _screen_w, _screen_h;
 
-    static std::unordered_map<std::string, float> param_value_map;
-    static std::unordered_map<std::string, bool > param_bool_map;
+//    static std::unordered_map<std::string, float> param_value_map;
+//    static std::unordered_map<std::string, bool > param_bool_map;
 
     static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
@@ -31,7 +32,9 @@ public:
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
 
-    inline static bool isRayCasting(){return param_bool_map["raycast"];}
+    inline static bool isRayCasting(){
+        return param_bool[dvr::CHECK_RAYCAST];
+    }
 
     static glm::vec3 csphere_c;
     static float csphere_radius;

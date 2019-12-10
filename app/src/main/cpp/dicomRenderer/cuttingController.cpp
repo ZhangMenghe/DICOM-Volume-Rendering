@@ -32,7 +32,7 @@ p_start_(ps), p_norm_(pn){
 }
 void cuttingController::UpdateAndDraw(){
     Update();
-    if(vrController::param_bool_map["cutting"]) draw_plane();
+    if(vrController::param_bool[dvr::CHECK_CUTTING]) draw_plane();
 }
 void cuttingController::setCuttingParams(GLuint sp,bool includePoints){
 //    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
@@ -116,8 +116,10 @@ void cuttingController::setCutPlane(float value){
     p_p2o_dirty = true;
 }
 bool cuttingController::keep_cutting_position(){
-    mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
-    return (tar == PLANE && vrController::param_bool_map["pfview"]);
+    return false;
+    //TODO!!!
+//    mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
+//    return (tar == PLANE && vrController::param_bool_map["pfview"]);
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){}

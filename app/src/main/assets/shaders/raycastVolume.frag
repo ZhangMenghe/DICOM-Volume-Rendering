@@ -26,7 +26,7 @@ uniform Plane uPlane;
 //uniform Sphere uSphere;
 
 uniform mediump sampler3D uSampler_tex;
-uniform bool ub_accumulate;//
+//uniform bool ub_accumulate;//
 uniform bool ub_cuttingplane;
 
 uniform float sample_step_inverse;      // step used to advance the sampling ray
