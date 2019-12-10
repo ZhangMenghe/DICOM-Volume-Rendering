@@ -1,6 +1,7 @@
 package helmsley.vr;
 
 import android.app.Activity;
+import android.util.Log;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
@@ -44,9 +45,7 @@ public class UIsManager {
         //Tune spinners
         spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
         seekbarAdapter = new SeekbarAdapter(actRef.get(), this);
-        seekbarAdapter.getListAdapter(tex_id);
-        seekbarAdapter.getListAdapter(raycast_id);
-        onTexRaySwitch(getTexRayIdx() == raycast_id);
+        spinner_tune.setAdapter(seekbarAdapter.getListAdapter(getTexRayIdx()));
         //function spinners
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
         funcAdapter fAdapter = new funcAdapter(actRef.get(), this);
