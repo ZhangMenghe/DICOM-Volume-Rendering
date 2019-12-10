@@ -18,6 +18,7 @@ SET(ANDROID_HELPER_FILES
         )
 SET(JNI_FILES
         Jnis/jni_interface.cpp
+        Jnis/dui_interface.cpp
         Jnis/jui_interface.cpp)
 SET(GL_PIPELINE_FILES
         GLPipeline/Shader.cpp

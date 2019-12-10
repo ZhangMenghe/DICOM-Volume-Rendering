@@ -13,6 +13,10 @@
     JNIEXPORT returnType JNICALL        \
         Java_helmsley_vr_UIsController_##funcName
 
+#define DUI_METHOD(returnType, funcName)\
+    JNIEXPORT returnType JNICALL        \
+        Java_helmsley_vr_DUIs_JUIInterface_##funcName
+
 namespace dvr{
     inline jlong nativeAddr;
 

@@ -18,8 +18,13 @@ public:
     static Camera* camera;
     static int VOLUME_TEX_ID, BAKED_TEX_ID, BAKED_RAY_ID;
     static float _screen_w, _screen_h;
+
     static std::unordered_map<std::string, float> param_value_map;
     static std::unordered_map<std::string, bool > param_bool_map;
+
+    static std::vector<float> param_tex, param_ray;
+    static std::vector<bool> param_bool;
+
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
     static glm::uvec3 VOL_DIMS;
@@ -46,6 +51,8 @@ public:
     void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);
+
+
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;

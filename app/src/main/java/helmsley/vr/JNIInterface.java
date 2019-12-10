@@ -1,7 +1,6 @@
 package helmsley.vr;
 
 import android.content.res.AssetManager;
-import android.graphics.Bitmap;
 
 import helmsley.vr.Utils.dcmImage;
 

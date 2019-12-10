@@ -14,6 +14,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
+import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 
 public class SeekbarAdapter {
@@ -34,25 +35,32 @@ public class SeekbarAdapter {
         //setup initial values
         Resources res = contexRef.get().getResources();
         //setup tune values
-        setupTuneMapValue(res, R.array.texParams);
-        setupTuneMapValue(res, R.array.raycastParams);
+        setupTuneMapValue(res, R.array.texParams, 0 );
+        setupTuneMapValue(res, R.array.raycastParams, 1);
     }
-    private void setupTuneMapValue(Resources res, int paramID) {
+    private void setupTuneMapValue(Resources res, int paramID, int tex_ray_id) {
         TypedArray params = res.obtainTypedArray(paramID);
         int item_numbers = params.length();
         LinkedHashMap<String, Float> value_map = new LinkedHashMap<>();
         float[] max_values = new float[item_numbers];
         int[] max_seeks = new int[item_numbers];
+        String[] names = new String[item_numbers];
+        float[] values= new float[item_numbers];
 
-        for (int i = 0; i < params.length(); i++) {
+        for (int i = 0; i < item_numbers; i++) {
             int resId = params.getResourceId(i, -1);
             if (resId == -1) continue;
+
             String param[] = res.getStringArray(resId);
-            value_map.put(param[0], Float.valueOf(param[1]));
+            names[i] = param[0];
+            values[i] = Float.valueOf(param[1]);
+            value_map.put(names[i], values[i]);
             max_values[i] = Float.valueOf(param[2]);
             max_seeks[i] = Integer.valueOf(param[3]);
         }
         tune_maxs.add(max_values); tune_seek_max.add(max_seeks);tune_maps.add(value_map);
+
+        JUIInterface.JUIInitTuneParam(tex_ray_id, item_numbers, names, values);
     }
     public seekbarListAdapter createListAdapter(int index){
         if(index > TuneTitles.length) return null;
@@ -130,6 +138,4 @@ public class SeekbarAdapter {
             SeekBar seekbar;
         }
     }
-
-
 }
