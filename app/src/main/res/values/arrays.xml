@@ -4,7 +4,7 @@
     <string-array name="checkParams">
         <item>@string/texray_check_name</item>
         <item>Color Transfer</item>
-        <item>Cutting</item>
+        <item>@string/cutting_check_name</item>
         <item>MaskOn</item>
     </string-array>
     <string-array name="checkValues">
@@ -70,6 +70,12 @@
         <item>Reset</item>
         <item>Change Data</item>
     </string-array>
+
+    <string-array name="cutting_plane">
+        <item>0.0</item>
+        <item>50</item>
+    </string-array>
+
 
     <string-array name="entry_has_sub">
         <item>Opacity</item>

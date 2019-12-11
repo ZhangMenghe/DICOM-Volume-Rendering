@@ -22,7 +22,7 @@ public class checkboxAdapter {
     private final WeakReference<UIsManager> mUIManagerRef;
 
     private static LinkedHashMap<String, Boolean> check_map=new LinkedHashMap<>();
-    private static String raycast_name;
+    private static String raycast_name, cutting_name;
 
     public checkboxAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
@@ -41,10 +41,10 @@ public class checkboxAdapter {
             check_map.put(check_items[i], values[i]);
         }
         raycast_name = res.getString(R.string.texray_check_name);
+        cutting_name = res.getString(R.string.cutting_check_name);
         mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
-    public static boolean isRaycast(){return check_map.get(raycast_name);}
     public checkboxListAdapter getListAdapter(){
         if(mAdapterRef == null){
             checkboxListAdapter adapter = new checkboxListAdapter(
@@ -82,8 +82,9 @@ public class checkboxAdapter {
                     public void onCheckedChanged(CompoundButton buttonView,
                                                  boolean isChecked) {
                         if(item_values.get(position) == isChecked) return;
-
                         if(item_names.get(position).equals(raycast_name)) mUIManagerRef.get().onTexRaySwitch(isChecked);
+                        else if(item_names.get(position).equals(cutting_name)) mUIManagerRef.get().onCuttingPlaneSwitch(isChecked);
+
                         item_values.set(position, isChecked);
                         JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
                     }
