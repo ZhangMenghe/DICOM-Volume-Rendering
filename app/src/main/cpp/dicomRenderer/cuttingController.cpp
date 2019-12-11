@@ -116,28 +116,23 @@ void cuttingController::setCutPlane(float value){
     p_p2o_dirty = true;
 }
 bool cuttingController::keep_cutting_position(){
-    return false;
-    //TODO!!!
-//    mTarget tar = mTarget((int)vrController::param_value_map["mtarget"]);
-//    return (tar == PLANE && vrController::param_bool_map["pfview"]);
+    return vrController::param_bool[dvr::CHECK_FREEZE_CPLANE];
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){}
-void cuttingController::onRotate(mTarget target, float offx, float offy){
-    if(target == PLANE){
-        update_plane_(glm::rotate(glm::mat4(1.0f), offx, glm::vec3(0,1,0))
-                        * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))
-                        * p_rotate_mat_);
-        p_p2o_dirty = true;
-    }
+void cuttingController::onRotate(float offx, float offy){
+    update_plane_(glm::rotate(glm::mat4(1.0f), offx, glm::vec3(0,1,0))
+                    * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))
+                    * p_rotate_mat_);
+    p_p2o_dirty = true;
 }
 
-void cuttingController::onScale(mTarget target, float sx, float sy, float sz){
+void cuttingController::onScale(float sx, float sy, float sz){
     if(sy < .0f)    p_scale = p_scale * sx;
     else p_scale = p_scale * glm::vec3(sx, sy, sz);
     p_p2o_dirty = true;
 }
-void cuttingController::onTranslate(mTarget target, float offx, float offy){
+void cuttingController::onTranslate(float offx, float offy){
     //do nothing currently
 }
 void cuttingController::update_modelMat_o(){

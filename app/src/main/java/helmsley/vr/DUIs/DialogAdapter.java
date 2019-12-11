@@ -65,6 +65,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
         holder.textViewDate.setText(info.getDate());
         holder.textViewPatient.setText(info.getPatientName());
         //todo:nothing
+        holder.textViewDetail.setText("Details:..");
 //        holder.textViewDetail.setText(activityReference.get().getString(R.string.card_data_detail,info.getFolderName(),info.getFileNums()));
     }
 

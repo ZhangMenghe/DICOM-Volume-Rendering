@@ -22,7 +22,7 @@ public class checkboxAdapter {
     private final WeakReference<UIsManager> mUIManagerRef;
 
     private static LinkedHashMap<String, Boolean> check_map;
-    private static String raycast_name, cutting_name, freeze_plane_name;
+    private static String raycast_name, cutting_name, freeze_plane_name, freeze_volume_name;
 
     public checkboxAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
@@ -42,6 +42,7 @@ public class checkboxAdapter {
         raycast_name = res.getString(R.string.texray_check_name);
         cutting_name = res.getString(R.string.cutting_check_name);
         freeze_plane_name=res.getString(R.string.freezeplane_check_name);
+        freeze_volume_name = res.getString(R.string.freezeVolume_check_name);
 
         mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
@@ -113,6 +114,7 @@ public class checkboxAdapter {
                     if(item_name.equals(raycast_name)) onTexRaySwitch(isChecked);
                     else if(item_name.equals(cutting_name)) onCuttingPlaneSwitch(isChecked);
                     else if(item_name.equals(freeze_plane_name)) onFreezePlaneSwitch(isChecked);
+                    else if(item_name.equals(freeze_volume_name)) onFreezeVolumeSwitch(isChecked);
 
                     item_values.set(position, isChecked);
                     JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
@@ -143,5 +145,22 @@ public class checkboxAdapter {
     }
     private void onFreezePlaneSwitch(boolean isChecked){
         cutplaneUIs.isPlaneFreeze = isChecked;
+        //mutual exclusion true
+        if(isChecked && mAdapter.getItemValue(freeze_volume_name)){
+            int position = mAdapter.item_names.indexOf(freeze_volume_name);
+            mAdapter.item_values.set(position, false);
+            JUIInterface.JUIsetChecks(mAdapter.item_names.get(position), false);
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+    private void onFreezeVolumeSwitch(boolean isChecked){
+        //mutual exclusion true
+        if(isChecked && mAdapter.getItemValue(freeze_plane_name)){
+            cutplaneUIs.isPlaneFreeze = false;
+            int position = mAdapter.item_names.indexOf(freeze_plane_name);
+            mAdapter.item_values.set(position, false);
+            JUIInterface.JUIsetChecks(mAdapter.item_names.get(position), false);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }

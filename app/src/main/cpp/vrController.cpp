@@ -123,11 +123,11 @@ void vrController::onTouchMove(float x, float y) {
         else camera->rotateCamera(2, ModelMat_[3], yoffset);
         return;
     }
-    //Todo!!!
-//    if(param_value_map["mtarget"] > .0f && !param_bool_map["pfview"]){
-//        cuttingController::instance()->onRotate(mTarget((int)param_value_map["mtarget"]), xoffset, yoffset);
-//        return;
-//    }
+    if(param_bool[dvr::CHECK_FREEZE_VOLUME] && !param_bool[dvr::CHECK_FREEZE_CPLANE]){
+        cuttingController::instance()->onRotate(xoffset, yoffset);
+        return;
+    }
+//    cuttingController::instance()->setTarget(param_bool[dvr::CHECK_FREEZE_CPLANE]?VOLUME:PLANE);
 
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
     volume_model_dirty = true;
@@ -140,15 +140,12 @@ void vrController::onScale(float sx, float sy){
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
 
-    //Todo!!!
-//    //rotate cutting
-//    if(param_value_map["mtarget"] > .0f){
-//        mTarget tar = mTarget((int)param_value_map["mtarget"]);
-//        cuttingController::instance()->onScale(tar, sx);
-//    }else{
+    if(param_bool[dvr::CHECK_FREEZE_VOLUME]){
+        cuttingController::instance()->onScale(sx);
+    }else{
         ScaleVec3_ = ScaleVec3_* sx;
         volume_model_dirty = true;
-//    }
+    }
 }
 void vrController::onPan(float x, float y){
     if(!tex_volume) return;
