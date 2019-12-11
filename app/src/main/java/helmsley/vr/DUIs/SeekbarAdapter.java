@@ -20,23 +20,33 @@ import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
 public class SeekbarAdapter {
-    private ArrayList<seekbarListAdapter> mAdapters = new ArrayList<>();
+    private ArrayList<seekbarListAdapter> mAdapters;
     private final WeakReference<Context> contexRef;
     private final WeakReference<UIsManager> mUIManagerRef;
     private final static String[] TuneTitles = {"Opacity", "Tunes"};
-    private ArrayList<float[]>tune_maxs = new ArrayList<>();
-    private ArrayList<int[]>tune_seek_max= new ArrayList<>();
-    private ArrayList<LinkedHashMap<String, Float>> tune_maps= new ArrayList<>();
+    private ArrayList<float[]>tune_maxs;
+    private ArrayList<int[]>tune_seek_max;
+    private ArrayList<LinkedHashMap<String, Float>> tune_maps;
 
     public SeekbarAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
         mUIManagerRef = new WeakReference<>(manager);
+        Reset();
+    }
+    public seekbarListAdapter getListAdapter(int index){
+        if(index > TuneTitles.length) return null;
+        return mAdapters.get(index);
+    }
+    public void Reset(){
+        tune_maxs = new ArrayList<>();
+        tune_seek_max= new ArrayList<>();
+        tune_maps = new ArrayList<>();
+        mAdapters = new ArrayList<>();
         //setup initial values
         Resources res = contexRef.get().getResources();
         //setup tune values
         setupTuneMapValue(res, R.array.texParams, 0 );
         setupTuneMapValue(res, R.array.raycastParams, 1);
-
         for(int i=0; i<TuneTitles.length; i++){
             LinkedHashMap vmap = tune_maps.get(i);
             mAdapters.add(new seekbarListAdapter(
@@ -48,6 +58,7 @@ public class SeekbarAdapter {
                     TuneTitles[i]));
         }
     }
+
     private void setupTuneMapValue(Resources res, int paramID, int tex_ray_id) {
         TypedArray params = res.obtainTypedArray(paramID);
         int item_numbers = params.length();
@@ -72,11 +83,6 @@ public class SeekbarAdapter {
 
         JUIInterface.JUIInitTuneParam(tex_ray_id, item_numbers, names, values);
     }
-    public seekbarListAdapter getListAdapter(int index){
-        if(index > TuneTitles.length) return null;
-        return mAdapters.get(index);
-    }
-
     public class seekbarListAdapter extends ListAdapter {
         private ArrayList<Float> item_values;
         private float[] item_value_max;

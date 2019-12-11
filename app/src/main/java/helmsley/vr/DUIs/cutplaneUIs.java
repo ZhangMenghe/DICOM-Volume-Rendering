@@ -1,7 +1,6 @@
 package helmsley.vr.DUIs;
 
 import android.app.Activity;
-import android.content.res.TypedArray;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,18 +24,17 @@ public class cutplaneUIs {
     //panel
     private View panel_tune_;//bottom
 
-    private boolean isCutting = false;
+    private boolean isCutting;
     public cutplaneUIs(final Activity activity){
         actRef = new WeakReference<>(activity);
 
         panel_tune_ = (View)activity.findViewById(R.id.bottomPanel);
-        panel_tune_.setVisibility(View.INVISIBLE);
-
+//        panel_tune_.setVisibility(View.INVISIBLE);
         seek_bar_ = (SeekBar)activity.findViewById(R.id.cuttingSeekBar);
         String params[] = activity.getResources().getStringArray(R.array.cutting_plane);
 
         int max_seek_value = Integer.valueOf(params[1]);
-        seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
+//        seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
         seek_bar_.setMax(max_seek_value);
         seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -80,8 +78,17 @@ public class cutplaneUIs {
             }
 
         });
+        Reset();
     }
+    public void Reset(){
+        isCutting = false;
+        panel_tune_.setVisibility(View.INVISIBLE);
+        String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
 
+        int max_seek_value = Integer.valueOf(params[1]);
+        seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
+
+    }
     public void onCuttingStateChange(boolean isCutting_, boolean isRaycast){
         isCutting = isCutting_;
         if(isCutting){
