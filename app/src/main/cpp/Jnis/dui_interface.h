@@ -14,7 +14,7 @@ extern "C"{
     DUI_METHOD(void, JUIsetTuneParam)(JNIEnv *, jclass, jint, jstring , jfloat);
     DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring, jboolean);
 
-    DUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat);
+    DUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat, jboolean);
 
 
 

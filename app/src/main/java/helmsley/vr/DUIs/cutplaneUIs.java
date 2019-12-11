@@ -25,6 +25,8 @@ public class cutplaneUIs {
     private View panel_tune_;//bottom
 
     private boolean isCutting;
+    //todo:set it
+    public static boolean isPlaneFreeze = false;
     public cutplaneUIs(final Activity activity){
         actRef = new WeakReference<>(activity);
 
@@ -39,7 +41,7 @@ public class cutplaneUIs {
         seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                JUIInterface.JUIsetCuttingPlane(UIsManager.tex_id, 1.0f * i / max_seek_value);
+                JUIInterface.JUIsetCuttingPlane(UIsManager.tex_id, 1.0f * i / max_seek_value, false);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -62,7 +64,7 @@ public class cutplaneUIs {
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        JUIInterface.JUIsetCuttingPlane(UIsManager.raycast_id, event.getRawX() - down_e_x);
+                        JUIInterface.JUIsetCuttingPlane(UIsManager.raycast_id, event.getRawX() - down_e_x, isPlaneFreeze);
                         view.setX(e_v_offset + event.getRawX());
                         break;
 
