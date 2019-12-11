@@ -22,17 +22,12 @@ public class UIsManager {
     //Spinner adapter
     SeekbarAdapter seekbarAdapter;
 
-    final static private int tex_id=0, raycast_id=1;
+    final static public int tex_id=0, raycast_id=1;
     static private int current_texray_id = -1;
     public UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);
         cuttingController = new cutplaneUIs(activity_);
-        InitUIs();
-    }
-
-
-    private void InitUIs(){
         setupTopPanelSpinners();
     }
 
@@ -46,8 +41,6 @@ public class UIsManager {
         checkboxAdapter cbAdapter = new checkboxAdapter(actRef.get(), this);
         spinner_check.setAdapter(cbAdapter.getListAdapter());
 
-
-//        spinner_tune.setAdapter(seekbarAdapter.getListAdapter(getTexRayIdx()));
         //function spinners
         spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
         funcAdapter fAdapter = new funcAdapter(actRef.get(), this);
@@ -62,6 +55,10 @@ public class UIsManager {
     public void onTexRaySwitch(boolean isRaycast){
         spinner_tune.setAdapter(seekbarAdapter.getListAdapter(isRaycast?raycast_id:tex_id));
         current_texray_id = isRaycast?raycast_id:tex_id;
+        cuttingController.onCuttingStateChange(isRaycast);
+    }
+    public void onCuttingPlaneSwitch(boolean isCutting){
+        cuttingController.onCuttingStateChange(isCutting, current_texray_id==raycast_id);
     }
 
 }

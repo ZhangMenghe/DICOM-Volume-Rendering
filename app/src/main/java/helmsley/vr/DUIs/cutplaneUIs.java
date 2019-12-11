@@ -1,17 +1,18 @@
 package helmsley.vr.DUIs;
 
 import android.app.Activity;
+import android.content.res.TypedArray;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.SeekBar;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 
 import helmsley.vr.R;
-
-import static helmsley.vr.UIsController.JUIsetParam;
+import helmsley.vr.UIsManager;
 
 public class cutplaneUIs {
     private final WeakReference<Activity> actRef;
@@ -24,6 +25,7 @@ public class cutplaneUIs {
     //panel
     private View panel_tune_;//bottom
 
+    private boolean isCutting = false;
     public cutplaneUIs(final Activity activity){
         actRef = new WeakReference<>(activity);
 
@@ -31,12 +33,15 @@ public class cutplaneUIs {
         panel_tune_.setVisibility(View.INVISIBLE);
 
         seek_bar_ = (SeekBar)activity.findViewById(R.id.cuttingSeekBar);
+        String params[] = activity.getResources().getStringArray(R.array.cutting_plane);
+
+        int max_seek_value = Integer.valueOf(params[1]);
+        seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
+        seek_bar_.setMax(max_seek_value);
         seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                Log.e(TAG, "====onProgressChanged: " );
-//                if(!b) return;
-//                JUIsetParam("cutting", 1.0f * i / seek_value_pair.second);
+                JUIInterface.JUIsetCuttingPlane(UIsManager.tex_id, 1.0f * i / max_seek_value);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -44,6 +49,7 @@ public class cutplaneUIs {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
+
 
         button_ = activity.findViewById(R.id.cutting_button);
         button_.setOnTouchListener(new View.OnTouchListener(){
@@ -58,7 +64,7 @@ public class cutplaneUIs {
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        JUIsetParam("cutting", event.getRawX() - down_e_x);
+                        JUIInterface.JUIsetCuttingPlane(UIsManager.raycast_id, event.getRawX() - down_e_x);
                         view.setX(e_v_offset + event.getRawX());
                         break;
 
@@ -72,6 +78,28 @@ public class cutplaneUIs {
                 }
                 return true;
             }
+
         });
+    }
+
+    public void onCuttingStateChange(boolean isCutting_, boolean isRaycast){
+        isCutting = isCutting_;
+        if(isCutting){
+            panel_tune_.setVisibility(View.VISIBLE);
+            if(isRaycast){
+                button_.show();
+                seek_bar_.setVisibility(View.INVISIBLE);
+                Toast.makeText(actRef.get(), "Drag Bottom Button to Change", Toast.LENGTH_LONG).show();
+            }else{
+                button_.hide();
+                seek_bar_.setVisibility(View.VISIBLE);
+                Toast.makeText(actRef.get(), "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();
+            }
+        }else{
+            panel_tune_.setVisibility(View.INVISIBLE);
+        }
+    }
+    public void onCuttingStateChange(boolean isRaycast){
+        onCuttingStateChange(isCutting, isRaycast);
     }
 }
