@@ -9,7 +9,8 @@ using namespace dvr;
 namespace {
     std::vector<std::string> param_tex_names, param_ray_names, param_checks;
     const int TEX_ID = 0, RAY_ID = 1;
-    const std::string cutting_keyword = "cutting", freeze_keyworkd="freeze_cplane";
+    //todo:currently should manully keep consistence with R.string....
+    const std::string cutting_keyword = "Cutting", freeze_keyworkd="Freeze Plane";
 }
 
 DUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobjectArray jkeys, jfloatArray jvalues){
@@ -38,7 +39,7 @@ DUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray
         std::string key = dvr::jstring2string(env,jkey);
         param_checks.push_back(key);
         vrController::param_bool.push_back(values[i]);
-        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
+//        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
 
     param_checks.push_back(freeze_keyworkd);
@@ -63,19 +64,21 @@ DUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
+//        LOGE("======SET  %s, %d", key.c_str(), value);
+        if(jstring2string(env, jkey)==freeze_keyworkd) vrController::cutDirty = true;
         vrController::baked_dirty_ = true;
-        LOGE("======SET  %s, %d", key.c_str(), value);
     }
+
 }
 DUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value, jboolean freeze_plane){
     auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
     auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
-//    LOGE("======CUTTING %d, %f", id, value);
+//    LOGE("======CUTTING %d, %f, %d", id, value, freeze_plane?1:0);
     auto it = std::find (vec->begin(), vec->end(), cutting_keyword);
     (*tvec)[it - vec->begin()] = value;
     if(id == RAY_ID){
-        auto it_freeze = std::find(vec->begin(), vec->end(), freeze_keyworkd);
-        (*tvec)[it_freeze - vec->begin()] = freeze_plane;
+        auto it_freeze = std::find (param_checks.begin(), param_checks.end(), freeze_keyworkd);
+        vrController::param_bool[it_freeze-param_checks.begin()] = freeze_plane;
     }
     vrController::cutDirty = true;
     vrController::baked_dirty_ = true;

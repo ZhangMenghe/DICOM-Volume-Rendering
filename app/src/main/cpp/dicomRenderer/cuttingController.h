@@ -43,6 +43,7 @@ private:
     float cmove_value = .0f;
     glm::vec4 plane_color_ = glm::vec4(0.8, 0.8,.0, 0.3);
     const float CUTTING_FACTOR = 0.00002f;
+    mTarget current_target = VOLUME;
 
     void draw_plane();
     bool keep_cutting_position();
@@ -55,6 +56,7 @@ public:
     static cuttingController* instance();
     cuttingController();
     cuttingController(glm::vec3 ps, glm::vec3 pn);
+    void setTarget(mTarget target){current_target = target;}
     void Update();
     void UpdateAndDraw();
     void setCuttingParams(GLuint sp, bool includePoints = false);
@@ -63,9 +65,9 @@ public:
     void setCutPlane(glm::vec3 normal);
     void setCutPlane(glm::vec3 startPoint, glm::vec3 normal);
 
-    void onRotate(mTarget target, float offx, float offy);
-    void onScale(mTarget target, float sx, float sy=-1.0f, float sz=-1.0f);
-    void onTranslate(mTarget target, float offx, float offy);
+    void onRotate(float offx, float offy);
+    void onScale(float sx, float sy=-1.0f, float sz=-1.0f);
+    void onTranslate(float offx, float offy);
 };
 
 
