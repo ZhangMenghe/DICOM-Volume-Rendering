@@ -110,6 +110,7 @@ void vrController::onDraw() {
 
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
+    if(!param_bool[dvr::CHECK_CUTTING]&&param_bool[dvr::CHECK_FREEZE_VOLUME]) return;
 
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 
@@ -123,7 +124,7 @@ void vrController::onTouchMove(float x, float y) {
         else camera->rotateCamera(2, ModelMat_[3], yoffset);
         return;
     }
-    if(param_bool[dvr::CHECK_FREEZE_VOLUME] && !param_bool[dvr::CHECK_FREEZE_CPLANE]){
+    if(param_bool[dvr::CHECK_FREEZE_VOLUME]){
         cuttingController::instance()->onRotate(xoffset, yoffset);
         return;
     }
@@ -148,7 +149,7 @@ void vrController::onScale(float sx, float sy){
     }
 }
 void vrController::onPan(float x, float y){
-    if(!tex_volume) return;
+    if(!tex_volume|| vrController::param_bool[dvr::CHECK_FREEZE_VOLUME]) return;
 
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
