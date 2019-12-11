@@ -88,7 +88,8 @@ public class checkboxAdapter {
             notifyDataSetChanged();
         }
         public boolean getItemValue(String name){
-            return this.item_values.get(this.item_names.indexOf(name));
+            int position = this.item_names.indexOf(name);
+            return position==-1? false:this.item_values.get(position);
         }
 
         public View getDropDownView(int position, View convertView, ViewGroup parent){
