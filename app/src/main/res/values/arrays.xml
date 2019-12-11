@@ -6,9 +6,11 @@
         <item>Color Transfer</item>
         <item>@string/cutting_check_name</item>
         <item>MaskOn</item>
+        <item>Freeze Volume</item>
     </string-array>
     <string-array name="checkValues">
         <item>true</item>
+        <item>false</item>
         <item>false</item>
         <item>false</item>
         <item>false</item>

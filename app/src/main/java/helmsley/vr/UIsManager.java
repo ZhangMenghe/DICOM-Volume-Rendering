@@ -19,11 +19,12 @@ public class UIsManager {
     protected dialogUIs dialogController;
 
     //Spinner adapter
-    SeekbarAdapter seekbarAdapter;
-    checkboxAdapter cbAdapter;
+    SeekbarAdapter seekbarAdapter = null;
+    checkboxAdapter cbAdapter = null;
 
     final static public int tex_id=0, raycast_id=1;
     static private int current_texray_id = -1;
+
     public UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);

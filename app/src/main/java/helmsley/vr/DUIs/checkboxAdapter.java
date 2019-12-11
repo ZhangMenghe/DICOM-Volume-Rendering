@@ -22,7 +22,7 @@ public class checkboxAdapter {
     private final WeakReference<UIsManager> mUIManagerRef;
 
     private static LinkedHashMap<String, Boolean> check_map;
-    private static String raycast_name, cutting_name;
+    private static String raycast_name, cutting_name, freeze_plane_name;
 
     public checkboxAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
@@ -41,6 +41,8 @@ public class checkboxAdapter {
         }
         raycast_name = res.getString(R.string.texray_check_name);
         cutting_name = res.getString(R.string.cutting_check_name);
+        freeze_plane_name=res.getString(R.string.freezeplane_check_name);
+
         mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
@@ -60,6 +62,7 @@ public class checkboxAdapter {
         }
         return mAdapter;
     }
+
     public class checkboxListAdapter extends ListAdapter{
         private ArrayList<Boolean> item_values;
 
@@ -70,7 +73,22 @@ public class checkboxAdapter {
             this.item_names = item_names;
             this.item_values = item_values;
         }
-
+        public void addItem(String name, boolean value){
+            if(this.item_names.contains(name)) return;
+            this.item_names.add(name);
+            this.item_values.add(value);
+            notifyDataSetChanged();
+        }
+        public void removeItem(String name){
+            int id = this.item_names.indexOf(name);
+            if(id == -1) return;
+            this.item_names.remove(id);
+            this.item_values.remove(id);
+            notifyDataSetChanged();
+        }
+        public boolean getItemValue(String name){
+            return this.item_values.get(this.item_names.indexOf(name));
+        }
 
         public View getDropDownView(int position, View convertView, ViewGroup parent){
             ViewContentHolder holder;
@@ -81,25 +99,27 @@ public class checkboxAdapter {
                 holder.checkBox = (CheckBox) convertView.findViewById(R.id.checkCheckBox);
                 convertView.setTag(R.layout.spinner_check_layout, holder);
 
-                holder.checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView,
-                                                 boolean isChecked) {
-                        if(item_values.get(position) == isChecked) return;
-                        if(item_names.get(position).equals(raycast_name)) mUIManagerRef.get().onTexRaySwitch(isChecked);
-                        else if(item_names.get(position).equals(cutting_name)) mUIManagerRef.get().onCuttingPlaneSwitch(isChecked);
-
-                        item_values.set(position, isChecked);
-                        JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
-                    }
-                });
-                holder.checkBox.setTag(position);
-                holder.checkBox.setChecked(item_values.get(position));
-
             } else {
                 holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
             }
             holder.text_name.setText(item_names.get(position));
+            holder.checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView,
+                                             boolean isChecked) {
+                    if(item_values.get(position) == isChecked) return;
+                    String item_name = item_names.get(position);
+
+                    if(item_name.equals(raycast_name)) onTexRaySwitch(isChecked);
+                    else if(item_name.equals(cutting_name)) onCuttingPlaneSwitch(isChecked);
+                    else if(item_name.equals(freeze_plane_name)) onFreezePlaneSwitch(isChecked);
+
+                    item_values.set(position, isChecked);
+                    JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
+                }
+            });
+            holder.checkBox.setTag(position);
+            holder.checkBox.setChecked(item_values.get(position));
             return convertView;
         }
 
@@ -109,5 +129,19 @@ public class checkboxAdapter {
         }
 
     }
+    private void onTexRaySwitch(boolean isChecked){
+        if(isChecked && mAdapter.getItemValue(cutting_name)) mAdapter.addItem(freeze_plane_name, false);
+        else mAdapter.removeItem(freeze_plane_name);
 
+        mUIManagerRef.get().onTexRaySwitch(isChecked);
+    }
+    private void onCuttingPlaneSwitch(boolean isChecked){
+        if(isChecked && mAdapter.getItemValue(raycast_name)) mAdapter.addItem(freeze_plane_name, false);
+        else mAdapter.removeItem(freeze_plane_name);
+
+        mUIManagerRef.get().onCuttingPlaneSwitch(isChecked);
+    }
+    private void onFreezePlaneSwitch(boolean isChecked){
+        cutplaneUIs.isPlaneFreeze = isChecked;
+    }
 }

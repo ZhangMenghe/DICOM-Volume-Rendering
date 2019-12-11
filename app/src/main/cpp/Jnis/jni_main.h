@@ -25,7 +25,9 @@ namespace dvr{
         CHECK_RAYCAST=0,
         CHECK_COLOR_TRANS,
         CHECK_CUTTING,
-        CHECK_MASKON
+        CHECK_MASKON,
+        CHECK_FREEZE_VOLUME,
+        CHECK_FREEZE_CPLANE
     };
     enum PARAM_TEX{
         TUNE_OVERALL=0,
