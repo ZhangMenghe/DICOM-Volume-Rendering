@@ -2,6 +2,7 @@ package helmsley.vr.DUIs;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -46,16 +47,42 @@ public class funcAdapter{
                 holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
             }
             holder.text_name.setText(item_names.get(position));
-            holder.text_name.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    switch (position){
-                        case 0:onClickResetButton();break;
-                        case 1:onClickDataChangeButton();break;
-                        default:break;
+//            holder.text_name.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    //change background
+//                    holder.text_name.setTextAppearance(R.style.itemHighlightText);
+//                    switch (position){
+//                        case 0:onClickResetButton();break;
+//                        case 1:onClickDataChangeButton();break;
+//                        default:break;
+//                    }
+//                }
+//            });
+
+            holder.text_name.setOnTouchListener(new View.OnTouchListener(){
+                public boolean onTouch(View view, MotionEvent event) {
+                    switch (event.getActionMasked()) {
+                        case MotionEvent.ACTION_DOWN:
+                            holder.text_name.setTextAppearance(R.style.itemHighlightText);
+                            switch (position){
+                                case 0:onClickResetButton();break;
+                                case 1:onClickDataChangeButton();break;
+                                default:break;
+                            }
+                            break;
+                        case MotionEvent.ACTION_UP:
+                            holder.text_name.setTextAppearance(R.style.itemText);
+                            break;
+
+                        default:
+                            break;
                     }
+                    return true;
                 }
+
             });
+
 
             return convertView;
         }

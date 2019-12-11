@@ -63,7 +63,7 @@ public class dialogUIs {
         layoutDialog_builder.setView(dialogView);
         AlertDialog dialog = layoutDialog_builder.create();
 
-        dialog.setCanceledOnTouchOutside(false);
+//        dialog.setCanceledOnTouchOutside(false);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
