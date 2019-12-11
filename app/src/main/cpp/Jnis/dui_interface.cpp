@@ -15,6 +15,7 @@ namespace {
 DUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobjectArray jkeys, jfloatArray jvalues){
     auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
     auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
+    vec->clear();tvec->clear();
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
     for(int i=0; i<num; i++){
         jstring jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
@@ -26,6 +27,8 @@ DUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobje
     vrController::baked_dirty_ = true;
 }
 DUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
+    param_checks.clear();
+    vrController::param_bool.clear();
     jboolean* values = env->GetBooleanArrayElements(jvalues, 0);
     for(int i=0; i<num; i++){
         jstring jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));

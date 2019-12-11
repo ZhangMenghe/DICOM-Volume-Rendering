@@ -68,6 +68,7 @@ public class funcAdapter{
         //todo: unfinish!
     }
     private void onClickResetButton(){
+        mUIManagerRef.get().RequestReset();
     }
 }
 

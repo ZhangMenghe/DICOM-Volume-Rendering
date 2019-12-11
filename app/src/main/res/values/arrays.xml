@@ -68,7 +68,7 @@
 <!--other functions-->
     <string-array name="functions">
         <item>Reset</item>
-        <item>Change Data</item>
+        <item>Select Data</item>
     </string-array>
 
     <string-array name="cutting_plane">

@@ -1,7 +1,6 @@
 package helmsley.vr;
 
 import android.app.Activity;
-import android.util.Log;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
@@ -21,6 +20,7 @@ public class UIsManager {
 
     //Spinner adapter
     SeekbarAdapter seekbarAdapter;
+    checkboxAdapter cbAdapter;
 
     final static public int tex_id=0, raycast_id=1;
     static private int current_texray_id = -1;
@@ -38,7 +38,7 @@ public class UIsManager {
 
         //checkbox spinners
         spinner_check =  (Spinner)actRef.get().findViewById(R.id.checkSpinner);
-        checkboxAdapter cbAdapter = new checkboxAdapter(actRef.get(), this);
+        cbAdapter = new checkboxAdapter(actRef.get(), this);
         spinner_check.setAdapter(cbAdapter.getListAdapter());
 
         //function spinners
@@ -59,6 +59,12 @@ public class UIsManager {
     }
     public void onCuttingPlaneSwitch(boolean isCutting){
         cuttingController.onCuttingStateChange(isCutting, current_texray_id==raycast_id);
+    }
+    public void RequestReset(){
+        cuttingController.Reset();
+        seekbarAdapter.Reset();
+        cbAdapter.Reset();
+        spinner_check.setAdapter(cbAdapter.getListAdapter());
     }
 
 }

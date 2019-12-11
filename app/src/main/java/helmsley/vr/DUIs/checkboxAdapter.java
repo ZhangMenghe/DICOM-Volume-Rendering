@@ -17,18 +17,17 @@ import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
 public class checkboxAdapter {
-    private WeakReference<checkboxListAdapter> mAdapterRef = null;
+    private checkboxListAdapter mAdapter;
     private final WeakReference<Context> contexRef;
     private final WeakReference<UIsManager> mUIManagerRef;
 
-    private static LinkedHashMap<String, Boolean> check_map=new LinkedHashMap<>();
+    private static LinkedHashMap<String, Boolean> check_map;
     private static String raycast_name, cutting_name;
 
     public checkboxAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
         mUIManagerRef = new WeakReference<>(manager);
-        //setup initial values
-        setupCheckMapValue(contexRef.get().getResources());
+        Reset();
     }
     private void setupCheckMapValue(Resources res) {
         //setup check map values
@@ -45,16 +44,21 @@ public class checkboxAdapter {
         mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
+    public void Reset(){
+        check_map=new LinkedHashMap<>();
+        //setup initial values
+        setupCheckMapValue(contexRef.get().getResources());
+        mAdapter = null;
+    }
     public checkboxListAdapter getListAdapter(){
-        if(mAdapterRef == null){
-            checkboxListAdapter adapter = new checkboxListAdapter(
+        if(mAdapter == null){
+            mAdapter = new checkboxListAdapter(
                     contexRef.get(),
                     new ArrayList<>(check_map.keySet()),
                     new ArrayList<>(check_map.values()),
                     contexRef.get().getString(R.string.check_group_name));
-            mAdapterRef = new WeakReference<>(adapter);
         }
-        return mAdapterRef.get();
+        return mAdapter;
     }
     public class checkboxListAdapter extends ListAdapter{
         private ArrayList<Boolean> item_values;
