@@ -11,9 +11,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import helmsley.vr.R;
@@ -60,26 +58,24 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
         View card_view = (View) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.dataset_cards_layout, parent, false);
 
-
         card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                //show/hide volume details
                 int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
-                if(isLocal){
-                    ViewGroup vp = (ViewGroup)v;
-                    for(int index=0; index<vp.getChildCount(); ++index) {
-                        View child = vp.getChildAt(index);
-                        if(child.getId() == R.id.card_list){
-                            if(child.getVisibility() == View.VISIBLE)child.setVisibility(View.GONE);
-                            else child.setVisibility(View.VISIBLE);
-                        }
+                ViewGroup vp = (ViewGroup)v;
+                ListView lv = null;
+                for(int index=0; index<vp.getChildCount(); ++index) {
+                    View child = vp.getChildAt(index);
+                    if(child.getId() == R.id.card_list){
+                        lv = (ListView)child;
+                        if(!isLocal && lv.getCount() == 0)
+                            createListViewContent(lv, downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName());
+                        if(child.getVisibility() == View.VISIBLE)child.setVisibility(View.GONE);
+                        else child.setVisibility(View.VISIBLE);
+                        break;
                     }
-
-//                    dialogUIs.RequestVolumeFromDatasetLocal(downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName());
                 }
-
-                else
-                    dialogUIs.RequestVolumeFromDataset(downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName());
             }
         });
         return new cardHolder(card_view);
@@ -95,40 +91,13 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
         holder.textViewDetail.setText("Details:..");
 //        holder.textViewDetail.setText(activityReference.get().getString(R.string.card_data_detail,info.getFolderName(),info.getFileNums()));
 
-        if(isLocal) {
-            //build content
-            List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(info.getFolderName(), true);
-            ArrayList<String> volcon_lst = new ArrayList<>();
-            for (volumeResponse.volumeInfo vinfo : vol_lst)
-                volcon_lst.add(activityReference.get().getString(R.string.volume_lst_item, vinfo.getFolderName(), vinfo.getImgWidth(), vinfo.getImgHeight(), vinfo.getFileNums()));
+        if(isLocal) createListViewContent(holder.lstViewVol, info.getFolderName());
 
-
-            final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
-                    (activityReference.get(), android.R.layout.simple_list_item_1, volcon_lst);
-            //init listview
-            holder.lstViewVol.setAdapter(arrayAdapter);
-
-            ViewGroup.LayoutParams params = holder.lstViewVol.getLayoutParams();
-            params.height = holder.lstViewVol.getDividerHeight() * arrayAdapter.getCount();
-
-            for (int pos = 0; pos < arrayAdapter.getCount(); pos++) {
-                View cv = arrayAdapter.getView(pos, null, holder.lstViewVol);
-                cv.measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-                params.height += cv.getMeasuredHeight()
-                        + 40 * vol_lst.get(pos).getFolderName().length() / 24;
-                //todo:40 and 24 is estimated...very ugly..
-            }
-            holder.lstViewVol.setLayoutParams(params);
-            holder.lstViewVol.setVisibility(View.GONE);
-        }else{
-            //request on the click, not here
-            holder.lstViewVol.setVisibility(View.GONE);
-        }
-
+        holder.lstViewVol.setVisibility(View.GONE);
         holder.lstViewVol.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(isLocal)dialogUIs.RequestVolumeFromDatasetLocal(info.getFolderName(), position);
+                dialogUIs.RequestVolumeFromDataset(info.getFolderName(), position, isLocal);
             }
         });
     }
@@ -137,5 +106,27 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
     @Override
     public int getItemCount() {
         return downloaderReference.get().getAvailableDataset(isLocal).size();
+    }
+
+    private void createListViewContent(ListView lv, String ds_name){
+        List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
+        ArrayList<String> volcon_lst = new ArrayList<>();
+        for (volumeResponse.volumeInfo vinfo : vol_lst)
+            volcon_lst.add(activityReference.get().getString(R.string.volume_lst_item, vinfo.getFolderName(), vinfo.getImgWidth(), vinfo.getImgHeight(), vinfo.getFileNums()));
+        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
+                (activityReference.get(), android.R.layout.simple_list_item_1, volcon_lst);
+        //init listview
+        lv.setAdapter(arrayAdapter);
+
+        ViewGroup.LayoutParams params = lv.getLayoutParams();
+        params.height = lv.getDividerHeight() * arrayAdapter.getCount();
+
+        for (int pos = 0; pos < arrayAdapter.getCount(); pos++) {
+            View cv = arrayAdapter.getView(pos, null, lv);
+            cv.measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            params.height += cv.getMeasuredHeight()
+                    + 40 * vol_lst.get(pos).getFolderName().length() / 24;
+        }
+        lv.setLayoutParams(params);
     }
 }
