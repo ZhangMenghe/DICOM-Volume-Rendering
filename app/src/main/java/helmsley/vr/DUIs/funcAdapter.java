@@ -68,6 +68,7 @@ public class funcAdapter{
                             switch (position){
                                 case 0:onClickResetButton();break;
                                 case 1:onClickDataChangeButton();break;
+                                case 2:onClickLocalDataButton();break;
                                 default:break;
                             }
                             break;
@@ -93,6 +94,9 @@ public class funcAdapter{
     private void onClickDataChangeButton(){
         mUIManagerRef.get().RequestSetupServerConnection();
         //todo: unfinish!
+    }
+    private void onClickLocalDataButton(){
+        mUIManagerRef.get().RequestSetupLocalDataServer();
     }
     private void onClickResetButton(){
         mUIManagerRef.get().RequestReset();

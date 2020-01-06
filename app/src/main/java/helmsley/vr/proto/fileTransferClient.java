@@ -2,6 +2,7 @@ package helmsley.vr.proto;
 
 import android.app.Activity;
 import android.os.AsyncTask;
+import android.renderscript.ScriptGroup;
 import android.util.Log;
 
 import helmsley.vr.DUIs.dialogUIs;
@@ -34,12 +35,15 @@ public class fileTransferClient {
 
     private final WeakReference<Activity> activityReference;
     private final String target_root_dir;
-    private List<datasetInfo> available_remote_datasets;
+    private List<datasetInfo> available_remote_datasets, available_local_datasets;
 
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
         target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
         selfReference = new WeakReference<>(this);
+    }
+    public void SetupLocalServer(){
+        LoadConfigFiles();
     }
     public String Setup(String host, String portStr){
         try{
@@ -57,8 +61,8 @@ public class fileTransferClient {
             return String.format("Failed... : %n%s", sw);
         }
     }
-    public List<datasetInfo> getAvailableDataset(){
-        return available_remote_datasets;
+    public List<datasetInfo> getAvailableDataset(boolean local){
+        return local? available_local_datasets: available_remote_datasets;
     }
 
     public List<volumeInfo> requestVolumesFromDataset(String dataset_name){
@@ -217,6 +221,36 @@ public class fileTransferClient {
             }
         }
         finished = true;
+    }
+    private void LoadConfigFiles(){
+        available_local_datasets = new ArrayList<>();
+        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2012-01-17-MRI").setDate("2012-01-17").build());
+        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2016-10-26-MRI").setDate("2016-10-26").build());
+
+//
+//        }/data/user/0/helmsley.vr/files/helmsley_cached/Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS
+        ///data/user/0/helmsley.vr/files/helmsley_cached/Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira
+    }
+    public boolean LoadCachedDataLocal(String vpath){
+        Activity activity = activityReference.get();
+        //target folder exist
+            File destDir = Paths.get(target_root_dir, vpath).toFile();
+            if(!destDir.exists()) return false;
+            //load data
+            try{
+                loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcm_name))), false);
+            }catch(Exception e){
+                e.printStackTrace();
+                return false;
+            }
+
+            //load mask
+            try{
+                loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name))), true);
+            }catch(Exception e){
+                Log.e(TAG, "===LoadCachedData: no masks found" );
+            }
+            return true;
     }
     private boolean LoadCachedData(){
         Activity activity = activityReference.get();

@@ -88,6 +88,10 @@ DUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value, jb
 //namespace {
 //    perfMonitor fps_monitor_;
 //}
+DUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass){
+    nativeApp(nativeAddr)->onReset();
+}
+
 DUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
     nativeApp(nativeAddr)->onSingleTouchDown(x, y);
 }

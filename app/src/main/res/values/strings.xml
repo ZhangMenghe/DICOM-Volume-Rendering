@@ -23,8 +23,8 @@
     <string name="dialog_select_title">Select a Dataset</string>
     <string name="dialog_progress_title">Loading...</string>
 
-    <string name="check_group_name">Checks</string>
-    <string name="tune_group_name">Tunes</string>
+    <string name="tune_group_name">Tune</string>
+    <string name="check_group_name">Check</string>
     <string name="fund_group_name">Setting</string>
 
     <string name="texray_check_name">seeVolume</string>

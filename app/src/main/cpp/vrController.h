@@ -9,6 +9,7 @@
 #include "GLPipeline/Camera.h"
 #include "nEntrance.h"
 #include "dicomRenderer/funcsRenderer.h"
+#include "dicomRenderer/Constants.h"
 #include <unordered_map>
 #include <vector>
 #include <Jnis/jni_main.h>
@@ -19,9 +20,6 @@ public:
     static Camera* camera;
     static int VOLUME_TEX_ID, BAKED_TEX_ID, BAKED_RAY_ID;
     static float _screen_w, _screen_h;
-
-//    static std::unordered_map<std::string, float> param_value_map;
-//    static std::unordered_map<std::string, bool > param_bool_map;
 
     static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
@@ -43,12 +41,16 @@ public:
     static vrController* instance();
 
     vrController(AAssetManager *assetManager);
+
     void assembleTexture(GLubyte * data);
     void assembleTextureMask(GLubyte* mask);
     void setVolumeConfig(int width, int height, int dims);
+
+    /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
     void onDraw();
+    void onReset();
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);
@@ -64,14 +66,9 @@ private:
     FuncRenderer* funcRenderer_ = nullptr;
 
     glm::fvec2 Mouse_old = glm::fvec2(.0);
-    const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
-    const float MOUSE_SCALE_SENSITIVITY = 0.8f;
-    const float MOUSE_PAN_SENSITIVITY = 1.2f;
-    const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f,0.5f);
-
     bool volume_model_dirty = true;
-    Shader* bakeShader_ = nullptr;
 
+    Shader* bakeShader_ = nullptr;
     uint32_t* vol_data = nullptr;
 
     void updateVolumeModelMat(){

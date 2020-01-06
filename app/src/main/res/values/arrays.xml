@@ -70,7 +70,8 @@
 <!--other functions-->
     <string-array name="functions">
         <item>Reset</item>
-        <item>Select Data</item>
+        <item>Remote Data</item>
+        <item>Local Data</item>
     </string-array>
 
     <string-array name="cutting_plane">

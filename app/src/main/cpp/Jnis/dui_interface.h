@@ -3,6 +3,7 @@
 #include "jni_main.h"
 
 extern "C"{
+    DUI_METHOD(void, JUIonReset)(JNIEnv*, jclass);
     DUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass, jfloat, jfloat);
     DUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat, jfloat);
     DUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat, jfloat);
