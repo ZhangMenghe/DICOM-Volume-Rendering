@@ -38,7 +38,7 @@ public class fileTransferClient {
     private final WeakReference<Activity> activityReference;
     private final String target_root_dir;
     private List<datasetInfo> available_remote_datasets, available_local_datasets;
-    private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>(), remote_dv_map = new HashMap<>();
+    private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
@@ -97,9 +97,6 @@ public class fileTransferClient {
         ///data/user/0/helmsley.vr/files/helmsley_cached/Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira
     }
 
-    public volumeInfo getVolumeAt(String dataset_name, int pos, boolean isLocal){
-        return isLocal?local_dv_map.get(dataset_name).get(pos):remote_dv_map.get(dataset_name).get(pos);
-    }
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
         return isLocal? available_local_datasets: available_remote_datasets;
     }
@@ -113,9 +110,9 @@ public class fileTransferClient {
         return blockingStub.getVolumeFromDataset(req).getVolumesList();
     }
 
-    public void Download(volumeInfo target_volume){
+    public void Download(String ds_name, volumeInfo target_volume){
         target_vol = target_volume;
-        if(!LoadCachedData())
+        if(!LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))
             new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds, target_volume.getFolderName()).toString());
     }
     public void DownloadMasks(String target_path){
@@ -265,7 +262,8 @@ public class fileTransferClient {
         finished = true;
     }
 
-    public boolean LoadCachedDataLocal(String vpath){
+
+    private boolean LoadDataFromLocal(String vpath){
         Activity activity = activityReference.get();
         //target folder exist
             File destDir = Paths.get(target_root_dir, vpath).toFile();
@@ -286,28 +284,7 @@ public class fileTransferClient {
             }
             return true;
     }
-    private boolean LoadCachedData(){
-        Activity activity = activityReference.get();
-        if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_loadcache))) return false;
-        //target folder exist
-        File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
-        if(!destDir.exists()) return false;
-        //load data
-        try{
-            loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcm_name))), false);
-        }catch(Exception e){
-            e.printStackTrace();
-            return false;
-        }
 
-        //load mask
-        try{
-            loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name))), true);
-        }catch(Exception e){
-            Log.e(TAG, "===LoadCachedData: no masks found" );
-        }
-        return true;
-    }
     private void loadVolumeData(InputStream instream, boolean isMask)
         throws IOException{
             byte[] chunk = new byte[1024];

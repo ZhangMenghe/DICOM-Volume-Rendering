@@ -142,27 +142,18 @@ public class dialogUIs {
         sendButton.setEnabled(true);
         return false;
     }
-    public static void RequestVolumeFromDatasetLocal(String dataset_name, int pos){
-        //request volumes of a specific dataset
-       volumeResponse.volumeInfo vol_info = downloader.getAvailableVolumes(dataset_name, true).get(pos);
+    public static void RequestVolumeFromDataset(String dataset_name, int pos, boolean isLocal){
+        volumeResponse.volumeInfo vol_info = downloader.getAvailableVolumes(dataset_name, isLocal).get(pos);
         JNIInterface.JNIsetupDCMIConfig(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums());
-        downloader.LoadCachedDataLocal(dataset_name+"/"+vol_info.getFolderName());
+
+//        if(isLocal)downloader.LoadCachedDataLocal(dataset_name+"/"+vol_info.getFolderName());
+//        else
+
+        downloader.Download(dataset_name, vol_info);
 
         //downloading...
         download_dialog.dismiss();
         SetupProgressDialog(dataset_name);
-    }
-    public static void RequestVolumeFromDataset(String dataset_name){
-        List<volumeResponse.volumeInfo>vol_lst = downloader.getAvailableVolumes(dataset_name, false);
-        //todo:some ui stuff->inflate a listview, wait to select
-        int tar_id = 0;
-        volumeResponse.volumeInfo tar_vol = vol_lst.get(tar_id);
-        JNIInterface.JNIsetupDCMIConfig(tar_vol.getImgWidth(), tar_vol.getImgHeight(), tar_vol.getFileNums());
-
-        //downloading...
-        downloader.Download(tar_vol);
-        download_dialog.dismiss();
-        SetupProgressDialog(tar_vol.getFolderName());
     }
 
     public static void FinishProgress(){if(progress_dialog!=null)progress_dialog.dismiss();}
