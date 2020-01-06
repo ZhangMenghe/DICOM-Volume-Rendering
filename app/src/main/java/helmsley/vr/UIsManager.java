@@ -53,7 +53,7 @@ public class UIsManager {
         dialogController.SetupConnect();
     }
     public void RequestSetupLocalDataServer(){
-        dialogController.SetupLocalDataLoader();
+        dialogController.SetupConnectLocal();
     }
     public static int getTexRayIdx(){
         return current_texray_id;

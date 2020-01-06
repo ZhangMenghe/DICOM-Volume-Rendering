@@ -17,8 +17,10 @@ import java.io.*;
 import java.lang.ref.WeakReference;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -36,14 +38,12 @@ public class fileTransferClient {
     private final WeakReference<Activity> activityReference;
     private final String target_root_dir;
     private List<datasetInfo> available_remote_datasets, available_local_datasets;
+    private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>(), remote_dv_map = new HashMap<>();
 
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
         target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
         selfReference = new WeakReference<>(this);
-    }
-    public void SetupLocalServer(){
-        LoadConfigFiles();
     }
     public String Setup(String host, String portStr){
         try{
@@ -61,16 +61,58 @@ public class fileTransferClient {
             return String.format("Failed... : %n%s", sw);
         }
     }
-    public List<datasetInfo> getAvailableDataset(boolean local){
-        return local? available_local_datasets: available_remote_datasets;
+    public void SetupLocal(){
+//        OutputStream out_config = new FileOutputStream(new File(destDir, activityReference.get().getString(R.string.cf_config_name)));
+//        OutputStreamWriter config_writer = new OutputStreamWriter(out_config);
+//        //save config
+//        String content = target_vol.getFolderName() + "\n"
+//                +target_vol.getFileNums() + "\n"
+//                +target_vol.getImgHeight() + "\n"
+//                +target_vol.getImgWidth();
+//        config_writer.write(content);
+//        config_writer.close();
+//        out_config.close();
+        //todo:dataset?volume
+        available_local_datasets = new ArrayList<>();
+        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2012-01-17-MRI").setDate("2012-01-17").build());
+        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2016-10-26-MRI").setDate("2016-10-26").build());
+
+//        if(dataset_name.equals("Larry-2012-01-17-MRI"))
+//        {JNIInterface.JNIsetupDCMIConfig(512, 512, 48);downloader.LoadCachedDataLocal("Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS");}
+//        else {JNIInterface.JNIsetupDCMIConfig(512, 512, 144);downloader.LoadCachedDataLocal("Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira");}
+
+
+        ArrayList<volumeInfo> vlst_2012 = new ArrayList<>();
+        vlst_2012.add(volumeInfo.newBuilder().setFolderName("series_214_DYN_COR_VIBE_3_RUNS").setFileNums(48).setImgHeight(512).setImgWidth(512).build());
+
+        ArrayList<volumeInfo> vlst_2016 = new ArrayList<>();
+        vlst_2016.add(volumeInfo.newBuilder().setFolderName("series_23_Cor_LAVA_PRE-Amira").setFileNums(144).setImgHeight(512).setImgWidth(512).build());
+
+
+        local_dv_map.put("Larry-2012-01-17-MRI", vlst_2012);
+        local_dv_map.put("Larry-2016-10-26-MRI", vlst_2016);
+
+//
+//        }/data/user/0/helmsley.vr/files/helmsley_cached/Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS
+        ///data/user/0/helmsley.vr/files/helmsley_cached/Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira
     }
 
-    public List<volumeInfo> requestVolumesFromDataset(String dataset_name){
+    public volumeInfo getVolumeAt(String dataset_name, int pos, boolean isLocal){
+        return isLocal?local_dv_map.get(dataset_name).get(pos):remote_dv_map.get(dataset_name).get(pos);
+    }
+    public List<datasetInfo> getAvailableDataset(boolean isLocal){
+        return isLocal? available_local_datasets: available_remote_datasets;
+    }
+    public List<volumeInfo> getAvailableVolumes(String dataset_name, boolean isLocal){
+        if(isLocal) return local_dv_map.get(dataset_name);
+
+        //download
         target_ds = dataset_name;
         Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(target_ds).build();
         dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
         return blockingStub.getVolumeFromDataset(req).getVolumesList();
     }
+
     public void Download(volumeInfo target_volume){
         target_vol = target_volume;
         if(!LoadCachedData())
@@ -222,15 +264,7 @@ public class fileTransferClient {
         }
         finished = true;
     }
-    private void LoadConfigFiles(){
-        available_local_datasets = new ArrayList<>();
-        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2012-01-17-MRI").setDate("2012-01-17").build());
-        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2016-10-26-MRI").setDate("2016-10-26").build());
 
-//
-//        }/data/user/0/helmsley.vr/files/helmsley_cached/Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS
-        ///data/user/0/helmsley.vr/files/helmsley_cached/Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira
-    }
     public boolean LoadCachedDataLocal(String vpath){
         Activity activity = activityReference.get();
         //target folder exist

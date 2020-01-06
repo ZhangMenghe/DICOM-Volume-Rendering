@@ -2,6 +2,7 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -76,7 +77,7 @@ public class dialogUIs {
                 port_addr = port_addr.isEmpty()?portEdit.getHint().toString():port_addr;
 
                 if(SetupDownloader(host_addr, port_addr)){
-                    Log.i(TAG, "====Connect to server successfully=====");
+                    Log.i(TAG, "=====Connect to server successfully=====");
                     dialog.dismiss();
                     SetupDownloadDialog(false);
                 }
@@ -85,9 +86,9 @@ public class dialogUIs {
 
         dialog.show();
     }
-    public void SetupLocalDataLoader(){
+    public void SetupConnectLocal(){
         downloader = new fileTransferClient(activity);
-        downloader.SetupLocalServer();
+        downloader.SetupLocal();
         SetupDownloadDialog(true);
     }
     private void SetupDownloadDialog(boolean local){
@@ -141,19 +142,19 @@ public class dialogUIs {
         sendButton.setEnabled(true);
         return false;
     }
-    public static void RequestVolumeFromDatasetLocal(String dataset_name){
-
-        if(dataset_name.equals("Larry-2012-01-17-MRI"))
-        {JNIInterface.JNIsetupDCMIConfig(512, 512, 48);downloader.LoadCachedDataLocal("Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS");}
-        else {JNIInterface.JNIsetupDCMIConfig(512, 512, 144);downloader.LoadCachedDataLocal("Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira");}
+    public static void RequestVolumeFromDatasetLocal(String dataset_name, int pos){
+        //request volumes of a specific dataset
+       volumeResponse.volumeInfo vol_info = downloader.getAvailableVolumes(dataset_name, true).get(pos);
+        JNIInterface.JNIsetupDCMIConfig(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums());
+        downloader.LoadCachedDataLocal(dataset_name+"/"+vol_info.getFolderName());
 
         //downloading...
         download_dialog.dismiss();
         SetupProgressDialog(dataset_name);
     }
     public static void RequestVolumeFromDataset(String dataset_name){
-        List<volumeResponse.volumeInfo>vol_lst = downloader.requestVolumesFromDataset(dataset_name);
-        //todo:some ui stuff->inflat a listview, wait to select
+        List<volumeResponse.volumeInfo>vol_lst = downloader.getAvailableVolumes(dataset_name, false);
+        //todo:some ui stuff->inflate a listview, wait to select
         int tar_id = 0;
         volumeResponse.volumeInfo tar_vol = vol_lst.get(tar_id);
         JNIInterface.JNIsetupDCMIConfig(tar_vol.getImgWidth(), tar_vol.getImgHeight(), tar_vol.getFileNums());
