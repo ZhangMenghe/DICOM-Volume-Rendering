@@ -89,7 +89,6 @@ public class cutplaneUIs {
 
         int max_seek_value = Integer.valueOf(params[1]);
         seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
-
     }
     public void onCuttingStateChange(boolean isCutting_, boolean isRaycast){
         isCutting = isCutting_;

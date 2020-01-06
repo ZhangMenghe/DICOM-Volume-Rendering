@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
+
+import helmsley.vr.DUIs.JUIInterface;
 import helmsley.vr.DUIs.SeekbarAdapter;
 import helmsley.vr.DUIs.checkboxAdapter;
 import helmsley.vr.DUIs.cutplaneUIs;
@@ -50,6 +52,9 @@ public class UIsManager {
     public void RequestSetupServerConnection(){
         dialogController.SetupConnect();
     }
+    public void RequestSetupLocalDataServer(){
+        dialogController.SetupLocalDataLoader();
+    }
     public static int getTexRayIdx(){
         return current_texray_id;
     }
@@ -66,6 +71,7 @@ public class UIsManager {
         seekbarAdapter.Reset();
         cbAdapter.Reset();
         spinner_check.setAdapter(cbAdapter.getListAdapter());
+        JUIInterface.JUIonReset();
     }
 
 }

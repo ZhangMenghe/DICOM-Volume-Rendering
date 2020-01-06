@@ -19,6 +19,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
     private final WeakReference<Activity> activityReference;
     private final WeakReference<RecyclerView> recyclerView;
     private final WeakReference<fileTransferClient> downloaderReference;
+    private boolean isLocal;
     //config of each card
     public static class cardHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
@@ -34,10 +35,11 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public DialogAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader) {
+    public DialogAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, boolean local) {
         downloaderReference = new WeakReference<>(downloader);
         activityReference = new WeakReference<>(activity);
         recyclerView = new WeakReference<>(recycle_view);
+        isLocal = local;
     }
 
     // Create new views (invoked by the layout manager)
@@ -52,7 +54,10 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
             @Override
             public void onClick(View v) {
                 int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
-                dialogUIs.RequestVolumeFromDataset(downloaderReference.get().getAvailableDataset().get(selectedItemPosition).getFolderName());
+                if(isLocal)
+                    dialogUIs.RequestVolumeFromDatasetLocal(downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName());
+                else
+                    dialogUIs.RequestVolumeFromDataset(downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName());
             }
         });
         return new cardHolder(card_view);
@@ -61,7 +66,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
     // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(cardHolder holder, int position) {
-        datasetInfo info = downloaderReference.get().getAvailableDataset().get(position);
+        datasetInfo info = downloaderReference.get().getAvailableDataset(isLocal).get(position);
         holder.textViewDate.setText(info.getDate());
         holder.textViewPatient.setText(info.getPatientName());
         //todo:nothing
@@ -72,6 +77,6 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return downloaderReference.get().getAvailableDataset().size();
+        return downloaderReference.get().getAvailableDataset(isLocal).size();
     }
 }

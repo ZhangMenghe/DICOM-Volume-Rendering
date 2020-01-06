@@ -1,20 +1,15 @@
 #include <AndroidUtils/AndroidHelper.h>
 #include "vrController.h"
-#include "dicomRenderer/Color.h"
 #include <AndroidUtils/mathUtils.h>
-
+using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
 Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr; Texture* vrController::ray_baked = nullptr;
-int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1, vrController::BAKED_RAY_ID = 2;//, vrController::TRANS_TEX_ID = 1;
+int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1, vrController::BAKED_RAY_ID = 2;
 float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
-//std::unordered_map<std::string, float> vrController::param_value_map;
-//std::unordered_map<std::string, bool > vrController::param_bool_map;
-
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
-
 
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
@@ -34,10 +29,14 @@ vrController::vrController(AAssetManager *assetManager):
     new assetLoader(assetManager);
     camera = new Camera;
     myPtr_ = this;
+    onReset();
+}
+void vrController::onReset() {
     ScaleVec3_ = DEFAULT_SCALE;
+    RotateMat_ = DEFAULT_ROTATE;
+    PosVec3_ = DEFAULT_POS;
     updateVolumeModelMat();
 }
-
 void vrController::setVolumeConfig(int width, int height, int dims){
     VOL_DIMS = glm::uvec3(width, height, dims);
 }

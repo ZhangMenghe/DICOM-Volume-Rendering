@@ -78,14 +78,19 @@ public class dialogUIs {
                 if(SetupDownloader(host_addr, port_addr)){
                     Log.i(TAG, "====Connect to server successfully=====");
                     dialog.dismiss();
-                    SetupDownloadDialog();
+                    SetupDownloadDialog(false);
                 }
             }
         });
 
         dialog.show();
     }
-    private void SetupDownloadDialog(){
+    public void SetupLocalDataLoader(){
+        downloader = new fileTransferClient(activity);
+        downloader.SetupLocalServer();
+        SetupDownloadDialog(true);
+    }
+    private void SetupDownloadDialog(boolean local){
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
 
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, null);
@@ -98,13 +103,13 @@ public class dialogUIs {
         RecyclerView.LayoutManager layout_manager = new LinearLayoutManager(activity);
         content_view.setLayoutManager(layout_manager);
         //adapter
-        content_view.setAdapter(new DialogAdapter(activity, content_view, downloader));
+        content_view.setAdapter(new DialogAdapter(activity, content_view, downloader, local));
 
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_select_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
         layoutDialog_builder.setView(dialogView);
         download_dialog = layoutDialog_builder.create();
-        download_dialog.setCanceledOnTouchOutside(false);
+//        download_dialog.setCanceledOnTouchOutside(false);
 
         download_dialog.show();
 
@@ -135,6 +140,16 @@ public class dialogUIs {
         errText.setVisibility(View.VISIBLE);
         sendButton.setEnabled(true);
         return false;
+    }
+    public static void RequestVolumeFromDatasetLocal(String dataset_name){
+
+        if(dataset_name.equals("Larry-2012-01-17-MRI"))
+        {JNIInterface.JNIsetupDCMIConfig(512, 512, 48);downloader.LoadCachedDataLocal("Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS");}
+        else {JNIInterface.JNIsetupDCMIConfig(512, 512, 144);downloader.LoadCachedDataLocal("Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira");}
+
+        //downloading...
+        download_dialog.dismiss();
+        SetupProgressDialog(dataset_name);
     }
     public static void RequestVolumeFromDataset(String dataset_name){
         List<volumeResponse.volumeInfo>vol_lst = downloader.requestVolumesFromDataset(dataset_name);
