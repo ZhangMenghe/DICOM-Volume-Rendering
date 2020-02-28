@@ -162,6 +162,7 @@ public class dialogUIs {
             @Override
             public void run()  {
                 Toast.makeText(activity, "Masks Loaded!", Toast.LENGTH_LONG).show();
+
             }});
     }
 }

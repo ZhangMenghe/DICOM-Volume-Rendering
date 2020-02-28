@@ -73,7 +73,17 @@ uvec4 Sample(ivec3 pos){
     #ifdef ORGANS_ONLY
         //upper part as mask
         uint mask = value>>uint(16);
-        color.a*=(mask>> uint(0)) & uint(1);
+        color.a*=((mask>> uint(0)) & uint(1)
+                    | (mask>> uint(0)) & uint(2)
+                    | (mask>> uint(0)) & uint(4)
+                    | (mask>> uint(0)) & uint(8)
+                );
+        color.r = uint(255) * ((mask>> uint(0)) & uint(1));
+        color.g = uint(255) * ((mask>> uint(0)) & uint(2));
+        color.b = uint(255) * ((mask>> uint(0)) & uint(4));
+        if(color.r == color.g && color.r== color.b &&  color.a!=uint(0)){color.rgb=uvec3(255);}
+
+
     #endif
     return color;
 }
