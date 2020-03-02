@@ -1,5 +1,5 @@
-#ifndef MESH_PRIMITIVE_H
-#define MESH_PRIMITIVE_H
+#ifndef GLPIPELINE_MESH_PRIMITIVE_H
+#define GLPIPELINE_MESH_PRIMITIVE_H
 
 const unsigned int quad_indices[6]= {0,1,2,
                                      0,2,3};

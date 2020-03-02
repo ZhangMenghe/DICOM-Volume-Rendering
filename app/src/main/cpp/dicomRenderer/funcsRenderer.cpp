@@ -1,5 +1,4 @@
 #include <cstring>
-#include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include "funcsRenderer.h"
 #include <GLPipeline/Primitive.h>

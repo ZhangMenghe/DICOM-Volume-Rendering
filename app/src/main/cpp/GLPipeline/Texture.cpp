@@ -1,4 +1,3 @@
-#include <AndroidUtils/AndroidHelper.h>
 #include "Texture.h"
 
 Texture::Texture(GLenum internalFormat, GLenum format, GLenum type, unsigned int width, unsigned int height)

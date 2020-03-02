@@ -1,18 +1,9 @@
-#ifndef ANDROID_HELPER
-#define ANDROID_HELPER
+#ifndef PLATFORM_ANDROID_ASSETLOADER_H
+#define PLATFORM_ANDROID_ASSETLOADER_H
 
 #include <string>
-#include <map>
 #include <android/asset_manager.h>
-
-#include <stack>
-#include <iosfwd>
-#include <GLES3/gl32.h>
-
-#include <android/log.h>
-#define TAG "ANDROID-HELPER"
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__)
-#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__)
+#include <platforms/platform.h>
 
 class assetLoader{
 private:
@@ -23,7 +14,5 @@ public:
     assetLoader(AAssetManager * assetManager);
     bool LoadTextFileFromAssetManager(const char* file_name, std::string* out_file_text_string);
 };
-
-
 
 #endif

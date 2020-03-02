@@ -1,7 +1,3 @@
-//
-// Created by menghe on 8/20/2018.
-//
-
 #include "perfMonitor.h"
 
 perfMonitor::perfMonitor()

@@ -1,8 +1,9 @@
-#ifndef GL_SHADER_H
-#define GL_SHADER_H
+#ifndef GLPIPELINE_SHADER_H
+#define GLPIPELINE_SHADER_H
 
+#include <platforms/platform.h>
 #include <glm/glm.hpp>
-#include <GLES3/gl32.h>
+
 #include <unordered_set>
 #include <unordered_map>
 #include <string>

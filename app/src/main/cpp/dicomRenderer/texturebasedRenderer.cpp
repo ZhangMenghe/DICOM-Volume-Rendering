@@ -1,4 +1,3 @@
-#include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include <GLPipeline/Primitive.h>
 #include "texturebasedRenderer.h"

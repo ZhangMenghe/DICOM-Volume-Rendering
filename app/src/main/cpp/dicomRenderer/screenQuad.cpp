@@ -1,5 +1,4 @@
 #include <vrController.h>
-#include <AndroidUtils/AndroidHelper.h>
 #include <GLPipeline/Primitive.h>
 #include "screenQuad.h"
 screenQuad* screenQuad::myPtr_ = nullptr;

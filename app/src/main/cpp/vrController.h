@@ -1,10 +1,8 @@
 #ifndef VR_CONTROLLER_H
 #define VR_CONTROLLER_H
 
-#include <android/asset_manager.h>
 #include <dicomRenderer/texturebasedRenderer.h>
 #include <dicomRenderer/raycastRenderer.h>
-#include <GLES3/gl32.h>
 #include <GLPipeline/Texture.h>
 #include "GLPipeline/Camera.h"
 #include "nEntrance.h"
@@ -12,7 +10,11 @@
 #include "dicomRenderer/Constants.h"
 #include <unordered_map>
 #include <vector>
-#include <Jnis/jni_main.h>
+
+#ifdef __ANDROID
+    #include <Jnis/jni_main.h>
+#endif
+class AAssetManager;
 
 class vrController:public nEntrance{
 public:
@@ -40,7 +42,7 @@ public:
 
     static vrController* instance();
 
-    vrController(AAssetManager *assetManager);
+    vrController(AAssetManager *assetManager = nullptr);
 
     void assembleTexture(GLubyte * data);
     void assembleTextureMask(GLubyte* mask);
