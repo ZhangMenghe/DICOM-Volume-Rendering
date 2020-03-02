@@ -1,9 +1,7 @@
-#include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include "raycastRenderer.h"
 #include "screenQuad.h"
 #include <GLPipeline/Primitive.h>
-#include <AndroidUtils/mathUtils.h>
 raycastRenderer::raycastRenderer(bool screen_baked):
 DRAW_BAKED(screen_baked){
     //geometry

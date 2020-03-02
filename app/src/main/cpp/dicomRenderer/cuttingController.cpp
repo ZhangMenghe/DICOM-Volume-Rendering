@@ -1,10 +1,10 @@
 #include "cuttingController.h"
 
 #include <glm/gtx/transform.hpp>
-#include <AndroidUtils/AndroidHelper.h>
 #include <vrController.h>
 #include <glm/gtx/rotate_vector.hpp>
-#include <AndroidUtils/mathUtils.h>
+#include <Utils/mathUtils.h>
+
 using namespace glm;
 
 cuttingController* cuttingController::_mptr = nullptr;

@@ -1,17 +1,7 @@
 #ifndef FUNCTION_RENDERER_H
 #define FUNCTION_RENDERER_H
-// Include the latest possible header file( GL version header )
-#if __ANDROID_API__ >= 24
-#include <GLES3/gl32.h>
-#include <glm/vec2.hpp>
-#include <GLPipeline/Shader.h>
 
-#elif __ANDROID_API__ >= 21
-#include <GLES3/gl31.h>
-#else
-#include <GLES3/gl3.h>
-#endif
-
+#include <platforms/platform.h>
 enum FUNC_TYPE{
     OPACITY_FUN = 0,
     COLOR_BAR

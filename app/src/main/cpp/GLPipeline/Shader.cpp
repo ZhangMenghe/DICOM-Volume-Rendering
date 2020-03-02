@@ -1,7 +1,9 @@
 #include "Shader.h"
-#include <string>
-#include "AndroidUtils/AndroidHelper.h"
+
 #include <sstream>
+#ifndef __ANDROID__
+    #include <fstream>
+#endif
 using namespace glm;
 using namespace std;
 
@@ -14,10 +16,25 @@ Shader::~Shader() {
 }
 bool Shader::AddShaderFile(GLenum type, const char* filename){
     string content;
-    if (!assetLoader::instance()->LoadTextFileFromAssetManager(filename, &content)) {
-        LOGE("====Failed to load file: %s", filename);
-        return false;
-    }
+    #ifdef __ANDROID__
+        if (!assetLoader::instance()->LoadTextFileFromAssetManager(filename, &content)) {
+            LOGE("====Failed to load file: %s", filename);
+            return false;
+        }
+    #else
+        auto path = STRING(RESOURCE_DESKTOP_DIR) + std::string(filename);
+
+        std::ifstream ShaderStream(path, std::ios::in);
+        if(ShaderStream.is_open()){
+            std::string Line = "";
+            while(getline(ShaderStream, Line))
+                content += "\n" + Line;
+                ShaderStream.close();
+        }else{
+            LOGE("====Failed to load file: %s", filename);
+            return false;
+        } 
+    #endif
     mShadersToLink.emplace(type, content);
     return true;
 }

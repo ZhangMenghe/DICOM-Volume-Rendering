@@ -1,9 +1,5 @@
-//
-// Created by menghe on 8/20/2018.
-//
-
-#ifndef ARCALVR_PERFMONITOR_H
-#define ARCALVR_PERFMONITOR_H
+#ifndef UTILS_PERFMONITOR_H
+#define UTILS_PERFMONITOR_H
 
 
 #include <cstdint>

@@ -1,6 +1,6 @@
-#include <AndroidUtils/AndroidHelper.h>
 #include "vrController.h"
-#include <AndroidUtils/mathUtils.h>
+#include <Utils/mathUtils.h>
+
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
@@ -26,7 +26,9 @@ vrController* vrController::instance(){
 }
 vrController::vrController(AAssetManager *assetManager):
         _asset_manager(assetManager){
-    new assetLoader(assetManager);
+    #ifdef __ANDROID__
+        new assetLoader(assetManager);
+    #endif
     camera = new Camera;
     myPtr_ = this;
     onReset();

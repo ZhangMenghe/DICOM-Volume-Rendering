@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef DICOMRENDERER_CONSTANTS_H
+#define DICOMRENDERER_CONSTANTS_H
 namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,

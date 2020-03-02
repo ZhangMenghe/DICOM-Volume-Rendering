@@ -2,7 +2,6 @@
 #define TEXTUREBASED_RENDERER_H
 
 #include <cstring>
-#include <GLES3/gl32.h>
 #include <vector>
 #include <GLPipeline/Mesh.h>
 #include <GLPipeline/Shader.h>

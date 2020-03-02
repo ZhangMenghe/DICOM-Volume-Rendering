@@ -1,4 +1,5 @@
-#include "AndroidHelper.h"
+#include <platforms/android/assetLoader.h>
+
 assetLoader* assetLoader::_myPtr = nullptr;
 
 assetLoader::assetLoader(AAssetManager * const assetManager):

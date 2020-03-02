@@ -1,5 +1,5 @@
-#ifndef DICOM_VOLUME_RENDERING_CAMERA_H
-#define DICOM_VOLUME_RENDERING_CAMERA_H
+#ifndef GLPIPELINE_CAMERA_H
+#define GLPIPELINE_CAMERA_H
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

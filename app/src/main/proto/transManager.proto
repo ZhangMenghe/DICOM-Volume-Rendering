@@ -7,7 +7,6 @@ option objc_class_prefix = "TRP";
 
 package helmsley;
 
-
 message datasetResponse{
     message datasetInfo{
         string folder_name = 1;
