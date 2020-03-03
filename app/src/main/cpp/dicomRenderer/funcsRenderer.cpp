@@ -52,7 +52,8 @@ void FuncRenderer::UpdateFuncPoints(FUNC_TYPE type){
     if(type == OPACITY_FUN)
         UpdateFuncPoints(
             OPACITY_FUN,
-            glm::vec2(vrController::param_tex[dvr::TUNE_CUTOFF]-0.5f,vrController::param_tex[dvr::TUNE_LOWEST] * vrController::param_tex[dvr::TUNE_OVERALL]),
+            glm::vec2(vrController::param_tex[dvr::TUNE_CUTOFF]-0.5f,
+            vrController::param_tex[dvr::TUNE_LOWEST] * vrController::param_tex[dvr::TUNE_OVERALL]),
             glm::vec2(0.5f, vrController::param_tex[dvr::TUNE_OVERALL]));
 }
 void FuncRenderer::UpdateFuncPoints(FUNC_TYPE type, glm::vec2 p1, glm::vec2 p2, bool is_quad){

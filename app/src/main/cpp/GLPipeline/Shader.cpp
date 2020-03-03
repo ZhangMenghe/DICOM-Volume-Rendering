@@ -22,22 +22,20 @@ bool Shader::AddShaderFile(GLenum type, const char* filename){
             return false;
         }
     #else
-        auto path = STRING(RESOURCE_DESKTOP_DIR) + std::string(filename);
-
-        std::ifstream ShaderStream(path, std::ios::in);
+        std::ifstream ShaderStream(PATH(filename), std::ios::in);
         if(ShaderStream.is_open()){
             std::string Line = "";
-            while(getline(ShaderStream, Line))
-                content += "\n" + Line;
-                ShaderStream.close();
+            while(getline(ShaderStream, Line)) content += "\n" + Line;
+            ShaderStream.close();
         }else{
             LOGE("====Failed to load file: %s", filename);
             return false;
-        } 
+        }
     #endif
     mShadersToLink.emplace(type, content);
     return true;
 }
+
 bool Shader::CompileAndLink(){
 //    vector<vector<string>> keywords;
     available_keywords_.push_back(vector<string>());
@@ -46,6 +44,7 @@ bool Shader::CompileAndLink(){
     for (const auto it : mShadersToLink) {
         istringstream iss(it.second);
         string line;
+
         while(getline(iss, line)){
             unsigned int kwc = available_keywords_.size();
             stringstream ss(line);
@@ -119,15 +118,22 @@ GLuint CompileShader(GLenum type, string content, vector<string> keywords) {
     bool insertLine = false;
     string firstLine;
     istringstream iss(content);
+    //check for #version
+    std::streampos last_pos = iss.tellg();
     while(getline(iss, firstLine)){
         if (firstLine.substr(0, 8) == "#version"){
-            content.insert(iss.tellg(), key_word_str);
+            content.insert(last_pos, key_word_str);
+            content.erase(content.find("#version"),iss.tellg()-std::streamoff(1) );
+            content.insert(0, GLSL_VERSION);
             insertLine = true;
             break;
         }
+        last_pos = iss.tellg();
     }
-    if(!insertLine)
+    if(!insertLine){
         content.insert(0, key_word_str);
+        content.insert(0, GLSL_VERSION);
+    }
 
     const char* src = content.c_str();
 
@@ -156,8 +162,6 @@ GLuint CompileShader(GLenum type, string content, vector<string> keywords) {
 bool Shader::LinkShader(std::vector<std::string> keywords, ShaderProgram& pgm){
     // compile shaders with keywords
 //    LOGE("########keywords num :%d", keywords.size());
-//    if(keywords.size() > 1)
-//        LOGE("=====stop here2");
     for (const auto& it : mShadersToLink){
         GLuint shader_id = CompileShader(it.first, it.second, keywords);
         if(!shader_id)
