@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.4.1)
 
 project (vrDesktop)
 
+# set(DEFAULT_BUILD_TYPE "Debug")
+
 # SET( GCC_COVERAGE_LINK_FLAGS    "-v")
 # SET( CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
 # SET( CMAKE_SHARED_LINKER_FLAGS  "${CMAKE_SHARED_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}" )
@@ -18,8 +20,12 @@ set(OpenGL_LIBS
 	${GLEW_LIBRARIES}
 	${OPENGL_LIBRARY}
 	)
+set(DPRE "platforms/desktop")
 set(VRDESKTOP_SRCS
-	"platforms/desktop/main.cpp")
+	${DPRE}/main.cpp
+	${DPRE}/utils/dicomLoader.cpp
+	${DPRE}/utils/uiController.cpp)
+	
 
 
 SET(GL_PIPELINE_FILES
