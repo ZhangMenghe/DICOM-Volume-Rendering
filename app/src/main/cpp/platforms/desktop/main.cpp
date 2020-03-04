@@ -18,18 +18,48 @@ using namespace glm;
 dicomLoader loader_;
 uiController ui_;
 vrController controller_;
-
+bool is_pressed = false;
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
+	if(is_pressed){
+		controller_.onTouchMove(float(xpos), float(ypos));
+	}
+}
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods){
+    if (button == GLFW_MOUSE_BUTTON_LEFT){
+		double xpos, ypos;
+		glfwGetCursorPos(window, &xpos, &ypos);
+        switch (action){
+			case GLFW_PRESS:
+				controller_.onSingleTouchDown(float(xpos), float(ypos));
+				is_pressed = true;
+				break;
+			case GLFW_RELEASE:
+				is_pressed = false;
+			default:
+				break;
+			}
+    }
+}
 
 bool onCreated(){
+	ui_.InitTuneParam();
+	ui_.InitCheckParam();
 	controller_.onViewCreated();
+	
+	// onViewChange(1024, 768);
+	controller_.onViewChange(1024, 768);
+
 	return true;
 
 }
 void onDraw(){
-	// controller_.onDraw();
+	controller_.onDraw();
 }
 void onViewChange(int width, int height){
-	// controller_.onViewChange(width, height);
+	controller_.onViewChange(width, height);
+}
+void onDestroy(){
+	// controller_.onDestroy(true);
 }
 
 bool InitWindow(){
@@ -45,6 +75,7 @@ bool InitWindow(){
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+	
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow( 1024, 768, "Tutorial 02 - Red triangle", NULL, NULL);
@@ -54,6 +85,9 @@ bool InitWindow(){
 		return false;
 	}
 	glfwMakeContextCurrent(window);
+	// gladLoadGL(glfwGetProcAddress);
+    glfwSwapInterval(1);
+
 	// Initialize GLEW
 	glewExperimental = true; // Needed for core profile
 	if (glewInit() != GLEW_OK) {
@@ -63,21 +97,20 @@ bool InitWindow(){
 
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-	onViewChange(1024, 768);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
+
 	return true;
 }
 
 void setupApplication(){
 	loader_.setupDCMIConfig(512,512,48);
 	controller_.setVolumeConfig(512,512,48);
-	if(loader_.loadDicomFiles("dicom-images/sample_data")){
+	if(loader_.loadDicomFiles("dicom-images/sample_data_4bytes")){
 		controller_.assembleTexture(loader_.getVolumeData());
 		loader_.reset();
 	}
-	ui_.InitTuneParam();
-	ui_.InitCheckParam();
 }
-
 
 int main(int argc, char** argv){
 	
@@ -85,7 +118,9 @@ int main(int argc, char** argv){
 
 	setupApplication();
 	if(!onCreated()) return -1;
+
 	do{
+
 		onDraw();
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -95,76 +130,9 @@ int main(int argc, char** argv){
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0 );
 	
-	// // Dark blue background
-	// glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
+	onDestroy();
 
-
-
-	// GLuint VertexArrayID;
-	// glGenVertexArrays(1, &VertexArrayID);
-	// glBindVertexArray(VertexArrayID);
-
-	// // Create and compile our GLSL program from the shaders
-	// // GLuint programID = LoadShaders( "shaders/naive.vert", "shaders/naive.frag" );
-	
-	// if(!shader_.AddShader(GL_VERTEX_SHADER, loadTextFile("shaders/naive.vert")) 
-	// || !shader_.AddShader(GL_FRAGMENT_SHADER, loadTextFile("shaders/naive.frag"))
-	// ||!shader_.CompileAndLink())
-	// 	return 0;
-
-	
-
-	// static const GLfloat g_vertex_buffer_data[] = { 
-	// 	-1.0f, -1.0f, 0.0f,
-	// 	 1.0f, -1.0f, 0.0f,
-	// 	 0.0f,  1.0f, 0.0f,
-	// };
-
-	// GLuint vertexbuffer;
-	// glGenBuffers(1, &vertexbuffer);
-	// glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	// glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-
-	// do{
-
-	// 	// Clear the screen
-	// 	glClear( GL_COLOR_BUFFER_BIT );
-
-	// 	// Use our shader
-	// 	// glUseProgram(programID);
-	// 	shader_.Use();
-
-	// 	// 1rst attribute buffer : vertices
-	// 	glEnableVertexAttribArray(0);
-	// 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	// 	glVertexAttribPointer(
-	// 		0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-	// 		3,                  // size
-	// 		GL_FLOAT,           // type
-	// 		GL_FALSE,           // normalized?
-	// 		0,                  // stride
-	// 		(void*)0            // array buffer offset
-	// 	);
-
-	// 	// Draw the triangle !
-	// 	glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
-
-	// 	glDisableVertexAttribArray(0);
-
-	// 	// Swap buffers
-	// 	glfwSwapBuffers(window);
-	// 	glfwPollEvents();
-
-	// } // Check if the ESC key was pressed or the window was closed
-	// while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-	// 	   glfwWindowShouldClose(window) == 0 );
-
-	// // Cleanup VBO
-	// glDeleteBuffers(1, &vertexbuffer);
-	// glDeleteVertexArrays(1, &VertexArrayID);
-	// // glDeleteProgram(programID);
-	// shader_.UnUse();
-
+glfwDestroyWindow(window);
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 

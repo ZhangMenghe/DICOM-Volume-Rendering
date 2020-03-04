@@ -43,7 +43,7 @@ public:
     static vrController* instance();
 
     vrController(AAssetManager *assetManager = nullptr);
-
+    ~vrController();
     void assembleTexture(GLubyte * data);
     void assembleTextureMask(GLubyte* mask);
     void setVolumeConfig(int width, int height, int dims);
@@ -58,7 +58,6 @@ public:
     void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);
-
 
 private:
     static vrController* myPtr_;
