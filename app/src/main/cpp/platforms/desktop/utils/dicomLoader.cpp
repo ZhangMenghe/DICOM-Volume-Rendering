@@ -32,6 +32,7 @@ void dicomLoader::send_dicom_data(int id, int chunk_size, char* data){
 
     if(chunk_size!=0) memcpy(buffer, data, chunk_size);
     else{
+        std::cout<<"----error"<<std::endl;
         int x, y, idx = 0;
         for (y = 0; y < img_h; y++) {
             for (x = 0; x < img_w; x++) {

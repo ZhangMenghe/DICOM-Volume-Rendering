@@ -24,6 +24,10 @@ bool vrController::cutDirty = true;
 vrController* vrController::instance(){
     return myPtr_;
 }
+vrController::~vrController(){
+    std::cout<<"delete controller"<<std::endl;
+}
+
 vrController::vrController(AAssetManager *assetManager):
         _asset_manager(assetManager){
     #ifdef __ANDROID__

@@ -34,7 +34,7 @@ void uiController::InitTuneParam(int id, int num, const char*keys[], float value
     for(int i=0; i<num; i++){
         vec->push_back(std::string(keys[i]));
         tvec->push_back(values[i]);
-        LOGE("======SET INIT %s, %f", keys[i], values[i]);
+        LOGE("======SET INIT %s, %f\n", keys[i], values[i]);
     }
     vec->push_back(cutting_keyword);
     tvec->push_back(-1.0f);
@@ -50,6 +50,7 @@ void uiController::InitCheckParam(){
         "MaskOn",
         "Freeze Volume"
     };
+    
     bool values[5] = {
         true,
         false,
@@ -66,7 +67,7 @@ void uiController::InitCheckParam(int num, const char*keys[], bool values[]){
     for(int i=0; i<num; i++){
         param_checks.push_back(std::string(keys[i]));
         vrController::param_bool.push_back(values[i]);
-       LOGE("======SET INIT %s, %d", keys[i], values[i]);
+       LOGE("======SET INIT %s, %d\n", keys[i], values[i]);
     }
 
     param_checks.push_back(freeze_keyworkd);
@@ -92,7 +93,7 @@ void uiController::setCheck(const char*key, bool value){
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
 //        LOGE("======SET  %s, %d", key.c_str(), value);
-        if(key_str==freeze_keyworkd) vrController::cutDirty = true;
+        if(key_str == freeze_keyworkd) vrController::cutDirty = true;
         vrController::baked_dirty_ = true;
     }
 }
