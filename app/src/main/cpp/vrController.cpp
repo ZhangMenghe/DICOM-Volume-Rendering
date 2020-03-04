@@ -65,6 +65,7 @@ void vrController::assembleTexture(GLubyte * data){
     tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, tb_data);
     delete[]tb_data;
 }
+
 void vrController::assembleTextureMask(GLubyte* mask){
     if(!vol_data)   return;
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
@@ -201,4 +202,7 @@ void vrController::precompute(){
     bakeShader_->UnUse();
     baked_dirty_ = false;
     isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+}
+void vrController::onDestroy(){
+    //todo: do sth
 }

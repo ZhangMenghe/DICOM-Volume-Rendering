@@ -1,24 +1,16 @@
 
-#include <stdlib.h>
-#include <string>
-#include <iostream>
+
 #include <platforms/platform.h>
-#include <GLPipeline/Shader.h>
 #include <vrController.h>
-
-GLFWwindow* window;
-Shader shader_;
-// Include GLM
-#include <glm/glm.hpp>
-using namespace glm;
-
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
 
+GLFWwindow* window;
 dicomLoader loader_;
 uiController ui_;
 vrController controller_;
 bool is_pressed = false;
+
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
 	if(is_pressed){
 		controller_.onTouchMove(float(xpos), float(ypos));
@@ -41,16 +33,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 
-bool onCreated(){
+void onCreated(){
 	ui_.InitTuneParam();
 	ui_.InitCheckParam();
 	controller_.onViewCreated();
-	
-	// onViewChange(1024, 768);
-	controller_.onViewChange(1024, 768);
-
-	return true;
-
 }
 void onDraw(){
 	controller_.onDraw();
@@ -59,7 +45,7 @@ void onViewChange(int width, int height){
 	controller_.onViewChange(width, height);
 }
 void onDestroy(){
-	// controller_.onDestroy(true);
+	controller_.onDestroy();
 }
 
 bool InitWindow(){
@@ -78,7 +64,7 @@ bool InitWindow(){
 	
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1024, 768, "Tutorial 02 - Red triangle", NULL, NULL);
+	window = glfwCreateWindow( 430, 768, "Volume Rendering", nullptr, nullptr);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		glfwTerminate();
@@ -99,14 +85,15 @@ bool InitWindow(){
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
-
+	onViewChange(430,768);
 	return true;
 }
 
 void setupApplication(){
-	loader_.setupDCMIConfig(512,512,48);
-	controller_.setVolumeConfig(512,512,48);
-	if(loader_.loadDicomFiles("dicom-images/sample_data_4bytes")){
+	int dims = 144;
+	loader_.setupDCMIConfig(512,512,dims);
+	controller_.setVolumeConfig(512,512,dims);
+	if(loader_.loadData("dicom-images/sample_data_2bytes", LOAD_DICOM, 2)){
 		controller_.assembleTexture(loader_.getVolumeData());
 		loader_.reset();
 	}
@@ -117,10 +104,9 @@ int main(int argc, char** argv){
 	if(!InitWindow()) return -1;
 
 	setupApplication();
-	if(!onCreated()) return -1;
+	onCreated();
 
 	do{
-
 		onDraw();
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -132,7 +118,7 @@ int main(int argc, char** argv){
 	
 	onDestroy();
 
-glfwDestroyWindow(window);
+	glfwDestroyWindow(window);
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
 

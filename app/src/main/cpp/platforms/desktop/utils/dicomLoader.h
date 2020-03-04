@@ -6,23 +6,17 @@
 #include <fstream>
 #include <platforms/platform.h>
 
-inline std::string loadTextFile(const char* filename){
-    std::string content;
-    std::ifstream ShaderStream(PATH(filename), std::ios::in);
-    if(ShaderStream.is_open()){
-        std::string Line = "";
-        while(getline(ShaderStream, Line))
-            content += "\n" + Line;
-            ShaderStream.close();
-    }else{
-        LOGE("====Failed to load file: %s", filename);
-    }
-    return content; 
-}
+typedef enum{
+    LOAD_DICOM = 0,
+    LOAD_MASK
+}mLoadTarget;
+
 class dicomLoader{
 public:
     void setupDCMIConfig(int width, int height, int dims);
-    bool loadDicomFiles(std::string filename);
+    bool loadData(std::string filename, mLoadTarget target, int unit_size=2);
+    bool loadData(std::string dicom_path, std::string mask_path,int data_unit_size=2, int mask_unit_size=2);
+
     GLubyte* getVolumeData(){return g_VolumeTexData;}
     void reset(){
         delete[] g_VolumeTexData;
@@ -37,7 +31,7 @@ private:
     size_t n_data_offset = 0, n_mask_offset=0;
 
     GLubyte* g_VolumeTexData = nullptr;
-    void send_dicom_data(int id, int chunk_size, char* data);
+    void send_dicom_data(mLoadTarget target, int id, int chunk_size, int unit_size, char* data);
 };
 
 #endif

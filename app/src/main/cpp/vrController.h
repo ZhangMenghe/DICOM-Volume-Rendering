@@ -53,6 +53,7 @@ public:
     void onViewChange(int width, int height);
     void onDraw();
     void onReset();
+    void onDestroy();
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);
