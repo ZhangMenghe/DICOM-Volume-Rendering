@@ -10,8 +10,12 @@ void dicomLoader::setupDCMIConfig(int width, int height, int dims){
 	g_VolumeTexData = new GLubyte[total_size];
     memset(g_VolumeTexData, 0x00, total_size * sizeof(GLubyte));
 }
+bool dicomLoader::loadData(std::string dicom_path, std::string mask_path, int data_unit_size, int mask_unit_size){
+    loadData(dicom_path, LOAD_DICOM, data_unit_size);
+    loadData(mask_path, LOAD_MASK, mask_unit_size);
+}
 
-bool dicomLoader::loadDicomFiles(std::string filename){
+bool dicomLoader::loadData(std::string filename, mLoadTarget target, int unit_size){
     char buffer[1024];
     std::ifstream inFile (PATH(filename), std::ios::in | std::ios::binary);
     if(!inFile.is_open()) return false;
@@ -20,27 +24,29 @@ bool dicomLoader::loadDicomFiles(std::string filename){
         inFile.read(buffer, 1024);
         std::streamsize len = inFile.gcount();
         if(len == 0) continue;
-        send_dicom_data(id, len, buffer);
+        send_dicom_data(target, id, len, unit_size, buffer);
     }
     return true;
 }
 
-void dicomLoader::send_dicom_data(int id, int chunk_size, char* data){
+void dicomLoader::send_dicom_data(mLoadTarget target, int id, int chunk_size, int unit_size, char* data){
     //check initialization
     if(!g_VolumeTexData) return;
     GLubyte* buffer = g_VolumeTexData+n_data_offset;
-
-    if(chunk_size!=0) memcpy(buffer, data, chunk_size);
+    int num = (chunk_size==0)? (img_h*img_w) : chunk_size / unit_size;
+    if(chunk_size !=0 && unit_size == 4) memcpy(buffer, data, chunk_size);
     else{
-        std::cout<<"----error"<<std::endl;
-        int x, y, idx = 0;
-        for (y = 0; y < img_h; y++) {
-            for (x = 0; x < img_w; x++) {
+        if(target == LOAD_DICOM){
+            for(auto idx = 0; idx<num; idx++){
                 buffer[CHANEL_NUM* idx] = GLubyte(data[2*idx]);
                 buffer[CHANEL_NUM* idx + 1] = GLubyte(data[2*idx+1]);
-                idx++;
+            }
+        }else{
+            for(auto idx = 0; idx<num; idx++){
+                buffer[CHANEL_NUM* idx + 2] = GLubyte(data[2*idx]);
+                buffer[CHANEL_NUM* idx + 3] = GLubyte(data[2*idx+1]);
             }
         }
     }
-    n_data_offset+=(chunk_size==0)?single_size:chunk_size;   
+    n_data_offset += (chunk_size==0)?single_size:(CHANEL_NUM / unit_size * chunk_size);   
 }

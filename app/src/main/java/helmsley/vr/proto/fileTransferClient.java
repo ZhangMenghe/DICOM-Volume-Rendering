@@ -174,7 +174,7 @@ public class fileTransferClient {
             while(dcm_img_iterator.hasNext()){
                 dcmImage img = dcm_img_iterator.next();
                 //tackle with the image here
-                Log.e(TAG, "====img:" + img.getPosition() );
+                // Log.e(TAG, "====img:" + img.getPosition() );
                 JNIInterface.JNIsendDCMImg(img.getDcmID(), 0, img.getData().toByteArray());
             }
             return "===Success!\n";
