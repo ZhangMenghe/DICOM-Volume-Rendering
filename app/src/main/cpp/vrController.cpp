@@ -49,11 +49,12 @@ void vrController::setVolumeConfig(int width, int height, int dims){
 void vrController::assembleTexture(GLubyte * data){
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     vol_data = new uint32_t[vsize];
-
+    uint16_t tm;
     //fuse volume data
     for(auto i=0; i<vsize; i++) {
         vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
-//        vol_data[i] = uint32_t((((uint32_t)tmp)<<16)+vol_data[i]);
+        tm = uint16_t((((uint16_t)data[4*i+3])<<8)+data[4*i+2]);
+        vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
     }
     tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vol_data);
 

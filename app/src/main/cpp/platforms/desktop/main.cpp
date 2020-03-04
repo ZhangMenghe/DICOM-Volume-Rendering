@@ -93,7 +93,13 @@ void setupApplication(){
 	int dims = 144;
 	loader_.setupDCMIConfig(512,512,dims);
 	controller_.setVolumeConfig(512,512,dims);
-	if(loader_.loadData("dicom-images/sample_data_2bytes", LOAD_DICOM, 2)){
+	// if(loader_.loadData("dicom-images/sample_data_2bytes", LOAD_DICOM, 2)){
+	// 	controller_.assembleTexture(loader_.getVolumeData());
+	// 	loader_.reset();
+	// }
+
+	//test assemble together
+	if(loader_.loadData("dicom-images/sample_data_2bytes", "dicom-images/sample_data_mask_2bytes")){
 		controller_.assembleTexture(loader_.getVolumeData());
 		loader_.reset();
 	}

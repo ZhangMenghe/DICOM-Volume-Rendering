@@ -26,6 +26,7 @@ bool dicomLoader::loadData(std::string filename, mLoadTarget target, int unit_si
         if(len == 0) continue;
         send_dicom_data(target, id, len, unit_size, buffer);
     }
+    n_data_offset = 0;
     return true;
 }
 
@@ -33,9 +34,9 @@ void dicomLoader::send_dicom_data(mLoadTarget target, int id, int chunk_size, in
     //check initialization
     if(!g_VolumeTexData) return;
     GLubyte* buffer = g_VolumeTexData+n_data_offset;
-    int num = (chunk_size==0)? (img_h*img_w) : chunk_size / unit_size;
     if(chunk_size !=0 && unit_size == 4) memcpy(buffer, data, chunk_size);
     else{
+        int num = (chunk_size==0)? (img_h*img_w) : chunk_size / unit_size;
         if(target == LOAD_DICOM){
             for(auto idx = 0; idx<num; idx++){
                 buffer[CHANEL_NUM* idx] = GLubyte(data[2*idx]);
