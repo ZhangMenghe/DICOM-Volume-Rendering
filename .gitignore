@@ -1,10 +1,11 @@
 # Built application files
 /*/build/
-**/build/
+# **/build/
+**/build*/
 
 #vs code files 
 **/.vscode/
-
+**/.cxx/
 #cmake stuff
 **/CMakeFiles/
 

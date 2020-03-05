@@ -17,20 +17,18 @@
     #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__)
     #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__)
     #define PATH(FILENAME) std::string(FILENAME)
-    #define GLSL_VERSION "#version 300 es\n"
+    #define GLSL_VERSION "#version 310 es\n"
 
 #else
     #include <GL/glew.h>
     #include <GLFW/glfw3.h>
     #include <stdio.h>
-    #include <string>
-    #include <iostream>
+
 
     #define LOGE(...) printf(__VA_ARGS__)
     #define LOGI(...) printf(__VA_ARGS__)
-    #define STRING(...) std::string(__VA_ARGS__)
-    #define PATH(FILENAME) std::string(RESOURCE_DESKTOP_DIR) +std::string(FILENAME)
     #define GLSL_VERSION "#version 430 core\n"
+
 
 #endif
 

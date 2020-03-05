@@ -1,6 +1,5 @@
 #include "vrController.h"
 #include <Utils/mathUtils.h>
-
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
@@ -10,6 +9,7 @@ float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
+std::vector<std::string> vrController::shader_contents = std::vector<std::string>(14);
 
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
@@ -25,14 +25,14 @@ vrController* vrController::instance(){
     return myPtr_;
 }
 vrController::~vrController(){
-    std::cout<<"delete controller"<<std::endl;
+//    std::cout<<"delete controller"<<std::endl;
 }
 
 vrController::vrController(AAssetManager *assetManager):
         _asset_manager(assetManager){
-    #ifdef __ANDROID__
-        new assetLoader(assetManager);
-    #endif
+//    #ifdef __ANDROID__
+//        new assetLoader(assetManager);
+//    #endif
     camera = new Camera;
     myPtr_ = this;
     onReset();
@@ -55,6 +55,7 @@ void vrController::assembleTexture(GLubyte * data){
         vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
         tm = uint16_t((((uint16_t)data[4*i+3])<<8)+data[4*i+2]);
         vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
+        // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
     }
     tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vol_data);
 
@@ -169,7 +170,7 @@ void vrController::precompute(){
     if(!bakeShader_){
         //geometry program
         bakeShader_ = new Shader;
-        if(!bakeShader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastVolume.glsl")
+        if(!bakeShader_->AddShader(GL_COMPUTE_SHADER, shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL])
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
     }
@@ -207,3 +208,8 @@ void vrController::precompute(){
 void vrController::onDestroy(){
     //todo: do sth
 }
+void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content){
+    if(fid < dvr::SHADER_END)
+        shader_contents[fid] = content;
+}
+

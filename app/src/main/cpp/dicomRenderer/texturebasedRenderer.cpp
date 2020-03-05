@@ -7,8 +7,8 @@ texvrRenderer::texvrRenderer(bool screen_baked)
 :DRAW_BAKED(screen_baked){
     //program
     shader_ = new Shader();
-    if(!shader_->AddShaderFile(GL_VERTEX_SHADER,"shaders/textureVolume.vert")
-       ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/textureVolume.frag")
+    if(!shader_->AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT])
+       ||!shader_->AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG])
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
     onCuttingChange(.0f);

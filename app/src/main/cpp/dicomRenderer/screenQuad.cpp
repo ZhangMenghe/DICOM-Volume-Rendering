@@ -22,8 +22,8 @@ screenQuad::screenQuad(){
     qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
     TEX_ID = vrController::BAKED_RAY_ID + 1;
 
-    if(!qshader_.AddShaderFile(GL_VERTEX_SHADER,"shaders/quad.vert")
-       ||!qshader_.AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/quad.frag")
+    if(!qshader_.AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_QUAD_VERT])
+       ||!qshader_.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_QUAD_FRAG])
        ||!qshader_.CompileAndLink())
         LOGE("Screen===Failed to create screen shader program===");
     myPtr_ = this;

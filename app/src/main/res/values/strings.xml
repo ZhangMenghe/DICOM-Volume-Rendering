@@ -9,9 +9,9 @@
     <string name="config_volname">sample</string>
     <string name="config_mask_tail">_mask</string>
 
-    <string name="DEFAULT_HOST">137.110.118.222</string>
+    <string name="DEFAULT_HOST">10.68.2.100</string>
 
-    <!--    <string name="DEFAULT_HOST">137.110.115.158</string>-->
+    <!--    <string name="DEFAULT_HOST">137.110.118.222</string>-->
     <string name="DEFAULT_PORT">23333</string>
 
     <string name="cf_b_loadcache">true</string>

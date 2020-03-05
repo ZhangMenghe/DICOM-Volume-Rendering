@@ -4,7 +4,7 @@
 #include <vrController.h>
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
-
+#include "utils/fileLoader.h"
 GLFWwindow* window;
 dicomLoader loader_;
 uiController ui_;
@@ -34,6 +34,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 void onCreated(){
+	setupShaderContents(&controller_);
 	ui_.InitTuneParam();
 	ui_.InitCheckParam();
 	controller_.onViewCreated();

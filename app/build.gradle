@@ -1,10 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.google.protobuf'
 
-def thirdparty_path = "/home/menghe/PACKAGES"
-//windows:
-//def thirdparty_path = "D:/OpenGL-Libs"
-
 android {
     compileSdkVersion 28
     defaultConfig {
@@ -17,8 +13,7 @@ android {
         externalNativeBuild {
             cmake {
                 cppFlags "-std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security "
-                arguments "-DANDROID_STL=c++_static",
-                          "-DGLM_DIRECTORY=${thirdparty_path}/glm"
+                arguments "-DANDROID_STL=c++_static"
             }
         }
         ndk {

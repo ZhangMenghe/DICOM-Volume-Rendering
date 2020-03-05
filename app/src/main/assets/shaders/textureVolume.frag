@@ -5,7 +5,7 @@ precision mediump float;
 out vec4 gl_FragColor;
 in vec3 vTexcoord;
 
-uniform sampler3D uSampler_baked;
+uniform mediump sampler3D uSampler_baked;
 uniform float u_cut_texz;
 
 void main(){

@@ -1,5 +1,6 @@
 #ifndef DICOMRENDERER_CONSTANTS_H
 #define DICOMRENDERER_CONSTANTS_H
+#include <string>
 namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,
@@ -21,6 +22,23 @@ namespace dvr{
         TUNE_BRIGHT,
         TUNE_CUTTING_RAY
     };
+    enum SHADER_FILES{
+        SHADER_TEXTUREVOLUME_VERT = 0,
+        SHADER_TEXTUREVOLUME_FRAG,
+        SHADER_RAYCASTVOLUME_VERT,
+        SHADER_RAYCASTVOLUME_FRAG,
+        SHADER_RAYCASTCOMPUTE_GLSL,
+        SHADER_RAYCASTVOLUME_GLSL,
+        SHADER_QUAD_VERT,
+        SHADER_QUAD_FRAG,
+        SHADER_CPLANE_VERT,
+        SHADER_CPLANE_FRAG,
+        SHADER_COLOR_VIZ_VERT,
+        SHADER_COLOR_VIZ_FRAG,
+        SHADER_OPA_VIZ_VERT,
+        SHADER_OPA_VIZ_FRAG,
+        SHADER_END
+    };
 
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
@@ -31,6 +49,7 @@ namespace dvr{
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f,0.5f);
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
+
 
 }
 #endif

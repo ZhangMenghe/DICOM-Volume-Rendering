@@ -25,7 +25,7 @@ public:
 
     static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
-
+    static std::vector<std::string> shader_contents;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
     static glm::uvec3 VOL_DIMS;
@@ -60,6 +60,7 @@ public:
     void onScale(float sx, float sy);
     void onPan(float x, float y);
 
+    void setShaderContents(dvr::SHADER_FILES fid, std::string content);
 private:
     static vrController* myPtr_;
     AAssetManager* _asset_manager;
