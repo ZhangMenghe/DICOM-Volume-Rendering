@@ -73,8 +73,8 @@ void cuttingController::Update(){
 void cuttingController::draw_plane(){
     if(!pshader){
         pshader = new Shader();
-        if(!pshader->AddShaderFile(GL_VERTEX_SHADER,"shaders/cplane.vert")
-           ||!pshader->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/cplane.frag")
+        if(!pshader->AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_CPLANE_VERT])
+           ||!pshader->AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_CPLANE_FRAG])
            ||!pshader->CompileAndLink())
             LOGE("Raycast===Failed to create cutting plane shader program===");
     }

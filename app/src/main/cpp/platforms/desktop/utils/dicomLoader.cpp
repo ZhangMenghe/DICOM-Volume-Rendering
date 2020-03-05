@@ -1,4 +1,5 @@
 #include "dicomLoader.h"
+#include <platforms/desktop/common.h>
 #include <cstring> //memset
 
 void dicomLoader::setupDCMIConfig(int width, int height, int dims){

@@ -1,6 +1,5 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
-#include <AndroidUtils/AndroidHelper.h>
 #include "dui_interface.h"
 #include <vrController.h>
 using namespace dvr;

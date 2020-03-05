@@ -1,7 +1,8 @@
 #include "Shader.h"
 
 #include <sstream>
-#ifndef __ANDROID__
+
+#ifdef __ANDROID__
     #include <fstream>
 #endif
 using namespace glm;
@@ -14,27 +15,27 @@ Shader::~Shader() {
             glDeleteShader(s);
     }
 }
-bool Shader::AddShaderFile(GLenum type, const char* filename){
-    string content;
-    #ifdef __ANDROID__
-        if (!assetLoader::instance()->LoadTextFileFromAssetManager(filename, &content)) {
-            LOGE("====Failed to load file: %s", filename);
-            return false;
-        }
-    #else
-        std::ifstream ShaderStream(PATH(filename), std::ios::in);
-        if(ShaderStream.is_open()){
-            std::string Line = "";
-            while(getline(ShaderStream, Line)) content += "\n" + Line;
-            ShaderStream.close();
-        }else{
-            LOGE("====Failed to load file: %s", filename);
-            return false;
-        }
-    #endif
-    mShadersToLink.emplace(type, content);
-    return true;
-}
+//bool Shader::AddShaderFile(GLenum type, const char* filename){
+//    string content;
+//    #ifdef __ANDROID__
+//        if (!assetLoader::instance()->LoadTextFileFromAssetManager(filename, &content)) {
+//            LOGE("====Failed to load file: %s", filename);
+//            return false;
+//        }
+//    #else
+//        std::ifstream ShaderStream(PATH(filename), std::ios::in);
+//        if(ShaderStream.is_open()){
+//            std::string Line = "";
+//            while(getline(ShaderStream, Line)) content += "\n" + Line;
+//            ShaderStream.close();
+//        }else{
+//            LOGE("====Failed to load file: %s", filename);
+//            return false;
+//        }
+//    #endif
+//    mShadersToLink.emplace(type, content);
+//    return true;
+//}
 
 bool Shader::CompileAndLink(){
 //    vector<vector<string>> keywords;

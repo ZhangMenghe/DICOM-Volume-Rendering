@@ -8,7 +8,7 @@ import helmsley.vr.proto.fileTransferClient;
 public class MainActivity extends GLActivity {
     final static String TAG = "Main_Activity";
     static {
-        System.loadLibrary("vrNative");
+        System.loadLibrary("vrAndroid");
     }
     //ui
     protected UIsManager ui_manager;

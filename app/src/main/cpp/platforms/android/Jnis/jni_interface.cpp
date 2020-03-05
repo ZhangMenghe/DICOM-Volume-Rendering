@@ -1,11 +1,10 @@
-#include <android/asset_manager.h>
+#include <assetLoader.h>
 #include <android/asset_manager_jni.h>
 #include <GLES3/gl32.h>
 #include "jni_interface.h"
 #include "vrController.h"
 
 #include <android/bitmap.h>
-#include <AndroidUtils/AndroidHelper.h>
 #include <vector>
 
 using namespace dvr;
@@ -34,10 +33,56 @@ namespace {
     int g_img_h, g_img_w, g_vol_dim;
     size_t g_ssize_schanel, g_ssize = 0, g_vol_len, g_mask_ssize, g_mask_len;
     size_t n_data_offset = 0, n_mask_offset=0;
+    AAssetManager * _asset_manager;
+
+    std::string LoadTextFile(const char* file_name) {
+        std::string* out_file_text_string = new std::string();
+        AAsset* asset =
+                AAssetManager_open(_asset_manager, file_name, AASSET_MODE_STREAMING);
+        if (asset == nullptr) {
+            LOGE("Error opening asset %s", file_name);
+            return "";
+        }
+
+        off_t file_size = AAsset_getLength(asset);
+        out_file_text_string->resize(file_size);
+        int ret = AAsset_read(asset, &out_file_text_string->front(), file_size);
+
+        if (ret <= 0) {
+            LOGE("Failed to open file: %s", file_name);
+            AAsset_close(asset);
+            return "";
+        }
+        AAsset_close(asset);
+        return *out_file_text_string;
+    }
+    void setupShaderContents(){
+        vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+        const char* shader_file_names[14] = {
+                "shaders/textureVolume.vert",
+                "shaders/textureVolume.frag",
+                "shaders/raycastVolume.vert",
+                "shaders/raycastVolume.frag",
+                "shaders/raycastCompute.glsl",
+
+                "shaders/raycastVolume.glsl",
+                "shaders/quad.vert",
+                "shaders/quad.frag",
+                "shaders/cplane.vert",
+                "shaders/cplane.frag",
+                "shaders/colorViz.vert",
+                "shaders/colorViz.frag",
+                "shaders/opaViz.vert",
+                "shaders/opaViz.frag"
+        };
+        for(int i = 0; i<int(dvr::SHADER_END); i++)
+            vrc->setShaderContents(SHADER_FILES (i), LoadTextFile(shader_file_names[i]));
+    }
 }
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
-    AAssetManager * cpp_asset_manager = AAssetManager_fromJava(env, asset_manager);
-    nativeAddr =  getNativeClassAddr(new vrController(cpp_asset_manager));
+    _asset_manager = AAssetManager_fromJava(env, asset_manager);
+    nativeAddr =  getNativeClassAddr(new vrController());
+    setupShaderContents();
     return nativeAddr;
 }
 

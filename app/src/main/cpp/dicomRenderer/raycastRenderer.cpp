@@ -9,8 +9,8 @@ DRAW_BAKED(screen_baked){
 
     //program
     shader_ = new Shader();
-    if(!shader_->AddShaderFile(GL_VERTEX_SHADER,"shaders/raycastVolume.vert")
-            ||!shader_->AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/raycastVolume.frag")
+    if(!shader_->AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT])
+            ||!shader_->AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG])
             ||!shader_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
     cutter_ = new cuttingController;
@@ -87,7 +87,7 @@ void raycastRenderer::precompute(){
     if(!baked_dirty_) return;
     if(!cshader_){
         cshader_ = new Shader;
-        if(!cshader_->AddShaderFile(GL_COMPUTE_SHADER, "shaders/raycastCompute.glsl")
+        if(!cshader_->AddShader(GL_COMPUTE_SHADER, vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
            ||!cshader_->CompileAndLink())
             LOGE("Raycast=====Failed to create raycast geometry shader");
     }

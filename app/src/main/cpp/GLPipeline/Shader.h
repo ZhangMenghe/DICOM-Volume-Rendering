@@ -17,7 +17,7 @@ class Shader {
 public:
 	Shader(){}
 	~Shader();
-	bool AddShaderFile(GLenum type, const char* filename);
+//	bool AddShaderFile(GLenum type, const char* filename);
 	bool AddShader(GLenum type, std::string content){
 		if(content.empty()) return false;
 		mShadersToLink.emplace(type, content);

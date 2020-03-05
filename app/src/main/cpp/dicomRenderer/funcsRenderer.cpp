@@ -5,16 +5,16 @@
 FuncRenderer::FuncRenderer(){
     vertices_func_ = new GLfloat[MAX_VERTICS * 3];
 
-    if(!shader_func.AddShaderFile(GL_VERTEX_SHADER,"shaders/opaViz.vert")
-       ||!shader_func.AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/opaViz.frag")
+    if(!shader_func.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_OPA_VIZ_VERT])
+       ||!shader_func.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_OPA_VIZ_FRAG])
        ||!shader_func.CompileAndLink())
         LOGE("FuncsVisual===Failed to create opacity shader program===");
-    if(!shader_quad.AddShaderFile(GL_VERTEX_SHADER,"shaders/opaViz.vert")
-       ||!shader_quad.AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/opaViz.frag")
+    if(!shader_quad.AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_OPA_VIZ_VERT])
+       ||!shader_quad.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_OPA_VIZ_FRAG])
        ||!shader_quad.CompileAndLink())
         LOGE("FuncsVisual===Failed to create shader_quad shader program===");
-    if(!shader_colorbar.AddShaderFile(GL_VERTEX_SHADER,"shaders/colorViz.vert")
-       ||!shader_colorbar.AddShaderFile(GL_FRAGMENT_SHADER,  "shaders/colorViz.frag")
+    if(!shader_colorbar.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_COLOR_VIZ_VERT])
+       ||!shader_colorbar.AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_COLOR_VIZ_FRAG])
        ||!shader_colorbar.CompileAndLink())
         LOGE("FuncsVisual===Failed to create shader_colorbar shader program===");
 
