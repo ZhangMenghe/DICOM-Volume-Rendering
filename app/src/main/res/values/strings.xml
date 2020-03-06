@@ -29,6 +29,8 @@
     <string name="check_group_name">Check</string>
     <string name="fund_group_name">Setting</string>
 
+
+    <string name="mask_check_name">MaskOn</string>
     <string name="texray_check_name">seeVolume</string>
     <string name="cutting_check_name">Cutting</string>
     <string name="freezeplane_check_name">Freeze Plane</string>

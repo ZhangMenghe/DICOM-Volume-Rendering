@@ -5,7 +5,7 @@
         <item>@string/texray_check_name</item>
         <item>Color Transfer</item>
         <item>@string/cutting_check_name</item>
-        <item>MaskOn</item>
+        <item>@string/mask_check_name</item>
         <item>@string/freezeVolume_check_name</item>
     </string-array>
     <string-array name="checkValues">
@@ -77,6 +77,14 @@
     <string-array name="cutting_plane">
         <item>0.0</item>
         <item>50</item>
+    </string-array>
+
+    <string-array name="masks_list">
+        <item>Body</item>
+        <item>Liver</item>
+        <item>Colon</item>
+        <item>Kidneys</item>
+        <item>Bladder</item>
     </string-array>
 
 
