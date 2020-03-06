@@ -2,7 +2,6 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.SeekBar;

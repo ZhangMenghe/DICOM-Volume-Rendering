@@ -22,7 +22,7 @@ public class checkboxAdapter {
     private final WeakReference<UIsManager> mUIManagerRef;
 
     private static LinkedHashMap<String, Boolean> check_map;
-    private static String raycast_name, cutting_name, freeze_plane_name, freeze_volume_name;
+    private static String mask_name, raycast_name, cutting_name, freeze_plane_name, freeze_volume_name;
 
     public checkboxAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
@@ -39,12 +39,14 @@ public class checkboxAdapter {
             values[i] = check_values.getBoolean(i, false);
             check_map.put(check_items[i], values[i]);
         }
+        mask_name = res.getString(R.string.mask_check_name);
         raycast_name = res.getString(R.string.texray_check_name);
         cutting_name = res.getString(R.string.cutting_check_name);
         freeze_plane_name=res.getString(R.string.freezeplane_check_name);
         freeze_volume_name = res.getString(R.string.freezeVolume_check_name);
 
         mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
+        mUIManagerRef.get().onMaskPanelSwitch(check_map.get(mask_name));
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
     public void Reset(){
@@ -113,6 +115,7 @@ public class checkboxAdapter {
                     String item_name = item_names.get(position);
 
                     if(item_name.equals(raycast_name)) onTexRaySwitch(isChecked);
+                    else if(item_name.equals(mask_name)) onMaskPanelSwitch(isChecked);
                     else if(item_name.equals(cutting_name)) onCuttingPlaneSwitch(isChecked);
                     else if(item_name.equals(freeze_plane_name)) onFreezePlaneSwitch(isChecked);
                     else if(item_name.equals(freeze_volume_name)) onFreezeVolumeSwitch(isChecked);
@@ -137,6 +140,9 @@ public class checkboxAdapter {
         else mAdapter.removeItem(freeze_plane_name);
 
         mUIManagerRef.get().onTexRaySwitch(isChecked);
+    }
+    private void onMaskPanelSwitch(boolean isChecked){
+        mUIManagerRef.get().onMaskPanelSwitch(isChecked);
     }
     private void onCuttingPlaneSwitch(boolean isChecked){
         if(isChecked && mAdapter.getItemValue(raycast_name)) mAdapter.addItem(freeze_plane_name, false);

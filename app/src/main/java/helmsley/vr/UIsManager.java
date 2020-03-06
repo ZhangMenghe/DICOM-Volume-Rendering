@@ -11,6 +11,7 @@ import helmsley.vr.DUIs.checkboxAdapter;
 import helmsley.vr.DUIs.cutplaneUIs;
 import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.DUIs.funcAdapter;
+import helmsley.vr.DUIs.maskUIs;
 
 public class UIsManager {
     private final WeakReference<Activity> actRef;
@@ -19,6 +20,7 @@ public class UIsManager {
     private Spinner spinner_tune, spinner_check, spinner_func;
     private cutplaneUIs cuttingController;
     protected dialogUIs dialogController;
+    private maskUIs masksController;
 
     //Spinner adapter
     SeekbarAdapter seekbarAdapter = null;
@@ -31,6 +33,7 @@ public class UIsManager {
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);
         cuttingController = new cutplaneUIs(activity_);
+        masksController = new maskUIs(activity_);
         setupTopPanelSpinners();
     }
 
@@ -65,6 +68,9 @@ public class UIsManager {
     }
     public void onCuttingPlaneSwitch(boolean isCutting){
         cuttingController.onCuttingStateChange(isCutting, current_texray_id==raycast_id);
+    }
+    public void onMaskPanelSwitch(boolean isPanelOn){
+        masksController.onStateChange(isPanelOn);
     }
     public void RequestReset(){
         cuttingController.Reset();

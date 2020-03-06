@@ -28,23 +28,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:orientation="horizontal">
-
-<!--            <Button-->
-<!--                android:id="@+id/tuneGroupButton"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/tune_group_name"-->
-<!--                android:gravity="center"-->
-<!--                style="@style/SpinnerButtonStyle"/>-->
-<!--            <Button-->
-<!--                android:id="@+id/checkGroupButton"-->
-<!--                android:layout_width="0dp"-->
-<!--                android:layout_weight="1"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="@string/check_group_name"-->
-<!--                android:gravity="center"-->
-<!--                style="@style/SpinnerButtonStyle" />-->
             <Spinner
                 android:id="@+id/tuneSpinner"
                 android:layout_width="0dp"
@@ -70,91 +53,6 @@
                 style="@style/Spinner"/>
 
         </LinearLayout>
-        <!--Hidden panel-->
-<!--        <LinearLayout-->
-<!--            android:id="@+id/tuneGroup"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:gravity="center"-->
-<!--            app:layout_constraintWidth_percent="0.7"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/spinnerGroup"-->
-<!--            android:orientation="vertical">-->
-<!--            <android.support.constraint.ConstraintLayout-->
-<!--                android:id="@+id/tuneGroupSub"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="0dp"-->
-<!--                android:layout_weight="1">-->
-<!--                <TextView-->
-<!--                    android:id="@+id/textTune"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_marginEnd="10dp"-->
-<!--                    android:textAppearance="?android:attr/textAppearanceMedium"-->
-<!--                    android:textColor="@android:color/white"-->
-<!--                    app:layout_constraintWidth_percent="0.3"-->
-<!--                    app:layout_constraintStart_toStartOf="parent"-->
-<!--                    app:layout_constraintTop_toTopOf="parent" />-->
-<!--                <SeekBar-->
-<!--                    android:id="@+id/seekbarTune"-->
-<!--                    android:layout_width="0dp"-->
-<!--                    android:layout_height="match_parent"-->
-<!--                    android:theme="@style/Seekbar"-->
-<!--                    android:visibility="invisible"-->
-<!--                    app:layout_constraintWidth_percent="0.7"-->
-<!--                    app:layout_constraintStart_toEndOf="@+id/textTune" />-->
-<!--            </android.support.constraint.ConstraintLayout>-->
-<!--&lt;!&ndash;            <android.support.constraint.ConstraintLayout&ndash;&gt;-->
-<!--&lt;!&ndash;                android:id="@+id/tuneGroupSub2"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_height="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_weight="1">&ndash;&gt;-->
-<!--&lt;!&ndash;                <TextView&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/textTune2"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_marginEnd="10dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:textAppearance="?android:attr/textAppearanceMedium"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:textColor="@android:color/white"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintWidth_percent="0.3"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintStart_toStartOf="parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintTop_toTopOf="parent" />&ndash;&gt;-->
-<!--&lt;!&ndash;                <SeekBar&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/seekbarTune2"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:theme="@style/Seekbar"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:visibility="invisible"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintWidth_percent="0.7"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintStart_toEndOf="@+id/textTune2" />&ndash;&gt;-->
-<!--&lt;!&ndash;            </android.support.constraint.ConstraintLayout>&ndash;&gt;-->
-<!--&lt;!&ndash;            <android.support.constraint.ConstraintLayout&ndash;&gt;-->
-<!--&lt;!&ndash;                android:id="@+id/tuneGroupSub3"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_width="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_height="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                android:layout_weight="1">&ndash;&gt;-->
-<!--&lt;!&ndash;                <TextView&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/textTune3"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="wrap_content"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_marginEnd="10dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:textAppearance="?android:attr/textAppearanceMedium"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:textColor="@android:color/white"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintWidth_percent="0.3"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintStart_toStartOf="parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintTop_toTopOf="parent" />&ndash;&gt;-->
-<!--&lt;!&ndash;                <SeekBar&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:id="@+id/seekbarTune3"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_width="0dp"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:layout_height="match_parent"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:theme="@style/Seekbar"&ndash;&gt;-->
-<!--&lt;!&ndash;                    android:visibility="invisible"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintWidth_percent="0.7"&ndash;&gt;-->
-<!--&lt;!&ndash;                    app:layout_constraintStart_toEndOf="@+id/textTune3" />&ndash;&gt;-->
-<!--&lt;!&ndash;            </android.support.constraint.ConstraintLayout>&ndash;&gt;-->
-
-<!--        </LinearLayout>-->
 
     </android.support.constraint.ConstraintLayout>
 
@@ -196,4 +94,27 @@
             app:layout_constraintDimensionRatio="1:1"/>
     </android.support.constraint.ConstraintLayout>
 
+<!--    bottom panel: organ masks-->
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/maskPanel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:background="@color/paneColor"
+        app:layout_constraintHeight_percent="0.08"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/mask_recycle"
+            android:scrollbars="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            app:layout_constraintWidth_percent="0.9"
+            app:layout_constraintHeight_percent="0.9"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+    </android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

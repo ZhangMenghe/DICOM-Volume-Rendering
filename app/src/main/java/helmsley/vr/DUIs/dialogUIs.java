@@ -104,7 +104,7 @@ public class dialogUIs {
         RecyclerView.LayoutManager layout_manager = new LinearLayoutManager(activity);
         content_view.setLayoutManager(layout_manager);
         //adapter
-        content_view.setAdapter(new DialogAdapter(activity, content_view, downloader, local));
+        content_view.setAdapter(new DSCardRecyclerViewAdapter(activity, content_view, downloader, local));
 
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_select_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);

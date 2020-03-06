@@ -19,8 +19,8 @@ import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
 
-public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder> {
-    final static String TAG = "DialogAdapter";
+public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecyclerViewAdapter.cardHolder> {
+    final static String TAG = "DSCardRecyclerViewAdapter";
     private final WeakReference<Activity> activityReference;
     private final WeakReference<RecyclerView> recyclerView;
     private final WeakReference<fileTransferClient> downloaderReference;
@@ -43,7 +43,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public DialogAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, boolean local) {
+    public DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, boolean local) {
         downloaderReference = new WeakReference<>(downloader);
         activityReference = new WeakReference<>(activity);
         recyclerView = new WeakReference<>(recycle_view);
@@ -52,7 +52,7 @@ public class DialogAdapter extends RecyclerView.Adapter<DialogAdapter.cardHolder
 
     // Create new views (invoked by the layout manager)
     @Override
-    public DialogAdapter.cardHolder onCreateViewHolder(ViewGroup parent,
+    public DSCardRecyclerViewAdapter.cardHolder onCreateViewHolder(ViewGroup parent,
                                                          int viewType) {
         // create a new view
         View card_view = (View) LayoutInflater.from(parent.getContext())

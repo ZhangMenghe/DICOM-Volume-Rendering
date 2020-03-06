@@ -1,0 +1,24 @@
+<android.support.v7.widget.CardView
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/horizontal_card"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+    card_view:contentPadding="7dp"
+    card_view:cardCornerRadius="7dp"
+    card_view:cardElevation="7dp"
+    card_view:cardBackgroundColor="#FF9800"
+    android:layout_margin="1dp">
+
+    <TextView
+        android:id="@+id/horizontal_card_text"
+        android:layout_gravity="center"
+        android:textSize="20sp"
+        android:layout_marginTop="3dp"
+        android:layout_marginBottom="3dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="#fff"/>
+
+</android.support.v7.widget.CardView>
