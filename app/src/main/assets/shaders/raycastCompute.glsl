@@ -1,7 +1,7 @@
 #version 310 es
 
 #pragma multi_compile UPDATE_RAY_BAKED
-#pragma multi_compile ORGANS_ONLY
+#pragma multi_compile SHOW_ORGANS
 #pragma multi_compile TRANSFER_COLOR MASKON
 
 #extension GL_EXT_shader_io_blocks:require
@@ -28,6 +28,12 @@ uniform float u_brightness;
 
 float CURRENT_INTENSITY;
 
+//Uniforms for masks
+// uniform int u_maskbits;
+// uniform int u_organ_num;
+
+uint u_maskbits = uint(31);
+uint u_organ_num = uint(4);
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -35,7 +41,12 @@ vec3 hsv2rgb(vec3 c){
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
-
+uvec3 transfer_scheme(float gray){
+    return uvec3(hsv2rgb(vec3(gray * 0.8, 1.0, 1.0)) * 255.0);
+}
+uvec3 transfer_scheme(float cat, float gray){
+    return uvec3(hsv2rgb(vec3(cat, 1.0, gray)) * 255.0);
+}
 vec4 UpdateTextureBased(uvec4 sampled_color){
     vec4 fcolor = vec4(sampled_color) * 0.003921;
     float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
@@ -47,8 +58,30 @@ uvec4 UpdateRaybased(uvec4 sampled_color){
     alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
     return uvec4(alpha * vec4(sampled_color));
 }
-uvec3 transfer_scheme(float gray){
-    return uvec3(hsv2rgb(vec3(gray * 0.8, 1.0, 1.0)) * 255.0);
+
+uvec4 show_organs(uvec4 color, uint mask){
+    uint alpha = uint(0);
+    //organs
+    for(uint i=uint(0); i<u_organ_num; i++){
+        if( ((u_maskbits>> uint(i + uint(1))) & uint(1)) == uint(0)) continue;
+        uint cbit = (mask>> uint(i)) & uint(1);
+        alpha = alpha | cbit;
+        if(cbit == uint(1)){
+            // if(i == uint(0)) color.rgb = uvec3(color.r);
+            color.rgb = transfer_scheme(float(i) / float(u_organ_num), CURRENT_INTENSITY);
+            break;
+        }
+    }
+    // body
+    if(alpha == uint(0)){
+        if( ( u_maskbits & uint(1) ) == uint(1)) 
+        {alpha = uint(1); color.rgb = uvec3(color.r);}
+    }
+    // if((u_maskbits>> uint(0)) & uint(1)) == uint(0))
+    //      color.rgb = uvec3(color.r);
+    color.a*= alpha;
+    // if(color.r == color.g && color.r== color.b &&  color.a!=uint(0)){color.rgb=uvec3(255);}
+    return color;
 }
 uvec4 Sample(ivec3 pos){
     uint value = imageLoad(srcTex, pos).r;
@@ -61,21 +94,10 @@ uvec4 Sample(ivec3 pos){
     //        if(sc.g > 0.01) color.gb = vec2(.0);
     #endif
 
-    #ifdef ORGANS_ONLY
-    //upper part as mask
-    uint mask = value>>uint(16);
-    color.a*=((mask>> uint(0)) & uint(1)
-    | (mask>> uint(0)) & uint(2)
-    | (mask>> uint(0)) & uint(4)
-    | (mask>> uint(0)) & uint(8)
-    );
-    color.r = uint(255) * ((mask>> uint(0)) & uint(1));
-    color.g = uint(255) * ((mask>> uint(0)) & uint(2));
-    color.b = uint(255) * ((mask>> uint(0)) & uint(4));
-    if(color.r == color.g && color.r== color.b &&  color.a!=uint(0)){color.rgb=uvec3(255);}
-
-
-        #endif
+    #ifdef SHOW_ORGANS
+        //upper part as mask
+        color = show_organs(color, value>>uint(16));
+    #endif
     return color;
 }
 void main(){
