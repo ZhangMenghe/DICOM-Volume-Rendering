@@ -81,9 +81,9 @@
 
     <string-array name="masks_list">
         <item>Body</item>
-        <item>Liver</item>
         <item>Colon</item>
         <item>Kidneys</item>
+        <item>Spleen</item>
         <item>Bladder</item>
     </string-array>
     <string-array name="masks_status">
