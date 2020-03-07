@@ -1,100 +1,132 @@
 #version 310 es
 
-#pragma multi_compile UPDATE_RAY_BAKED
-#pragma multi_compile ORGANS_ONLY
-#pragma multi_compile TRANSFER_COLOR MASKON
+#pragma multi_compile CUTTING_PLANE
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
 
 precision mediump float;
 
-layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
-layout(binding = 0, r32ui)readonly uniform mediump uimage3D srcTex;
-layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex_tex;
-layout(binding = 2, rgba16ui)writeonly uniform mediump uimage3D destTex_ray;
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
+layout(binding = 0, rgba16ui)readonly uniform mediump uimage3D srcTex;
+layout(binding = 1, rgba8)writeonly uniform mediump image2D destTex;
 
-//Uniforms for texture_baked
-struct OpacityAdj{
-    float overall;//0-1
-    float lowbound; //slope adj, 0-1
-    float cutoff;//0,1
+uniform vec2 u_con_size;
+uniform float u_fov;
+
+uniform mat4 u_WorldToModel;
+uniform mat4 u_CamToWorld;
+
+uniform vec4 u_plane_color;
+uniform vec3 uCamposObjSpace;
+uniform float uViewDir;
+uniform float usample_step_inverse;
+struct Plane{
+    vec3 p;
+    vec3 normal;
+    vec3 s1, s2, s3;
 };
-uniform OpacityAdj uOpacitys;
+uniform Plane uPlane;
+const float constantNCP = 1.0;
+vec3 VolumeSize;
 
-//Uniforms for ray_baked
-uniform float u_val_threshold;
-uniform float u_brightness;
-
-float CURRENT_INTENSITY;
-
-const float START_H_VALUE = 0.1667;
-const float BASE_S_VALUE = 0.7;
-const float BASE_S_H = 0.6667;//pure blue
-const float BASE_V_VALUE = 0.8;
-
-// All components are in the range [0…1], including hue.
-vec3 hsv2rgb(vec3 c){
-    vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
-    vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
-    return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
+    vec3 tMin = (-extents - ro) / rd;
+    vec3 tMax = (extents - ro) / rd;
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+    return vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
+}
+float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
+    float d = dot(planen, rd);
+    float t = dot(planep - ro, planen);
+    return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
 
-vec4 UpdateTextureBased(uvec4 sampled_color){
-    vec4 fcolor = vec4(sampled_color) * 0.003921;
-    float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
-    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*fcolor.a;
-    return vec4(fcolor.rgb, alpha*uOpacitys.overall);
+bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
+    vec3 dms1 = M-s1;
+    vec3 ds21 = s2 - s1; vec3 ds31 = s3 - s1; //should be perpendicular to each other
+    float u = dot(dms1, ds21);
+    float v = dot(dms1, ds31);
+    return (u >= 0.0 && u <= dot(ds21, ds21)
+    && v >= 0.0 && v <= dot(ds31,ds31));
 }
-uvec4 UpdateRaybased(uvec4 sampled_color){
-    float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
-    alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
-    return uvec4(alpha * vec4(sampled_color));
+
+vec4 Sample(vec3 p){
+    vec3 coord = clamp(p, vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
+    uvec4 ucolor = imageLoad(srcTex, ivec3(VolumeSize *coord));
+    return vec4(ucolor)/ 256.0;
 }
-uvec3 transfer_scheme(float gray){
-    // transfer a gray-scale from 0-1 to proper rgb value
-    float h = (1.0 - START_H_VALUE) * gray + START_H_VALUE;
-    float off_h = h - BASE_S_H;
-    float s = off_h>.0? BASE_S_VALUE + off_h / (1.0 - BASE_S_H) * 0.3: BASE_S_VALUE + off_h / (BASE_S_H - START_H_VALUE) * 0.5;
-    float v = off_h >.0? BASE_V_VALUE: BASE_V_VALUE + off_h / (BASE_S_H - START_H_VALUE)*0.3;
-    return uvec3(hsv2rgb(vec3(h,s,v)) * 255.0);
+vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
+    float t0 = t - StepSize * 4.0;
+    float t1 = t;
+    float tm;
+
+    #define BINARY_SUBDIV tm = (t0 + t1) * .5; p = ro + rd * tm; if (Sample(p).a > .01) t1 = tm; else t0 = tm;
+    BINARY_SUBDIV
+BINARY_SUBDIV
+BINARY_SUBDIV
+BINARY_SUBDIV
+#undef BINARY_SUBDIV
+t = tm;
+return Sample(p);
 }
-uvec4 Sample(ivec3 pos){
-    uint value = imageLoad(srcTex, pos).r;
-    //lower part as color
-    uvec4 color = uvec4(uvec3(value&uint(0xffff)), 255);
-    CURRENT_INTENSITY = float(color.r) * 0.003921;
-    #ifdef TRANSFER_COLOR
-        color.rgb = transfer_scheme(CURRENT_INTENSITY);
-//    #elif defined MASKON
-//        if(sc.g > 0.01) color.gb = vec2(.0);
+vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
+    vec4 sum = vec4(.0);
+    int steps = 0; float pd = .0;
+
+    float vmax = .0;
+    for(float t = head; t<tail; ){
+        if(sum.a >= 0.95) break;
+        vec3 p = ro + rd * t;
+        vec4 val_color = Sample(p);
+        if(val_color.a > 0.01){
+            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
+            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
+            sum.a += (1.0 - sum.a) * val_color.a;
+        }
+        t += val_color.a > 0.01? usample_step_inverse: usample_step_inverse * 4.0;
+        steps++;
+        pd = sum.a;
+    }
+    return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
+}
+
+vec4 tracing(float u, float v){
+    float tangent = tan(u_fov / 2.0); // angle in radians
+    float ar = (float(u_con_size.x) / u_con_size.y);
+
+    vec3 ro = uCamposObjSpace;
+    vec3 rd = vec3(normalize(u_WorldToModel * u_CamToWorld *vec4(u* tangent*ar, v*tangent, -constantNCP, .0)));
+
+    vec2 intersect = RayCube(ro, rd, vec3(0.5));
+    intersect.x = max(.0, intersect.x);
+    VolumeSize = vec3(imageSize(srcTex));
+
+    bool drawed_square=false; bool blocked_by_plane=false;
+    //plane
+    #ifdef CUTTING_PLANE
+    float t;
+    if(dot(uPlane.normal, -uCamposObjSpace) > .0){
+        t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
+        blocked_by_plane = (t <= intersect.x);
+        intersect.x = max(intersect.x, t);
+    }
+    else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
+
+    drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
+
+    if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
     #endif
+    if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);
 
-    #ifdef ORGANS_ONLY
-        //upper part as mask
-        uint mask = value>>uint(16);
-        color.a*=((mask>> uint(0)) & uint(1)
-                    | (mask>> uint(0)) & uint(2)
-                    | (mask>> uint(0)) & uint(4)
-                    | (mask>> uint(0)) & uint(8)
-                );
-        color.r = uint(255) * ((mask>> uint(0)) & uint(1));
-        color.g = uint(255) * ((mask>> uint(0)) & uint(2));
-        color.b = uint(255) * ((mask>> uint(0)) & uint(4));
-        if(color.r == color.g && color.r== color.b &&  color.a!=uint(0)){color.rgb=uvec3(255);}
-
-
-    #endif
-    return color;
+    return Volume(ro + 0.5, rd, intersect.x, intersect.y);
 }
-void main(){
-    ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
-    uvec4 final_color = Sample(storePos);
-    #ifdef UPDATE_RAY_BAKED
-        uvec4 ray_color = UpdateRaybased(final_color);
-        imageStore(destTex_ray, storePos, ray_color);
-    #else
-        vec4 tex_color = UpdateTextureBased(final_color);
-        imageStore(destTex_tex, storePos, tex_color);
-    #endif
+void main() {
+    ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
+    float cx = float(storePos.x); float cy = float(storePos.y);
+    if ( cx >= u_con_size.x ||  cy >= u_con_size.y) return;
+    cy = u_con_size.y - cy;
+    vec2 uv = (vec2(cx, cy) + 0.5) / u_con_size * 2.0 - 1.0;
+    imageStore(destTex, ivec2(cx, cy), tracing(uv.x, uv.y));
 }

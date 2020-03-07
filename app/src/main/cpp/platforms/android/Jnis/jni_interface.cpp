@@ -63,9 +63,8 @@ namespace {
                 "shaders/textureVolume.frag",
                 "shaders/raycastVolume.vert",
                 "shaders/raycastVolume.frag",
-                "shaders/raycastCompute.glsl",
-
                 "shaders/raycastVolume.glsl",
+                "shaders/raycastCompute.glsl",
                 "shaders/quad.vert",
                 "shaders/quad.frag",
                 "shaders/cplane.vert",
