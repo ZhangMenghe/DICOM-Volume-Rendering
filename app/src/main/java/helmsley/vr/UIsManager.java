@@ -1,6 +1,7 @@
 package helmsley.vr;
 
 import android.app.Activity;
+import android.view.View;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
@@ -74,10 +75,10 @@ public class UIsManager {
     }
     public void RequestReset(){
         cuttingController.Reset();
+        masksController.Reset();
         seekbarAdapter.Reset();
         cbAdapter.Reset();
         spinner_check.setAdapter(cbAdapter.getListAdapter());
         JUIInterface.JUIonReset();
     }
-
 }

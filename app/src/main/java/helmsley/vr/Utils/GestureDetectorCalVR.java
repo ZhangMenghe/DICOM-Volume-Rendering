@@ -29,7 +29,7 @@ public class GestureDetectorCalVR {
 
             }
 
-            public  void onFling(int pointerNum, float srcx, float srcy, float dstx, float dsty){}
+            public void onFling(int pointerNum, float srcx, float srcy, float dstx, float dsty){}
 
             // LEFT(0) OR Right(1) Single Tap [UP]
             public  void onSingleTapUp(int pointerNum, MotionEvent event){

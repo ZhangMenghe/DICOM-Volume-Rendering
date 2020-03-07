@@ -86,6 +86,13 @@
         <item>Kidneys</item>
         <item>Bladder</item>
     </string-array>
+    <string-array name="masks_status">
+        <item>true</item>
+        <item>true</item>
+        <item>true</item>
+        <item>true</item>
+        <item>true</item>
+    </string-array>
 
 
     <string-array name="entry_has_sub">

@@ -35,7 +35,6 @@ public class cutplaneUIs {
         String params[] = activity.getResources().getStringArray(R.array.cutting_plane);
 
         int max_seek_value = Integer.valueOf(params[1]);
-//        seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
         seek_bar_.setMax(max_seek_value);
         seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -91,8 +90,8 @@ public class cutplaneUIs {
     }
     public void onCuttingStateChange(boolean isCutting_, boolean isRaycast){
         isCutting = isCutting_;
+        DUIHelpers.ToggleShowView_animate(panel_tune_, isCutting);
         if(isCutting){
-            panel_tune_.setVisibility(View.VISIBLE);
             if(isRaycast){
                 button_.show();
                 seek_bar_.setVisibility(View.INVISIBLE);
@@ -102,8 +101,6 @@ public class cutplaneUIs {
                 seek_bar_.setVisibility(View.VISIBLE);
                 Toast.makeText(actRef.get(), "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();
             }
-        }else{
-            panel_tune_.setVisibility(View.INVISIBLE);
         }
     }
     public void onCuttingStateChange(boolean isRaycast){
