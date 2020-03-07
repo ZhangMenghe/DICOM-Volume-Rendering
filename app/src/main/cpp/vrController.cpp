@@ -181,8 +181,8 @@ void vrController::precompute(){
     if(param_bool[dvr::CHECK_COLOR_TRANS]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
     else bakeShader_->DisableKeyword("TRANSFER_COLOR");
 
-    if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("ORGANS_ONLY");
-    else bakeShader_->DisableKeyword("ORGANS_ONLY");
+    if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
+    else bakeShader_->DisableKeyword("SHOW_ORGANS");
 
     GLuint sp = bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);//GL_RGBA16UI);//GL_RGBA8);

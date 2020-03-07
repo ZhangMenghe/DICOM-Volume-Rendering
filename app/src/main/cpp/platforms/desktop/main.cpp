@@ -10,7 +10,6 @@ dicomLoader loader_;
 uiController ui_;
 vrController controller_;
 bool is_pressed = false;
-
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
 	if(is_pressed){
 		controller_.onTouchMove(float(xpos), float(ypos));
@@ -38,6 +37,13 @@ void onCreated(){
 	ui_.InitTuneParam();
 	ui_.InitCheckParam();
 	controller_.onViewCreated();
+
+	//load data
+	if(loader_.loadData("dicom-images/sample_data_2bytes", "dicom-images/sample_data_mask_2bytes")){
+	// if(loader_.loadData("dicom-images/sample_data_2bytes_2012", LOAD_DICOM)){
+		controller_.assembleTexture(loader_.getVolumeData());
+		loader_.reset();
+	}
 }
 void onDraw(){
 	controller_.onDraw();
@@ -99,11 +105,6 @@ void setupApplication(){
 	// 	loader_.reset();
 	// }
 
-	//test assemble together
-	if(loader_.loadData("dicom-images/sample_data_2bytes", "dicom-images/sample_data_mask_2bytes")){
-		controller_.assembleTexture(loader_.getVolumeData());
-		loader_.reset();
-	}
 }
 
 int main(int argc, char** argv){
