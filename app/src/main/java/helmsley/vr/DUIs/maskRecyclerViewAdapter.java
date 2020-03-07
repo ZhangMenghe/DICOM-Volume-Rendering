@@ -59,6 +59,7 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
                 int item_position = recyRef.get().getChildAdapterPosition(v);
                 values[item_position] = !values[item_position];
                 setButtonStyle(v, item_position);
+                //todo: set to native
             }
         });
         return new MyView(card_view);
