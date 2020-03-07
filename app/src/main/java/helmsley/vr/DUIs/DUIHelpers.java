@@ -4,8 +4,8 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 
-public class DUIHelpers {
-    public static TranslateAnimation panelHiddenAction, panelShownAction;
+class DUIHelpers {
+    private static TranslateAnimation panelHiddenAction, panelShownAction;
 
     static {
         panelHiddenAction = new TranslateAnimation(Animation.RELATIVE_TO_SELF,
@@ -20,7 +20,7 @@ public class DUIHelpers {
         panelShownAction.setDuration(500);
     }
 
-    public static void ToggleShowView_animate(View panel, boolean isShowUp){
+    static void ToggleShowView_animate(View panel, boolean isShowUp){
         if(isShowUp){
             panel.startAnimation(panelShownAction);
             panel.setVisibility(View.VISIBLE);
