@@ -2,7 +2,7 @@
 /*/build/
 # **/build/
 **/build*/
-
+*.crap
 #vs code files 
 **/.vscode/
 **/.cxx/

@@ -16,15 +16,16 @@ vec3 hsv2rgb(vec3 c){
 }
 vec3 transfer_scheme(float gray){
     // transfer a gray-scale from 0-1 to proper rgb value
-    float range = 0.833;
-    float h = (1.0 - START_H_VALUE) * gray + START_H_VALUE;
-    float off_h = h - BASE_S_H;
-    float s = off_h>.0? BASE_S_VALUE + off_h / (1.0 - BASE_S_H) * 0.3: BASE_S_VALUE + off_h / (BASE_S_H - START_H_VALUE) * 0.5;
-    float v = off_h >.0? BASE_V_VALUE: BASE_V_VALUE + off_h / (BASE_S_H - START_H_VALUE)*0.3;
-    return hsv2rgb(vec3(h,s,v));
+    // float range = 0.833;
+    // float h = (1.0 - START_H_VALUE) * gray + START_H_VALUE;
+    // float off_h = h - BASE_S_H;
+    // float s = off_h>.0? BASE_S_VALUE + off_h / (1.0 - BASE_S_H) * 0.3: BASE_S_VALUE + off_h / (BASE_S_H - START_H_VALUE) * 0.5;
+    // float v = off_h >.0? BASE_V_VALUE: BASE_V_VALUE + off_h / (BASE_S_H - START_H_VALUE)*0.3;
+    // return hsv2rgb(vec3(h,s,v));
+    return hsv2rgb(vec3(gray * 0.8, 1.0, 1.0));
+
 }
 
 void main(){
     gl_FragColor = vec4(transfer_scheme(vTexcoord.x), 1.0);
-//    gl_FragColor = vec4(hsv2rgb(texture(uSample_trans, vTexcoord).rgb), 1.0);
 }

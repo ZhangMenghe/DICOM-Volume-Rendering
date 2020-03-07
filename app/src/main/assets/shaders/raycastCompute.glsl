@@ -28,10 +28,6 @@ uniform float u_brightness;
 
 float CURRENT_INTENSITY;
 
-const float START_H_VALUE = 0.1667;
-const float BASE_S_VALUE = 0.7;
-const float BASE_S_H = 0.6667;//pure blue
-const float BASE_V_VALUE = 0.8;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -52,12 +48,7 @@ uvec4 UpdateRaybased(uvec4 sampled_color){
     return uvec4(alpha * vec4(sampled_color));
 }
 uvec3 transfer_scheme(float gray){
-    // transfer a gray-scale from 0-1 to proper rgb value
-    float h = (1.0 - START_H_VALUE) * gray + START_H_VALUE;
-    float off_h = h - BASE_S_H;
-    float s = off_h>.0? BASE_S_VALUE + off_h / (1.0 - BASE_S_H) * 0.3: BASE_S_VALUE + off_h / (BASE_S_H - START_H_VALUE) * 0.5;
-    float v = off_h >.0? BASE_V_VALUE: BASE_V_VALUE + off_h / (BASE_S_H - START_H_VALUE)*0.3;
-    return uvec3(hsv2rgb(vec3(h,s,v)) * 255.0);
+    return uvec3(hsv2rgb(vec3(gray * 0.8, 1.0, 1.0)) * 255.0);
 }
 uvec4 Sample(ivec3 pos){
     uint value = imageLoad(srcTex, pos).r;
