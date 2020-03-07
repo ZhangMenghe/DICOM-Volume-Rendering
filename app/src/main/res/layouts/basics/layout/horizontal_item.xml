@@ -7,7 +7,6 @@
     card_view:contentPadding="7dp"
     card_view:cardCornerRadius="7dp"
     card_view:cardElevation="7dp"
-    card_view:cardBackgroundColor="#FF9800"
     android:layout_margin="1dp">
 
     <TextView
@@ -18,7 +17,6 @@
         android:layout_marginBottom="3dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
-        android:textColor="#fff"/>
+        android:textColor="@color/darkBlue"/>
 
 </android.support.v7.widget.CardView>
