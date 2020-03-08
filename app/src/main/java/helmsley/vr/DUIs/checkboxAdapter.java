@@ -47,7 +47,7 @@ public class checkboxAdapter {
 
         mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
         mUIManagerRef.get().onMaskPanelSwitch(check_map.get(mask_name), false);
-        JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
+        JUIInterface.JUIInitCheckParam(check_items.length, check_items, values);
     }
     public void Reset(){
         check_map=new LinkedHashMap<>();

@@ -20,6 +20,8 @@ bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true
 glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
 float vrController::csphere_radius = 0.5f;
 bool vrController::cutDirty = true;
+unsigned int vrController::mask_num_ = 0; unsigned int vrController::mask_bits_ = 0;
+
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -188,6 +190,9 @@ void vrController::precompute(){
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);//GL_RGBA16UI);//GL_RGBA8);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
     glBindImageTexture(2, ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16UI);//GL_RGBA16UI);//GL_RGBA8);
+
+    Shader::Uniform(sp, "u_maskbits", vrController::mask_bits_);
+    Shader::Uniform(sp, "u_organ_num", vrController::mask_num_);
 
     if(isRayCasting())
         raycastRenderer_->updatePrecomputation(sp);

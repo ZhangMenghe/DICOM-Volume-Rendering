@@ -32,6 +32,8 @@ public:
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
 
+    static unsigned int mask_num_, mask_bits_;
+
     inline static bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }

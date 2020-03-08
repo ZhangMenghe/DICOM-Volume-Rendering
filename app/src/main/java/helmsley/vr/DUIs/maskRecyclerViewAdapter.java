@@ -24,6 +24,7 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
 
     private int norm_bg_color, high_bg_color;
 
+    private int mask_num, mask_bits;
     class MyView extends RecyclerView.ViewHolder {
 
         TextView textView;
@@ -59,7 +60,10 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
                 int item_position = recyRef.get().getChildAdapterPosition(v);
                 values[item_position] = !values[item_position];
                 setButtonStyle(v, item_position);
-                //todo: set to native
+                if(values[item_position]) mask_bits |= 1 << item_position;
+                else mask_bits &= ~(1 << item_position);
+                JUIInterface.JUIsetMaskBits(mask_num, mask_bits);
+
             }
         });
         return new MyView(card_view);
@@ -84,11 +88,14 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
     private void set_initial_values(){
         list = Arrays.asList(actRef.get().getResources().getStringArray(R.array.masks_list));
         values = new Boolean[list.size()];
-
+        mask_num = list.size() - 1;
+        mask_bits = 0;
         TypedArray tvalues = actRef.get().getResources().obtainTypedArray(R.array.masks_status);
         for(int i=0; i<list.size(); i++){
-            values[i] = tvalues.getBoolean(i, false);
+            values[i] = tvalues.getBoolean(i, true);
+            mask_bits+= values[i]? (int)Math.pow(2, i) : 0;
         }
+        JUIInterface.JUIsetMaskBits(mask_num, mask_bits);
     }
     void Reset(){
         set_initial_values();

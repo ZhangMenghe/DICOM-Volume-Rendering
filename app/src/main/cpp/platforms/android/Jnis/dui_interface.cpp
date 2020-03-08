@@ -81,6 +81,12 @@ DUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value, jb
     vrController::cutDirty = true;
     vrController::baked_dirty_ = true;
 }
+DUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint num, jint mbits){
+    vrController::mask_num_ = (unsigned int)num;
+    vrController::mask_bits_ = (unsigned int)mbits;
+    vrController::baked_dirty_ = true;
+}
+
 
 DUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass){
     nativeApp(nativeAddr)->onReset();
