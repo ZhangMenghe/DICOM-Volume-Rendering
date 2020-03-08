@@ -33,6 +33,8 @@ public:
 
 	// set int
 	static void Uniform(GLuint program, const GLchar* name, int x){glUniform1i(glGetUniformLocation(program, name), x);}
+	//set uint
+	static void Uniform(GLuint program, const GLchar* name, unsigned int x){glUniform1ui(glGetUniformLocation(program, name), x);}
 	//set float
 	static void Uniform(GLuint program, const GLchar* name, float x){glUniform1f(glGetUniformLocation(program, name), x);}
 	//set bool

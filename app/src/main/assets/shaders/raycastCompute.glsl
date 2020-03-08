@@ -32,8 +32,8 @@ float CURRENT_INTENSITY;
 // uniform int u_maskbits;
 // uniform int u_organ_num;
 
-uint u_maskbits = uint(31);
-uint u_organ_num = uint(4);
+uniform uint u_maskbits;// = uint(31);
+uniform uint u_organ_num;// = uint(4);
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){

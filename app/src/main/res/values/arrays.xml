@@ -79,6 +79,7 @@
         <item>50</item>
     </string-array>
 
+<!--    order matters for mask bit order!-->
     <string-array name="masks_list">
         <item>Body</item>
         <item>Colon</item>
