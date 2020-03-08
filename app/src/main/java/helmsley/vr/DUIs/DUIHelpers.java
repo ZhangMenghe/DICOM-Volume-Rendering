@@ -1,5 +1,7 @@
 package helmsley.vr.DUIs;
 
+import android.graphics.drawable.Drawable;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
@@ -18,6 +20,8 @@ class DUIHelpers {
                 Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
                 1.0f, Animation.RELATIVE_TO_SELF, .0f);
         panelShownAction.setDuration(500);
+
+
     }
 
     static void ToggleShowView_animate(View panel, boolean isShowUp){
@@ -30,4 +34,5 @@ class DUIHelpers {
             panel.setVisibility(View.GONE);
         }
     }
+
 }

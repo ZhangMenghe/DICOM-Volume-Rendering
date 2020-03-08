@@ -46,7 +46,7 @@ public class checkboxAdapter {
         freeze_volume_name = res.getString(R.string.freezeVolume_check_name);
 
         mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
-        mUIManagerRef.get().onMaskPanelSwitch(check_map.get(mask_name));
+        mUIManagerRef.get().onMaskPanelSwitch(check_map.get(mask_name), false);
         JUIInterface.JUIInitCheckParam(check_items.length,check_items,values);
     }
     public void Reset(){
@@ -115,12 +115,13 @@ public class checkboxAdapter {
                     String item_name = item_names.get(position);
 
                     if(item_name.equals(raycast_name)) onTexRaySwitch(isChecked);
-                    else if(item_name.equals(mask_name)) onMaskPanelSwitch(isChecked);
+                    else if(item_name.equals(mask_name)) onMaskPanelSwitch(isChecked, false);
                     else if(item_name.equals(cutting_name)) onCuttingPlaneSwitch(isChecked);
                     else if(item_name.equals(freeze_plane_name)) onFreezePlaneSwitch(isChecked);
                     else if(item_name.equals(freeze_volume_name)) onFreezeVolumeSwitch(isChecked);
 
                     item_values.set(position, isChecked);
+                    updateValue(item_name, isChecked);
                     JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
                 }
             });
@@ -141,14 +142,17 @@ public class checkboxAdapter {
 
         mUIManagerRef.get().onTexRaySwitch(isChecked);
     }
-    private void onMaskPanelSwitch(boolean isChecked){
-        mUIManagerRef.get().onMaskPanelSwitch(isChecked);
+    private void onMaskPanelSwitch(boolean isChecked, boolean keepHiddenIcon){
+        mUIManagerRef.get().onMaskPanelSwitch(isChecked, keepHiddenIcon);
     }
     private void onCuttingPlaneSwitch(boolean isChecked){
         if(isChecked && mAdapter.getItemValue(raycast_name)) mAdapter.addItem(freeze_plane_name, false);
         else mAdapter.removeItem(freeze_plane_name);
 
         mUIManagerRef.get().onCuttingPlaneSwitch(isChecked);
+
+        if(check_map.get(mask_name))onMaskPanelSwitch(false, true);
+
     }
     private void onFreezePlaneSwitch(boolean isChecked){
         cutplaneUIs.isPlaneFreeze = isChecked;
@@ -169,5 +173,8 @@ public class checkboxAdapter {
             JUIInterface.JUIsetChecks(mAdapter.item_names.get(position), false);
             mAdapter.notifyDataSetChanged();
         }
+    }
+    private void updateValue(String item_name, boolean isChecked){
+        check_map.put(item_name, isChecked);
     }
 }

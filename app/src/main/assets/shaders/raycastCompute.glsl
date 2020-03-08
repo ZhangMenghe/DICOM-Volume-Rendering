@@ -67,7 +67,6 @@ uvec4 show_organs(uvec4 color, uint mask){
         uint cbit = (mask>> uint(i)) & uint(1);
         alpha = alpha | cbit;
         if(cbit == uint(1)){
-            // if(i == uint(0)) color.rgb = uvec3(color.r);
             color.rgb = transfer_scheme(float(i) / float(u_organ_num), CURRENT_INTENSITY);
             break;
         }
@@ -77,10 +76,7 @@ uvec4 show_organs(uvec4 color, uint mask){
         if( ( u_maskbits & uint(1) ) == uint(1)) 
         {alpha = uint(1); color.rgb = uvec3(color.r);}
     }
-    // if((u_maskbits>> uint(0)) & uint(1)) == uint(0))
-    //      color.rgb = uvec3(color.r);
     color.a*= alpha;
-    // if(color.r == color.g && color.r== color.b &&  color.a!=uint(0)){color.rgb=uvec3(255);}
     return color;
 }
 uvec4 Sample(ivec3 pos){

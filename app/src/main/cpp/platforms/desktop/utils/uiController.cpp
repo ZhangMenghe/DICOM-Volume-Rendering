@@ -34,7 +34,7 @@ void uiController::InitTuneParam(int id, int num, const char*keys[], float value
     for(int i=0; i<num; i++){
         vec->push_back(std::string(keys[i]));
         tvec->push_back(values[i]);
-        LOGE("======SET INIT %s, %f\n", keys[i], values[i]);
+        // LOGE("======SET INIT %s, %f\n", keys[i], values[i]);
     }
     vec->push_back(cutting_keyword);
     tvec->push_back(-1.0f);
@@ -55,7 +55,7 @@ void uiController::InitCheckParam(){
         true,
         false,
         false,
-        true,
+        false,
         false
     };
     InitCheckParam(5, keys, values);
@@ -67,7 +67,7 @@ void uiController::InitCheckParam(int num, const char*keys[], bool values[]){
     for(int i=0; i<num; i++){
         param_checks.push_back(std::string(keys[i]));
         vrController::param_bool.push_back(values[i]);
-       LOGE("======SET INIT %s, %d\n", keys[i], values[i]);
+    //    LOGE("======SET INIT %s, %d\n", keys[i], values[i]);
     }
 
     param_checks.push_back(freeze_keyworkd);
