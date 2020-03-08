@@ -70,8 +70,8 @@ public class UIsManager {
     public void onCuttingPlaneSwitch(boolean isCutting){
         cuttingController.onCuttingStateChange(isCutting, current_texray_id==raycast_id);
     }
-    public void onMaskPanelSwitch(boolean isPanelOn){
-        masksController.onStateChange(isPanelOn);
+    public void onMaskPanelSwitch(boolean isPanelOn, boolean keepHiddenIcon){
+        masksController.onStateChange(isPanelOn, keepHiddenIcon);
     }
     public void RequestReset(){
         cuttingController.Reset();
