@@ -82,6 +82,8 @@ void raycastRenderer::onCuttingChange(float percent){
 void raycastRenderer::updatePrecomputation(GLuint sp){
     Shader::Uniform(sp, "u_val_threshold", vrController::param_ray[dvr::TUNE_CONTRAST]);
     Shader::Uniform(sp, "u_brightness", vrController::param_ray[dvr::TUNE_BRIGHT]);
+    Shader::Uniform(sp, "u_opacitymult", vrController::param_ray[dvr::TUNE_OPACITY_MULT]);
+
 }
 void raycastRenderer::precompute(){
     if(!baked_dirty_) return;

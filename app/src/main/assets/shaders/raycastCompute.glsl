@@ -25,12 +25,10 @@ uniform OpacityAdj uOpacitys;
 //Uniforms for ray_baked
 uniform float u_val_threshold;
 uniform float u_brightness;
+uniform float u_opacitymult;
 
 float CURRENT_INTENSITY;
-
-//Uniforms for masks
-// uniform int u_maskbits;
-// uniform int u_organ_num;
+uint MASKS_;
 
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
@@ -47,24 +45,28 @@ uvec3 transfer_scheme(float gray){
 uvec3 transfer_scheme(float cat, float gray){
     return uvec3(hsv2rgb(vec3(cat, 1.0, gray)) * 255.0);
 }
-vec4 UpdateTextureBased(uvec4 sampled_color){
-    vec4 fcolor = vec4(sampled_color) * 0.003921;
+uint UpdateTextureBased(uint sampled_alpha){
+    float falpha = float(sampled_alpha) * 0.003921;
     float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
-    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*fcolor.a;
-    return vec4(fcolor.rgb, alpha*uOpacitys.overall);
+    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*falpha;
+    return uint(alpha*uOpacitys.overall * 255.0);
 }
 uvec4 UpdateRaybased(uvec4 sampled_color){
-    float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
-    alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
-    return uvec4(alpha * vec4(sampled_color));
+//    float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
+//    alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
+    CURRENT_INTENSITY = (CURRENT_INTENSITY - 0.5);
+    CURRENT_INTENSITY = clamp(CURRENT_INTENSITY, 0.0, 1.0);
+    float alpha =  1.0 - (abs(u_val_threshold - CURRENT_INTENSITY) / u_brightness);
+    alpha = alpha* u_opacitymult;
+    return uvec4(uvec3(CURRENT_INTENSITY * 255.0), uint(alpha * float(sampled_color.a)));
 }
 
-uvec4 show_organs(uvec4 color, uint mask){
+uvec4 show_organs(uvec4 color){
     uint alpha = uint(0);
     //organs
     for(uint i=uint(0); i<u_organ_num; i++){
         if( ((u_maskbits>> uint(i + uint(1))) & uint(1)) == uint(0)) continue;
-        uint cbit = (mask>> uint(i)) & uint(1);
+        uint cbit = (MASKS_>> uint(i)) & uint(1);
         alpha = alpha | cbit;
         if(cbit == uint(1)){
             color.rgb = transfer_scheme(float(i) / float(u_organ_num), CURRENT_INTENSITY);
@@ -84,6 +86,10 @@ uvec4 Sample(ivec3 pos){
     //lower part as color
     uvec4 color = uvec4(uvec3(value&uint(0xffff)), 255);
     CURRENT_INTENSITY = float(color.r) * 0.003921;
+    MASKS_ = value>>uint(16);
+    return color;
+}
+uvec4 post_process(uvec4 color){
     #ifdef TRANSFER_COLOR
     color.rgb = transfer_scheme(CURRENT_INTENSITY);
     //    #elif defined MASKON
@@ -91,20 +97,22 @@ uvec4 Sample(ivec3 pos){
     #endif
 
     #ifdef SHOW_ORGANS
-        //upper part as mask
-        color = show_organs(color, value>>uint(16));
+    //upper part as mask
+    color = show_organs(color);
     #endif
     return color;
 }
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
-    uvec4 final_color = Sample(storePos);
+    uvec4 sample_color = Sample(storePos);
     #ifdef UPDATE_RAY_BAKED
-    uvec4 ray_color = UpdateRaybased(final_color);
-    imageStore(destTex_ray, storePos, ray_color);
+    uvec4 ray_color = UpdateRaybased(sample_color);
+    imageStore(destTex_ray, storePos, post_process(ray_color));
     #else
-    vec4 tex_color = UpdateTextureBased(final_color);
-    imageStore(destTex_tex, storePos, tex_color);
+    uint alpha = UpdateTextureBased(sample_color.a);
+
+    vec4 fcolor = vec4(post_process(uvec4(sample_color.rgb, alpha))) * 0.003921;
+    imageStore(destTex_tex, storePos, fcolor);
     #endif
 }
 

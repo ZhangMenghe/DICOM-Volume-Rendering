@@ -20,6 +20,7 @@ namespace dvr{
         TUNE_DENSITY = 0,
         TUNE_CONTRAST,
         TUNE_BRIGHT,
+        TUNE_OPACITY_MULT,
         TUNE_CUTTING_RAY
     };
     enum SHADER_FILES{
