@@ -54,11 +54,16 @@ uint UpdateTextureBased(uint sampled_alpha){
 uvec4 UpdateRaybased(uvec4 sampled_color){
 //    float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
 //    alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
-    CURRENT_INTENSITY = (CURRENT_INTENSITY - 0.5);
+//    CURRENT_INTENSITY = (CURRENT_INTENSITY - 0.5);
     CURRENT_INTENSITY = clamp(CURRENT_INTENSITY, 0.0, 1.0);
-    float alpha =  1.0 - (abs(u_val_threshold - CURRENT_INTENSITY) / u_brightness);
-    alpha = alpha* u_opacitymult;
-    return uvec4(uvec3(CURRENT_INTENSITY * 255.0), uint(alpha * float(sampled_color.a)));
+//    float alpha =  1.0 - (abs(u_val_threshold - CURRENT_INTENSITY) / u_brightness);
+//    alpha = alpha* u_opacitymult;
+
+    float falpha = float(sampled_color.a) * 0.003921;
+    float alpha = CURRENT_INTENSITY * (1.0 - u_opacitymult) + u_opacitymult;
+    alpha = (CURRENT_INTENSITY < u_brightness)?.0:alpha*falpha;
+
+    return uvec4(uvec3(CURRENT_INTENSITY * 255.0), uint(alpha * u_val_threshold * 255.0));
 }
 
 uvec4 show_organs(uvec4 color){
