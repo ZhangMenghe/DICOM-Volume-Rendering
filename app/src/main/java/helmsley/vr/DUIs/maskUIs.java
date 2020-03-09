@@ -1,17 +1,12 @@
 package helmsley.vr.DUIs;
 
 import android.app.Activity;
-import android.graphics.drawable.Drawable;
-import android.support.constraint.ConstraintSet;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import helmsley.vr.R;
-
 
 public class maskUIs {
     private View panel;
@@ -64,5 +59,4 @@ public class maskUIs {
     public void Reset(){
         recyclerViewAdapter.Reset();
     }
-
 }
