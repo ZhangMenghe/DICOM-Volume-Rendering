@@ -9,22 +9,6 @@
 
 using namespace dvr;
 namespace {
-    typedef struct {
-        uint8_t red;
-        uint8_t green;
-        uint8_t blue;
-        uint8_t alpha;
-    } argb;
-    class dcmImage{
-    public:
-        GLubyte * data;
-        float location;
-        dcmImage(GLubyte * _data, float _location):
-                data(_data), location(_location){}
-
-    };
-    std::vector<dcmImage *> images_;
-    int img_height, img_width;
     const int CHANEL_NUM = 4, CHANEL_MASK=2;
 
     //globally
@@ -97,69 +81,6 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     nativeApp(nativeAddr)->onDraw();
 }
 
-void load_mask_from_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int w, int h ){
-    AndroidBitmapInfo srcInfo;
-    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
-        LOGE("====get bitmap info failed");
-        return;
-    }
-    void * buffer;
-    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_lockPixels(env, bitmap, &buffer)) {
-        LOGE("====lock src bitmap failed");
-        return;
-    }
-
-    int x, y, idx = 0;
-    for (y = 0; y < h; y++) {
-        argb * line = (argb *) buffer;
-        for (x = 0; x < w; x++) {
-            data[CHANEL_NUM*idx+1] = line[x].red;
-            idx++;
-        }
-        buffer = (char *) buffer + srcInfo.stride;
-    }
-    AndroidBitmap_unlockPixels(env, bitmap);
-}
-
-void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h, int offset ){
-    AndroidBitmapInfo srcInfo;
-    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_getInfo(env, bitmap, &srcInfo)) {
-        LOGE("====get bitmap info failed");
-        return;
-    }
-    void * buffer;
-    if (ANDROID_BITMAP_RESULT_SUCCESS != AndroidBitmap_lockPixels(env, bitmap, &buffer)) {
-        LOGE("===lock src bitmap failed");
-        return;
-    }
-    if(!data){
-        LOGI("width=%d; height=%d; stride=%d; format=%d;flag=%d",
-             srcInfo.width, //  width=2700 (900*3)
-             srcInfo.height, // height=2025 (675*3)
-             srcInfo.stride, // stride=10800 (2700*4)
-             srcInfo.format, // format=1 (ANDROID_BITMAP_FORMAT_RGBA_8888=1)
-             srcInfo.flags); // flags=0 (ANDROID_BITMAP_RESULT_SUCCESS=0)
-        w = srcInfo.width; h = srcInfo.height;
-
-        size_t size = srcInfo.width * srcInfo.height;
-
-        data = new GLubyte[CHANEL_NUM*size];
-        memset(data, 0x00, CHANEL_NUM * size * sizeof(GLubyte));
-    }
-
-    int x, y, idx = 0;
-    for (y = 0; y < h; y++) {
-        argb * line = (argb *) buffer;
-        for (x = 0; x < w; x++) {
-            data[CHANEL_NUM*idx + offset] = GLubyte(line[x].red);
-            idx++;
-        }
-
-        buffer = (char *) buffer + srcInfo.stride;
-    }
-    AndroidBitmap_unlockPixels(env, bitmap);
-}
-
 JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jint chunk_size, jbyteArray data){
     //check initialization
     if(!g_VolumeTexData) return;
@@ -188,12 +109,6 @@ JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv* env, jclass, jint id,  jint chunk_size
 
     auto single_size = (chunk_size==0)?g_mask_ssize:chunk_size;
     memcpy(buffer, c_array, single_size);
-
-//    if(chunk_size != 0 )memcpy(buffer, c_array, chunk_size);
-//    else memcpy(buffer, c_array)
-//        for(int i=0 ;i<g_ssize_schanel; i++)
-            //buffer[i] = uint16_t((((uint16_t)c_array[2*i + 1])<<8)+c_array[2*i]);
-
     n_mask_offset+=single_size;
 }
 

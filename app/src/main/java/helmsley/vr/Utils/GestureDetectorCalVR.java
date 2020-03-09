@@ -2,11 +2,9 @@ package  helmsley.vr.Utils;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.util.Log;
 import android.view.MotionEvent;
 
 import helmsley.vr.DUIs.JUIInterface;
-import helmsley.vr.UIsController;
 
 import static java.lang.Math.abs;
 
