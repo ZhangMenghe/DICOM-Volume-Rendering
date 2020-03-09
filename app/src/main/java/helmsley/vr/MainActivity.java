@@ -1,6 +1,5 @@
 package helmsley.vr;
 
-
 import android.os.Bundle;
 import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.proto.fileTransferClient;
@@ -29,6 +28,5 @@ public class MainActivity extends GLActivity {
         if(fileTransferClient.finished) {JNIInterface.JNIAssembleVolume();dialogUIs.FinishProgress(); fileTransferClient.finished=false;}
         if(fileTransferClient.finished_mask){JNIInterface.JNIAssembleMask();fileTransferClient.finished_mask = false;}
         super.updateOnFrame();
-//        uiController.updateFPS();
     }
 }

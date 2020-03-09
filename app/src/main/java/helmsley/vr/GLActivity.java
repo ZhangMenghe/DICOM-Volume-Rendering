@@ -14,7 +14,6 @@ import javax.microedition.khronos.opengles.GL10;
 import helmsley.vr.Utils.GestureDetectorCalVR;
 import helmsley.vr.Utils.fileUtils;
 
-
 public class GLActivity extends AppCompatActivity {
     final static String TAG = "BASIC_Activity";
     // Resource

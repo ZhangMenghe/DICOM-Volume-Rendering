@@ -1,7 +1,6 @@
 package helmsley.vr;
 
 import android.app.Activity;
-import android.view.View;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
