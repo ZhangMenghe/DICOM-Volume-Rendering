@@ -159,45 +159,6 @@ void convert_bitmap(JNIEnv* env, jobject bitmap, GLubyte*& data, int&w, int &h, 
     }
     AndroidBitmap_unlockPixels(env, bitmap);
 }
-JNI_METHOD(void, JNIsendDCMImgs)(JNIEnv* env, jclass , jobjectArray img_arr, jobjectArray msk_arr, jint size){
-    //get dcmImg class defined in java
-    jclass imgClass = env->FindClass("helmsley/vr/Utils/dcmImage");
-    jobject img, bitmap, bitmap_mask;
-    jfieldID bitmap_id, bm_mask_id, location_id, thickness_id;
-    float location, thickness;
-    int valid_num = 0;
-    int width, height;
-    for(int i=0; i<size; i++) {
-        img = env->GetObjectArrayElement(img_arr, i);
-
-        thickness_id = env->GetFieldID(imgClass, "thickness", "F");
-        thickness = env->GetFloatField(img, thickness_id);
-        if(thickness == -1)//invalid
-            continue;
-        else{valid_num++;}
-
-        location_id = env->GetFieldID(imgClass, "location", "F");
-        location = env->GetFloatField(img, location_id);
-
-        bitmap_id = env->GetFieldID(imgClass, "bitmap", "Landroid/graphics/Bitmap;");
-        bitmap = env->GetObjectField(img, bitmap_id);
-
-        GLubyte * data = nullptr;
-        convert_bitmap(env, bitmap, data, width, height, 0);
-        img_height = height; img_width = width;
-        images_.push_back(new dcmImage(
-                data,
-                location));
-    }
-    std::sort(images_.begin(), images_.end(),
-              [](const dcmImage* img1, const dcmImage* img2){return img1->location < img2->location;});
-    if(env->GetArrayLength(msk_arr)){
-        for(int idx = 0; idx<size; idx++){
-            bitmap_mask = env->GetObjectArrayElement(msk_arr, idx);
-            convert_bitmap(env, bitmap_mask, images_[idx]->data, width, height, 1);
-        }
-    }
-}
 
 JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jint chunk_size, jbyteArray data){
     //check initialization
