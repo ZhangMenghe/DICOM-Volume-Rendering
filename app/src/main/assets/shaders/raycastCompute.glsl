@@ -1,8 +1,8 @@
 #version 310 es
 
 #pragma multi_compile UPDATE_RAY_BAKED
-#pragma multi_compile SHOW_ORGANS
-#pragma multi_compile TRANSFER_COLOR MASKON
+#pragma multi_compile SHOW_ORGANS TRANSFER_COLOR
+#pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -79,17 +79,16 @@ uvec4 Sample(ivec3 pos){
 }
 uvec4 post_process(uvec4 color){
     #ifdef TRANSFER_COLOR
-    color.rgb = transfer_scheme(CURRENT_INTENSITY);
-    //    #elif defined MASKON
-    //        if(sc.g > 0.01) color.gb = vec2(.0);
+        color.rgb = transfer_scheme(CURRENT_INTENSITY);
     #endif
 
     #ifdef SHOW_ORGANS
-    //upper part as mask
-    color = show_organs(color);
+        //upper part as mask
+        color = show_organs(color);
     #endif
     return color;
 }
+
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
     uvec4 sample_color = Sample(storePos);
