@@ -33,7 +33,7 @@
     <string-array name="raycast_contrast">
         <item>Contrast</item>
         <item>1.0</item>
-        <item>2.0</item>
+        <item>1.0</item>
         <item>50</item>
     </string-array>
 <!--    <string-array name="raycast_contrast">-->
@@ -46,13 +46,13 @@
     <string-array name="raycast_bright">
         <item>Bright</item>
         <item>1.0</item>
-        <item>2.0</item>
+        <item>1.0</item>
         <item>50</item>
     </string-array>
     <string-array name="raycast_mul">
         <item>Mult</item>
         <item>1.0</item>
-        <item>2.0</item>
+        <item>1.0</item>
         <item>50</item>
     </string-array>
     <!--name, value, maxvalue, toggle_bar_max-->
