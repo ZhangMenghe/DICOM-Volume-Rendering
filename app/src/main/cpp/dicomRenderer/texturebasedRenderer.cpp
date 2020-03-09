@@ -103,9 +103,9 @@ void texvrRenderer::onCuttingChange(float percent){
     shader_->UnUse();
 }
 void texvrRenderer::updatePrecomputation(GLuint sp) {
-    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_tex[dvr::TUNE_OVERALL]);
-    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_tex[dvr::TUNE_LOWEST]);
-    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_tex[dvr::TUNE_CUTOFF]);
+    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_tex[dvr::TT_OVERALL]);
+    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_tex[dvr::TT_LOWEST]);
+    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_tex[dvr::TT_CUTOFF]);
 }
 
 void texvrRenderer::two_pass_draw() {

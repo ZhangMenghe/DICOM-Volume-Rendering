@@ -56,7 +56,7 @@ void raycastRenderer::Draw(){
 //    Shader::Uniform(sp,"ub_accumulate", vrController::param_bool_map["accumulate"]);
     Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool[dvr::CHECK_CUTTING]);
 
-    Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TUNE_DENSITY]);
+    Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
     cutter_->setCuttingParams(sp);
 
     if(vrController::camera->getViewDirection().z <0)
@@ -80,10 +80,9 @@ void raycastRenderer::onCuttingChange(float percent){
 //    dirtyPrecompute();
 }
 void raycastRenderer::updatePrecomputation(GLuint sp){
-    Shader::Uniform(sp, "u_val_threshold", vrController::param_ray[dvr::TUNE_CONTRAST]);
-    Shader::Uniform(sp, "u_brightness", vrController::param_ray[dvr::TUNE_BRIGHT]);
-    Shader::Uniform(sp, "u_opacitymult", vrController::param_ray[dvr::TUNE_OPACITY_MULT]);
-
+    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_ray[dvr::TR_OVERALL]);
+    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_ray[dvr::TR_LOWEST]);
+    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_ray[dvr::TR_CUTOFF]);
 }
 void raycastRenderer::precompute(){
     if(!baked_dirty_) return;
@@ -110,7 +109,7 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
-    Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_ray[dvr::TUNE_DENSITY]);
+    Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
     cutter_->Update();
     cutter_->setCuttingParams(sp, true);
 

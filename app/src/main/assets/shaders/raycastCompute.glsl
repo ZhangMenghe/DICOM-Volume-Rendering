@@ -20,16 +20,13 @@ struct OpacityAdj{
     float lowbound; //slope adj, 0-1
     float cutoff;//0,1
 };
+//shaderd by tex and ray, but mutually exclusive
 uniform OpacityAdj uOpacitys;
-
-//Uniforms for ray_baked
-uniform float u_val_threshold;
-uniform float u_brightness;
-uniform float u_opacitymult;
 
 float CURRENT_INTENSITY;
 uint MASKS_;
 
+//last bit indicates body(which doesn't belong to organs)
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
 
@@ -45,25 +42,11 @@ uvec3 transfer_scheme(float gray){
 uvec3 transfer_scheme(float cat, float gray){
     return uvec3(hsv2rgb(vec3(cat, 1.0, gray)) * 255.0);
 }
-uint UpdateTextureBased(uint sampled_alpha){
+uint UpdateOpacityAlpha(uint sampled_alpha){
     float falpha = float(sampled_alpha) * 0.003921;
     float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
     alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*falpha;
     return uint(alpha*uOpacitys.overall * 255.0);
-}
-uvec4 UpdateRaybased(uvec4 sampled_color){
-//    float alpha = CURRENT_INTENSITY + u_val_threshold - 0.5;
-//    alpha = clamp(alpha * u_brightness / 250.0, 0.0, 1.0);
-//    CURRENT_INTENSITY = (CURRENT_INTENSITY - 0.5);
-    CURRENT_INTENSITY = clamp(CURRENT_INTENSITY, 0.0, 1.0);
-//    float alpha =  1.0 - (abs(u_val_threshold - CURRENT_INTENSITY) / u_brightness);
-//    alpha = alpha* u_opacitymult;
-
-    float falpha = float(sampled_color.a) * 0.003921;
-    float alpha = CURRENT_INTENSITY * (1.0 - u_opacitymult) + u_opacitymult;
-    alpha = (CURRENT_INTENSITY < u_brightness)?.0:alpha*falpha;
-
-    return uvec4(uvec3(CURRENT_INTENSITY * 255.0), uint(alpha * u_val_threshold * 255.0));
 }
 
 uvec4 show_organs(uvec4 color){
@@ -110,14 +93,13 @@ uvec4 post_process(uvec4 color){
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
     uvec4 sample_color = Sample(storePos);
-    #ifdef UPDATE_RAY_BAKED
-    uvec4 ray_color = UpdateRaybased(sample_color);
-    imageStore(destTex_ray, storePos, post_process(ray_color));
-    #else
-    uint alpha = UpdateTextureBased(sample_color.a);
+    uint alpha = UpdateOpacityAlpha(sample_color.a);
+    uvec4 ufc = post_process(uvec4(sample_color.rgb, alpha));
 
-    vec4 fcolor = vec4(post_process(uvec4(sample_color.rgb, alpha))) * 0.003921;
-    imageStore(destTex_tex, storePos, fcolor);
+    #ifdef UPDATE_RAY_BAKED
+        imageStore(destTex_ray, storePos, ufc);
+    #else
+        imageStore(destTex_tex, storePos, vec4(ufc) * 0.003921);
     #endif
 }
 
