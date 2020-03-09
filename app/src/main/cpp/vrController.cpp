@@ -107,8 +107,8 @@ void vrController::onDraw() {
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(cutDirty){ //panel switch to cutting, update cutting result
         cutDirty = false;
-        texvrRenderer_->onCuttingChange(param_tex[dvr::TUNE_CUTTING_TEX]);
-        raycastRenderer_->onCuttingChange(param_ray[dvr::TUNE_CUTTING_RAY]);
+        texvrRenderer_->onCuttingChange(param_tex[dvr::TT_CUTTING_TEX]);
+        raycastRenderer_->onCuttingChange(param_ray[dvr::TR_CUTTING_RAY]);
     }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();

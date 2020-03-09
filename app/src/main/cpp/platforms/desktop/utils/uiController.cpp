@@ -2,17 +2,19 @@
 #include <vrController.h>
 #include <algorithm>
 void uiController::InitTuneParam(){
-    const char* ray_keys[3] ={
+    const char* ray_keys[4] ={
         "Density",
-        "Contrast",
-        "Bright"
+        "Overall",
+        "Lowest",
+        "Cut-off"
     };
-    float ray_values[3] = {
+    float ray_values[4] = {
         400.0f,
         1.0f,
-        600.0f
+        1.0f,
+        .0f
     };
-    InitTuneParam(RAY_ID, 3, ray_keys, ray_values);
+    InitTuneParam(RAY_ID, 4, ray_keys, ray_values);
     const char* tex_keys[3] ={
         "Overall",
         "Lowest",
@@ -44,7 +46,7 @@ void uiController::InitTuneParam(int id, int num, const char*keys[], float value
 
 void uiController::InitCheckParam(){
     const char* keys[5] = {
-        "seeVolume",
+        "Raycasting",
         "Color Transfer",
         "Cutting",
         "MaskOn",

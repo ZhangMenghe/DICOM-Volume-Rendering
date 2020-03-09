@@ -49,12 +49,22 @@ void FuncRenderer::CreateFunction(FUNC_TYPE type){
     }
 }
 void FuncRenderer::UpdateFuncPoints(FUNC_TYPE type){
-    if(type == OPACITY_FUN)
-        UpdateFuncPoints(
-            OPACITY_FUN,
-            glm::vec2(vrController::param_tex[dvr::TUNE_CUTOFF]-0.5f,
-            vrController::param_tex[dvr::TUNE_LOWEST] * vrController::param_tex[dvr::TUNE_OVERALL]),
-            glm::vec2(0.5f, vrController::param_tex[dvr::TUNE_OVERALL]));
+    if(type == OPACITY_FUN){
+        if(vrController::param_bool[dvr::CHECK_RAYCAST]){
+            UpdateFuncPoints(
+                    OPACITY_FUN,
+                    glm::vec2(vrController::param_ray[dvr::TR_CUTOFF]-0.5f,
+                              vrController::param_ray[dvr::TR_LOWEST] * vrController::param_ray[dvr::TR_OVERALL]),
+                    glm::vec2(0.5f, vrController::param_ray[dvr::TR_OVERALL]));
+        }else{
+            UpdateFuncPoints(
+                    OPACITY_FUN,
+                    glm::vec2(vrController::param_tex[dvr::TT_CUTOFF]-0.5f,
+                              vrController::param_tex[dvr::TT_LOWEST] * vrController::param_tex[dvr::TT_OVERALL]),
+                    glm::vec2(0.5f, vrController::param_tex[dvr::TT_OVERALL]));
+        }
+    }
+
 }
 void FuncRenderer::UpdateFuncPoints(FUNC_TYPE type, glm::vec2 p1, glm::vec2 p2, bool is_quad){
     float vertices[] = {
@@ -84,7 +94,7 @@ void FuncRenderer::draw_opacity_func(){
     float trans_color_offset = .0f;
     if(vrController::param_bool[dvr::CHECK_COLOR_TRANS])
         trans_color_offset = 0.08f;
-    if(!vrController::param_bool[dvr::CHECK_RAYCAST])
+//    if(!vrController::param_bool[dvr::CHECK_RAYCAST])
         UpdateFuncPoints(OPACITY_FUN);
     glBindBuffer(GL_ARRAY_BUFFER, VBO_FUNC);
     glBufferSubData(GL_ARRAY_BUFFER, 0, 3*4  *sizeof(GL_FLOAT), vertices_func_);
@@ -112,6 +122,6 @@ void FuncRenderer::draw_opacity_func(){
 }
 void FuncRenderer::Draw(){
     if(vrController::param_bool[dvr::CHECK_COLOR_TRANS])draw_color_bar();
-    if(!vrController::param_bool[dvr::CHECK_RAYCAST])draw_opacity_func();
+    draw_opacity_func();
 
 }

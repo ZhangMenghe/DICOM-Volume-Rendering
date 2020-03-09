@@ -19,9 +19,9 @@
 <!--    name, value, maxvalue, toggle_bar_max-->
     <string-array name="raycastParams">
         <item>@array/raycast_density</item>
-        <item>@array/raycast_contrast</item>
-        <item>@array/raycast_bright</item>
-        <item>@array/raycast_mul</item>
+        <item>@array/opa_overall</item>
+        <item>@array/opa_lowest</item>
+        <item>@array/opa_cutoff</item>
     </string-array>
 
     <string-array name="raycast_density">
@@ -30,51 +30,27 @@
         <item>800.0</item>
         <item>800</item>
     </string-array>
-    <string-array name="raycast_contrast">
-        <item>Contrast</item>
-        <item>1.0</item>
-        <item>1.0</item>
-        <item>50</item>
-    </string-array>
-<!--    <string-array name="raycast_contrast">-->
-<!--        <item>Contrast</item>-->
-<!--        <item>1.0</item>-->
-<!--        <item>.0</item>-->
-<!--        <item>1.0</item>-->
-<!--        <item>50</item>-->
-<!--    </string-array>-->
-    <string-array name="raycast_bright">
-        <item>Bright</item>
-        <item>1.0</item>
-        <item>1.0</item>
-        <item>50</item>
-    </string-array>
-    <string-array name="raycast_mul">
-        <item>Mult</item>
-        <item>1.0</item>
-        <item>1.0</item>
-        <item>50</item>
-    </string-array>
+
     <!--name, value, maxvalue, toggle_bar_max-->
     <string-array name="texParams">
-        <item>@array/tex_overall</item>
-        <item>@array/tex_lowest</item>
-        <item>@array/tex_cutoff</item>
+        <item>@array/opa_overall</item>
+        <item>@array/opa_lowest</item>
+        <item>@array/opa_cutoff</item>
     </string-array>
-    <string-array name="tex_overall">
+    <string-array name="opa_overall">
         <item>Overall</item>
         <item>1.0</item>
         <item>1.0</item>
         <item>50</item>
     </string-array>
 
-    <string-array name="tex_lowest">
+    <string-array name="opa_lowest">
         <item>Lowest</item>
         <item>1.0</item>
         <item>1.0</item>
         <item>50</item>
     </string-array>
-    <string-array name="tex_cutoff">
+    <string-array name="opa_cutoff">
         <item>Cut-off</item>
         <item>0.0</item>
         <item>1.0</item>

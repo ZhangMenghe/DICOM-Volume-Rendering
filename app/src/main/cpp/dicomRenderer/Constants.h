@@ -11,17 +11,17 @@ namespace dvr{
         CHECK_FREEZE_CPLANE
     };
     enum PARAM_TEX{
-        TUNE_OVERALL=0,
-        TUNE_LOWEST,
-        TUNE_CUTOFF,
-        TUNE_CUTTING_TEX
+        TT_OVERALL=0,
+        TT_LOWEST,
+        TT_CUTOFF,
+        TT_CUTTING_TEX
     };
     enum PARAM_RAYCAST{
-        TUNE_DENSITY = 0,
-        TUNE_CONTRAST,
-        TUNE_BRIGHT,
-        TUNE_OPACITY_MULT,
-        TUNE_CUTTING_RAY
+        TR_DENSITY = 0,
+        TR_OVERALL,
+        TR_LOWEST,
+        TR_CUTOFF,
+        TR_CUTTING_RAY
     };
     enum SHADER_FILES{
         SHADER_TEXTUREVOLUME_VERT = 0,
