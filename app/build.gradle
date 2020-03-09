@@ -84,7 +84,7 @@ protobuf {
 }
 dependencies {
     //imebra
-    implementation project(':imebrajni')
+//    implementation project(':imebrajni')
 
     // You need to build grpc-java to obtain these libraries below.
     implementation 'io.grpc:grpc-okhttp:1.25.0' // CURRENT_GRPC_VERSION

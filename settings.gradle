@@ -1,1 +1,1 @@
-include ':app', ':imebrajni'
+include ':app'
