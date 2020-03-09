@@ -8,7 +8,7 @@ set(SRC_FILES
 	utils/uiController.cpp)
 	
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-add_definitions(-DRESOURCE_DESKTOP_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../../../assets/")
+add_definitions(-DRESOURCE_DESKTOP_DIR="${ASSET_DIRECTORY}/")
 
 add_executable(
 	vrDesktop

@@ -10,12 +10,13 @@ set(DEFAULT_BUILD_TYPE "Debug")
         ${GLEW_LIBRARIES}
         ${OPENGL_LIBRARY}
         )
+    set(ASSET_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../app/src/main/assets)
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
     set(OpenGL_LIBS
         GLESv3
         EGL
-            log)
+        log)
 endif()
 set(GLM_DIRECTORY /usr/local/include/glm)
 
