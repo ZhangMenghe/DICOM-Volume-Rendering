@@ -8,6 +8,7 @@ import android.util.Log;
 import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
+import helmsley.vr.Utils.fileUtils;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -18,21 +19,23 @@ import java.lang.ref.WeakReference;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
-    public static WeakReference<fileTransferClient> selfReference;
+    private static WeakReference<fileTransferClient> selfReference;
     public static boolean finished = false, finished_mask=false;
 
     private ManagedChannel mChannel;
 
-    public final int CLIENT_ID = 1;
-    private String target_ds;
+    private final int CLIENT_ID = 1;
+    private datasetInfo target_ds;
     private volumeInfo target_vol;
 
     private final WeakReference<Activity> activityReference;
@@ -40,10 +43,12 @@ public class fileTransferClient {
     private List<datasetInfo> available_remote_datasets, available_local_datasets;
     private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
+    final private String local_index_filename;
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
         target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
         selfReference = new WeakReference<>(this);
+        local_index_filename = target_root_dir + "/" + activityReference.get().getString(R.string.cf_config_name);
     }
     public String Setup(String host, String portStr){
         try{
@@ -62,39 +67,24 @@ public class fileTransferClient {
         }
     }
     public void SetupLocal(){
-//        OutputStream out_config = new FileOutputStream(new File(destDir, activityReference.get().getString(R.string.cf_config_name)));
-//        OutputStreamWriter config_writer = new OutputStreamWriter(out_config);
-//        //save config
-//        String content = target_vol.getFolderName() + "\n"
-//                +target_vol.getFileNums() + "\n"
-//                +target_vol.getImgHeight() + "\n"
-//                +target_vol.getImgWidth();
-//        config_writer.write(content);
-//        config_writer.close();
-//        out_config.close();
-        //todo:dataset?volume
+        List<String> lpc = fileUtils.readLines(local_index_filename);
         available_local_datasets = new ArrayList<>();
-        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2012-01-17-MRI").setDate("2012-01-17").build());
-        available_local_datasets.add(datasetInfo.newBuilder().setPatientName("Larry Smarr").setFolderName("Larry-2016-10-26-MRI").setDate("2016-10-26").build());
 
-//        if(dataset_name.equals("Larry-2012-01-17-MRI"))
-//        {JNIInterface.JNIsetupDCMIConfig(512, 512, 48);downloader.LoadCachedDataLocal("Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS");}
-//        else {JNIInterface.JNIsetupDCMIConfig(512, 512, 144);downloader.LoadCachedDataLocal("Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira");}
+        if(lpc.isEmpty()){
+            Log.i(TAG, "=== SetupLocal: No existing index file exist====");
+            return;
+        }
+        for(String line:lpc){
+            Log.e(TAG, "===SetupLocal: read " + line);
+            String[] info = line.split(",");
+            if(info.length < 7) continue;
+            //eg: "Larry Smarr" ,"2016-10-26" ,"Larry-2016-10-26-MRI"
+            datasetInfo tinfo = datasetInfo.newBuilder().setPatientName(info[0]).setFolderName(info[2]).setDate(info[1]).build();
+            // eg. "series_214_DYN_COR_VIBE_3_RUNS" 512, 512, 48,2,2
+            volumeInfo vol_info = volumeInfo.newBuilder().setFolderName(info[3]).setFileNums(Integer.parseInt(info[6])).setImgHeight(Integer.parseInt(info[4])).setImgWidth(Integer.parseInt(info[5])).build();
 
-
-        ArrayList<volumeInfo> vlst_2012 = new ArrayList<>();
-        vlst_2012.add(volumeInfo.newBuilder().setFolderName("series_214_DYN_COR_VIBE_3_RUNS").setFileNums(48).setImgHeight(512).setImgWidth(512).build());
-
-        ArrayList<volumeInfo> vlst_2016 = new ArrayList<>();
-        vlst_2016.add(volumeInfo.newBuilder().setFolderName("series_23_Cor_LAVA_PRE-Amira").setFileNums(144).setImgHeight(512).setImgWidth(512).build());
-
-
-        local_dv_map.put("Larry-2012-01-17-MRI", vlst_2012);
-        local_dv_map.put("Larry-2016-10-26-MRI", vlst_2016);
-
-//
-//        }/data/user/0/helmsley.vr/files/helmsley_cached/Larry-2012-01-17-MRI/series_214_DYN_COR_VIBE_3_RUNS
-        ///data/user/0/helmsley.vr/files/helmsley_cached/Larry-2016-10-26-MRI/series_23_Cor_LAVA_PRE-Amira
+            update_local_info(tinfo, vol_info);
+        }
     }
 
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
@@ -104,8 +94,10 @@ public class fileTransferClient {
         if(isLocal) return local_dv_map.get(dataset_name);
 
         //download
-        target_ds = dataset_name;
-        Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(target_ds).build();
+        for(datasetInfo dsInfo: available_remote_datasets){
+            if(dsInfo.getFolderName().equals(dataset_name)){target_ds = dsInfo; break;}
+        }
+        Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(dataset_name).build();
         dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
         return blockingStub.getVolumeFromDataset(req).getVolumesList();
     }
@@ -113,7 +105,7 @@ public class fileTransferClient {
     public void Download(String ds_name, volumeInfo target_volume){
         target_vol = target_volume;
         if(!LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))
-            new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds, target_volume.getFolderName()).toString());
+            new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
     }
     public void DownloadMasks(String target_path){
         Log.e(TAG, "====DownloadMasks: " + target_path );
@@ -221,7 +213,7 @@ public class fileTransferClient {
 
     public void SaveMasks(){
         dialogUIs.FinishMaskLoading();
-        File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
+        File destDir = Paths.get(target_root_dir, target_ds.getFolderName(), target_vol.getFolderName()).toFile();
         if(!destDir.exists()) destDir.mkdirs();
 
         Activity activity = activityReference.get();
@@ -234,34 +226,48 @@ public class fileTransferClient {
             Log.e(TAG, "====Failed to Save Masks to file");
         }
     }
+    private void update_local_info(datasetInfo tds, volumeInfo tvol){
+        String dsname = tds.getFolderName();
+
+        if(!local_dv_map.containsKey(dsname)){
+            available_local_datasets.add(tds);
+            local_dv_map.put(dsname, new ArrayList<>());
+        }
+        List<volumeInfo> infolist = local_dv_map.get(dsname);
+        infolist.add(tvol);
+        local_dv_map.put(dsname, infolist);
+    }
     private void saveDCMIData(){
         Activity activity = activityReference.get();
+
+//        //check if it's in local already
+//        String dsname = target_ds.getFolderName();
+//        if(local_dv_map.containsKey(dsname) && local_dv_map.get(dsname).contains(target_vol)) {        finished = true; return;}
+
+        //update local data
+        update_local_info(target_ds, target_vol);
+
+        //save to local file
         if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
             try{
-                File destDir = Paths.get(target_root_dir, target_ds, target_vol.getFolderName()).toFile();
-                if(!destDir.exists()) destDir.mkdirs();
+                String content = target_ds.getPatientName()+","
+                        +target_ds.getDate()+","
+                        +target_ds.getFolderName()+","
+                        +target_vol.getFolderName()+","
+                        +target_vol.getImgWidth()+","
+                        +target_vol.getImgHeight()+","
+                        +target_vol.getFileNums();
+                fileUtils.addToFile(local_index_filename, content);
 
-
-                OutputStream out_config = new FileOutputStream(new File(destDir, activity.getString(R.string.cf_config_name)));
-                OutputStreamWriter config_writer = new OutputStreamWriter(out_config);
-                //save config
-                String content = target_vol.getFolderName() + "\n"
-                                +target_vol.getFileNums() + "\n"
-                                +target_vol.getImgHeight() + "\n"
-                                +target_vol.getImgWidth();
-                config_writer.write(content);
-                config_writer.close();
-                out_config.close();
-
-                OutputStream out_data = new FileOutputStream(new File(destDir, activity.getString(R.string.cf_dcm_name)));
-                saveLargeImageToFile(out_data, JNIInterface.JNIgetVolumeData(false));
+                //save data
+                File datafile = Paths.get(target_root_dir, target_ds.getFolderName(), target_vol.getFolderName(),  activity.getString(R.string.cf_dcm_name)).toFile();
+                saveLargeImageToFile(new FileOutputStream(datafile), JNIInterface.JNIgetVolumeData(false));
             }catch (Exception e){
                 Log.e(TAG, "====Failed to Save Results to file");
             }
         }
         finished = true;
     }
-
 
     private boolean LoadDataFromLocal(String vpath){
         Activity activity = activityReference.get();
@@ -292,14 +298,16 @@ public class fileTransferClient {
             int len;
             if(isMask){
                 while ((len = instream.read(chunk)) != -1) {
-                    JNIInterface.JNIsendDCMIMask(id, len, chunk);
+//                    JNIInterface.JNIsendDCMIMask(id, len, chunk);
+                    JNIInterface.JNIsendData(1, id, len, 2, chunk);
                     id++;
                 }
                 finished_mask = true;
             }
             else{
                 while ((len = instream.read(chunk)) != -1) {
-                    JNIInterface.JNIsendDCMImg(id, len, chunk);
+//                    JNIInterface.JNIsendDCMImg(id, len, chunk);
+                    JNIInterface.JNIsendData(0, id, len, 2, chunk);
                     id++;
                 }
                 finished = true;

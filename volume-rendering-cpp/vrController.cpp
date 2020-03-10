@@ -70,22 +70,20 @@ void vrController::assembleTexture(GLubyte * data){
     delete[]tb_data;
 }
 
-void vrController::assembleTextureMask(GLubyte* mask){
+void vrController::updateTexture(GLubyte* data){
     if(!vol_data)   return;
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
-    LOGE("===size %d", vsize);
     uint16_t tm;
-    for(auto i=0; i<vsize; i++){
-        tm= uint16_t((((uint16_t)mask[2*i + 1])<<8)+mask[2*i]);
+    //fuse volume data
+    for(auto i=0; i<vsize; i++) {
+        vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
+        tm = uint16_t((((uint16_t)data[4*i+3])<<8)+data[4*i+2]);
         vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
+        // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
     }
 
     tex_volume->Update(vol_data);
     baked_dirty_ = true;
-//    if(vol_data){
-//        delete[]vol_data;//todo:delete or not?
-//        vol_data = nullptr;
-//    }
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;

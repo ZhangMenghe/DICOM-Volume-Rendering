@@ -22,7 +22,7 @@ public class GLActivity extends AppCompatActivity {
     //DST folder that runtime can use, constains what u copied from asset
     protected String ass_copy_dst = null;
 
-    final static boolean skipLoadingResource = true;
+    final static boolean skipLoadingResource = false;
 
     //Surface view
     protected GLSurfaceView surfaceView;
@@ -73,14 +73,14 @@ public class GLActivity extends AppCompatActivity {
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
     protected void copyFromAssets(){
-        ass_copy_src = getString(R.string.config_voldir);
+        ass_copy_src = getString(R.string.cf_cache_folder_name);
         ass_copy_dst = getFilesDir().getAbsolutePath() + "/" + ass_copy_src;
+
+        File destDir = new File(ass_copy_dst);
+
         //Skip copying if files exist
-        if(skipLoadingResource){
-            File destDir = new File(ass_copy_dst);
-            if(destDir.exists())
-                return;
-        }
+        if(skipLoadingResource && destDir.exists()) return;
+        fileUtils.deleteDirectory(destDir);
         try{
             fileUtils.copyFromAsset(getAssets(), ass_copy_src, ass_copy_dst);
         }catch (Exception e){

@@ -18,15 +18,15 @@ public class MainActivity extends GLActivity {
         super.onCreate(savedInstanceState);
         ui_manager = new UIsManager(this);
     }
-    protected boolean setupResource(){
-        //do nothing in this case
-        return true;
-    }
+//    protected boolean setupResource(){
+//        //do nothing in this case
+//        return true;
+//    }
 
     @Override
     protected void updateOnFrame(){
         if(fileTransferClient.finished) {JNIInterface.JNIAssembleVolume();dialogUIs.FinishProgress(); fileTransferClient.finished=false;}
-        if(fileTransferClient.finished_mask){JNIInterface.JNIAssembleMask();fileTransferClient.finished_mask = false;}
+//        if(fileTransferClient.finished_mask){JNIInterface.JNIAssembleMask();fileTransferClient.finished_mask = false;}
         super.updateOnFrame();
     }
 }

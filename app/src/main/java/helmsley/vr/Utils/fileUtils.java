@@ -13,6 +13,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -147,6 +151,23 @@ public class fileUtils {
         ArrayList<Bitmap> sorted_img_list = new ArrayList(img_list);
         Collections.sort(sorted_img_list, Comparator.comparing(s -> name_list.get(img_list.indexOf(s))));
         return sorted_img_list;
+    }
+    public static List<String> readLines(String filename){
+        List<String> allLines = new ArrayList<>();
+        try {
+            allLines = Files.readAllLines(Paths.get(filename));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return allLines;
+    }
+    public static void addToFile(String filename, String content){
+        try{
+            Path path = Paths.get(filename);
+            Files.write(path, content.getBytes(), StandardOpenOption.APPEND);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
 

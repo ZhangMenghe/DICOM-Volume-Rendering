@@ -15,7 +15,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
@@ -89,10 +88,10 @@ public class SeekbarAdapter {
         private int[] item_seek_max;
         private int dropview_width;
 
-        public seekbarListAdapter(Context context,
-                                  ArrayList<String> item_names, ArrayList<Float> item_values,
-                                  float[] item_value_max, int[]  item_seek_max,
-                                  String title) {
+        seekbarListAdapter(Context context,
+                           ArrayList<String> item_names, ArrayList<Float> item_values,
+                           float[] item_value_max, int[] item_seek_max,
+                           String title) {
             super(context, title);
 
             this.item_names = item_names;
@@ -120,7 +119,7 @@ public class SeekbarAdapter {
                         float value = (float)i / item_seek_max[position] * item_value_max[position];
                         if(value == item_values.get(position)) return;
                         item_values.set(position, value);
-                        holder.text_value.setText(contexRef.get().getString(R.string.text_value, item_values.get(position)));
+                        holder.text_value.setText(contexRef.get().getString(R.string.tune_value, item_values.get(position)));
                         JUIInterface.JUIsetTuneParam(UIsManager.getTexRayIdx(), item_names.get(position), item_values.get(position));
                     }
                     @Override
@@ -141,7 +140,7 @@ public class SeekbarAdapter {
             holder.text_name.setText(item_names.get(position));
             float value = item_values.get(position);
 
-            holder.text_value.setText(contexRef.get().getString(R.string.text_value, value));
+            holder.text_value.setText(contexRef.get().getString(R.string.tune_value, value));
 
             return convertView;
         }
