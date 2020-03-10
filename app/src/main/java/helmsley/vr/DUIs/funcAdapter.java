@@ -47,18 +47,6 @@ public class funcAdapter{
                 holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
             }
             holder.text_name.setText(item_names.get(position));
-//            holder.text_name.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    //change background
-//                    holder.text_name.setTextAppearance(R.style.itemHighlightText);
-//                    switch (position){
-//                        case 0:onClickResetButton();break;
-//                        case 1:onClickDataChangeButton();break;
-//                        default:break;
-//                    }
-//                }
-//            });
 
             holder.text_name.setOnTouchListener(new View.OnTouchListener(){
                 public boolean onTouch(View view, MotionEvent event) {

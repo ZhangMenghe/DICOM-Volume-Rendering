@@ -146,9 +146,6 @@ public class dialogUIs {
         volumeResponse.volumeInfo vol_info = downloader.getAvailableVolumes(dataset_name, isLocal).get(pos);
         JNIInterface.JNIsetupDCMIConfig(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums());
 
-//        if(isLocal)downloader.LoadCachedDataLocal(dataset_name+"/"+vol_info.getFolderName());
-//        else
-
         downloader.Download(dataset_name, vol_info);
 
         //downloading...

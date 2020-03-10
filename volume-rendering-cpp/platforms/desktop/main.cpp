@@ -39,7 +39,7 @@ void onCreated(){
 	controller_.onViewCreated();
 
 	//load data
-	if(loader_.loadData("dicom-images/sample_data_2bytes", "dicom-images/sample_data_mask_2bytes")){
+	if(loader_.loadData("helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/data", "helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/mask")){
 	// if(loader_.loadData("dicom-images/sample_data_2bytes_2012", LOAD_DICOM)){
 		controller_.assembleTexture(loader_.getVolumeData());
 		loader_.reset();

@@ -10,6 +10,8 @@
 extern "C"{
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager);
 
+JNI_METHOD(void, JNIsendData)(JNIEnv*, jclass, jint, jint, jint, jint, jbyteArray);
+
 JNI_METHOD(void, JNIsendDCMImg)(JNIEnv*, jclass, jint, jint, jbyteArray);
 
 JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv*, jclass, jint,  jint, jbyteArray);
