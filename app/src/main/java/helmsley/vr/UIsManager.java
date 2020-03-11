@@ -80,4 +80,7 @@ public class UIsManager {
         spinner_check.setAdapter(cbAdapter.getListAdapter());
         JUIInterface.JUIonReset();
     }
+    void updateOnFrame(){
+        dialogController.updateOnFrame();
+    }
 }

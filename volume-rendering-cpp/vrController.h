@@ -46,7 +46,7 @@ public:
 
     vrController(AAssetManager *assetManager = nullptr);
     ~vrController();
-    void assembleTexture(GLubyte * data);
+    void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims);
 

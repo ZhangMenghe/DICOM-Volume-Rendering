@@ -10,9 +10,7 @@
 using namespace dvr;
 namespace {
     const int LOAD_DCMI_ID = 0, LOAD_MASK_ID = 1;
-    const int CHANEL_NUM = 4;
-//    CHANEL_MASK=2;
-
+    int CHANEL_NUM = 4;
     //globally
     GLubyte* g_VolumeTexData = nullptr;
 //    GLubyte* g_VolumeMaskData = nullptr;
@@ -90,7 +88,7 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
     jbyte *data = env->GetByteArrayElements(jdata, 0);
 
     GLubyte* buffer = g_VolumeTexData+n_data_offset[target];
-    if(chunk_size !=0 && unit_size == 4) memcpy(buffer, data, (size_t)chunk_size);
+    if(chunk_size !=0 && unit_size == CHANEL_NUM) memcpy(buffer, data, (size_t)chunk_size);
     else{
         int num = (chunk_size==0)? (g_img_h*g_img_w) : chunk_size / unit_size;
         if(target == LOAD_DCMI_ID){
@@ -105,50 +103,16 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
             }
         }
     }
-    n_data_offset[target] += (chunk_size==0)?g_ssize:(CHANEL_NUM / unit_size * chunk_size);
+    n_data_offset[target] += CHANEL_NUM / unit_size * chunk_size;
 }
 
-JNI_METHOD(void, JNIsendDCMImg)(JNIEnv* env, jclass, jint id, jint chunk_size, jbyteArray data){
-    //check initialization
-    if(!g_VolumeTexData) return;
-    jbyte *c_array = env->GetByteArrayElements(data, 0);
-    GLubyte* buffer = g_VolumeTexData+n_data_offset[LOAD_DCMI_ID];
-
-    if(chunk_size!=0) memcpy(buffer, c_array, chunk_size);
-    else{
-        int x, y, idx = 0;
-        for (y = 0; y < g_img_h; y++) {
-            for (x = 0; x < g_img_w; x++) {
-                buffer[CHANEL_NUM* idx] = GLubyte(c_array[2*idx]);
-                buffer[CHANEL_NUM* idx + 1] = GLubyte(c_array[2*idx+1]);
-                idx++;
-            }
-        }
-    }
-    n_data_offset[LOAD_DCMI_ID]+=(chunk_size==0)?g_ssize:chunk_size;
-}
-
-JNI_METHOD(void, JNIsendDCMIMask)(JNIEnv* env, jclass, jint id,  jint chunk_size, jbyteArray data){
-    //todo
-    //    if(!g_VolumeMaskData) g_VolumeMaskData = new GLubyte[g_mask_len];
-//
-//    jbyte *c_array = env->GetByteArrayElements(data, 0);
-//    auto* buffer = g_VolumeMaskData+n_data_offset[LOAD_MASK_ID];
-//
-//    auto single_size = (chunk_size==0)?g_mask_ssize:chunk_size;
-//    memcpy(buffer, c_array, single_size);
-//    n_data_offset[LOAD_MASK_ID]+=single_size;
-}
-
-JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, jint dims){
+JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, jint dims, jboolean b_wmask){
+    CHANEL_NUM = b_wmask? 4:2;
     g_img_h = height; g_img_w = width;
     g_ssize_schanel = width * height;
     g_vol_dim = dims;
     g_ssize = CHANEL_NUM * g_ssize_schanel;
-//    g_mask_ssize = g_ssize_schanel * CHANEL_MASK;
-
     g_vol_len = g_ssize* dims;
-//    g_mask_len = g_mask_ssize*dims;
 
     g_VolumeTexData = new GLubyte[ g_vol_len];
     memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
@@ -157,26 +121,15 @@ JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, j
     vrc->setVolumeConfig(width, height, dims);
 }
 
-JNI_METHOD(void, JNIAssembleMask)(JNIEnv*, jclass){
+JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
+    if(n_data_offset[LOAD_DCMI_ID] == 0 && n_data_offset[LOAD_MASK_ID] == 0) return;
     vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-    vrc->updateTexture(g_VolumeTexData);
-    n_data_offset[LOAD_MASK_ID] = 0;
+    vrc->assembleTexture(g_VolumeTexData, CHANEL_NUM);
+    n_data_offset[LOAD_DCMI_ID] = 0; n_data_offset[LOAD_MASK_ID] = 0;
 }
 
-JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*env, jclass){
-    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-    vrc->assembleTexture(g_VolumeTexData);
-    n_data_offset[LOAD_DCMI_ID] = 0;
-}
-
-JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass, jboolean b_getmask){
-    jbyteArray gdata;
-//    if(b_getmask){
-//        gdata = env->NewByteArray(g_mask_len);
-//        env->SetByteArrayRegion(gdata, 0, g_mask_len, reinterpret_cast<jbyte*>(g_VolumeMaskData));
-//    }else{
-        gdata = env->NewByteArray(g_vol_len);
-        env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
-//    }
+JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
+    jbyteArray gdata = env->NewByteArray(g_vol_len);
+    env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
     return gdata;
 }

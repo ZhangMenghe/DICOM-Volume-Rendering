@@ -2,7 +2,6 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -13,19 +12,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
@@ -142,18 +128,21 @@ public class dialogUIs {
         sendButton.setEnabled(true);
         return false;
     }
-    public static void RequestVolumeFromDataset(String dataset_name, int pos, boolean isLocal){
+    static void RequestVolumeFromDataset(String dataset_name, int pos, boolean isLocal){
         volumeResponse.volumeInfo vol_info = downloader.getAvailableVolumes(dataset_name, isLocal).get(pos);
-        JNIInterface.JNIsetupDCMIConfig(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums());
+        JNIInterface.JNIsetupDCMIConfig(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums(), vol_info.getMaskAvailable());
 
         downloader.Download(dataset_name, vol_info);
 
         //downloading...
-        download_dialog.dismiss();
-        SetupProgressDialog(dataset_name);
+        activity.runOnUiThread(new Runnable()  {
+            @Override
+            public void run()  {
+                download_dialog.dismiss();
+                SetupProgressDialog(dataset_name);
+            }});
     }
 
-    public static void FinishProgress(){if(progress_dialog!=null)progress_dialog.dismiss();}
     public static void FinishMaskLoading(){
         activity.runOnUiThread(new Runnable()  {
             @Override
@@ -161,5 +150,21 @@ public class dialogUIs {
                 Toast.makeText(activity, "Masks Loaded!", Toast.LENGTH_LONG).show();
 
             }});
+    }
+    public void updateOnFrame(){
+        if(downloader == null) return;
+        if(downloader.isDownloadingProcessFinished()){
+            downloader.Reset();
+            JNIInterface.JNIAssembleVolume();
+            activity.runOnUiThread(new Runnable()  {
+                @Override
+                public void run()  {
+                    if(progress_dialog!=null) progress_dialog.dismiss();
+                }});
+        }
+        if(downloader.isDownloadingMaskProcessFinished()){
+            downloader.ResetMast();
+            JNIInterface.JNIAssembleVolume();
+        }
     }
 }
