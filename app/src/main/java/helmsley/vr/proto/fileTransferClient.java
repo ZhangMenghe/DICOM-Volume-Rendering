@@ -16,6 +16,7 @@ import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.volumeResponse.volumeInfo;
 import java.io.*;
 import java.lang.ref.WeakReference;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,17 +31,18 @@ import java.util.concurrent.TimeUnit;
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
     private static WeakReference<fileTransferClient> selfReference;
-    public static boolean finished = false, finished_mask=false;
+    private static boolean finished = false, finished_mask=false;
 
     private ManagedChannel mChannel;
 
     private final int CLIENT_ID = 1;
     private datasetInfo target_ds;
     private volumeInfo target_vol;
-
+    private boolean vol_with_mask = true;
     private final WeakReference<Activity> activityReference;
     private final String target_root_dir;
-    private List<datasetInfo> available_remote_datasets, available_local_datasets;
+    private List<datasetInfo> available_remote_datasets,
+            available_local_datasets = new ArrayList<>();
     private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
     final private String local_index_filename;
@@ -68,7 +70,6 @@ public class fileTransferClient {
     }
     public void SetupLocal(){
         List<String> lpc = fileUtils.readLines(local_index_filename);
-        available_local_datasets = new ArrayList<>();
 
         if(lpc.isEmpty()){
             Log.i(TAG, "=== SetupLocal: No existing index file exist====");
@@ -80,8 +81,14 @@ public class fileTransferClient {
             if(info.length < 7) continue;
             //eg: "Larry Smarr" ,"2016-10-26" ,"Larry-2016-10-26-MRI"
             datasetInfo tinfo = datasetInfo.newBuilder().setPatientName(info[0]).setFolderName(info[2]).setDate(info[1]).build();
-            // eg. "series_214_DYN_COR_VIBE_3_RUNS" 512, 512, 48,2,2
-            volumeInfo vol_info = volumeInfo.newBuilder().setFolderName(info[3]).setFileNums(Integer.parseInt(info[6])).setImgHeight(Integer.parseInt(info[4])).setImgWidth(Integer.parseInt(info[5])).build();
+            // eg. "series_214_DYN_COR_VIBE_3_RUNS" 512, 512, 48, 2, 2
+            volumeInfo vol_info = volumeInfo.newBuilder()
+                    .setFolderName(info[3])
+                    .setFileNums(Integer.parseInt(info[6]))
+                    .setImgHeight(Integer.parseInt(info[4]))
+                    .setImgWidth(Integer.parseInt(info[5]))
+                    .setMaskAvailable(Integer.parseInt(info[8]) != 0)
+                    .build();
 
             update_local_info(tinfo, vol_info);
         }
@@ -116,7 +123,6 @@ public class fileTransferClient {
         private final GrpcRunnable grpcRunnable;
         private final ManagedChannel channel;
         private final WeakReference<fileTransferClient> activityReference;
-        private String folder_name;
 
         GrpcTask(GrpcRunnable grpcRunnable, ManagedChannel channel, fileTransferClient activity) {
             this.grpcRunnable = grpcRunnable;
@@ -127,9 +133,8 @@ public class fileTransferClient {
         @Override
         protected String doInBackground(String... params) {
             try {
-                folder_name = params[0];
-                String log_msg = this.grpcRunnable.run(folder_name, dataTransferGrpc.newBlockingStub(channel), dataTransferGrpc.newStub(channel));
-                return log_msg;
+                String folder_name = params[0];
+                return this.grpcRunnable.run(folder_name, dataTransferGrpc.newBlockingStub(channel), dataTransferGrpc.newStub(channel));
             } catch (Exception e) {
                 StringWriter sw = new StringWriter();
                 PrintWriter pw = new PrintWriter(sw);
@@ -160,6 +165,28 @@ public class fileTransferClient {
         public String run(String folder_path, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
             target_path = folder_path;
+            loadTextureOnly(blockingStub);
+//            loadDCMImage(blockingStub);
+            return "===Success!\n";
+        }
+        @Override
+        public void onPostExecute(fileTransferClient activity){
+            activity.saveDCMI();
+            activity.DownloadMasks(target_path);
+        }
+        private void loadTextureOnly(dataTransferGrpc.dataTransferBlockingStub blockingStub){
+            RequestWholeVolume req = RequestWholeVolume.newBuilder().setClientId(1).setReqMsg(target_path).setUnitSize(2).build();
+            Iterator<volumeWholeResponse> data_itor;
+            data_itor = blockingStub.downloadVolume(req);
+            int id = 0;
+            while(data_itor.hasNext()){
+                volumeWholeResponse data = data_itor.next();
+
+                JNIInterface.JNIsendData(0, id, data.getData().size(), 2, data.getData().toByteArray());
+                id++;
+            }
+        }
+        private void loadDCMImage(dataTransferGrpc.dataTransferBlockingStub blockingStub){
             Request req = Request.newBuilder().setClientId(1).setReqMsg(target_path).build();
             Iterator<dcmImage> dcm_img_iterator;
             dcm_img_iterator = blockingStub.download(req);
@@ -167,28 +194,50 @@ public class fileTransferClient {
                 dcmImage img = dcm_img_iterator.next();
                 //tackle with the image here
                 // Log.e(TAG, "====img:" + img.getPosition() );
-                JNIInterface.JNIsendDCMImg(img.getDcmID(), 0, img.getData().toByteArray());
+                JNIInterface.JNIsendData(0, img.getDcmID(), img.getData().size(), 2, img.getData().toByteArray());
             }
-            return "===Success!\n";
-        }
-        @Override
-        public void onPostExecute(fileTransferClient activity){
-            activity.saveDCMIData();
-            activity.DownloadMasks(target_path);
         }
     }
     private static class DownloadMasksRunnable implements GrpcRunnable{
         @Override
         public String run(String folder_name, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
-//            ArrayList<dcmImage> lst = new ArrayList<>();
+            loadTextureOnly(folder_name, asyncStub);
+            return "success";
+        }
+        private void loadTextureOnly(String folder_name, dataTransferGrpc.dataTransferStub asyncStub){
+            RequestWholeVolume req = RequestWholeVolume.newBuilder().setClientId(1).setReqMsg(folder_name).setUnitSize(2).build();
+            StreamObserver<volumeWholeResponse> mask_observer = new StreamObserver<volumeWholeResponse>() {
+                int id = 0;
+                @Override
+                public void onNext(volumeWholeResponse value) {
+                    JNIInterface.JNIsendData(1, id, value.getData().size(), 2, value.getData().toByteArray());
+                    id +=1 ;
+                }
+
+                @Override
+                public void onError(Throwable t) {
+
+                }
+
+                @Override
+                public void onCompleted() {
+                    Log.i(TAG, "==============Finish Loading Masks========= " );
+                    selfReference.get().SaveMasks();
+                    finished_mask = true;
+                    id = 0;
+                }
+            };
+            asyncStub.downloadVolume(req, mask_observer);
+        }
+        private void loadMaskAsDCMIImage(String folder_name, dataTransferGrpc.dataTransferStub asyncStub){
             Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_name).build();
 
             StreamObserver<dcmImage> mask_observer = new StreamObserver<dcmImage>() {
                 @Override
                 public void onNext(dcmImage value) {
                     Log.e(TAG, "==========onNext: "+ value.getPosition() );
-                    JNIInterface.JNIsendDCMIMask(value.getDcmID(), 0, value.getData().toByteArray());
+                    JNIInterface.JNIsendData(1, value.getDcmID(), value.getData().size(), 2, value.getData().toByteArray());
                 }
 
                 @Override
@@ -204,27 +253,63 @@ public class fileTransferClient {
                 }
             };
             asyncStub.downloadMasks(req, mask_observer);
-            return "success";
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
         }
     }
 
-    public void SaveMasks(){
-        dialogUIs.FinishMaskLoading();
-        File destDir = Paths.get(target_root_dir, target_ds.getFolderName(), target_vol.getFolderName()).toFile();
-        if(!destDir.exists()) destDir.mkdirs();
+    private void saveData(Activity activity, String fname) throws IOException{
+        //save data
+        String file_name = target_vol.getMaskAvailable()? activity.getString(R.string.cf_dcmwmask_name):fname;
+        File tar_ds_dir = Paths.get(target_root_dir, target_ds.getFolderName()).toFile();
+        if(!tar_ds_dir.exists()) tar_ds_dir.mkdir();
+        File tar_vol_dir = new File(tar_ds_dir, target_vol.getFolderName());
+        if(!tar_vol_dir.exists()) tar_vol_dir.mkdir();
+        File datafile = new File(tar_vol_dir, file_name);
 
+        saveLargeImageToFile(new FileOutputStream(datafile), JNIInterface.JNIgetVolumeData());
+    }
+
+    //save after download complete
+    private void SaveMasks(){
+        dialogUIs.FinishMaskLoading();
         Activity activity = activityReference.get();
         if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))) return;
 
         try {
-            OutputStream out_data = new FileOutputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name)));
-            saveLargeImageToFile(out_data, JNIInterface.JNIgetVolumeData(true));
+            saveData(activity, activity.getString(R.string.cf_dcmmask_name));
         } catch (Exception e) {
             Log.e(TAG, "====Failed to Save Masks to file");
         }
+    }
+    //save after download complete
+    private void saveDCMI(){
+        Activity activity = activityReference.get();
+        //update local data
+        update_local_info(target_ds, target_vol);
+
+        //save to local file
+        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
+            try{
+                String content = target_ds.getPatientName()+","
+                        +target_ds.getDate()+","
+                        +target_ds.getFolderName()+","
+                        +target_vol.getFolderName()+","
+                        +target_vol.getImgHeight()+","
+                        +target_vol.getImgWidth()+","
+                        +target_vol.getFileNums() + ","
+                        +(target_vol.getMaskAvailable()?"2,2":"2,0")
+                        +"\n";
+                fileUtils.addToFile(local_index_filename, content);
+                saveData(activity, activity.getString(R.string.cf_dcm_name));
+            }catch (Exception e){
+                e.printStackTrace();
+
+                Log.e(TAG, "====Failed to Save Results to file");
+            }
+        }
+        finished = true;
     }
     private void update_local_info(datasetInfo tds, volumeInfo tvol){
         String dsname = tds.getFolderName();
@@ -237,80 +322,54 @@ public class fileTransferClient {
         infolist.add(tvol);
         local_dv_map.put(dsname, infolist);
     }
-    private void saveDCMIData(){
-        Activity activity = activityReference.get();
-
-//        //check if it's in local already
-//        String dsname = target_ds.getFolderName();
-//        if(local_dv_map.containsKey(dsname) && local_dv_map.get(dsname).contains(target_vol)) {        finished = true; return;}
-
-        //update local data
-        update_local_info(target_ds, target_vol);
-
-        //save to local file
-        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
-            try{
-                String content = target_ds.getPatientName()+","
-                        +target_ds.getDate()+","
-                        +target_ds.getFolderName()+","
-                        +target_vol.getFolderName()+","
-                        +target_vol.getImgWidth()+","
-                        +target_vol.getImgHeight()+","
-                        +target_vol.getFileNums();
-                fileUtils.addToFile(local_index_filename, content);
-
-                //save data
-                File datafile = Paths.get(target_root_dir, target_ds.getFolderName(), target_vol.getFolderName(),  activity.getString(R.string.cf_dcm_name)).toFile();
-                saveLargeImageToFile(new FileOutputStream(datafile), JNIInterface.JNIgetVolumeData(false));
-            }catch (Exception e){
-                Log.e(TAG, "====Failed to Save Results to file");
-            }
-        }
-        finished = true;
-    }
-
     private boolean LoadDataFromLocal(String vpath){
         Activity activity = activityReference.get();
         //target folder exist
-            File destDir = Paths.get(target_root_dir, vpath).toFile();
-            if(!destDir.exists()) return false;
-            //load data
-            try{
-                loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcm_name))), false);
-            }catch(Exception e){
-                e.printStackTrace();
-                return false;
-            }
+        Path destDir_path = Paths.get(target_root_dir, vpath);
+        File destDir = destDir_path.toFile();
 
-            //load mask
-            try{
-                loadVolumeData(new FileInputStream(new File(destDir, activity.getString(R.string.cf_dcmmask_name))), true);
-            }catch(Exception e){
-                Log.e(TAG, "===LoadCachedData: no masks found" );
+        if(!destDir.exists()) return false;
+
+        //load data
+        File DwM = new File(destDir, activity.getString(R.string.cf_dcmwmask_name));
+        try{
+
+            if(DwM.exists()){
+                loadVolumeData(new FileInputStream(DwM), -1, 4);
+                finished = true; finished_mask = true;
+            }else{
+                //load data and path separately
+                File data = new File(destDir, activity.getString(R.string.cf_dcm_name));
+                loadVolumeData(new FileInputStream(data), 0, 2);
+                finished = true;
+//
             }
-            return true;
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        if(!DwM.exists()){
+            try{
+                File mask = new File(destDir, activity.getString(R.string.cf_dcmmask_name));
+                loadVolumeData(new FileInputStream(mask), 1, 2);
+            }catch (Exception e){
+                e.printStackTrace();
+                vol_with_mask = false;
+            }
+        }
+        finished_mask = true;
+        return true;
     }
 
-    private void loadVolumeData(InputStream instream, boolean isMask)
+    //0 for dcmi, 1 for mask, unit_size for single type usually 2, together will be 4
+    private void loadVolumeData(InputStream instream, int target, int unit_size)
         throws IOException{
             byte[] chunk = new byte[1024];
             int id = 0;
             int len;
-            if(isMask){
-                while ((len = instream.read(chunk)) != -1) {
-//                    JNIInterface.JNIsendDCMIMask(id, len, chunk);
-                    JNIInterface.JNIsendData(1, id, len, 2, chunk);
+            while ((len = instream.read(chunk)) != -1) {
+                    JNIInterface.JNIsendData(target, id, len, unit_size, chunk);
                     id++;
-                }
-                finished_mask = true;
-            }
-            else{
-                while ((len = instream.read(chunk)) != -1) {
-//                    JNIInterface.JNIsendDCMImg(id, len, chunk);
-                    JNIInterface.JNIsendData(0, id, len, 2, chunk);
-                    id++;
-                }
-                finished = true;
             }
     }
 
@@ -326,6 +385,18 @@ public class fileTransferClient {
     }
     public void Shutdown() throws InterruptedException {
         mChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+    }
+    public boolean isDownloadingProcessFinished(){
+        return finished;
+    }
+    public void Reset(){
+        finished = false;
+    }
+    public boolean isDownloadingMaskProcessFinished(){
+        return finished_mask;
+    }
+    public void ResetMast(){
+        finished_mask = false;
     }
 
 }

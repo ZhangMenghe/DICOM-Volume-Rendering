@@ -2,7 +2,8 @@
 #include <platforms/desktop/common.h>
 #include <cstring> //memset
 
-void dicomLoader::setupDCMIConfig(int width, int height, int dims){
+void dicomLoader::setupDCMIConfig(int width, int height, int dims, bool b_wmask){
+    CHANEL_NUM = b_wmask? 4:2;
     img_w = width; img_h=height; vol_dim = dims;
     single_csize = img_h * img_w;
     single_size = single_csize * CHANEL_NUM;
@@ -50,5 +51,5 @@ void dicomLoader::send_dicom_data(mLoadTarget target, int id, int chunk_size, in
             }
         }
     }
-    n_data_offset += (chunk_size==0)?single_size:(CHANEL_NUM / unit_size * chunk_size);   
+    n_data_offset += CHANEL_NUM / unit_size * chunk_size;   
 }

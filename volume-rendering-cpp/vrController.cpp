@@ -48,14 +48,15 @@ void vrController::onReset() {
 void vrController::setVolumeConfig(int width, int height, int dims){
     VOL_DIMS = glm::uvec3(width, height, dims);
 }
-void vrController::assembleTexture(GLubyte * data){
+void vrController::assembleTexture(GLubyte * data, int nc){
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     vol_data = new uint32_t[vsize];
     uint16_t tm;
     //fuse volume data
-    for(auto i=0; i<vsize; i++) {
-        vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
-        tm = uint16_t((((uint16_t)data[4*i+3])<<8)+data[4*i+2]);
+    for(auto i=0, shift = 0; i<vsize; i++, shift+=nc) {
+
+        vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
+        tm = (nc==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
         vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
         // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
     }

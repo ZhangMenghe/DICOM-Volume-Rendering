@@ -41,7 +41,7 @@ void onCreated(){
 	//load data
 	if(loader_.loadData("helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/data", "helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/mask")){
 	// if(loader_.loadData("dicom-images/sample_data_2bytes_2012", LOAD_DICOM)){
-		controller_.assembleTexture(loader_.getVolumeData());
+		controller_.assembleTexture(loader_.getVolumeData(), loader_.getChannelNum());
 		loader_.reset();
 	}
 }
@@ -98,7 +98,7 @@ bool InitWindow(){
 
 void setupApplication(){
 	int dims = 144;
-	loader_.setupDCMIConfig(512,512,dims);
+	loader_.setupDCMIConfig(512,512,dims,true);
 	controller_.setVolumeConfig(512,512,dims);
 	// if(loader_.loadData("dicom-images/sample_data_2bytes", LOAD_DICOM, 2)){
 	// 	controller_.assembleTexture(loader_.getVolumeData());

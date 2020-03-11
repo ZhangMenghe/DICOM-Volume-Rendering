@@ -11,6 +11,7 @@
     <string name="cf_config_name">pacs_local.txt</string>
     <string name="cf_dcm_name">data</string>
     <string name="cf_dcmmask_name">mask</string>
+    <string name="cf_dcmwmask_name">data_w_mask</string>
 
     <string name="dialog_connect_title">Connect to Server</string>
     <string name="dialog_select_title">Select a Dataset</string>
