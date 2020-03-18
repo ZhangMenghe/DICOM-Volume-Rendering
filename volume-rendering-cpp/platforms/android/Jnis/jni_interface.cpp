@@ -74,8 +74,8 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
     nativeApp(nativeAddr)->onViewCreated();
 }
 
-JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
-    nativeApp(nativeAddr)->onViewChange(w, h);
+JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
+    nativeApp(nativeAddr)->onViewChange(rot, w, h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){

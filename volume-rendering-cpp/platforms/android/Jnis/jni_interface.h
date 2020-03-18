@@ -22,7 +22,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass);
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv * env, jclass);
 
-JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint, jint);
+JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint, jint, jint);
 }
 
 

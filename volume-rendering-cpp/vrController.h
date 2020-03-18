@@ -53,6 +53,7 @@ public:
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
+    void onViewChange(int rot, int width, int height);
     void onDraw();
     void onReset();
     void onDestroy();

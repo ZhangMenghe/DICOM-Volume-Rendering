@@ -5,6 +5,7 @@ class nEntrance{
 public:
     virtual void onViewCreated() = 0;
     virtual void onViewChange(int width, int height) = 0;
+    virtual void onViewChange(int rot, int width, int height) = 0;
     virtual void onDraw()=0;
     virtual void onReset()=0;
 

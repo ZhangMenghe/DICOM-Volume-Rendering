@@ -15,6 +15,7 @@ inline std::string LoadTextFile(const char* filename){
            std::string Line = "";
            while(getline(ShaderStream, Line)) content += "\n" + Line;
            ShaderStream.close();
+           std::cout<<PATH(filename)<<std::endl;
        }else{
            LOGE("====Failed to load file: %s", filename);
        }

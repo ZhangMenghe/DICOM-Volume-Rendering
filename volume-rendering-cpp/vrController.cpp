@@ -100,6 +100,14 @@ void vrController::onViewChange(int width, int height){
     _screen_w = width; _screen_h = height;
     glClear(GL_COLOR_BUFFER_BIT);
 }
+void vrController::onViewChange(int rot, int width, int height){
+    onViewChange(width, height);
+    //todo:
+//    if (ar_session_ != nullptr) {
+//        ArSession_setDisplayGeometry(ar_session_, display_rotation, width, height);
+//    }
+
+}
 void vrController::onDraw() {
     if(!tex_volume) return;
 
