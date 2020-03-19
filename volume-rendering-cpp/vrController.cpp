@@ -116,8 +116,13 @@ void vrController::onDraw() {
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
 
-    if(isRayCasting())  raycastRenderer_->Draw();
-    else texvrRenderer_->Draw();
+    if(isRayCasting()){
+        raycastRenderer_->dirtyPrecompute();
+        raycastRenderer_->Draw();
+    }else {
+        texvrRenderer_->dirtyPrecompute();
+        texvrRenderer_->Draw();
+    }
     funcRenderer_->Draw();
 }
 

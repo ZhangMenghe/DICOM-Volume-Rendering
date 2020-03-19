@@ -6,6 +6,7 @@
 
 #include <platforms/android/ARHelpers/arController.h>
 #include <vrController.h>
+#include <dicomRenderer/screenQuad.h>
 
 using namespace dvr;
 namespace {
@@ -125,7 +126,8 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     dynamic_cast<arController*>(nativeApp(arhelperAddr))->onDraw();
-//    dynamic_cast<vrController*>(nativeApp(nativeAddr))->onDraw();
+    dynamic_cast<vrController*>(nativeApp(nativeAddr))->onDraw();
+    screenQuad::instance()->Draw();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){

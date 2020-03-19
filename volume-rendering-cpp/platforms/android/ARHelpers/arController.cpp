@@ -131,7 +131,7 @@ void arController::onDraw(){
 
     if(bg2step)bg_render->dirtyPrecompute();
     bg_render->Draw(transformed_uvs_);
-    if(bg2step)screenQuad::instance()->Draw();
+//    if(bg2step)screenQuad::instance()->Draw();
 
     if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) {
         return ;

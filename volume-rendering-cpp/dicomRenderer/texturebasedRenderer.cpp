@@ -114,9 +114,9 @@ void texvrRenderer::draw_baked() {
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
-    screenQuad::instance()->Draw();
+//    screenQuad::instance()->Draw();
 }

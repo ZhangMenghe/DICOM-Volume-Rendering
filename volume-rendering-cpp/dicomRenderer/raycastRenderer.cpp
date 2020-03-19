@@ -17,7 +17,7 @@ DRAW_BAKED(screen_baked){
 }
 void raycastRenderer::draw_baked(){
     precompute();
-    screenQuad::instance()->Draw();
+//    screenQuad::instance()->Draw();
 }
 void raycastRenderer::Draw(){
     if(DRAW_BAKED) {draw_baked(); return;}
