@@ -88,7 +88,7 @@ void vrController::updateTexture(GLubyte* data){
     baked_dirty_ = true;
 }
 void vrController::onViewCreated(){
-    texvrRenderer_ = new texvrRenderer(false);
+    texvrRenderer_ = new texvrRenderer;
     raycastRenderer_ = new raycastRenderer;
 
     funcRenderer_ = new FuncRenderer;

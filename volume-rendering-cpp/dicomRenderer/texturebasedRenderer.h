@@ -22,8 +22,10 @@ private:
     //for screen baking
     bool baked_dirty_ = true;
     void init_vertices();
-    void two_pass_draw();
     void draw_scene();
+
+    void draw_baked();
+    void precompute();
 
 public:
     texvrRenderer(bool screen_baked = true);
