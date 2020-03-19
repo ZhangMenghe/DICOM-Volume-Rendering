@@ -88,7 +88,7 @@ void vrController::updateTexture(GLubyte* data){
     baked_dirty_ = true;
 }
 void vrController::onViewCreated(){
-    texvrRenderer_ = new texvrRenderer;
+    texvrRenderer_ = new texvrRenderer(false);
     raycastRenderer_ = new raycastRenderer;
 
     funcRenderer_ = new FuncRenderer;
@@ -113,7 +113,7 @@ void vrController::onDraw() {
         texvrRenderer_->onCuttingChange(param_tex[dvr::TT_CUTTING_TEX]);
         raycastRenderer_->onCuttingChange(param_ray[dvr::TR_CUTTING_RAY]);
     }
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
 
     if(isRayCasting())  raycastRenderer_->Draw();
