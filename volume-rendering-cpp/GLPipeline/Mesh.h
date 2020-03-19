@@ -18,8 +18,6 @@ public:
 	inline unsigned int ElementCount() const {
 		return mElementCount;
 	}
-	static void InitQuadWithTex(GLuint &vao, GLuint &vbo, int vertex_num,
-			const unsigned int* indices, int indice_num);
 	static void InitQuadWithTex(GLuint &vao, const float* vertices,
 								int vertex_num, const unsigned int* indices, int indice_num);
 	static void InitQuad(GLuint &vao, const float* vertices, int vertex_num,

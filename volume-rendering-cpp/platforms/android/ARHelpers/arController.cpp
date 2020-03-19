@@ -1,12 +1,15 @@
 #include <cstdlib>
 #include "arController.h"
 #include <glm/gtc/type_ptr.hpp>
-namespace {
-// Positions of the quad vertices in clip space (X, Y).
-    const GLfloat kVertices[] = {
-            -1.0f, -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f,
-    };
-}
+//namespace {
+//// Positions of the quad vertices in clip space (X, Y).
+//    const GLfloat kVertices[] = {
+//            -1.0f, -1.0f,
+//            +1.0f, -1.0f,
+//            -1.0f, +1.0f,
+//            +1.0f, +1.0f,
+//    };
+//}
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
     if(!_myPtr) _myPtr = new arController;
@@ -88,11 +91,10 @@ void arController::onDraw(){
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-//    glEnable(GL_CULL_FACE);
-//    glEnable(GL_DEPTH_TEST);
-//    glEnable(GL_BLEND);
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    bg_render->Draw(transformed_uvs_);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     if(ar_session_ == nullptr)
         return ;
     if(!background_tex_initialized){

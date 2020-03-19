@@ -2,18 +2,25 @@
 #include <GLPipeline/Primitive.h>
 #include "backgroundRenderer.h"
 #include <GLES2/gl2ext.h>
-namespace {
-// Positions of the quad vertices in clip space (X, Y).
-    const GLfloat kVertices[] = {
-            -1.0f, -1.0f, +1.0f, -1.0f, -1.0f, +1.0f, +1.0f, +1.0f,
-    };
-}
 backgroundRenderer::backgroundRenderer(){
-//    const unsigned int bg_indices[6]= {0,1,2,
-//                                         0,2,4};
-//    Mesh::InitQuadWithTex(vao_, vbo_, 4, bg_indices, 6);
+    glGenVertexArrays(1, &vao_);
+    glGenBuffers(1, &vbo_);
 
-    Mesh::InitQuadWithTex(vao_, quad_vertices_tex_standard, 4, quad_indices, 6);
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray((GLuint)vao_);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, nullptr, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, 0,  8  *sizeof(float), kVertices);
+
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)(8 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
 
     glGenTextures(1, &texture_id_);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture_id_);
@@ -28,15 +35,11 @@ backgroundRenderer::backgroundRenderer(){
         LOGE("ar-background===Failed to create opacity shader program===");
 }
 void backgroundRenderer::Draw(float * uvs_){
-//    LOGE("====%p", this);
-    //update vertices
-//    const float test[8]= {
-//            0.0f,0.0f,1.0f,0.0f, 0.0f,1.0f,1.0f,1.0f
-//    };
-//    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 //    glBufferSubData(GL_ARRAY_BUFFER, 0,  8  *sizeof(float), kVertices);
-//    glBufferSubData(GL_ARRAY_BUFFER, 8  *sizeof(float), 8 *sizeof(float), test);
-//    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBufferSubData(GL_ARRAY_BUFFER, 8*sizeof(float), 8 *sizeof(float), uvs_);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     GLuint sp = shader_.Use();
     glDepthMask(GL_FALSE);
@@ -46,8 +49,10 @@ void backgroundRenderer::Draw(float * uvs_){
     Shader::Uniform(sp, "uSampler", TEX_ID);
 
     glBindVertexArray(vao_);
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
     glBindVertexArray(0);
     shader_.UnUse();
+    glDepthMask(GL_TRUE);
 }
 GLuint backgroundRenderer::GetTextureId() const{ return texture_id_; }

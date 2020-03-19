@@ -67,30 +67,7 @@ void Mesh::InitQuad(GLuint &vao, GLuint &vbo, const unsigned int* indices, int i
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
-void Mesh::InitQuadWithTex(GLuint &vao, GLuint &vbo, int vertex_num,
-							const unsigned int* indices, int indice_num){
-	glGenVertexArrays(1, &vao);
-	unsigned int EBO;
-	glGenBuffers(1, &vbo);
-	glGenBuffers(1, &EBO);
 
-	// bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-	glBindVertexArray((GLuint)vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4* vertex_num, nullptr, GL_DYNAMIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*indice_num, indices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
 void Mesh::InitQuadWithTex(GLuint &vao, const float* vertices, int vertex_num, const unsigned int* indices, int indice_num){
 	glGenVertexArrays(1, &vao);
 	unsigned int VBO, EBO;

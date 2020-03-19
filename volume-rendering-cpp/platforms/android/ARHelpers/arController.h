@@ -36,7 +36,7 @@ private:
     ArConfig * ar_config_ = nullptr;
 
     //ar camera
-    static constexpr int kNumVertices = 4;
+
     float transformed_uvs_[8];
     bool uvs_initialized_ = false;
 
