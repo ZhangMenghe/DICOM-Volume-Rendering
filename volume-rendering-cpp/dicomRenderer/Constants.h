@@ -40,6 +40,11 @@ namespace dvr{
         SHADER_OPA_VIZ_FRAG,
         SHADER_END
     };
+    enum ANDROID_SHADER_FILES{
+        SHADER_AR_BACKGROUND_SCREEN_VERT = SHADER_END,
+        SHADER_AR_BACKGROUND_SCREEN_FRAG,
+        SHADER_ANDROID_END
+    };
 
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;

@@ -1,4 +1,4 @@
-#include <platforms/android/assetLoader.h>
+#include <platforms/android/Utils/assetLoader.h>
 
 assetLoader* assetLoader::_myPtr = nullptr;
 

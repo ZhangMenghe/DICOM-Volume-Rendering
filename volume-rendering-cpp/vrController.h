@@ -11,11 +11,10 @@
 #include <unordered_map>
 #include <vector>
 
-#ifdef __ANDROID
-    #include <Jnis/jni_main.h>
+#ifdef __ANDROID__
+    #include <platforms/android/Jnis/jni_main.h>
 #endif
 class AAssetManager;
-
 class vrController:public nEntrance{
 public:
     static Texture *tex_volume, *tex_baked, *ray_baked;
@@ -56,7 +55,9 @@ public:
     void onViewChange(int rot, int width, int height);
     void onDraw();
     void onReset();
+    void onPause();
     void onDestroy();
+    void onResume(void* env, void* context, void* activity);
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);

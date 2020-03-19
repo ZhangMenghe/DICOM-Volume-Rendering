@@ -1,14 +1,16 @@
-#include <assetLoader.h>
+#include <Utils/assetLoader.h>
 #include <android/asset_manager_jni.h>
 #include <GLES3/gl32.h>
 #include "jni_interface.h"
-#include "vrController.h"
-
-#include <android/bitmap.h>
 #include <vector>
+
+#include <platforms/android/ARHelpers/arController.h>
+#include <vrController.h>
 
 using namespace dvr;
 namespace {
+    inline jlong arhelperAddr;
+
     const int LOAD_DCMI_ID = 0, LOAD_MASK_ID = 1;
     int CHANEL_NUM = 4;
     //globally
@@ -59,27 +61,68 @@ namespace {
                 "shaders/opaViz.vert",
                 "shaders/opaViz.frag"
         };
+        const char* android_shader_file_names[2] = {
+                "shaders/arcore_screen_quad.vert",
+                "shaders/arcore_screen_quad.frag"
+        };
         for(int i = 0; i<int(dvr::SHADER_END); i++)
             vrc->setShaderContents(SHADER_FILES (i), LoadTextFile(shader_file_names[i]));
+        for(int i=0; i<int(dvr::SHADER_ANDROID_END) - int(dvr::SHADER_END); i++)
+            vrController::shader_contents[dvr::SHADER_END + i] = LoadTextFile(android_shader_file_names[i]);
+//            vrc->setShaderContents(ANDROID_SHADER_FILES(i), LoadTextFile(android_shader_file_names[i]));
     }
 }
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     _asset_manager = AAssetManager_fromJava(env, asset_manager);
     nativeAddr =  getNativeClassAddr(new vrController());
     setupShaderContents();
+    arhelperAddr = getNativeClassAddr(new arController());
     return nativeAddr;
 }
 
+JNI_METHOD(void, JNIonPause)(JNIEnv* env, jclass){
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+    arController* arc = dynamic_cast<arController*>(nativeApp(arhelperAddr));
+    vrc->onPause();
+    arc->onPause();
+}
+
+JNI_METHOD(void, JNIonDestroy)(JNIEnv* env, jclass){
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+    arController* arc = dynamic_cast<arController*>(nativeApp(arhelperAddr));
+    vrc->onDestroy();
+    arc->onDestroy();
+
+    delete vrc;
+    delete arc;
+
+    nativeAddr = 0;
+    arhelperAddr = 0;
+}
+
+JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject context, jobject activity){
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+    vrc->onResume(env, context, activity);
+    dynamic_cast<arController*>(nativeApp(arhelperAddr))->onResume(env, context, activity);
+}
+
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    nativeApp(nativeAddr)->onViewCreated();
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+
+    vrc->onViewCreated();
+    dynamic_cast<arController*>(nativeApp(arhelperAddr))->onViewCreated();
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
-    nativeApp(nativeAddr)->onViewChange(rot, w, h);
+    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
+
+    vrc->onViewChange(rot, w, h);
+    dynamic_cast<arController*>(nativeApp(arhelperAddr))->onViewChange(rot,w,h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
-    nativeApp(nativeAddr)->onDraw();
+//    nativeApp(nativeAddr)->onDraw();
+    dynamic_cast<arController*>(nativeApp(arhelperAddr))->onDraw();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){

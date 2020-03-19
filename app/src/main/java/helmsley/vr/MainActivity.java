@@ -26,22 +26,22 @@ public class MainActivity extends GLActivity
 
     @Override
     protected void onResume() {
-
-        if(Boolean.getBoolean(getString(R.string.ar_enable))){
+        super.onResume();
+        if(Boolean.parseBoolean(getString(R.string.ar_enable))){
             if (!CameraPermissionHelper.hasCameraPermission(this)) {
                 CameraPermissionHelper.requestCameraPermission(this);
                 return;
             }
-//            JNIInterface.onResume(nativeAddr, getApplicationContext(), this);
+            JNIInterface.JNIonResume(getApplicationContext(), this);
         }
 
-        super.onResume();
+        surfaceView.onResume();
         getSystemService(DisplayManager.class).registerDisplayListener(this, null);
     }
     @Override
     protected void onPause(){
         super.onPause();
-//        JNIInterface.JNIonPause();
+        JNIInterface.JNIonPause();
         getSystemService(DisplayManager.class).unregisterDisplayListener(this);
     }
     @Override
@@ -49,7 +49,7 @@ public class MainActivity extends GLActivity
         super.onDestroy();
         // Synchronized to avoid racing onDrawFrame.
         synchronized (this) {
-//            JNIInterface.JNIonDestroy(nativeAddr);
+            JNIInterface.JNIonDestroy();
             nativeAddr = 0;
         }
     }

@@ -16,6 +16,7 @@
     #define TAG "ANDROID-HELPER"
     #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR,TAG ,__VA_ARGS__)
     #define LOGI(...) __android_log_print(ANDROID_LOG_INFO,TAG ,__VA_ARGS__)
+
     #define PATH(FILENAME) std::string(FILENAME)
     #define GLSL_VERSION "#version 310 es\n"
 
@@ -31,5 +32,11 @@
 
 
 #endif
-
+#ifndef CHECK
+#define CHECK(condition)                                                   \
+      if (!(condition)) {                                                      \
+        LOGE("*** CHECK FAILED at %s:%d: %s", __FILE__, __LINE__, #condition); \
+        abort();                                                               \
+      }
+#endif  // CHECK
 #endif

@@ -9,7 +9,8 @@ float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
-std::vector<std::string> vrController::shader_contents = std::vector<std::string>(14);
+//todo:number of shaders
+std::vector<std::string> vrController::shader_contents = std::vector<std::string>(16);
 
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
@@ -102,11 +103,6 @@ void vrController::onViewChange(int width, int height){
 }
 void vrController::onViewChange(int rot, int width, int height){
     onViewChange(width, height);
-    //todo:
-//    if (ar_session_ != nullptr) {
-//        ArSession_setDisplayGeometry(ar_session_, display_rotation, width, height);
-//    }
-
 }
 void vrController::onDraw() {
     if(!tex_volume) return;
@@ -219,6 +215,12 @@ void vrController::precompute(){
 }
 void vrController::onDestroy(){
     //todo: do sth
+}
+void vrController::onPause(){
+//    ar_controller_->onPause();
+}
+void vrController::onResume(void* env, void* context, void* activity){
+//    ar_controller_->onResume(env, context, activity);
 }
 void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content){
     if(fid < dvr::SHADER_END)

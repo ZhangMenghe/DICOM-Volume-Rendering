@@ -1,10 +1,15 @@
 package helmsley.vr;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.res.AssetManager;
 
 public class JNIInterface {
     public static native long JNIonCreate(AssetManager asset_manager);
     public static native void JNIonGlSurfaceCreated();
+    public static native void JNIonPause();
+    public static native void JNIonResume(Context context, Activity activity);
+    public static native void JNIonDestroy();
     public static native void JNIonSurfaceChanged(int rotation, int width, int height);
     public static native void JNIdrawFrame();
 
