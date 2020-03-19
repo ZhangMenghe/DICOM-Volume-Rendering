@@ -23,9 +23,7 @@ private:
     bool baked_dirty_ = true;
     void init_vertices();
     void draw_scene();
-
     void draw_baked();
-    void precompute();
 
 public:
     texvrRenderer(bool screen_baked = true);

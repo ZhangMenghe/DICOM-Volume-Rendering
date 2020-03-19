@@ -12,16 +12,24 @@ static constexpr GLfloat kVertices[8] = {
 };
 class backgroundRenderer {
 public:
-    backgroundRenderer();
+    backgroundRenderer(bool screen_baked = true);
     ~backgroundRenderer() = default;
 
     void Draw(float * uvs_);
     GLuint GetTextureId() const;
+    void dirtyPrecompute(){baked_dirty_ = true;}
 
 private:
     Shader shader_;
+    GLuint frame_buff_ = 0;
     GLuint texture_id_;
     int TEX_ID;
     GLuint vao_, vbo_;
+    bool DRAW_TO_TEXTURE;
+    bool baked_dirty_ = true;
+
+    void draw_to_texture();
+    void draw_scene();
+
 };
 #endif

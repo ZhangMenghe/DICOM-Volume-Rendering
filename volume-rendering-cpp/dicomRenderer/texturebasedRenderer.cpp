@@ -93,8 +93,8 @@ void texvrRenderer::draw_scene(){
 }
 void texvrRenderer::Draw(){
     if(!b_init_successful) init_vertices();
-    if(DRAW_BAKED) {draw_baked(); return;}
-    draw_scene();
+    if(DRAW_BAKED) draw_baked();
+    else draw_scene();
 }
 void texvrRenderer::onCuttingChange(float percent){
     int cut_id = int(dimensions * percent);
@@ -108,9 +108,8 @@ void texvrRenderer::updatePrecomputation(GLuint sp) {
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_tex[dvr::TT_CUTOFF]);
 }
 
-void texvrRenderer::precompute() {
+void texvrRenderer::draw_baked() {
     if(!baked_dirty_) return;
-    ///replace here
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);
@@ -118,10 +117,6 @@ void texvrRenderer::precompute() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    ///
     baked_dirty_ = false;
-}
-void texvrRenderer::draw_baked() {
-    precompute();
     screenQuad::instance()->Draw();
 }

@@ -1,6 +1,8 @@
 #include <cstdlib>
 #include "arController.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <dicomRenderer/screenQuad.h>
+
 //namespace {
 //// Positions of the quad vertices in clip space (X, Y).
 //    const GLfloat kVertices[] = {
@@ -28,7 +30,7 @@ arController::~arController(){
 }
 
 void arController::onViewCreated(){
-    bg_render = new backgroundRenderer;
+    bg_render = new backgroundRenderer(bg2step);
 }
 
 void arController::onPause(){
@@ -127,7 +129,9 @@ void arController::onDraw(){
         uvs_initialized_ = true;
     }
 
+    if(bg2step)bg_render->dirtyPrecompute();
     bg_render->Draw(transformed_uvs_);
+    if(bg2step)screenQuad::instance()->Draw();
 
     if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) {
         return ;

@@ -18,7 +18,7 @@ screenQuad::screenQuad(){
     }
     int vsize= tex_width* tex_height;
     GLbyte * vdata = new GLbyte[vsize * 4];
-    memset(vdata, 0x00, vsize * 4 * sizeof(GLbyte));
+    memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
     qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
     TEX_ID = vrController::BAKED_RAY_ID + 1;
 

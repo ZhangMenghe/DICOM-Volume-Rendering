@@ -124,8 +124,8 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
 //    nativeApp(nativeAddr)->onDraw();
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-//    dynamic_cast<arController*>(nativeApp(arhelperAddr))->onDraw();
-    dynamic_cast<vrController*>(nativeApp(nativeAddr))->onDraw();
+    dynamic_cast<arController*>(nativeApp(arhelperAddr))->onDraw();
+//    dynamic_cast<vrController*>(nativeApp(nativeAddr))->onDraw();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){

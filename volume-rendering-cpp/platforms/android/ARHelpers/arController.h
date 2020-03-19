@@ -36,7 +36,6 @@ private:
     ArConfig * ar_config_ = nullptr;
 
     //ar camera
-
     float transformed_uvs_[8];
     bool uvs_initialized_ = false;
 
@@ -50,5 +49,6 @@ private:
     glm::mat4 view_mat, proj_mat;
 
     backgroundRenderer* bg_render = nullptr;
+    bool bg2step = false;
 };
 #endif

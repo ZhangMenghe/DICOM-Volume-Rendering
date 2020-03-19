@@ -2,7 +2,10 @@
 #include <GLPipeline/Primitive.h>
 #include "backgroundRenderer.h"
 #include <GLES2/gl2ext.h>
-backgroundRenderer::backgroundRenderer(){
+#include <dicomRenderer/screenQuad.h>
+
+backgroundRenderer::backgroundRenderer(bool screen_baked)
+:DRAW_TO_TEXTURE(screen_baked){
     glGenVertexArrays(1, &vao_);
     glGenBuffers(1, &vbo_);
 
@@ -35,12 +38,29 @@ backgroundRenderer::backgroundRenderer(){
         LOGE("ar-background===Failed to create opacity shader program===");
 }
 void backgroundRenderer::Draw(float * uvs_){
-
+    //update uv data
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-//    glBufferSubData(GL_ARRAY_BUFFER, 0,  8  *sizeof(float), kVertices);
     glBufferSubData(GL_ARRAY_BUFFER, 8*sizeof(float), 8 *sizeof(float), uvs_);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
+
+    if(DRAW_TO_TEXTURE) draw_to_texture();
+    else draw_scene();
+
+}
+void backgroundRenderer::draw_to_texture(){
+    if(!baked_dirty_) return;
+
+    if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
+    glm::vec2 tsize = screenQuad::instance()->getTexSize();
+    glViewport(0, 0, tsize.x, tsize.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    draw_scene();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    baked_dirty_ = false;
+}
+void backgroundRenderer::draw_scene(){
     GLuint sp = shader_.Use();
     glDepthMask(GL_FALSE);
 
