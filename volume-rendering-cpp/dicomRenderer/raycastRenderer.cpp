@@ -99,7 +99,9 @@ void raycastRenderer::precompute(){
     GLuint sp = cshader_->Use();
     Texture* ray_baked_screen  = screenQuad::instance()->getTex();
     glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16UI);//GL_RGBA8);
-    glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, screenQuad::instance()->getTex()->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(2, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
 
     Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
@@ -109,7 +111,7 @@ void raycastRenderer::precompute(){
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
-    Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
+    Shader::Uniform(sp, "usample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
     cutter_->Update();
     cutter_->setCuttingParams(sp, true);
 
@@ -117,7 +119,8 @@ void raycastRenderer::precompute(){
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16UI);//GL_RGBA8);
-    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     cshader_->UnUse();
     baked_dirty_ = false;
