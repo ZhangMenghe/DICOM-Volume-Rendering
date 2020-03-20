@@ -95,6 +95,7 @@ void raycastRenderer::precompute(){
 
     if(vrController::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
     else cshader_->DisableKeyword("CUTTING_PLANE");
+    cshader_->EnableKeyword("ENABLE_AR");
 
     GLuint sp = cshader_->Use();
     Texture* ray_baked_screen  = screenQuad::instance()->getTex();
@@ -118,7 +119,7 @@ void raycastRenderer::precompute(){
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16UI);//GL_RGBA8);
+    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16UI);
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 

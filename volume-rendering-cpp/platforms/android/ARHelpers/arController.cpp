@@ -19,7 +19,7 @@ arController *arController::instance() {
 }
 
 arController::arController(){
-
+    _myPtr = this;
 }
 
 arController::~arController(){

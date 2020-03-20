@@ -1,6 +1,7 @@
 #version 310 es
 
 #pragma multi_compile CUTTING_PLANE
+#pragma multi_compile ENABLE_AR
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -94,7 +95,10 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
 vec4 getBackground(ivec2 pos){
-    return imageLoad(bgTex, pos);
+    #ifdef ENABLE_AR
+        return imageLoad(bgTex, pos);
+    #endif
+    return vec4(.0);
 }
 vec4 tracing(float u, float v, ivec2 spos){
     float tangent = tan(u_fov / 2.0); // angle in radians
@@ -110,17 +114,17 @@ vec4 tracing(float u, float v, ivec2 spos){
     bool drawed_square=false; bool blocked_by_plane=false;
     //plane
     #ifdef CUTTING_PLANE
-    float t;
-    if(dot(uPlane.normal, -uCamposObjSpace) > .0){
-        t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
-        blocked_by_plane = (t <= intersect.x);
-        intersect.x = max(intersect.x, t);
-    }
-    else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
+        float t;
+        if(dot(uPlane.normal, -uCamposObjSpace) > .0){
+            t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
+            blocked_by_plane = (t <= intersect.x);
+            intersect.x = max(intersect.x, t);
+        }
+        else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-    drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
+        drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
 
-    if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
+        if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
     #endif
     if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, getBackground(spos), u_plane_color.a):getBackground(spos);
 
