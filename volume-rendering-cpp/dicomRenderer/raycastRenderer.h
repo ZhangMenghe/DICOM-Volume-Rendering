@@ -10,11 +10,13 @@ private:
     cuttingController* cutter_;
     Shader* shader_= nullptr, *cshader_ = nullptr;
     GLuint vao_cube_= 0;
+    GLuint frame_buff_ = 0;
     bool DRAW_BAKED;
     bool baked_dirty_ = true;
 
-    void precompute();
     void draw_baked();
+    void draw_scene();
+    void draw_to_texture();
 public:
     raycastRenderer(bool screen_baked = true);
 

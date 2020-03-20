@@ -77,15 +77,6 @@ void texvrRenderer::draw_scene(){
     else
         Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*vrController::ModelMat_);
 
-    glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
-
-//    glFrontFace(GL_CW);
-
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-//    if(dir.z < 0) glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int)*6, quad_indices);
-//    else glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int)*6, quad_indices);
-//    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
     glBindVertexArray(vao_slice);
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
 
@@ -99,7 +90,7 @@ void texvrRenderer::draw_scene(){
 }
 void texvrRenderer::Draw(){
     if(!b_init_successful) init_vertices();
-    if(DRAW_BAKED) draw_baked();
+    if(DRAW_BAKED || vrController::param_bool[dvr::CHECK_ARENABLED]) draw_baked();
     else draw_scene();
 }
 void texvrRenderer::onCuttingChange(float percent){
@@ -120,11 +111,8 @@ void texvrRenderer::draw_baked() {
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
-//todo:debug only
-//    glClear(GL_DEPTH_BUFFER_BIT|GL_COLOR_BUFFER_BIT);
-        glClear(GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
-//    screenQuad::instance()->Draw();
 }

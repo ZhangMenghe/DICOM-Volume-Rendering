@@ -15,17 +15,15 @@ DRAW_BAKED(screen_baked){
         LOGE("Raycast===Failed to create raycast shader program===");
     cutter_ = new cuttingController;
 }
-void raycastRenderer::draw_baked(){
-    precompute();
-//    screenQuad::instance()->Draw();
-}
-void raycastRenderer::Draw(){
-    if(DRAW_BAKED) {draw_baked(); return;}
 
+void raycastRenderer::Draw() {
+    if (DRAW_BAKED) draw_baked();
+    else if(vrController::param_bool[dvr::CHECK_ARENABLED]) draw_to_texture();
+    else draw_scene();
+}
+void raycastRenderer::draw_scene() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
 
     //Update cutting plane and draw
@@ -53,7 +51,6 @@ void raycastRenderer::Draw(){
                 vrController::tex_volume->Height(),
                 vrController::tex_volume->Depth()));
 
-//    Shader::Uniform(sp,"ub_accumulate", vrController::param_bool_map["accumulate"]);
     Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool[dvr::CHECK_CUTTING]);
 
     Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
@@ -72,19 +69,20 @@ void raycastRenderer::Draw(){
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
-//    glDisable(GL_CULL_FACE);
 }
 
 void raycastRenderer::onCuttingChange(float percent){
     cutter_->setCutPlane(percent);
 //    dirtyPrecompute();
 }
+
 void raycastRenderer::updatePrecomputation(GLuint sp){
     Shader::Uniform(sp,"uOpacitys.overall", vrController::param_ray[dvr::TR_OVERALL]);
     Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_ray[dvr::TR_LOWEST]);
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_ray[dvr::TR_CUTOFF]);
 }
-void raycastRenderer::precompute(){
+
+void raycastRenderer::draw_baked(){
     if(!baked_dirty_) return;
     if(!cshader_){
         cshader_ = new Shader;
@@ -124,5 +122,15 @@ void raycastRenderer::precompute(){
     glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     cshader_->UnUse();
+    baked_dirty_ = false;
+}
+void raycastRenderer::draw_to_texture(){
+    if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
+    glm::vec2 tsize = screenQuad::instance()->getTexSize();
+    glViewport(0, 0, tsize.x, tsize.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    draw_scene();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
 }

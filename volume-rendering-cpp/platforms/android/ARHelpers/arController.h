@@ -49,6 +49,5 @@ private:
     glm::mat4 view_mat, proj_mat;
 
     backgroundRenderer* bg_render = nullptr;
-    bool bg2step = true;
 };
 #endif

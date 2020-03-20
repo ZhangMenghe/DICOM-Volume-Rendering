@@ -115,12 +115,13 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    //order matters
     screenQuad::instance()->Clear();
+    if(vrController::param_bool[dvr::CHECK_ARENABLED])arController::instance()->onDraw();
 
-    if(vrController::param_bool[dvr::CHECK_ARENABLED]) arController::instance()->onDraw();
     nativeApp(nativeAddr)->onDraw();
-
     screenQuad::instance()->Draw();
+    vrController::instance()->onDrawOverlays();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){

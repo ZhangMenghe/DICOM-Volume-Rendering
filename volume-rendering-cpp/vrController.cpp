@@ -88,6 +88,7 @@ void vrController::updateTexture(GLubyte* data){
     baked_dirty_ = true;
 }
 void vrController::onViewCreated(){
+    //!!!todo:bugs on no baking
     texvrRenderer_ = new texvrRenderer;
     raycastRenderer_ = new raycastRenderer;
 
@@ -123,7 +124,6 @@ void vrController::onDraw() {
         texvrRenderer_->dirtyPrecompute();
         texvrRenderer_->Draw();
     }
-    funcRenderer_->Draw();
 }
 
 void vrController::onTouchMove(float x, float y) {
@@ -230,5 +230,8 @@ void vrController::onResume(void* env, void* context, void* activity){
 void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content){
     if(fid < dvr::SHADER_END)
         shader_contents[fid] = content;
+}
+void vrController::onDrawOverlays(){
+    funcRenderer_->Draw();
 }
 

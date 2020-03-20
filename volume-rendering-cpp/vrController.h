@@ -48,6 +48,7 @@ public:
     void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims);
+    void onDrawOverlays();
 
     /*Override*/
     void onViewCreated();
