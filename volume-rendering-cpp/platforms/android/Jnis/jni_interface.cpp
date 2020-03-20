@@ -10,7 +10,6 @@
 
 using namespace dvr;
 namespace {
-
     const int LOAD_DCMI_ID = 0, LOAD_MASK_ID = 1;
     int CHANEL_NUM = 4;
     //globally
@@ -20,7 +19,8 @@ namespace {
     size_t n_data_offset[2] = {0};
     AAssetManager * _asset_manager;
 
-    bool ar_enabled = false;
+    bool ar_enabled = true;
+    bool volume_baked_enabled = true;
 
     std::string LoadTextFile(const char* file_name) {
         std::string* out_file_text_string = new std::string();
@@ -115,8 +115,11 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    arController::instance()->onDraw();
+    screenQuad::instance()->Clear();
+
+    if(vrController::param_bool[dvr::CHECK_ARENABLED]) arController::instance()->onDraw();
     nativeApp(nativeAddr)->onDraw();
+
     screenQuad::instance()->Draw();
 }
 

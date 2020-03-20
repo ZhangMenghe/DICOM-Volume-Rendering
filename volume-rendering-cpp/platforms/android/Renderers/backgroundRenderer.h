@@ -3,6 +3,8 @@
 
 #include <platforms/platform.h>
 #include <GLPipeline/Shader.h>
+
+//will be used in arcontroller as well
 static constexpr int kNumVertices = 4;
 static constexpr GLfloat kVertices[8] = {
         -1.0f, -1.0f,
@@ -30,6 +32,5 @@ private:
 
     void draw_to_texture();
     void draw_scene();
-
 };
 #endif

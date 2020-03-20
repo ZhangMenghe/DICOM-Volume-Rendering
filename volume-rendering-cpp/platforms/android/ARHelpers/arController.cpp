@@ -3,15 +3,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <dicomRenderer/screenQuad.h>
 
-//namespace {
-//// Positions of the quad vertices in clip space (X, Y).
-//    const GLfloat kVertices[] = {
-//            -1.0f, -1.0f,
-//            +1.0f, -1.0f,
-//            -1.0f, +1.0f,
-//            +1.0f, +1.0f,
-//    };
-//}
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
     if(!_myPtr) _myPtr = new arController;

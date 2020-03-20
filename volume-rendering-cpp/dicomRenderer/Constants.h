@@ -3,7 +3,8 @@
 #include <string>
 namespace dvr{
     enum PARAM_BOOL{
-        CHECK_RAYCAST=0,
+        CHECK_ARENABLED=0,
+        CHECK_RAYCAST,
         CHECK_COLOR_TRANS,
         CHECK_CUTTING,
         CHECK_MASKON,

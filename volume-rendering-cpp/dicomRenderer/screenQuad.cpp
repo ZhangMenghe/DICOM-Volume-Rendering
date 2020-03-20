@@ -43,3 +43,11 @@ void screenQuad::Draw(){
     glBindVertexArray(0);
     qshader_.UnUse();
 }
+
+void screenQuad::Clear(){
+    if(!frame_buff_) Texture::initFBO(frame_buff_, qtex_, nullptr);
+    glViewport(0, 0, tex_width, tex_height);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}

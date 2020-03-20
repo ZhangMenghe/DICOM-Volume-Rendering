@@ -2,6 +2,7 @@
 <resources>
 <!--    check params and value-->
     <string-array name="checkParams">
+        <item>AR Enable</item>
         <item>@string/texray_check_name</item>
         <item>Color Transfer</item>
         <item>@string/cutting_check_name</item>
@@ -9,6 +10,7 @@
         <item>@string/freezeVolume_check_name</item>
     </string-array>
     <string-array name="checkValues">
+        <item>false</item>
         <item>false</item>
         <item>false</item>
         <item>false</item>
