@@ -13,8 +13,8 @@ void dicomLoader::setupDCMIConfig(int width, int height, int dims, bool b_wmask)
     memset(g_VolumeTexData, 0x00, total_size * sizeof(GLubyte));
 }
 bool dicomLoader::loadData(std::string dicom_path, std::string mask_path, int data_unit_size, int mask_unit_size){
-    loadData(dicom_path, LOAD_DICOM, data_unit_size);
-    loadData(mask_path, LOAD_MASK, mask_unit_size);
+    return (loadData(dicom_path, LOAD_DICOM, data_unit_size)
+    && loadData(mask_path, LOAD_MASK, mask_unit_size));
 }
 
 bool dicomLoader::loadData(std::string filename, mLoadTarget target, int unit_size){
