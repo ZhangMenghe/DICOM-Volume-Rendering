@@ -10,7 +10,7 @@ float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
 //todo:number of shaders
-std::vector<std::string> vrController::shader_contents = std::vector<std::string>(16);
+std::vector<std::string> vrController::shader_contents = std::vector<std::string>(20);
 
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
@@ -25,20 +25,17 @@ unsigned int vrController::mask_num_ = 0; unsigned int vrController::mask_bits_ 
 
 
 vrController* vrController::instance(){
+    if(!myPtr_) myPtr_ = new vrController;
     return myPtr_;
 }
-vrController::~vrController(){
-//    std::cout<<"delete controller"<<std::endl;
-}
-
-vrController::vrController(AAssetManager *assetManager):
-        _asset_manager(assetManager){
-//    #ifdef __ANDROID__
-//        new assetLoader(assetManager);
-//    #endif
+vrController::vrController(){
     camera = new Camera;
     myPtr_ = this;
     onReset();
+    myPtr_ = this;
+}
+vrController::~vrController(){
+//    std::cout<<"delete controller"<<std::endl;
 }
 void vrController::onReset() {
     ScaleVec3_ = DEFAULT_SCALE;
@@ -89,8 +86,8 @@ void vrController::updateTexture(GLubyte* data){
 }
 void vrController::onViewCreated(){
     //!!!todo:bugs on no baking
-    texvrRenderer_ = new texvrRenderer;
-    raycastRenderer_ = new raycastRenderer;
+    texvrRenderer_ = new texvrRenderer(true);
+    raycastRenderer_ = new raycastRenderer(true);
 
     funcRenderer_ = new FuncRenderer;
     funcRenderer_->CreateFunction(COLOR_BAR);
@@ -114,7 +111,6 @@ void vrController::onDraw() {
         texvrRenderer_->onCuttingChange(param_tex[dvr::TT_CUTTING_TEX]);
         raycastRenderer_->onCuttingChange(param_ray[dvr::TR_CUTTING_RAY]);
     }
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
 
     if(isRayCasting()){

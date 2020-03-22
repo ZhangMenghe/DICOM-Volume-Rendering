@@ -9,13 +9,15 @@ screenQuad* screenQuad::instance(){
 
 screenQuad::screenQuad(){
     Mesh::InitQuadWithTex(vao_, quad_vertices_tex_standard, 4, quad_indices, 6);
-
-    float width = vrController::_screen_w, height = vrController::_screen_h;
-    if(height > TEX_HEIGHT){
-        tex_width = width / height * TEX_HEIGHT; tex_height = TEX_HEIGHT;
-    }else{
-        tex_width = width; tex_height = height;
-    }
+    tex_width = vrController::_screen_w;
+    tex_height = vrController::_screen_h;
+    LOGE("===SCREEN QUAD: %f, %f", tex_width, tex_height );
+//    float width = vrController::_screen_w, height = vrController::_screen_h;
+//    if(height > TEX_HEIGHT){
+//        tex_width = width / height * TEX_HEIGHT; tex_height = TEX_HEIGHT;
+//    }else{
+//        tex_width = width; tex_height = height;
+//    }
     int vsize= tex_width* tex_height;
     GLbyte * vdata = new GLbyte[vsize * 4];
     memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));

@@ -17,6 +17,8 @@ SET(UTIL_FILES
         #        ARHelpers/jni_interface.cpp
         )
 SET(RENDER_FILES
+        Renderers/PlaneRenderer.cpp
+        Renderers/PointCloudRenderer.cpp
         Renderers/backgroundRenderer.cpp)
 # Import the ARCore library.
 add_library(arcore SHARED IMPORTED)
@@ -42,4 +44,6 @@ target_link_libraries(
         android
         mediandk
         arcore
+        GLESv2
+        ${OpenGL_LIBS}
         ${KERNEL_LIBRARIES})

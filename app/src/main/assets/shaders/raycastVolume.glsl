@@ -21,7 +21,6 @@ uniform mat4 u_CamToWorld;
 
 uniform vec4 u_plane_color;
 uniform vec3 uCamposObjSpace;
-uniform float uViewDir;
 uniform float usample_step_inverse;
 struct Plane{
     vec3 p;

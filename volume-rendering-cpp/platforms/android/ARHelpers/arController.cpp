@@ -2,6 +2,7 @@
 #include "arController.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <dicomRenderer/screenQuad.h>
+#include <vrController.h>
 
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
@@ -21,7 +22,8 @@ arController::~arController(){
 }
 
 void arController::onViewCreated(){
-    bg_render = new backgroundRenderer;
+    bg_render = new backgroundRenderer(true);
+    point_cloud_renderer_ = new PointCloudRenderer(true);
 }
 
 void arController::onPause(){
@@ -94,7 +96,6 @@ void arController::onDraw(){
         ArSession_setCameraTextureName(ar_session_, bg_render->GetTextureId());
         background_tex_initialized = true;
     }
-    //ArSession_setCameraTextureName(ar_session_, bgTextureId);
     // Update session to get current frame and render camera background.
     if (ArSession_update(ar_session_, ar_frame_) != AR_SUCCESS) {
         LOGE("OnDrawFrame ArSession_update error");
@@ -103,12 +104,15 @@ void arController::onDraw(){
     ArCamera* camera;
     ArFrame_acquireCamera(ar_session_, ar_frame_, &camera);
     ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
-    ArCamera_getProjectionMatrix(ar_session_,camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
+    ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
+    vrController::instance()->camera->setProjMat(proj_mat);
+    vrController::instance()->camera->setViewMat(view_mat);
+
 
     // If the camera isn't tracking don't bother rendering other objects.
     ArTrackingState camera_tracking_state;
     ArCamera_getTrackingState(ar_session_, camera, &camera_tracking_state);
-    ArCamera_release(camera);
+
 
     //draw background
     int32_t geometry_changed = 0;
@@ -124,8 +128,48 @@ void arController::onDraw(){
     bg_render->Draw(transformed_uvs_);
 
     if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) {
+
         return ;
     }
+
+
+    // Update and render point cloud.
+    ArPointCloud* ar_point_cloud = nullptr;
+    ArStatus point_cloud_status =
+            ArFrame_acquirePointCloud(ar_session_, ar_frame_, &ar_point_cloud);
+    if (point_cloud_status == AR_SUCCESS) {
+        int32_t number_of_points = 0;
+        const float* point_cloud_data;
+        ArPointCloud_getNumberOfPoints(ar_session_, ar_point_cloud, &number_of_points);
+
+        if (number_of_points > 0) {
+            ArPointCloud_getData(ar_session_, ar_point_cloud, &point_cloud_data);
+        }
+        point_cloud_renderer_->Draw(proj_mat * view_mat, number_of_points, point_cloud_data);
+
+        ArPointCloud_release(ar_point_cloud);
+    }
+
+    ArPose* camera_pose = nullptr;
+    ArPose_create(ar_session_, nullptr, &camera_pose);
+    ArCamera_getDisplayOrientedPose(ar_session_, camera, camera_pose);
+    ArCamera_release(camera);
+    float camera_pose_raw[7] = {0.f};
+    ArPose_getPoseRaw(ar_session_, camera_pose, camera_pose_raw);
+//    vrController::instance()->camera->setCamPos(glm::vec3(camera_pose_raw[4], camera_pose_raw[5],camera_pose_raw[6]));
+
+    ArPose_getMatrix(ar_session_, camera_pose, glm::value_ptr(camera_pose_col_major_) );
+    vrController::instance()->camera->updateCameraPose(camera_pose_col_major_);//(glm::transpose(camera_pose_col_major_));
+
+//    float normal_distance_to_plane = util::CalculateDistanceToPlane(
+//            *ar_session_, *hit_pose, *camera_pose);
+//
+//    ArPose_destroy(hit_pose);
+    ArPose_destroy(camera_pose);
+
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
 
 //    //update camera pose
 //    ArPose* camera_pose = nullptr;
@@ -138,8 +182,4 @@ void arController::onDraw(){
 //    ArPose_getMatrix(ar_session_, camera_pose, glm::value_ptr(camera_pose_col_major_) );
 
 //    LOGE("===POSE %f, %f, %f, %f,%f, %f, %f", camera_pose_raw[0], camera_pose_raw[1],camera_pose_raw[2],camera_pose_raw[3],camera_pose_raw[4],camera_pose_raw[5],camera_pose_raw[6]);
-
-    glDisable(GL_CULL_FACE);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
 }

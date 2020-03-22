@@ -14,7 +14,6 @@
 #ifdef __ANDROID__
     #include <platforms/android/Jnis/jni_main.h>
 #endif
-class AAssetManager;
 class vrController:public nEntrance{
 public:
     static Texture *tex_volume, *tex_baked, *ray_baked;
@@ -42,8 +41,7 @@ public:
     static bool cutDirty;
 
     static vrController* instance();
-
-    vrController(AAssetManager *assetManager = nullptr);
+    vrController();
     ~vrController();
     void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
@@ -68,7 +66,6 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
 private:
     static vrController* myPtr_;
-    AAssetManager* _asset_manager;
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;

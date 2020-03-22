@@ -5,6 +5,7 @@
 #include <nEntrance.h>
 #include <glm/glm.hpp>
 #include <platforms/android/Renderers/backgroundRenderer.h>
+#include <platforms/android/Renderers/PointCloudRenderer.h>
 
 class arController:public nEntrance{
 public:
@@ -49,5 +50,6 @@ private:
     glm::mat4 view_mat, proj_mat;
 
     backgroundRenderer* bg_render = nullptr;
+    PointCloudRenderer* point_cloud_renderer_ = nullptr;
 };
 #endif

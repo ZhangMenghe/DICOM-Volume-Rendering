@@ -8,7 +8,7 @@ namespace {
     std::vector<std::string> param_tex_names, param_ray_names, param_checks;
     const int TEX_ID = 0, RAY_ID = 1;
     //todo:currently should manully keep consistence with R.string....
-    const std::string cutting_keyword = "Cutting", freeze_keyworkd="Freeze Plane";
+    const std::string cutting_keyword = "Cutting", freeze_keyworkd="Freeze Plane", ar_keyword = "AR Enable";
 }
 
 JUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobjectArray jkeys, jfloatArray jvalues){
@@ -57,13 +57,14 @@ JUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jf
     }
 }
 JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
-    std::string key = dvr::jstring2string(env,jkey);
+    std::string key = dvr::jstring2string(env, jkey);
 
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
-//        LOGE("======SET  %s, %d", key.c_str(), value);
         if(jstring2string(env, jkey)==freeze_keyworkd) vrController::cutDirty = true;
+        //todo:get a better solution!!!
+        else if(jstring2string(env, jkey) == ar_keyword) vrController::instance()->camera->Reset();
         vrController::baked_dirty_ = true;
     }
 

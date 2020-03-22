@@ -61,9 +61,13 @@ namespace {
                 "shaders/opaViz.vert",
                 "shaders/opaViz.frag"
         };
-        const char* android_shader_file_names[2] = {
+        const char* android_shader_file_names[6] = {
                 "shaders/arcore_screen_quad.vert",
-                "shaders/arcore_screen_quad.frag"
+                "shaders/arcore_screen_quad.frag",
+                "shaders/pointcloud.vert",
+                "shaders/pointcloud.frag",
+                "shaders/plane.vert",
+                "shaders/plane.frag"
         };
         for(int i = 0; i<int(dvr::SHADER_END); i++)
             vrc->setShaderContents(SHADER_FILES (i), LoadTextFile(shader_file_names[i]));
@@ -72,9 +76,7 @@ namespace {
 //            vrc->setShaderContents(ANDROID_SHADER_FILES(i), LoadTextFile(android_shader_file_names[i]));
     }
 }
-void JNIEnableDisableAR(){
-    ar_enabled = !ar_enabled;
-}
+
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     _asset_manager = AAssetManager_fromJava(env, asset_manager);
     nativeAddr =  getNativeClassAddr(new vrController());
@@ -113,13 +115,14 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
-    glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     //order matters
     screenQuad::instance()->Clear();
-    if(vrController::param_bool[dvr::CHECK_ARENABLED])arController::instance()->onDraw();
 
+    if(vrController::param_bool[dvr::CHECK_ARENABLED])arController::instance()->onDraw();
     nativeApp(nativeAddr)->onDraw();
+
     screenQuad::instance()->Draw();
     vrController::instance()->onDrawOverlays();
 }

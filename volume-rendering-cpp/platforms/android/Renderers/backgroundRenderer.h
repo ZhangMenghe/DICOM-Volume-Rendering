@@ -14,7 +14,7 @@ static constexpr GLfloat kVertices[8] = {
 };
 class backgroundRenderer {
 public:
-    backgroundRenderer(bool screen_baked = true);
+    backgroundRenderer(bool screen_baked = false);
     ~backgroundRenderer() = default;
 
     void Draw(float * uvs_);
