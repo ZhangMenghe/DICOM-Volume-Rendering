@@ -25,7 +25,6 @@ private:
     Shader shader_;
     GLuint frame_buff_ = 0;
     GLuint texture_id_;
-    int TEX_ID;
     GLuint vao_, vbo_;
     bool DRAW_TO_TEXTURE;
     bool baked_dirty_ = true;

@@ -3,9 +3,7 @@
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr; Texture* vrController::ray_baked = nullptr;
-int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1, vrController::BAKED_RAY_ID = 2;
-float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
+float vrController::_screen_w = .0f; float vrController::_screen_h= .0f;
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
@@ -229,5 +227,10 @@ void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content)
 }
 void vrController::onDrawOverlays(){
     funcRenderer_->Draw();
+}
+void vrController::updateVolumeModelMat(){
+    ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
+                 * RotateMat_
+                 * glm::scale(glm::mat4(1.0), ScaleVec3_);
 }
 

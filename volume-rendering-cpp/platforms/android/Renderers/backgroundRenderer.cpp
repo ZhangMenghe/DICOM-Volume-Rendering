@@ -11,7 +11,6 @@ backgroundRenderer::backgroundRenderer(bool screen_baked)
 
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray((GLuint)vao_);
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 16, nullptr, GL_DYNAMIC_DRAW);
     glBufferSubData(GL_ARRAY_BUFFER, 0,  8  *sizeof(float), kVertices);
@@ -24,13 +23,10 @@ backgroundRenderer::backgroundRenderer(bool screen_baked)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-
     glGenTextures(1, &texture_id_);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture_id_);
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    TEX_ID = vrController::BAKED_RAY_ID + 2;
 
     if(!shader_.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_AR_BACKGROUND_SCREEN_VERT])
        ||!shader_.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_AR_BACKGROUND_SCREEN_FRAG])
@@ -43,10 +39,8 @@ void backgroundRenderer::Draw(float * uvs_){
     glBufferSubData(GL_ARRAY_BUFFER, 8*sizeof(float), 8 *sizeof(float), uvs_);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
     if(DRAW_TO_TEXTURE) draw_to_texture();
     else draw_scene();
-
 }
 void backgroundRenderer::draw_to_texture(){
     if(!baked_dirty_) return;
@@ -64,9 +58,9 @@ void backgroundRenderer::draw_scene(){
     GLuint sp = shader_.Use();
     glDepthMask(GL_FALSE);
 
-    glActiveTexture(GL_TEXTURE0+TEX_ID);
+    glActiveTexture(GL_TEXTURE0+dvr::BACK_GROUND_AR_ID);
     glBindTexture(GL_TEXTURE_EXTERNAL_OES, texture_id_);
-    Shader::Uniform(sp, "uSampler", TEX_ID);
+    Shader::Uniform(sp, "uSampler", dvr::BACK_GROUND_AR_ID);
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

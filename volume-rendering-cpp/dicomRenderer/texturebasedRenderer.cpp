@@ -68,14 +68,14 @@ void texvrRenderer::draw_scene(){
     }
     GLuint sp = shader_->Use();
 
-    glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
-    glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
-    Shader::Uniform(sp, "uSampler_baked", vrController::BAKED_TEX_ID);
+    glActiveTexture(GL_TEXTURE0 + dvr::BAKED_TEX_ID);
+    glBindTexture(GL_TEXTURE_3D, vrController::instance()->getTex(dvr::BAKED_TEX_ID)->GLTexture());
+    Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
     if(vrController::ROTATE_AROUND_CUBE)
-        Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat());
+        Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat());
     else
-        Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*vrController::ModelMat_);
+        Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*vrController::ModelMat_);
 
     glBindVertexArray(vao_slice);
     glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);

@@ -22,7 +22,6 @@ screenQuad::screenQuad(){
     GLbyte * vdata = new GLbyte[vsize * 4];
     memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
     qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
-    TEX_ID = vrController::BAKED_RAY_ID + 1;
 
     if(!qshader_.AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_QUAD_VERT])
        ||!qshader_.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_QUAD_FRAG])
@@ -37,9 +36,9 @@ void screenQuad::Draw(){
 
     //render to screen
     GLuint sp = qshader_.Use();
-    glActiveTexture(GL_TEXTURE0+TEX_ID);
+    glActiveTexture(GL_TEXTURE0+dvr::SCREEN_QUAD_ID);
     glBindTexture(GL_TEXTURE_2D, qtex_->GLTexture());
-    Shader::Uniform(sp, "uSampler", TEX_ID);
+    Shader::Uniform(sp, "uSampler", dvr::SCREEN_QUAD_ID);
     glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

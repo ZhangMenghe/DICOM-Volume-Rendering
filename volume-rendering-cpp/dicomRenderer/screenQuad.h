@@ -13,7 +13,6 @@ private:
     Shader qshader_;
     Texture* qtex_ = nullptr;
     float tex_width, tex_height;
-    int TEX_ID;
     GLuint vao_;
     GLuint frame_buff_ = 0;
 public:

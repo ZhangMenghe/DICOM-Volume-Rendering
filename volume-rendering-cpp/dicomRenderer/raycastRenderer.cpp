@@ -22,53 +22,54 @@ void raycastRenderer::Draw() {
     else draw_scene();
 }
 void raycastRenderer::draw_scene() {
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
+   glEnable(GL_BLEND);
+   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+   glEnable(GL_DEPTH_TEST);
 
-    //Update cutting plane and draw
-    cutter_->UpdateAndDraw();
+   //Update cutting plane and draw
+   cutter_->UpdateAndDraw();
+   Texture* tex = vrController::instance()->getTex(dvr::VOLUME_TEX_ID);
 
-    GLuint sp = shader_->Use();
-    if(vrController::ray_baked){
-        glActiveTexture(GL_TEXTURE0+vrController::BAKED_RAY_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::ray_baked->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::BAKED_RAY_ID);
-    }else{
-        glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
-    }
-    Shader::Uniform(sp, "uProjMat", vrController::camera->getProjMat());
-    Shader::Uniform(sp,"uViewMat", vrController::camera->getViewMat());
-    Shader::Uniform(sp,"uModelMat", vrController::ModelMat_);
+   GLuint sp = shader_->Use();
+//    if(vrController::ray_baked){
+//        glActiveTexture(GL_TEXTURE0+dvr::BAKED_RAY_ID);
+//        glBindTexture(GL_TEXTURE_3D, vrController::ray_baked->GLTexture());
+//        Shader::Uniform(sp, "uSampler_tex", dvr::BAKED_RAY_ID);
+//    }else{
+       glActiveTexture(GL_TEXTURE0+dvr::VOLUME_TEX_ID);
+       glBindTexture(GL_TEXTURE_3D, tex->GLTexture());
+       Shader::Uniform(sp, "uSampler_tex", dvr::VOLUME_TEX_ID);
+//    }
+   Shader::Uniform(sp, "uProjMat", vrController::camera->getProjMat());
+   Shader::Uniform(sp,"uViewMat", vrController::camera->getViewMat());
+   Shader::Uniform(sp,"uModelMat", vrController::ModelMat_);
 
-        glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
-    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
-        *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-    Shader::Uniform(sp,"uVolumeSize",
-                glm::vec3(vrController::tex_volume->Width(),
-                vrController::tex_volume->Height(),
-                vrController::tex_volume->Depth()));
+       glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
+   Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
+       *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
+   Shader::Uniform(sp,"uVolumeSize",
+               glm::vec3(tex->Width(),
+               tex->Height(),
+               tex->Depth()));
 
-    Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool[dvr::CHECK_CUTTING]);
+   Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool[dvr::CHECK_CUTTING]);
 
-    Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
-    cutter_->setCuttingParams(sp);
+   Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
+   cutter_->setCuttingParams(sp);
 
-    if(vrController::camera->getViewDirection().z <0)
-        glFrontFace(GL_CW);
-    else
-        glFrontFace(GL_CCW);
+   if(vrController::camera->getViewDirection().z <0)
+       glFrontFace(GL_CW);
+   else
+       glFrontFace(GL_CCW);
 
-        glBindVertexArray(vao_cube_);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
-    shader_->UnUse();
+       glBindVertexArray(vao_cube_);
+       glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+       glBindVertexArray(0);
+   shader_->UnUse();
 
 
-    glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
+   glDisable(GL_BLEND);
+   glDisable(GL_DEPTH_TEST);
 }
 
 void raycastRenderer::onCuttingChange(float percent){
@@ -97,7 +98,7 @@ void raycastRenderer::draw_baked(){
 
     GLuint sp = cshader_->Use();
     Texture* ray_baked_screen  = screenQuad::instance()->getTex();
-    glBindImageTexture(0, vrController::ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16UI);//GL_RGBA8);
+    glBindImageTexture(0, vrController::instance()->getTex(dvr::BAKED_RAY_ID)->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA16UI);//GL_RGBA8);
     glBindImageTexture(1, screenQuad::instance()->getTex()->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
     glBindImageTexture(2, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 

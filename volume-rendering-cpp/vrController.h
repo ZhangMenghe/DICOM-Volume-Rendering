@@ -16,9 +16,7 @@
 #endif
 class vrController:public nEntrance{
 public:
-    static Texture *tex_volume, *tex_baked, *ray_baked;
     static Camera* camera;
-    static int VOLUME_TEX_ID, BAKED_TEX_ID, BAKED_RAY_ID;
     static float _screen_w, _screen_h;
 
     static std::vector<float> param_tex, param_ray;
@@ -41,12 +39,17 @@ public:
     static bool cutDirty;
 
     static vrController* instance();
+
     vrController();
     ~vrController();
     void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims);
     void onDrawOverlays();
+    Texture* getTex(dvr::TEX_IDS id){
+        if(id == dvr::BAKED_TEX_ID) return tex_baked;
+        return ray_baked;
+    }
 
     /*Override*/
     void onViewCreated();
@@ -66,21 +69,25 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
 private:
     static vrController* myPtr_;
+
+    //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
+    //Textures
+    Texture *tex_volume= nullptr, *tex_baked = nullptr, *ray_baked = nullptr;
+
+    //ui
     glm::fvec2 Mouse_old = glm::fvec2(.0);
+
+    //flags
     bool volume_model_dirty = true;
 
     Shader* bakeShader_ = nullptr;
     uint32_t* vol_data = nullptr;
 
-    void updateVolumeModelMat(){
-        ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
-                     * RotateMat_
-                     * glm::scale(glm::mat4(1.0), ScaleVec3_);
-    }
+    void updateVolumeModelMat();
     void precompute();
 
 };
