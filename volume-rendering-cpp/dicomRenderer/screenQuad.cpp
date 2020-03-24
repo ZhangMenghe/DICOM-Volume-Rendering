@@ -6,32 +6,28 @@ screenQuad* screenQuad::instance(){
     if(!myPtr_) myPtr_ = new screenQuad();
     return myPtr_;
 }
-
 screenQuad::screenQuad(){
     Mesh::InitQuadWithTex(vao_, quad_vertices_tex_standard, 4, quad_indices, 6);
-    tex_width = vrController::_screen_w;
-    tex_height = vrController::_screen_h;
-    LOGE("===SCREEN QUAD: %f, %f", tex_width, tex_height );
-//    float width = vrController::_screen_w, height = vrController::_screen_h;
-//    if(height > TEX_HEIGHT){
-//        tex_width = width / height * TEX_HEIGHT; tex_height = TEX_HEIGHT;
-//    }else{
-//        tex_width = width; tex_height = height;
-//    }
-    int vsize= tex_width* tex_height;
-    GLbyte * vdata = new GLbyte[vsize * 4];
-    memset(vdata, 0xff, vsize * 4 * sizeof(GLbyte));
-    qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
-
     if(!qshader_.AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_QUAD_VERT])
        ||!qshader_.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_QUAD_FRAG])
        ||!qshader_.CompileAndLink())
         LOGE("Screen===Failed to create screen shader program===");
     myPtr_ = this;
 }
+void screenQuad::onScreenSizeChange(float width, float height){
+    if(width == tex_width && tex_height == height) return;
 
+    tex_width = GLuint (width);
+    tex_height = GLuint(height);
+    auto vsize = tex_width* tex_height * 4;
+    GLbyte * vdata = new GLbyte[vsize];
+    memset(vdata, 0x00, vsize * sizeof(GLbyte));
+    if(qtex_) delete qtex_;
+
+    qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
+}
 void screenQuad::Draw(){
-    glViewport(0, 0, vrController::_screen_w, vrController::_screen_h);
+    glViewport(0, 0, tex_width, tex_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //render to screen

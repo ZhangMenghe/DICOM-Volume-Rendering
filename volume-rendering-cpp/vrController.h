@@ -11,32 +11,23 @@
 #include <unordered_map>
 #include <vector>
 
-#ifdef __ANDROID__
-    #include <platforms/android/Jnis/jni_main.h>
-#endif
 class vrController:public nEntrance{
 public:
     static Camera* camera;
-    static float _screen_w, _screen_h;
-
     static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
     static std::vector<std::string> shader_contents;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
-    static glm::uvec3 VOL_DIMS;
+
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
-
-    static unsigned int mask_num_, mask_bits_;
+    static bool cutDirty;
+    unsigned int mask_num_, mask_bits_;
 
     inline static bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }
-
-    static glm::vec3 csphere_c;
-    static float csphere_radius;
-    static bool cutDirty;
 
     static vrController* instance();
 
@@ -75,17 +66,22 @@ private:
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
+    //Shader
+    Shader* bakeShader_ = nullptr;
+
     //Textures
     Texture *tex_volume= nullptr, *tex_baked = nullptr, *ray_baked = nullptr;
 
+    //volume datas
+    glm::uvec3 VOL_DIMS = glm::uvec3(0);
+    uint32_t* vol_data = nullptr;
+
     //ui
     glm::fvec2 Mouse_old = glm::fvec2(.0);
+    float _screen_w, _screen_h;
 
     //flags
     bool volume_model_dirty = true;
-
-    Shader* bakeShader_ = nullptr;
-    uint32_t* vol_data = nullptr;
 
     void updateVolumeModelMat();
     void precompute();

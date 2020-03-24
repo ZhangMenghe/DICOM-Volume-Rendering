@@ -27,6 +27,7 @@ private:
 
 public:
     texvrRenderer(bool screen_baked = true);
+    void setDimension(int dims){dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;}
     void onCuttingChange(float percent);
     void Draw();
     void updatePrecomputation(GLuint sp);

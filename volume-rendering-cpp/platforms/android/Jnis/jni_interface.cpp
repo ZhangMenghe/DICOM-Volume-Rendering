@@ -112,6 +112,7 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
     nativeApp(nativeAddr)->onViewChange(rot, w, h);
     arController::instance()->onViewChange(rot,w,h);
+    screenQuad::instance()->onScreenSizeChange(w, h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){

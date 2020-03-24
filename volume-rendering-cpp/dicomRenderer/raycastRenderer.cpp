@@ -44,7 +44,7 @@ void raycastRenderer::draw_scene() {
    Shader::Uniform(sp,"uViewMat", vrController::camera->getViewMat());
    Shader::Uniform(sp,"uModelMat", vrController::ModelMat_);
 
-       glm::mat4 model_inv = glm::inverse(vrController::ModelMat_);
+       glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * dim_scale_mat);
    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
        *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
    Shader::Uniform(sp,"uVolumeSize",
@@ -106,7 +106,7 @@ void raycastRenderer::draw_baked(){
     Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
-    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * glm::scale(glm::mat4(1.0), glm::vec3(0.75f)));
+    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * dim_scale_mat);
 
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
 //    if(vrController::param_bool[dvr::CHECK_ARENABLED])
@@ -138,4 +138,7 @@ void raycastRenderer::draw_to_texture(){
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
+}
+void raycastRenderer::setDimension(int dims){
+    dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0, 1.0, dims / 100.0f));
 }

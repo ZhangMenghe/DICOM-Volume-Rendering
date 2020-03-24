@@ -8,16 +8,16 @@
 class screenQuad {
 private:
     static screenQuad* myPtr_;
-    const float TEX_HEIGHT = 720.0f;
 
     Shader qshader_;
     Texture* qtex_ = nullptr;
-    float tex_width, tex_height;
+    GLuint tex_width=0, tex_height=0;
     GLuint vao_;
     GLuint frame_buff_ = 0;
 public:
     static screenQuad* instance();
     screenQuad();
+    void onScreenSizeChange(float width, float height);
     void Draw();
     void Clear();
     Texture* getTex(){ return qtex_;}

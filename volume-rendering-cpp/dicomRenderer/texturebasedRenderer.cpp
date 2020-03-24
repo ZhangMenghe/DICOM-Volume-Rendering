@@ -14,10 +14,7 @@ texvrRenderer::texvrRenderer(bool screen_baked)
     onCuttingChange(.0f);
 }
 void texvrRenderer::init_vertices(){
-    dimensions = int(vrController::VOL_DIMS.z * DENSE_FACTOR);
     if(dimensions == 0) return;
-
-    dimension_inv = 1.0f / dimensions;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
     float mappedZVal = -scale_inv, zTex = .0f;

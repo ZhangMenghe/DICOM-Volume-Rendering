@@ -3,24 +3,18 @@
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-float vrController::_screen_w = .0f; float vrController::_screen_h= .0f;
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
-//todo:number of shaders
-std::vector<std::string> vrController::shader_contents = std::vector<std::string>(20);
+std::vector<std::string> vrController::shader_contents;
 
+//model mats
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
 glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
-glm::uvec3 vrController::VOL_DIMS = glm::uvec3(0);
-bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true;
 
-glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
-float vrController::csphere_radius = 0.5f;
-bool vrController::cutDirty = true;
-unsigned int vrController::mask_num_ = 0; unsigned int vrController::mask_bits_ = 0;
-
+//flags
+bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true, vrController::cutDirty = true;
 
 vrController* vrController::instance(){
     if(!myPtr_) myPtr_ = new vrController;
@@ -28,7 +22,7 @@ vrController* vrController::instance(){
 }
 vrController::vrController(){
     camera = new Camera;
-    myPtr_ = this;
+    shader_contents = std::vector<std::string>(SHADER_ANDROID_END);
     onReset();
     myPtr_ = this;
 }
@@ -45,6 +39,8 @@ void vrController::setVolumeConfig(int width, int height, int dims){
     VOL_DIMS = glm::uvec3(width, height, dims);
 }
 void vrController::assembleTexture(GLubyte * data, int nc){
+    texvrRenderer_->setDimension(VOL_DIMS.z);
+    raycastRenderer_->setDimension(VOL_DIMS.z);
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     vol_data = new uint32_t[vsize];
     uint16_t tm;
