@@ -3,8 +3,17 @@ package helmsley.vr;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.opengl.GLUtils;
+import android.util.Log;
+
+import java.io.IOException;
 
 public class JNIInterface {
+    private static final String TAG = "JniInterface";
+    static AssetManager assetManager;
+
     public static native long JNIonCreate(AssetManager asset_manager);
     public static native void JNIonGlSurfaceCreated();
     public static native void JNIonPause();
@@ -17,4 +26,16 @@ public class JNIInterface {
     public static native void JNIsetupDCMIConfig(int width, int height, int dims, boolean b_wmask);
     public static native void JNIAssembleVolume();
     public static native byte[] JNIgetVolumeData();
+    public static Bitmap loadImage(String imageName) {
+        try {
+            return BitmapFactory.decodeStream(assetManager.open(imageName));
+        } catch (IOException e) {
+            Log.e(TAG, "Cannot open image " + imageName);
+            return null;
+        }
+    }
+
+    public static void loadTexture(int target, Bitmap bitmap) {
+        GLUtils.texImage2D(target, 0, bitmap, 0);
+    }
 }

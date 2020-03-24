@@ -3,6 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <dicomRenderer/screenQuad.h>
 #include <vrController.h>
+#include <glm/gtx/quaternion.hpp>
 
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
@@ -24,6 +25,7 @@ arController::~arController(){
 void arController::onViewCreated(){
     bg_render = new backgroundRenderer(true);
     point_cloud_renderer_ = new PointCloudRenderer(true);
+    plane_renderer_ = new PlaneRenderer(true);
 }
 
 void arController::onPause(){
@@ -132,6 +134,8 @@ void arController::onDraw(){
         return ;
     }
 
+    //update and render planes
+    update_and_draw_planes();
 
     // Update and render point cloud.
     ArPointCloud* ar_point_cloud = nullptr;
@@ -183,3 +187,143 @@ void arController::onDraw(){
 
 //    LOGE("===POSE %f, %f, %f, %f,%f, %f, %f", camera_pose_raw[0], camera_pose_raw[1],camera_pose_raw[2],camera_pose_raw[3],camera_pose_raw[4],camera_pose_raw[5],camera_pose_raw[6]);
 }
+void arController::update_and_draw_planes(){
+    // Update and render planes.
+    ArTrackableList* plane_list = nullptr;
+    ArTrackableList_create(ar_session_, &plane_list);
+    CHECK(plane_list != nullptr);
+
+    ArTrackableType plane_tracked_type = AR_TRACKABLE_PLANE;
+    ArSession_getAllTrackables(ar_session_, plane_tracked_type, plane_list);
+
+    int32_t plane_list_size = 0;
+    ArTrackableList_getSize(ar_session_, plane_list, &plane_list_size);
+    plane_count_ = plane_list_size;
+
+    for (int i = 0; i < plane_list_size; ++i) {
+        ArTrackable* ar_trackable = nullptr;
+        ArTrackableList_acquireItem(ar_session_, plane_list, i, &ar_trackable);
+        ArPlane* ar_plane = ArAsPlane(ar_trackable);
+        ArTrackingState out_tracking_state;
+        ArTrackable_getTrackingState(ar_session_, ar_trackable,
+                                     &out_tracking_state);
+
+        ArPlane* subsume_plane;
+        ArPlane_acquireSubsumedBy(ar_session_, ar_plane, &subsume_plane);
+        if (subsume_plane != nullptr) {
+            ArTrackable_release(ArAsTrackable(subsume_plane));
+            continue;
+        }
+
+        if (ArTrackingState::AR_TRACKING_STATE_TRACKING != out_tracking_state) {
+            continue;
+        }
+
+        ArTrackingState plane_tracking_state;
+        ArTrackable_getTrackingState(ar_session_, ArAsTrackable(ar_plane),
+                                     &plane_tracking_state);
+        if (plane_tracking_state == AR_TRACKING_STATE_TRACKING) {
+            glm::mat4 model_mat; glm::vec3 norm_vec;
+
+            update_plane_vertices(*ar_plane, model_mat, norm_vec);
+            plane_renderer_->Draw(plane_vertices_, plane_triangles_, proj_mat * view_mat, model_mat,norm_vec, glm::vec3(1.0f));
+            ArTrackable_release(ar_trackable);
+        }
+    }
+
+    ArTrackableList_destroy(plane_list);
+    plane_list = nullptr;
+}
+void arController::update_plane_vertices(const ArPlane& ar_plane, glm::mat4& model_mat, glm::vec3& normal_vec) {
+    // The following code generates a triangle mesh filling a convex polygon,
+    // including a feathered edge for blending.
+    //
+    // The indices shown in the diagram are used in comments below.
+    // _______________     0_______________1
+    // |             |      |4___________5|
+    // |             |      | |         | |
+    // |             | =>   | |         | |
+    // |             |      | |         | |
+    // |             |      |7-----------6|
+    // ---------------     3---------------2
+
+    plane_vertices_.clear();
+    plane_triangles_.clear();
+
+    int32_t polygon_length;
+    ArPlane_getPolygonSize(ar_session_, &ar_plane, &polygon_length);
+
+    if (polygon_length == 0) {
+        LOGE("PlaneRenderer::UpdatePlane, no valid plane polygon is found");
+        return;
+    }
+
+    const int32_t plane_vertices_size = polygon_length / 2;
+    std::vector<glm::vec2> raw_vertices(plane_vertices_size);
+    ArPlane_getPolygon(ar_session_, &ar_plane,
+                       glm::value_ptr(raw_vertices.front()));
+
+    // Fill vertex 0 to 3. Note that the vertex.xy are used for x and z
+    // position. vertex.z is used for alpha. The outter polygon's alpha
+    // is 0.
+    for (int32_t i = 0; i < plane_vertices_size; ++i) {
+        plane_vertices_.push_back(glm::vec3(raw_vertices[i].x, raw_vertices[i].y, 0.0f));
+    }
+
+    ArPose *pose_;
+    ArPose_create(ar_session_, nullptr, &pose_);
+
+    ArPlane_getCenterPose(ar_session_, &ar_plane, pose_);
+    ArPose_getMatrix(ar_session_, pose_, glm::value_ptr(model_mat));
+
+    //get normal
+    float plane_pose_raw[7] = {0.f};
+    ArPose_getPoseRaw(ar_session_, pose_, plane_pose_raw);
+    glm::quat plane_quaternion(plane_pose_raw[3], plane_pose_raw[0],
+                               plane_pose_raw[1], plane_pose_raw[2]);
+    // Get normal vector, normal is defined to be positive Y-position in local
+    // frame.
+    normal_vec = glm::rotate(plane_quaternion, glm::vec3(0., 1.f, 0.));
+
+
+    // Feather distance 0.2 meters.
+    const float kFeatherLength = 0.2f;
+    // Feather scale over the distance between plane center and vertices.
+    const float kFeatherScale = 0.2f;
+
+    // Fill vertex 4 to 7, with alpha set to 1.
+    for (int32_t i = 0; i < plane_vertices_size; ++i) {
+        // Vector from plane center to current point.
+        glm::vec2 v = raw_vertices[i];
+        const float scale =
+                1.0f - std::min((kFeatherLength / glm::length(v)), kFeatherScale);
+        const glm::vec2 result_v = scale * v;
+
+        plane_vertices_.push_back(glm::vec3(result_v.x, result_v.y, 1.0f));
+    }
+
+    const int32_t plane_vertices_length = plane_vertices_.size();
+    const int32_t half_plane_vertices_length = plane_vertices_length / 2;
+
+    // Generate triangle (4, 5, 6) and (4, 6, 7).
+    for (int i = half_plane_vertices_length + 1; i < plane_vertices_length - 1; ++i) {
+        plane_triangles_.push_back(half_plane_vertices_length);
+        plane_triangles_.push_back(i);
+        plane_triangles_.push_back(i + 1);
+    }
+
+    // Generate triangle (0, 1, 4), (4, 1, 5), (5, 1, 2), (5, 2, 6),
+    // (6, 2, 3), (6, 3, 7), (7, 3, 0), (7, 0, 4)
+    for (int i = 0; i < half_plane_vertices_length; ++i) {
+        plane_triangles_.push_back(i);
+        plane_triangles_.push_back((i + 1) % half_plane_vertices_length);
+        plane_triangles_.push_back(i + half_plane_vertices_length);
+
+        plane_triangles_.push_back(i + half_plane_vertices_length);
+        plane_triangles_.push_back((i + 1) % half_plane_vertices_length);
+        plane_triangles_.push_back(
+                (i + half_plane_vertices_length + 1) % half_plane_vertices_length +
+                half_plane_vertices_length);
+    }
+}
+

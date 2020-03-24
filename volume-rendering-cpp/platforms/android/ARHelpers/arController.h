@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include <platforms/android/Renderers/backgroundRenderer.h>
 #include <platforms/android/Renderers/PointCloudRenderer.h>
+#include <platforms/android/Renderers/PlaneRenderer.h>
 
 class arController:public nEntrance{
 public:
@@ -51,5 +52,14 @@ private:
 
     backgroundRenderer* bg_render = nullptr;
     PointCloudRenderer* point_cloud_renderer_ = nullptr;
+    PlaneRenderer* plane_renderer_ = nullptr;
+
+    //plane
+    int32_t plane_count_ = 0;
+    std::vector<glm::vec3> plane_vertices_;
+    std::vector<GLushort> plane_triangles_;
+
+    void update_and_draw_planes();
+    void update_plane_vertices(const ArPlane& ar_plane, glm::mat4& model_mat, glm::vec3& normal_vec);
 };
 #endif

@@ -7,6 +7,7 @@
 #include <platforms/android/ARHelpers/arController.h>
 #include <vrController.h>
 #include <dicomRenderer/screenQuad.h>
+#include <Utils/assetLoader.h>
 
 using namespace dvr;
 namespace {
@@ -17,32 +18,29 @@ namespace {
     int g_img_h, g_img_w, g_vol_dim;
     size_t g_ssize_schanel, g_ssize = 0, g_vol_len;
     size_t n_data_offset[2] = {0};
-    AAssetManager * _asset_manager;
+//    AAssetManager * _asset_manager;
 
-    bool ar_enabled = true;
-    bool volume_baked_enabled = true;
-
-    std::string LoadTextFile(const char* file_name) {
-        std::string* out_file_text_string = new std::string();
-        AAsset* asset =
-                AAssetManager_open(_asset_manager, file_name, AASSET_MODE_STREAMING);
-        if (asset == nullptr) {
-            LOGE("Error opening asset %s", file_name);
-            return "";
-        }
-
-        off_t file_size = AAsset_getLength(asset);
-        out_file_text_string->resize(file_size);
-        int ret = AAsset_read(asset, &out_file_text_string->front(), file_size);
-
-        if (ret <= 0) {
-            LOGE("Failed to open file: %s", file_name);
-            AAsset_close(asset);
-            return "";
-        }
-        AAsset_close(asset);
-        return *out_file_text_string;
-    }
+//    std::string LoadTextFile(const char* file_name) {
+//        std::string* out_file_text_string = new std::string();
+//        AAsset* asset =
+//                AAssetManager_open(_asset_manager, file_name, AASSET_MODE_STREAMING);
+//        if (asset == nullptr) {
+//            LOGE("Error opening asset %s", file_name);
+//            return "";
+//        }
+//
+//        off_t file_size = AAsset_getLength(asset);
+//        out_file_text_string->resize(file_size);
+//        int ret = AAsset_read(asset, &out_file_text_string->front(), file_size);
+//
+//        if (ret <= 0) {
+//            LOGE("Failed to open file: %s", file_name);
+//            AAsset_close(asset);
+//            return "";
+//        }
+//        AAsset_close(asset);
+//        return *out_file_text_string;
+//    }
     void setupShaderContents(){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
         const char* shader_file_names[14] = {
@@ -69,16 +67,28 @@ namespace {
                 "shaders/plane.vert",
                 "shaders/plane.frag"
         };
-        for(int i = 0; i<int(dvr::SHADER_END); i++)
-            vrc->setShaderContents(SHADER_FILES (i), LoadTextFile(shader_file_names[i]));
-        for(int i=0; i<int(dvr::SHADER_ANDROID_END) - int(dvr::SHADER_END); i++)
-            vrController::shader_contents[dvr::SHADER_END + i] = LoadTextFile(android_shader_file_names[i]);
-//            vrc->setShaderContents(ANDROID_SHADER_FILES(i), LoadTextFile(android_shader_file_names[i]));
+        for(int i = 0; i<int(dvr::SHADER_END); i++){
+            std::string content;
+            assetLoader::instance()->LoadTextFileFromAssetManager(shader_file_names[i], &content);
+            vrc->setShaderContents(SHADER_FILES (i), content);
+        }
+
+        for(int i=0; i<int(dvr::SHADER_ANDROID_END) - int(dvr::SHADER_END); i++){
+            std::string content;
+            assetLoader::instance()->LoadTextFileFromAssetManager(android_shader_file_names[i], &content);
+            vrController::shader_contents[dvr::SHADER_END + i] = content;
+        }
     }
 }
 
+jint JNI_OnLoad(JavaVM *vm, void *) {
+    g_vm = vm;
+    return JNI_VERSION_1_6;
+}
+
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
-    _asset_manager = AAssetManager_fromJava(env, asset_manager);
+    new assetLoader(AAssetManager_fromJava(env, asset_manager));
+
     nativeAddr =  getNativeClassAddr(new vrController());
     setupShaderContents();
     return nativeAddr;
@@ -178,4 +188,15 @@ JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
     jbyteArray gdata = env->NewByteArray(g_vol_len);
     env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
     return gdata;
+}
+
+JNIEnv *GetJniEnv() {
+    JNIEnv *env;
+    jint result = g_vm->AttachCurrentThread(&env, nullptr);
+    return result == JNI_OK ? env : nullptr;
+}
+
+jclass FindClass(const char *classname) {
+    JNIEnv *env = GetJniEnv();
+    return env->FindClass(classname);
 }

@@ -41,7 +41,8 @@ public class GLActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         setupSurfaceView();
-        nativeAddr = JNIInterface.JNIonCreate(getAssets());
+        JNIInterface.assetManager = getAssets();
+        nativeAddr = JNIInterface.JNIonCreate(JNIInterface.assetManager);
         setupTouchDetector();
     }
 

@@ -57,6 +57,7 @@ namespace dvr{
         BAKED_RAY_ID,
         SCREEN_QUAD_ID,
         BACK_GROUND_AR_ID,
+        PLANE_AR_ID,
     };
 
     //UIs
