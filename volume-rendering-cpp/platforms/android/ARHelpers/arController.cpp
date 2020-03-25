@@ -53,7 +53,6 @@ void arController::onResume(void* env, void* context, void* activity){
         CHECK(ar_frame_);
         ArSession_setDisplayGeometry(ar_session_, width_, height_, display_rotation_);
 
-
         ArCloudAnchorMode out_cloud_anchor_mode;
         ArFocusMode focus_mode;
         ArPlaneFindingMode plane_finding_mode;
@@ -129,10 +128,7 @@ void arController::onDraw(){
     bg_render->dirtyPrecompute();
     bg_render->Draw(transformed_uvs_);
 
-    if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) {
-
-        return ;
-    }
+    if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) return ;
 
     //update and render planes
     update_and_draw_planes();
@@ -174,18 +170,6 @@ void arController::onDraw(){
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
-
-//    //update camera pose
-//    ArPose* camera_pose = nullptr;
-//    ArPose_create(ar_session_, nullptr, &camera_pose);
-//    ArCamera_getPose(ar_session_, camera, camera_pose);
-//
-//    float camera_pose_raw[7] = {0.f};
-////    glm::mat4 camera_pose_col_major;
-//    ArPose_getPoseRaw(ar_session_, camera_pose, camera_pose_raw);
-//    ArPose_getMatrix(ar_session_, camera_pose, glm::value_ptr(camera_pose_col_major_) );
-
-//    LOGE("===POSE %f, %f, %f, %f,%f, %f, %f", camera_pose_raw[0], camera_pose_raw[1],camera_pose_raw[2],camera_pose_raw[3],camera_pose_raw[4],camera_pose_raw[5],camera_pose_raw[6]);
 }
 void arController::update_and_draw_planes(){
     // Update and render planes.
@@ -198,7 +182,6 @@ void arController::update_and_draw_planes(){
 
     int32_t plane_list_size = 0;
     ArTrackableList_getSize(ar_session_, plane_list, &plane_list_size);
-    plane_count_ = plane_list_size;
 
     for (int i = 0; i < plane_list_size; ++i) {
         ArTrackable* ar_trackable = nullptr;
@@ -226,6 +209,7 @@ void arController::update_and_draw_planes(){
             glm::mat4 model_mat; glm::vec3 norm_vec;
 
             update_plane_vertices(*ar_plane, model_mat, norm_vec);
+            tracked_planes.push_back(tPlane(model_mat, norm_vec));
             plane_renderer_->Draw(plane_vertices_, plane_triangles_, proj_mat * view_mat, model_mat,norm_vec, glm::vec3(1.0f));
             ArTrackable_release(ar_trackable);
         }
@@ -277,14 +261,7 @@ void arController::update_plane_vertices(const ArPlane& ar_plane, glm::mat4& mod
     ArPose_getMatrix(ar_session_, pose_, glm::value_ptr(model_mat));
 
     //get normal
-    float plane_pose_raw[7] = {0.f};
-    ArPose_getPoseRaw(ar_session_, pose_, plane_pose_raw);
-    glm::quat plane_quaternion(plane_pose_raw[3], plane_pose_raw[0],
-                               plane_pose_raw[1], plane_pose_raw[2]);
-    // Get normal vector, normal is defined to be positive Y-position in local
-    // frame.
-    normal_vec = glm::rotate(plane_quaternion, glm::vec3(0., 1.f, 0.));
-
+    normal_vec = get_plane_norm(*pose_);
 
     // Feather distance 0.2 meters.
     const float kFeatherLength = 0.2f;
@@ -325,5 +302,133 @@ void arController::update_plane_vertices(const ArPlane& ar_plane, glm::mat4& mod
                 (i + half_plane_vertices_length + 1) % half_plane_vertices_length +
                 half_plane_vertices_length);
     }
+}
+glm::vec3 arController::get_plane_norm(const ArPose& plane_pose){
+    float plane_pose_raw[7] = {0.f};
+    ArPose_getPoseRaw(ar_session_, &plane_pose, plane_pose_raw);
+    glm::quat plane_quaternion(plane_pose_raw[3], plane_pose_raw[0],
+                               plane_pose_raw[1], plane_pose_raw[2]);
+    // Get normal vector, normal is defined to be positive Y-position in local
+    // frame.
+    return glm::rotate(plane_quaternion, glm::vec3(0., 1.f, 0.));
+}
+float arController::get_dist_to_plane(const ArPose& plane_pose, const ArPose& camera_pose){
+    float plane_pose_raw[7] = {0.f};
+    ArPose_getPoseRaw(ar_session_, &plane_pose, plane_pose_raw);
+    glm::vec3 plane_position(plane_pose_raw[4], plane_pose_raw[5],
+                             plane_pose_raw[6]);
+    glm::vec3 normal = get_plane_norm(plane_pose);
+
+    float camera_pose_raw[7] = {0.f};
+    ArPose_getPoseRaw(ar_session_, &camera_pose, camera_pose_raw);
+    glm::vec3 camera_P_plane(camera_pose_raw[4] - plane_position.x,
+                             camera_pose_raw[5] - plane_position.y,
+                             camera_pose_raw[6] - plane_position.z);
+    return glm::dot(normal, camera_P_plane);
+}
+
+void arController::onSingleTouchDown(float x, float y){
+    if (ar_frame_ != nullptr && ar_session_ != nullptr) {
+        ArHitResultList* hit_result_list = nullptr;
+        ArHitResultList_create(ar_session_, &hit_result_list);
+        CHECK(hit_result_list);
+        ArFrame_hitTest(ar_session_, ar_frame_, x, y, hit_result_list);
+
+        int32_t hit_result_list_size = 0;
+        ArHitResultList_getSize(ar_session_, hit_result_list,
+                                &hit_result_list_size);
+
+        // The hitTest method sorts the resulting list by distance from the camera,
+        // increasing.  The first hit result will usually be the most relevant when
+        // responding to user input.
+
+        ArHitResult* ar_hit_result = nullptr;
+        ArTrackableType trackable_type = AR_TRACKABLE_NOT_VALID;
+        for (int32_t i = 0; i < hit_result_list_size; ++i) {
+            ArHitResult* ar_hit = nullptr;
+            ArHitResult_create(ar_session_, &ar_hit);
+            ArHitResultList_getItem(ar_session_, hit_result_list, i, ar_hit);
+
+            if (ar_hit == nullptr) {
+                LOGE("HelloArApplication::OnTouched ArHitResultList_getItem error");
+                return;
+            }
+
+            ArTrackable* ar_trackable = nullptr;
+            ArHitResult_acquireTrackable(ar_session_, ar_hit, &ar_trackable);
+            ArTrackableType ar_trackable_type = AR_TRACKABLE_NOT_VALID;
+            ArTrackable_getType(ar_session_, ar_trackable, &ar_trackable_type);
+            // Creates an anchor if a plane or an oriented point was hit.
+            if (AR_TRACKABLE_PLANE == ar_trackable_type) {
+                ArPose* hit_pose = nullptr;
+                ArPose_create(ar_session_, nullptr, &hit_pose);
+                ArHitResult_getHitPose(ar_session_, ar_hit, hit_pose);
+                int32_t in_polygon = 0;
+                ArPlane* ar_plane = ArAsPlane(ar_trackable);
+                ArPlane_isPoseInPolygon(ar_session_, ar_plane, hit_pose, &in_polygon);
+
+                // Use hit pose and camera pose to check if hittest is from the
+                // back of the plane, if it is, no need to create the anchor.
+                ArPose* camera_pose = nullptr;
+                ArPose_create(ar_session_, nullptr, &camera_pose);
+                ArCamera* ar_camera;
+                ArFrame_acquireCamera(ar_session_, ar_frame_, &ar_camera);
+                ArCamera_getPose(ar_session_, ar_camera, camera_pose);
+                ArCamera_release(ar_camera);
+                float normal_distance_to_plane = get_dist_to_plane(*hit_pose, *camera_pose);
+
+                ArPose_destroy(hit_pose);
+                ArPose_destroy(camera_pose);
+
+                if (!in_polygon || normal_distance_to_plane < 0) {
+                    continue;
+                }
+
+                ar_hit_result = ar_hit;
+                trackable_type = ar_trackable_type;
+                break;
+            } else if (AR_TRACKABLE_POINT == ar_trackable_type) {
+                ArPoint* ar_point = ArAsPoint(ar_trackable);
+                ArPointOrientationMode mode;
+                ArPoint_getOrientationMode(ar_session_, ar_point, &mode);
+                if (AR_POINT_ORIENTATION_ESTIMATED_SURFACE_NORMAL == mode) {
+                    ar_hit_result = ar_hit;
+                    trackable_type = ar_trackable_type;
+                    break;
+                }
+            }
+        }
+
+        if (ar_hit_result) {
+            // Note that the application is responsible for releasing the anchor
+            // pointer after using it. Call ArAnchor_release(anchor) to release.
+            ArAnchor* anchor = nullptr;
+            if (ArHitResult_acquireNewAnchor(ar_session_, ar_hit_result, &anchor) != AR_SUCCESS) {
+                LOGE("HelloArApplication::OnTouched ArHitResult_acquireNewAnchor error");
+                return;
+            }
+
+            ArTrackingState tracking_state = AR_TRACKING_STATE_STOPPED;
+            ArAnchor_getTrackingState(ar_session_, anchor, &tracking_state);
+            if (tracking_state != AR_TRACKING_STATE_TRACKING) {
+                ArAnchor_release(anchor);
+                return;
+            }
+
+            if(trackable_type == AR_TRACKABLE_PLANE){
+                anchors_[anchor_id % MAX_TRACKED_ANCHORS] = anchor;
+                anchor_id ++;
+            }
+
+            ArHitResult_destroy(ar_hit_result);
+            ar_hit_result = nullptr;
+
+            ArHitResultList_destroy(hit_result_list);
+            hit_result_list = nullptr;
+        }
+    }
+}
+void arController::onReset(){
+    //todo:set reset values
 }
 

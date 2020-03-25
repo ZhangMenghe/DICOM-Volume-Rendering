@@ -11,6 +11,7 @@
 
 using namespace dvr;
 namespace {
+    bool arInitialized = false;
     const int LOAD_DCMI_ID = 0, LOAD_MASK_ID = 1;
     int CHANEL_NUM = 4;
     //globally
@@ -18,29 +19,7 @@ namespace {
     int g_img_h, g_img_w, g_vol_dim;
     size_t g_ssize_schanel, g_ssize = 0, g_vol_len;
     size_t n_data_offset[2] = {0};
-//    AAssetManager * _asset_manager;
 
-//    std::string LoadTextFile(const char* file_name) {
-//        std::string* out_file_text_string = new std::string();
-//        AAsset* asset =
-//                AAssetManager_open(_asset_manager, file_name, AASSET_MODE_STREAMING);
-//        if (asset == nullptr) {
-//            LOGE("Error opening asset %s", file_name);
-//            return "";
-//        }
-//
-//        off_t file_size = AAsset_getLength(asset);
-//        out_file_text_string->resize(file_size);
-//        int ret = AAsset_read(asset, &out_file_text_string->front(), file_size);
-//
-//        if (ret <= 0) {
-//            LOGE("Failed to open file: %s", file_name);
-//            AAsset_close(asset);
-//            return "";
-//        }
-//        AAsset_close(asset);
-//        return *out_file_text_string;
-//    }
     void setupShaderContents(){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
         const char* shader_file_names[14] = {
@@ -131,8 +110,22 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     //order matters
     screenQuad::instance()->Clear();
 
-    if(vrController::param_bool[dvr::CHECK_ARENABLED])arController::instance()->onDraw();
-    nativeApp(nativeAddr)->onDraw();
+    if(vrController::param_bool[dvr::CHECK_ARENABLED]){
+        arController::instance()->onDraw();
+        if(!arInitialized){
+            //update model mat of volume
+            auto tplanes = arController::instance()->getTrackedPlanes();
+            if(!tplanes.empty()){
+                vrController::ScaleVec3_ = glm::vec3(0.2f);
+                vrController::RotateMat_ = tplanes[0].rotMat;
+                vrController::PosVec3_ = tplanes[0].centerVec;
+                arInitialized = true;
+                nativeApp(nativeAddr)->onDraw();
+            }
+        }else{nativeApp(nativeAddr)->onDraw();}
+    }else{
+        nativeApp(nativeAddr)->onDraw();
+    }
 
     screenQuad::instance()->Draw();
     vrController::instance()->onDrawOverlays();

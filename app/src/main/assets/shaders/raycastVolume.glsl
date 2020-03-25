@@ -128,6 +128,8 @@ vec4 tracing(float u, float v, ivec2 spos){
     if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, getBackground(spos), u_plane_color.a):getBackground(spos);
 
     return Volume(ro + 0.5, rd, intersect.x, intersect.y);
+//    vec4 sampled = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+//    return (sampled.a<0.1)?getBackground(spos):sampled;
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);

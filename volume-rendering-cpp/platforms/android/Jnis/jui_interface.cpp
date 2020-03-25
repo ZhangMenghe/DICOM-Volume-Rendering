@@ -2,6 +2,8 @@
 #include <android/asset_manager_jni.h>
 #include "jui_interface.h"
 #include <vrController.h>
+#include <platforms/android/ARHelpers/arController.h>
+
 using namespace dvr;
 
 namespace {
@@ -93,6 +95,10 @@ JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass){
     nativeApp(nativeAddr)->onReset();
 }
 
+JUI_METHOD(void ,JUIonDoubleTouchDown)(JNIEnv *, jclass, jfloat x, jfloat y){
+    if(vrController::param_bool[dvr::CHECK_ARENABLED])
+        arController::instance()->onSingleTouchDown(x,y);
+}
 JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
     nativeApp(nativeAddr)->onSingleTouchDown(x, y);
 }

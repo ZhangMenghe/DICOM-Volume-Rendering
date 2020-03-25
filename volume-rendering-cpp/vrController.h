@@ -85,6 +85,5 @@ private:
 
     void updateVolumeModelMat();
     void precompute();
-
 };
 #endif

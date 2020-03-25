@@ -140,5 +140,5 @@ void raycastRenderer::draw_to_texture(){
     baked_dirty_ = false;
 }
 void raycastRenderer::setDimension(int dims){
-    dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0, 1.0, dims / 100.0f));
+    dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0, 1.0, dims / 200.0f));
 }
