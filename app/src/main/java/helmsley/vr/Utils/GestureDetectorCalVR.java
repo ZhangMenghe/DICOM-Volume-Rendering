@@ -90,7 +90,7 @@ public class GestureDetectorCalVR {
             // ONE FINGER (left mouse click)
             // left double tap
             public void onOneFingerDoubleTap(float ex, float ey){
-//                JNIInterface.JNIonDoubleTouch(0, ex, ey);
+                JUIInterface.JUIonDoubleTouchDown(ex, ey);
             }
             public void onOneFingerTripleTap(){}
             public void onOneFingerLongPress(){}

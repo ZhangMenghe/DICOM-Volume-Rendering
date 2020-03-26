@@ -67,6 +67,7 @@ void Mesh::InitQuad(GLuint &vao, GLuint &vbo, const unsigned int* indices, int i
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 }
+
 void Mesh::InitQuadWithTex(GLuint &vao, const float* vertices, int vertex_num, const unsigned int* indices, int indice_num){
 	glGenVertexArrays(1, &vao);
 	unsigned int VBO, EBO;
@@ -90,3 +91,4 @@ void Mesh::InitQuadWithTex(GLuint &vao, const float* vertices, int vertex_num, c
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
+

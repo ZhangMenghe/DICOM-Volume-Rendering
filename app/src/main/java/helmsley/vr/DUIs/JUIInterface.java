@@ -13,6 +13,7 @@ public class JUIInterface {
 
     //touch action
     public static native void JUIonSingleTouchDown(float x, float y);
+    public static native void JUIonDoubleTouchDown(float x, float y);
     public static native void JUIonTouchMove(float x, float y);
     public static native void JUIonScale(float sx, float sy);
     public static native void JUIonPan(float x, float y);

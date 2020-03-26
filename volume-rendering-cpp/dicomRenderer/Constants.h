@@ -3,7 +3,8 @@
 #include <string>
 namespace dvr{
     enum PARAM_BOOL{
-        CHECK_RAYCAST=0,
+        CHECK_ARENABLED=0,
+        CHECK_RAYCAST,
         CHECK_COLOR_TRANS,
         CHECK_CUTTING,
         CHECK_MASKON,
@@ -39,6 +40,24 @@ namespace dvr{
         SHADER_OPA_VIZ_VERT,
         SHADER_OPA_VIZ_FRAG,
         SHADER_END
+    };
+    enum ANDROID_SHADER_FILES{
+        SHADER_AR_BACKGROUND_SCREEN_VERT = SHADER_END,
+        SHADER_AR_BACKGROUND_SCREEN_FRAG,
+        SHADER_AR_POINTCLOUD_VERT,
+        SHADER_AR_POINTCLOUD_FRAG,
+        SHADER_AR_PLANE_VERT,
+        SHADER_AR_PLANE_FRAG,
+        SHADER_ANDROID_END
+    };
+
+    enum TEX_IDS{
+        VOLUME_TEX_ID=0,
+        BAKED_TEX_ID,
+        BAKED_RAY_ID,
+        SCREEN_QUAD_ID,
+        BACK_GROUND_AR_ID,
+        PLANE_AR_ID,
     };
 
     //UIs

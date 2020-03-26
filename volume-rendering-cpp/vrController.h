@@ -10,16 +10,11 @@
 #include "dicomRenderer/Constants.h"
 #include <unordered_map>
 #include <vector>
-
-class AAssetManager;
+#include <platforms/android/Jnis/jni_main.h>
 
 class vrController:public nEntrance{
 public:
-    static Texture *tex_volume, *tex_baked, *ray_baked;
     static Camera* camera;
-    static int VOLUME_TEX_ID, BAKED_TEX_ID, BAKED_RAY_ID;
-    static float _screen_w, _screen_h;
-
     static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
     static std::vector<std::string> shader_contents;
@@ -27,31 +22,36 @@ public:
     static glm::vec3 ScaleVec3_, PosVec3_;
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
-
-    static unsigned int mask_num_, mask_bits_;
+    static bool cutDirty;
+    unsigned int mask_num_, mask_bits_;
 
     inline static bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }
-
-    static glm::vec3 csphere_c;
-    static float csphere_radius;
-    static bool cutDirty;
-
     static vrController* instance();
+    static void setMMS(dvr::ModelMatStatus mms);
+    static void getMMS(dvr::ModelMatStatus& mms);
 
     vrController();
     ~vrController();
     void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims);
+    void onDrawOverlays();
+    Texture* getTex(dvr::TEX_IDS id){
+        if(id == dvr::BAKED_TEX_ID) return tex_baked;
+        return ray_baked;
+    }
 
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
+    void onViewChange(int rot, int width, int height);
     void onDraw();
     void onReset();
+    void onPause();
     void onDestroy();
+    void onResume(void* env, void* context, void* activity);
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);
@@ -61,25 +61,30 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
 private:
     static vrController* myPtr_;
+
+  //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
-    glm::fvec2 Mouse_old = glm::fvec2(.0);
-    bool volume_model_dirty = true;
-
+    //Shader
     Shader* bakeShader_ = nullptr;
 
+    //Textures
+    Texture *tex_volume= nullptr, *tex_baked = nullptr, *ray_baked = nullptr;
+  
     //volume datas
     glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;
 
-    void updateVolumeModelMat(){
-        ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
-                     * RotateMat_
-                     * glm::scale(glm::mat4(1.0), ScaleVec3_);
-    }
-    void precompute();
+    //ui
+    glm::fvec2 Mouse_old = glm::fvec2(.0);
+    float _screen_w, _screen_h;
 
+    //flags
+    bool volume_model_dirty = true;
+
+    void updateVolumeModelMat();
+    void precompute();
 };
 #endif

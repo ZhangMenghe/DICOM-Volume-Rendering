@@ -3,36 +3,43 @@
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr; Texture* vrController::ray_baked = nullptr;
-int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1, vrController::BAKED_RAY_ID = 2;
-float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
-std::vector<std::string> vrController::shader_contents = std::vector<std::string>(14);
+std::vector<std::string> vrController::shader_contents;
 
+//model mats
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
 glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
-bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true;
 
-glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
-float vrController::csphere_radius = 0.5f;
-bool vrController::cutDirty = true;
-unsigned int vrController::mask_num_ = 0; unsigned int vrController::mask_bits_ = 0;
-
+//flags
+bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true, vrController::cutDirty = true;
 
 vrController* vrController::instance(){
+    if(!myPtr_) myPtr_ = new vrController;
     return myPtr_;
+}
+void vrController::setMMS(dvr::ModelMatStatus mms){
+    ScaleVec3_ = mms.scaleVec;
+    RotateMat_ = mms.rotMat;
+    PosVec3_ = mms.posVec;
+    ModelMat_ =  mms.modelMat;
+}
+void vrController::getMMS(dvr::ModelMatStatus& mms){
+    mms.scaleVec = ScaleVec3_;
+    mms.rotMat = RotateMat_;
+    mms.posVec = PosVec3_;
+    mms.modelMat =ModelMat_;
+}
+vrController::vrController(){
+    shader_contents = std::vector<std::string>(SHADER_ANDROID_END);
+//    onReset();
+    myPtr_ = this;
 }
 vrController::~vrController(){
 }
 
-vrController::vrController(){
-    camera = new Camera;
-    myPtr_ = this;
-    onReset();
-}
 void vrController::onReset() {
     ScaleVec3_ = DEFAULT_SCALE;
     RotateMat_ = DEFAULT_ROTATE;
@@ -85,7 +92,7 @@ void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
     //todo: bugs for raycast mode to draw directly
     raycastRenderer_ = new raycastRenderer;
-
+  
     funcRenderer_ = new FuncRenderer;
     funcRenderer_->CreateFunction(COLOR_BAR);
     funcRenderer_->CreateFunction(OPACITY_FUN);
@@ -96,6 +103,9 @@ void vrController::onViewChange(int width, int height){
     _screen_w = width; _screen_h = height;
     glClear(GL_COLOR_BUFFER_BIT);
 }
+void vrController::onViewChange(int rot, int width, int height){
+    onViewChange(width, height);
+}
 void vrController::onDraw() {
     if(!tex_volume) return;
 
@@ -105,12 +115,15 @@ void vrController::onDraw() {
         texvrRenderer_->onCuttingChange(param_tex[dvr::TT_CUTTING_TEX]);
         raycastRenderer_->onCuttingChange(param_ray[dvr::TR_CUTTING_RAY]);
     }
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
 
-    if(isRayCasting())  raycastRenderer_->Draw();
-    else texvrRenderer_->Draw();
-    funcRenderer_->Draw();
+    if(isRayCasting()){
+        raycastRenderer_->dirtyPrecompute();
+        raycastRenderer_->Draw();
+    }else {
+        texvrRenderer_->dirtyPrecompute();
+        texvrRenderer_->Draw();
+    }
 }
 
 void vrController::onTouchMove(float x, float y) {
@@ -208,8 +221,22 @@ void vrController::precompute(){
 void vrController::onDestroy(){
     //todo: do sth
 }
+void vrController::onPause(){
+//    ar_controller_->onPause();
+}
+void vrController::onResume(void* env, void* context, void* activity){
+//    ar_controller_->onResume(env, context, activity);
+}
 void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content){
     if(fid < dvr::SHADER_END)
         shader_contents[fid] = content;
+}
+void vrController::onDrawOverlays(){
+    funcRenderer_->Draw();
+}
+void vrController::updateVolumeModelMat(){
+    ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
+                 * RotateMat_
+                 * glm::scale(glm::mat4(1.0), ScaleVec3_);
 }
 

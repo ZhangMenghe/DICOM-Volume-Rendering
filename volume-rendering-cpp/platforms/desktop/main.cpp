@@ -5,6 +5,7 @@
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
 #include "utils/fileLoader.h"
+#include <dicomRenderer/screenQuad.h>
 GLFWwindow* window;
 dicomLoader loader_;
 uiController ui_;
@@ -46,7 +47,15 @@ void onCreated(){
 	}
 }
 void onDraw(){
+	glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+	//order matters
+    screenQuad::instance()->Clear();
+	
 	controller_.onDraw();
+	screenQuad::instance()->Draw();
+
+	controller_.onDrawOverlays();
 }
 void onViewChange(int width, int height){
 	controller_.onViewChange(width, height);
