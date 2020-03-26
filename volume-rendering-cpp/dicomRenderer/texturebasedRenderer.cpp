@@ -4,7 +4,7 @@
 #include "screenQuad.h"
 
 texvrRenderer::texvrRenderer(bool screen_baked)
-:DRAW_BAKED(screen_baked){
+        :DRAW_BAKED(screen_baked){
     //program
     shader_ = new Shader();
     if(!shader_->AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT])
@@ -13,11 +13,9 @@ texvrRenderer::texvrRenderer(bool screen_baked)
         LOGE("TextureBas===Failed to create texture based shader program===");
     onCuttingChange(.0f);
 }
-void texvrRenderer::init_vertices(){
-    dimensions = int(vrController::VOL_DIMS.z * DENSE_FACTOR);
-    if(dimensions == 0) return;
 
-    dimension_inv = 1.0f / dimensions;
+void texvrRenderer::init_vertices(){
+    if(dimensions == 0) return;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
     float mappedZVal = -scale_inv, zTex = .0f;
@@ -58,57 +56,54 @@ void texvrRenderer::init_vertices(){
     glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute.
     b_init_successful = true;
 }
+//BE SUPER CAUTIOUS TO CHANGE!
 void texvrRenderer::draw_scene(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glEnable(GL_DEPTH_TEST);
 
-    if(!vrController::param_bool[dvr::CHECK_MASKON]){
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glEnable(GL_DEPTH_TEST);
-    }
     GLuint sp = shader_->Use();
 
     glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
     Shader::Uniform(sp, "uSampler_baked", vrController::BAKED_TEX_ID);
+    Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * vrController::ModelMat_);
 
-    if(vrController::ROTATE_AROUND_CUBE)
-        Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat());
-    else
-        Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat()*vrController::ModelMat_);
-
+    //for backface rendering! don't erase
     glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
     if(dir.z < 0) glFrontFace(GL_CCW);
-    else  glFrontFace(GL_CW);
+    else glFrontFace(GL_CW);
+
     glBindVertexArray(vao_slice); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
 
     shader_->UnUse();
-
     glDisable(GL_BLEND);
-    if(!vrController::param_bool[dvr::CHECK_MASKON]){
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-    }
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
 }
+
 void texvrRenderer::Draw(){
     if(!b_init_successful) init_vertices();
-    if(DRAW_BAKED) {two_pass_draw(); return;}
+    if(DRAW_BAKED) {draw_baked(); return;}
     draw_scene();
 }
+
 void texvrRenderer::onCuttingChange(float percent){
     int cut_id = int(dimensions * percent);
     GLuint sp = shader_->Use();
-        Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
+    Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
     shader_->UnUse();
 }
+
 void texvrRenderer::updatePrecomputation(GLuint sp) {
     Shader::Uniform(sp,"uOpacitys.overall", vrController::param_tex[dvr::TT_OVERALL]);
     Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_tex[dvr::TT_LOWEST]);
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_tex[dvr::TT_CUTOFF]);
 }
 
-void texvrRenderer::two_pass_draw() {
+void texvrRenderer::draw_baked() {
     if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     //render to texture
@@ -121,3 +116,4 @@ void texvrRenderer::two_pass_draw() {
     screenQuad::instance()->Draw();
     baked_dirty_ = false;
 }
+void texvrRenderer::setDimension(int dims){dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;}
