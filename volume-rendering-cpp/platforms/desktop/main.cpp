@@ -36,6 +36,7 @@ void onCreated(){
 	setupShaderContents(&controller_);
 	ui_.InitTuneParam();
 	ui_.InitCheckParam();
+	ui_.setMaskBits(4, 30);
 	controller_.onViewCreated();
 
 	//load data
