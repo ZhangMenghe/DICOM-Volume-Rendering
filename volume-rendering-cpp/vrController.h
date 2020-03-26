@@ -10,6 +10,7 @@
 #include "dicomRenderer/Constants.h"
 #include <unordered_map>
 #include <vector>
+#include <platforms/android/Jnis/jni_main.h>
 
 class vrController:public nEntrance{
 public:
@@ -28,8 +29,9 @@ public:
     inline static bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }
-
     static vrController* instance();
+    static void setMMS(dvr::ModelMatStatus mms);
+    static void getMMS(dvr::ModelMatStatus& mms);
 
     vrController();
     ~vrController();

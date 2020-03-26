@@ -69,6 +69,7 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     new assetLoader(AAssetManager_fromJava(env, asset_manager));
 
     nativeAddr =  getNativeClassAddr(new vrController());
+    vrController::camera = &virtualCam;
     setupShaderContents();
     return nativeAddr;
 }

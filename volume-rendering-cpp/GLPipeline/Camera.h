@@ -3,12 +3,13 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/rotate_vector.hpp>>
+#include <glm/gtx/rotate_vector.hpp>
 
 class Camera{
     glm::mat4 _viewMat, _projMat;
     glm::vec3 _eyePos, _center, _up, _front, _right;
     glm::mat4 pose_;
+    const char* name_;
     float fov;
 
     const float NEAR_PLANE = 1.8f;//as close as possible
@@ -27,7 +28,8 @@ class Camera{
         pose_ = glm::translate(glm::mat4(1.0), _eyePos);
     }
 public:
-    Camera(){
+    Camera(const char* cam_name)
+    :name_(cam_name){
         Reset();
     }
     void setProjMat(int screen_width, int screen_height){

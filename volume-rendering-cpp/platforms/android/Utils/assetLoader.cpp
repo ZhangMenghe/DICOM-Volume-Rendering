@@ -2,6 +2,7 @@
 #include <platforms/platform.h>
 #include <Jnis/jni_interface.h>
 #include <sstream>
+#include <vector>
 assetLoader* assetLoader::_myPtr = nullptr;
 
 assetLoader::assetLoader(AAssetManager * const assetManager):
