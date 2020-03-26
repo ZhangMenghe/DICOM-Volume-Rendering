@@ -21,6 +21,7 @@ void raycastRenderer::Draw() {
     else if(vrController::param_bool[dvr::CHECK_ARENABLED]) draw_to_texture();
     else draw_scene();
 }
+
 void raycastRenderer::draw_scene() {
    glEnable(GL_BLEND);
    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -107,7 +108,6 @@ void raycastRenderer::draw_baked(){
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * dim_scale_mat);
-
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
 //    if(vrController::param_bool[dvr::CHECK_ARENABLED])
         Shader::Uniform(sp, "u_CamToWorld", vrController::camera->getCameraPose());
@@ -140,5 +140,6 @@ void raycastRenderer::draw_to_texture(){
     baked_dirty_ = false;
 }
 void raycastRenderer::setDimension(int dims){
-    dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0, 1.0, dims / 200.0f));
+    dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(.75f, 0.75f, dims / 200.0f));
 }
+

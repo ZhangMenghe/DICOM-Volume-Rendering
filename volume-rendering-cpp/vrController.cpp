@@ -38,8 +38,8 @@ vrController::vrController(){
     myPtr_ = this;
 }
 vrController::~vrController(){
-//    std::cout<<"delete controller"<<std::endl;
 }
+
 void vrController::onReset() {
     ScaleVec3_ = DEFAULT_SCALE;
     RotateMat_ = DEFAULT_ROTATE;
@@ -57,7 +57,6 @@ void vrController::assembleTexture(GLubyte * data, int nc){
     uint16_t tm;
     //fuse volume data
     for(auto i=0, shift = 0; i<vsize; i++, shift+=nc) {
-
         vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
         tm = (nc==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
         vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
@@ -90,10 +89,10 @@ void vrController::updateTexture(GLubyte* data){
     baked_dirty_ = true;
 }
 void vrController::onViewCreated(){
-    //!!!todo:bugs on no baking
-    texvrRenderer_ = new texvrRenderer(true);
-    raycastRenderer_ = new raycastRenderer(true);
-
+    texvrRenderer_ = new texvrRenderer;
+    //todo: bugs for raycast mode to draw directly
+    raycastRenderer_ = new raycastRenderer;
+  
     funcRenderer_ = new FuncRenderer;
     funcRenderer_->CreateFunction(COLOR_BAR);
     funcRenderer_->CreateFunction(OPACITY_FUN);

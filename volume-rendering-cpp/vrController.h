@@ -20,7 +20,6 @@ public:
     static std::vector<std::string> shader_contents;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
-
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
     static bool cutDirty;
@@ -63,7 +62,7 @@ public:
 private:
     static vrController* myPtr_;
 
-    //renderers
+  //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
@@ -73,7 +72,7 @@ private:
 
     //Textures
     Texture *tex_volume= nullptr, *tex_baked = nullptr, *ray_baked = nullptr;
-
+  
     //volume datas
     glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;
