@@ -1,7 +1,8 @@
 #version 310 es
 
 #pragma multi_compile UPDATE_RAY_BAKED
-#pragma multi_compile SHOW_ORGANS TRANSFER_COLOR
+#pragma multi_compile SHOW_ORGANS
+#pragma multi_compile TRANSFER_COLOR
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 
 #extension GL_EXT_shader_io_blocks:require
