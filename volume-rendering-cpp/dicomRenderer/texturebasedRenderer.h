@@ -22,11 +22,12 @@ private:
     //for screen baking
     bool baked_dirty_ = true;
     void init_vertices();
-    void two_pass_draw();
     void draw_scene();
+    void draw_baked();
 
 public:
     texvrRenderer(bool screen_baked = true);
+    void setDimension(int dims);
     void onCuttingChange(float percent);
     void Draw();
     void updatePrecomputation(GLuint sp);

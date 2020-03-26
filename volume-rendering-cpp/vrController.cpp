@@ -14,7 +14,6 @@ std::vector<std::string> vrController::shader_contents = std::vector<std::string
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
 glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
-glm::uvec3 vrController::VOL_DIMS = glm::uvec3(0);
 bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true;
 
 glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
@@ -27,14 +26,9 @@ vrController* vrController::instance(){
     return myPtr_;
 }
 vrController::~vrController(){
-//    std::cout<<"delete controller"<<std::endl;
 }
 
-vrController::vrController(AAssetManager *assetManager):
-        _asset_manager(assetManager){
-//    #ifdef __ANDROID__
-//        new assetLoader(assetManager);
-//    #endif
+vrController::vrController(){
     camera = new Camera;
     myPtr_ = this;
     onReset();
@@ -49,12 +43,13 @@ void vrController::setVolumeConfig(int width, int height, int dims){
     VOL_DIMS = glm::uvec3(width, height, dims);
 }
 void vrController::assembleTexture(GLubyte * data, int nc){
+    texvrRenderer_->setDimension(VOL_DIMS.z);
+    raycastRenderer_->setDimension(VOL_DIMS.z);
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     vol_data = new uint32_t[vsize];
     uint16_t tm;
     //fuse volume data
     for(auto i=0, shift = 0; i<vsize; i++, shift+=nc) {
-
         vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
         tm = (nc==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
         vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
@@ -88,6 +83,7 @@ void vrController::updateTexture(GLubyte* data){
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
+    //todo: bugs for raycast mode to draw directly
     raycastRenderer_ = new raycastRenderer;
 
     funcRenderer_ = new FuncRenderer;

@@ -11,9 +11,6 @@
 #include <unordered_map>
 #include <vector>
 
-#ifdef __ANDROID
-    #include <Jnis/jni_main.h>
-#endif
 class AAssetManager;
 
 class vrController:public nEntrance{
@@ -28,7 +25,6 @@ public:
     static std::vector<std::string> shader_contents;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
-    static glm::uvec3 VOL_DIMS;
     static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
 
@@ -44,7 +40,7 @@ public:
 
     static vrController* instance();
 
-    vrController(AAssetManager *assetManager = nullptr);
+    vrController();
     ~vrController();
     void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
@@ -65,7 +61,6 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
 private:
     static vrController* myPtr_;
-    AAssetManager* _asset_manager;
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
@@ -74,6 +69,9 @@ private:
     bool volume_model_dirty = true;
 
     Shader* bakeShader_ = nullptr;
+
+    //volume datas
+    glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;
 
     void updateVolumeModelMat(){
