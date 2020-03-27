@@ -1,7 +1,6 @@
 #ifndef DICOM_VOLUME_RENDERING_SCREENQUAD_H
 #define DICOM_VOLUME_RENDERING_SCREENQUAD_H
 
-
 #include <GLPipeline/Shader.h>
 #include <GLPipeline/Texture.h>
 
@@ -23,6 +22,4 @@ public:
     Texture* getTex(){ return qtex_;}
     glm::vec2 getTexSize(){return glm::vec2(tex_width, tex_height);}
 };
-
-
 #endif //DICOM_VOLUME_RENDERING_SCREENQUAD_H

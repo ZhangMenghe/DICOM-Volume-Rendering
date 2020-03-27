@@ -52,14 +52,11 @@ namespace dvr{
     };
 
     enum TEX_IDS{
-        VOLUME_TEX_ID=0,
-        BAKED_TEX_ID,
-        BAKED_RAY_ID,
-        SCREEN_QUAD_ID,
+        BAKED_TEX_ID=0,
+        SCREEN_QUAD_TEX_ID,
         BACK_GROUND_AR_ID,
         PLANE_AR_ID,
     };
-
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;

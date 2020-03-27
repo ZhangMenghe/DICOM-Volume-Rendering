@@ -50,7 +50,7 @@ void uiController::InitCheckParam(){
         "Raycasting",
         "Color Transfer",
         "Cutting",
-        "MaskOn",
+        "ShowMask",
         "Freeze Volume"
     };
     
@@ -103,4 +103,9 @@ void uiController::setCheck(const char*key, bool value){
 }
 void uiController::setCuttingPlane(int id, float value, bool freeze_plane){
 
+}
+void uiController::setMaskBits(int num, unsigned int mbits){
+    vrController::instance()->mask_num_ = (unsigned int)num;
+    vrController::instance()->mask_bits_ = (unsigned int)mbits;
+    vrController::baked_dirty_ = true;
 }

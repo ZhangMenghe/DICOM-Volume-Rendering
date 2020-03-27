@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.4.1)
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     set(CMAKE_CXX_STANDARD 14)
-set(DEFAULT_BUILD_TYPE "Debug")
+#    set(CMAKE_BUILD_TYPE "Debug")
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
     set(OpenGL_LIBS

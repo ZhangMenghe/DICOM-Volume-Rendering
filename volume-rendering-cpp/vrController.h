@@ -10,6 +10,7 @@
 #include "dicomRenderer/Constants.h"
 #include <unordered_map>
 #include <vector>
+
 #include <platforms/android/Jnis/jni_main.h>
 
 class vrController:public nEntrance{
@@ -20,14 +21,10 @@ public:
     static std::vector<std::string> shader_contents;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
-    static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
     static bool cutDirty;
     unsigned int mask_num_, mask_bits_;
-
-    inline static bool isRayCasting(){
-        return param_bool[dvr::CHECK_RAYCAST];
-    }
+    
     static vrController* instance();
     static void setMMS(dvr::ModelMatStatus mms);
     static void getMMS(dvr::ModelMatStatus& mms);
@@ -59,10 +56,11 @@ public:
     void onPan(float x, float y);
 
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
+    GLuint getBakedTex(){return tex_baked->GLTexture();}
 private:
     static vrController* myPtr_;
 
-  //renderers
+    //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
@@ -71,8 +69,8 @@ private:
     Shader* bakeShader_ = nullptr;
 
     //Textures
-    Texture *tex_volume= nullptr, *tex_baked = nullptr, *ray_baked = nullptr;
-  
+    Texture *tex_volume = nullptr, *tex_baked = nullptr;
+    
     //volume datas
     glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;
@@ -83,6 +81,9 @@ private:
 
     //flags
     bool volume_model_dirty = true;
+    bool isRayCasting(){
+        return param_bool[dvr::CHECK_RAYCAST];
+    }
 
     void updateVolumeModelMat();
     void precompute();

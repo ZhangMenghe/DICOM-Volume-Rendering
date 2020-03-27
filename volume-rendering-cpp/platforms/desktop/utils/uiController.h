@@ -19,6 +19,7 @@ public:
     void setTuneParam(int id, const char* key, float value);
     void setCheck(const char*key, bool value);
     void setCuttingPlane(int id, float value, bool freeze_plane);
+    void setMaskBits(int num, unsigned int mbits);
 
 };
 #endif

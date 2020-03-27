@@ -1,6 +1,5 @@
 #version 310 es
 
-#pragma multi_compile UPDATE_RAY_BAKED
 #pragma multi_compile SHOW_ORGANS
 #pragma multi_compile TRANSFER_COLOR
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
@@ -12,8 +11,7 @@ precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 layout(binding = 0, r32ui)readonly uniform mediump uimage3D srcTex;
-layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex_tex;
-layout(binding = 2, rgba16ui)writeonly uniform mediump uimage3D destTex_ray;
+layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex;
 
 //Uniforms for texture_baked
 struct OpacityAdj{
@@ -95,11 +93,6 @@ void main(){
     uvec4 sample_color = Sample(storePos);
     uint alpha = UpdateOpacityAlpha(sample_color.a);
     uvec4 ufc = post_process(uvec4(sample_color.rgb, alpha));
-
-    #ifdef UPDATE_RAY_BAKED
-        imageStore(destTex_ray, storePos, ufc);
-    #else
-        imageStore(destTex_tex, storePos, vec4(ufc) * 0.003921);
-    #endif
+    imageStore(destTex, storePos, vec4(ufc) * 0.003921);
 }
 
