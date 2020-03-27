@@ -1,7 +1,6 @@
 #version 310 es
 
 #pragma multi_compile CUTTING_PLANE
-#pragma multi_compile ENABLE_AR
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -10,7 +9,8 @@ precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 layout(binding = 0, rgba8)readonly uniform mediump image3D srcTex;
-layout(binding = 1, rgba8)writeonly uniform mediump image2D destTex;
+layout(binding = 1, rgba8)readonly uniform mediump image2D bgTex;
+layout(binding = 2, rgba8)writeonly uniform mediump image2D destTex;
 
 uniform vec2 u_con_size;
 uniform float u_fov;
@@ -92,10 +92,7 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
 vec4 getBackground(ivec2 pos){
-    #ifdef ENABLE_AR
-        return imageLoad(bgTex, pos);
-    #endif
-    return vec4(.0);
+    return imageLoad(bgTex, pos);
 }
 vec4 tracing(float u, float v, ivec2 spos){
     float tangent = tan(u_fov / 2.0); // angle in radians

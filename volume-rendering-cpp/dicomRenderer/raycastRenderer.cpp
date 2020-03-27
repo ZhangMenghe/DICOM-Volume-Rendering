@@ -86,23 +86,20 @@ void raycastRenderer::draw_baked(){
 
     if(vrController::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
     else cshader_->DisableKeyword("CUTTING_PLANE");
-    cshader_->EnableKeyword("ENABLE_AR");
 
     GLuint sp = cshader_->Use();
     Texture* ray_baked_screen  = screenQuad::instance()->getTex();
     
     glBindImageTexture(0, vrController::instance()->getBakedTex(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);//GL_RGBA8);
-    glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, screenQuad::instance()->getTex()->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(2, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
     glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * dim_scale_mat);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
-//    if(vrController::param_bool[dvr::CHECK_ARENABLED])
-        Shader::Uniform(sp, "u_CamToWorld", vrController::camera->getCameraPose());
-//    else
-//        Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), cam_world_pos));
+    Shader::Uniform(sp, "u_CamToWorld", vrController::camera->getCameraPose());
 
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "usample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
@@ -113,13 +110,11 @@ void raycastRenderer::draw_baked(){
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);//GL_RGBA8);
-    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     cshader_->UnUse();
     baked_dirty_ = false;
-
-    //todo: draw screen quad
-    screenQuad::instance()->Draw();
 }
 void raycastRenderer::draw_to_texture(){
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
