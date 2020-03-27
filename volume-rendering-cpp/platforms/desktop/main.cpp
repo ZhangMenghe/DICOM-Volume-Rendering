@@ -33,7 +33,6 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 void onCreated(){
-	setupShaderContents(&controller_);
 	ui_.InitTuneParam();
 	ui_.InitCheckParam();
 	ui_.setMaskBits(4, 30);
@@ -57,7 +56,6 @@ void onDestroy(){
 }
 
 bool InitWindow(){
-	
 	// Initialise GLFW
 	if( !glfwInit() ){
 		fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -109,6 +107,7 @@ void setupApplication(){
 }
 
 int main(int argc, char** argv){
+	setupShaderContents(&controller_);
 	
 	if(!InitWindow()) return -1;
 

@@ -40,7 +40,10 @@ namespace dvr{
         SHADER_OPA_VIZ_FRAG,
         SHADER_END
     };
-
+    enum TEX_IDS{
+        BAKED_TEX_ID=0,
+        SCREEN_QUAD_TEX_ID,
+    };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
