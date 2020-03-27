@@ -13,28 +13,16 @@
 
 class vrController:public nEntrance{
 public:
-    static Texture *tex_volume, *tex_baked, *ray_baked;
     static Camera* camera;
-    static int VOLUME_TEX_ID, BAKED_TEX_ID, BAKED_RAY_ID;
-    static float _screen_w, _screen_h;
-
     static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
     static std::vector<std::string> shader_contents;
     static glm::mat4 ModelMat_, RotateMat_;
     static glm::vec3 ScaleVec3_, PosVec3_;
-    static bool ROTATE_AROUND_CUBE;
     static bool baked_dirty_;
-
-    static unsigned int mask_num_, mask_bits_;
-
-    inline static bool isRayCasting(){
-        return param_bool[dvr::CHECK_RAYCAST];
-    }
-
-    static glm::vec3 csphere_c;
-    static float csphere_radius;
     static bool cutDirty;
+
+    unsigned int mask_num_, mask_bits_;
 
     static vrController* instance();
 
@@ -57,20 +45,31 @@ public:
     void onPan(float x, float y);
 
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
+    GLuint getBakedTex(){return tex_baked->GLTexture();}
 private:
     static vrController* myPtr_;
+
+    //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     FuncRenderer* funcRenderer_ = nullptr;
 
-    glm::fvec2 Mouse_old = glm::fvec2(.0);
-    bool volume_model_dirty = true;
-
+    //Shader
     Shader* bakeShader_ = nullptr;
+
+    //Textures
+    Texture *tex_volume = nullptr, *tex_baked = nullptr;
 
     //volume datas
     glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;
+
+    //ui
+    glm::fvec2 Mouse_old = glm::fvec2(.0);
+    float _screen_w, _screen_h;
+
+    //flags
+    bool volume_model_dirty = true;
 
     void updateVolumeModelMat(){
         ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
@@ -78,6 +77,9 @@ private:
                      * glm::scale(glm::mat4(1.0), ScaleVec3_);
     }
     void precompute();
+    bool isRayCasting(){
+        return param_bool[dvr::CHECK_RAYCAST];
+    }
 
 };
 #endif

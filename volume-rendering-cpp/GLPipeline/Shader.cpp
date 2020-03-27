@@ -150,7 +150,7 @@ GLuint CompileShader(GLenum type, string content, vector<string> keywords) {
 
         vector<GLchar> info(maxLength);
         glGetShaderInfoLog(shader, maxLength, &maxLength, info.data());
-
+        LOGE("===shader compile error %s", info.data());
         string kw = "";
         for (const auto& it : keywords) kw += it + " ";
         glDeleteShader(shader);

@@ -1,11 +1,10 @@
 #include "vrController.h"
 #include <Utils/mathUtils.h>
+#include <dicomRenderer/screenQuad.h>
+
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-Texture * vrController::tex_volume= nullptr; Texture* vrController::tex_baked = nullptr; Texture* vrController::ray_baked = nullptr;
-int vrController::VOLUME_TEX_ID=0, vrController::BAKED_TEX_ID = 1, vrController::BAKED_RAY_ID = 2;
-float vrController::_screen_w= .0f; float vrController::_screen_h= .0f;
 
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
@@ -14,13 +13,9 @@ std::vector<std::string> vrController::shader_contents = std::vector<std::string
 glm::mat4 vrController::ModelMat_ = glm::mat4(1.0f);
 glm::mat4 vrController::RotateMat_ = glm::mat4(1.0f);
 glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm::vec3(.0f);
-bool vrController::ROTATE_AROUND_CUBE = false, vrController::baked_dirty_ = true;
+bool vrController::baked_dirty_ = true;
 
-glm::vec3 vrController::csphere_c = glm::vec3(-1.2, -0.5, 0.5); //volume extend 0.5
-float vrController::csphere_radius = 0.5f;
 bool vrController::cutDirty = true;
-unsigned int vrController::mask_num_ = 0; unsigned int vrController::mask_bits_ = 0;
-
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -57,17 +52,13 @@ void vrController::assembleTexture(GLubyte * data, int nc){
     }
     tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vol_data);
 
-    auto* rb_data = new uint16_t[vsize * 4];
-    ray_baked = new Texture(GL_RGBA16UI, GL_RGBA_INTEGER, GL_UNSIGNED_SHORT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, rb_data);
-    delete[]rb_data;
-
     auto* tb_data = new GLubyte[vsize * 4];
     tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, tb_data);
     delete[]tb_data;
 }
 
 void vrController::updateTexture(GLubyte* data){
-    if(!vol_data)   return;
+    if(!vol_data) return;
     auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
     uint16_t tm;
     //fuse volume data
@@ -94,6 +85,7 @@ void vrController::onViewChange(int width, int height){
     camera->setProjMat(width, height);
     _screen_w = width; _screen_h = height;
     glClear(GL_COLOR_BUFFER_BIT);
+    screenQuad::instance()->onScreenSizeChange(width, height);
 }
 void vrController::onDraw() {
     if(!tex_volume) return;
@@ -123,11 +115,6 @@ void vrController::onTouchMove(float x, float y) {
     xoffset *= MOUSE_ROTATE_SENSITIVITY;
     yoffset *= -MOUSE_ROTATE_SENSITIVITY;
 
-    if(ROTATE_AROUND_CUBE){
-        if (fabsf(xoffset / _screen_w) > fabsf(yoffset / _screen_h)) camera->rotateCamera(3, ModelMat_[3], xoffset);
-        else camera->rotateCamera(2, ModelMat_[3], yoffset);
-        return;
-    }
     if(param_bool[dvr::CHECK_FREEZE_VOLUME]){
         cuttingController::instance()->onRotate(xoffset, yoffset);
         return;
@@ -171,9 +158,6 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
     }
 
-    if(isRayCasting()) bakeShader_->EnableKeyword("UPDATE_RAY_BAKED");
-    else bakeShader_->DisableKeyword("UPDATE_RAY_BAKED");
-
     if(param_bool[dvr::CHECK_COLOR_TRANS]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
     else bakeShader_->DisableKeyword("TRANSFER_COLOR");
 
@@ -181,9 +165,8 @@ void vrController::precompute(){
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
 
     GLuint sp = bakeShader_->Use();
-    glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);//GL_RGBA16UI);//GL_RGBA8);
+    glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glBindImageTexture(2, ray_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16UI);//GL_RGBA16UI);//GL_RGBA8);
 
     Shader::Uniform(sp, "u_maskbits", vrController::mask_bits_);
     Shader::Uniform(sp, "u_organ_num", vrController::mask_num_);
@@ -198,7 +181,6 @@ void vrController::precompute(){
 
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);//GL_RGBA16UI);//GL_RGBA8);
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
-    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA16UI);//GL_RGBA16UI);//GL_RGBA8);
 
     bakeShader_->UnUse();
     baked_dirty_ = false;
