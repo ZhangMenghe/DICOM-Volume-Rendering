@@ -11,8 +11,6 @@
 #include <unordered_map>
 #include <vector>
 
-class AAssetManager;
-
 class vrController:public nEntrance{
 public:
     static Texture *tex_volume, *tex_baked, *ray_baked;

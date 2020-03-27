@@ -96,10 +96,10 @@ void main(){
     uint alpha = UpdateOpacityAlpha(sample_color.a);
     uvec4 ufc = post_process(uvec4(sample_color.rgb, alpha));
 
-    #ifdef UPDATE_RAY_BAKED
+//    #ifdef UPDATE_RAY_BAKED
         imageStore(destTex_ray, storePos, ufc);
-    #else
+//    #else
         imageStore(destTex_tex, storePos, vec4(ufc) * 0.003921);
-    #endif
+//    #endif
 }
 

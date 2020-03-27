@@ -15,64 +15,51 @@ DRAW_BAKED(screen_baked){
         LOGE("Raycast===Failed to create raycast shader program===");
     cutter_ = new cuttingController;
 }
-void raycastRenderer::draw_baked(){
-    precompute();
-    screenQuad::instance()->Draw();
+void raycastRenderer::Draw() {
+    if (DRAW_BAKED) draw_baked();
+    else draw_scene();
 }
-void raycastRenderer::Draw(){
-    if(DRAW_BAKED) {draw_baked(); return;}
 
+void raycastRenderer::draw_scene(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//    glEnable(GL_CULL_FACE);
-//    glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     //Update cutting plane and draw
     cutter_->UpdateAndDraw();
-
     GLuint sp = shader_->Use();
-    if(vrController::ray_baked){
-        glActiveTexture(GL_TEXTURE0+vrController::BAKED_RAY_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::ray_baked->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::BAKED_RAY_ID);
-    }else{
-        glActiveTexture(GL_TEXTURE0+vrController::VOLUME_TEX_ID);
-        glBindTexture(GL_TEXTURE_3D, vrController::tex_volume->GLTexture());
-        Shader::Uniform(sp, "uSampler_tex", vrController::VOLUME_TEX_ID);
-    }
+
+    glActiveTexture(GL_TEXTURE0 + vrController::BAKED_TEX_ID);
+    glBindTexture(GL_TEXTURE_3D, vrController::tex_baked->GLTexture());
+    Shader::Uniform(sp, "uSampler", vrController::BAKED_TEX_ID);
+
     Shader::Uniform(sp, "uProjMat", vrController::camera->getProjMat());
-    Shader::Uniform(sp,"uViewMat", vrController::camera->getViewMat());
-    Shader::Uniform(sp,"uModelMat", vrController::ModelMat_);
+    Shader::Uniform(sp, "uViewMat", vrController::camera->getViewMat());
+    Shader::Uniform(sp, "uModelMat", vrController::ModelMat_);
 
-        glm::mat4 model_inv = glm::inverse(vrController::ModelMat_* dim_scale_mat);
-    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv
-        *glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-    Shader::Uniform(sp,"uVolumeSize",
-                glm::vec3(vrController::tex_volume->Width(),
-                vrController::tex_volume->Height(),
-                vrController::tex_volume->Depth()));
-
-//    Shader::Uniform(sp,"ub_accumulate", vrController::param_bool_map["accumulate"]);
-    Shader::Uniform(sp,"ub_cuttingplane", vrController::param_bool[dvr::CHECK_CUTTING]);
-
+    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_* dim_scale_mat);
+    Shader::Uniform(sp, "uCamposObjSpace",
+            glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
+
+    if(vrController::param_bool[dvr::CHECK_CUTTING])shader_->EnableKeyword("CUTTING_PLANE");
+    else shader_->DisableKeyword("CUTTING_PLANE");
+
     cutter_->setCuttingParams(sp);
 
-    if(vrController::camera->getViewDirection().z <0)
-        glFrontFace(GL_CW);
-    else
-        glFrontFace(GL_CCW);
+    //for backface rendering! don't erase
+    glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
+    if(dir.z <= 0) glFrontFace(GL_CCW);
+    else glFrontFace(GL_CW);
 
-        glBindVertexArray(vao_cube_);
-        glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-        glBindVertexArray(0);
+    glBindVertexArray(vao_cube_);
+    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
     shader_->UnUse();
-
 
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
-//    glDisable(GL_CULL_FACE);
 }
 
 void raycastRenderer::onCuttingChange(float percent){
@@ -84,8 +71,8 @@ void raycastRenderer::updatePrecomputation(GLuint sp){
     Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_ray[dvr::TR_LOWEST]);
     Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_ray[dvr::TR_CUTOFF]);
 }
-void raycastRenderer::precompute(){
-    if(!baked_dirty_) return;
+void raycastRenderer::draw_baked(){
+    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
     if(!cshader_){
         cshader_ = new Shader;
         if(!cshader_->AddShader(GL_COMPUTE_SHADER, vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
@@ -121,6 +108,9 @@ void raycastRenderer::precompute(){
 
     cshader_->UnUse();
     baked_dirty_ = false;
+
+    //todo: draw screen quad
+    screenQuad::instance()->Draw();
 }
 void raycastRenderer::setDimension(int dims){
     dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(.75f, 0.75f, dims / 200.0f));
