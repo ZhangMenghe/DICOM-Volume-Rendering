@@ -103,7 +103,7 @@ void uiController::setCuttingPlane(int id, float value, bool freeze_plane){
 
 }
 void uiController::setMaskBits(int num, unsigned int mbits){
-    vrController::mask_num_ = (unsigned int)num;
-    vrController::mask_bits_ = (unsigned int)mbits;
+    vrController::instance()->mask_num_ = (unsigned int)num;
+    vrController::instance()->mask_bits_ = (unsigned int)mbits;
     vrController::baked_dirty_ = true;
 }
