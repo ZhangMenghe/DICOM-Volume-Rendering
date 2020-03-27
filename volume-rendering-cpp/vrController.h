@@ -24,7 +24,7 @@ public:
     static bool baked_dirty_;
     static bool cutDirty;
     unsigned int mask_num_, mask_bits_;
-    
+
     static vrController* instance();
 //    static void setMMS(dvr::ModelMatStatus mms);
 //    static void getMMS(dvr::ModelMatStatus& mms);
@@ -66,7 +66,7 @@ private:
 
     //Textures
     Texture *tex_volume = nullptr, *tex_baked = nullptr;
-    
+
     //volume datas
     glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;

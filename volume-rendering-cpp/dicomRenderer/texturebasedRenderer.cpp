@@ -67,7 +67,7 @@ void texvrRenderer::draw_scene(){
 
     glActiveTexture(GL_TEXTURE0 + dvr::BAKED_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
-
+  
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
     Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * vrController::ModelMat_);
 

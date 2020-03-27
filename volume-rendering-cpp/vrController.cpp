@@ -18,6 +18,7 @@ glm::vec3 vrController::ScaleVec3_ = glm::vec3(1.0f), vrController::PosVec3_=glm
 //flags
 bool vrController::baked_dirty_ = true, vrController::cutDirty = true;
 
+
 vrController* vrController::instance(){
     if(!myPtr_) myPtr_ = new vrController;
     return myPtr_;
