@@ -64,12 +64,12 @@ vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
 
     #define BINARY_SUBDIV tm = (t0 + t1) * .5; p = ro + rd * tm; if (Sample(p).a > .01) t1 = tm; else t0 = tm;
     BINARY_SUBDIV
-BINARY_SUBDIV
-BINARY_SUBDIV
-BINARY_SUBDIV
-#undef BINARY_SUBDIV
-t = tm;
-return Sample(p);
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    BINARY_SUBDIV
+    #undef BINARY_SUBDIV
+    t = tm;
+    return Sample(p);
 }
 vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     vec4 sum = vec4(.0);

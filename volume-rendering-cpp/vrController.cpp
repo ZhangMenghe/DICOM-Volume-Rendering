@@ -83,7 +83,6 @@ void vrController::updateTexture(GLubyte* data){
 }
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
-    //todo: bugs for raycast mode to draw directly
     raycastRenderer_ = new raycastRenderer;
 
     funcRenderer_ = new FuncRenderer;
