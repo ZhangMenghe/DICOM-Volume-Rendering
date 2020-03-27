@@ -16,14 +16,13 @@ screenQuad::screenQuad(){
 }
 void screenQuad::onScreenSizeChange(float width, float height){
     if(width == tex_width && tex_height == height) return;
-
+  
     tex_width = GLuint (width);
     tex_height = GLuint(height);
     auto vsize = tex_width* tex_height * 4;
     GLbyte * vdata = new GLbyte[vsize];
     memset(vdata, 0x00, vsize * sizeof(GLbyte));
     if(qtex_) delete qtex_;
-
     qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
 }
 void screenQuad::Draw(){
@@ -32,9 +31,11 @@ void screenQuad::Draw(){
 
     //render to screen
     GLuint sp = qshader_.Use();
+  
     glActiveTexture(GL_TEXTURE0 + dvr::SCREEN_QUAD_TEX_ID);
     glBindTexture(GL_TEXTURE_2D, qtex_->GLTexture());
     Shader::Uniform(sp, "uSampler", dvr::SCREEN_QUAD_TEX_ID);
+
     glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

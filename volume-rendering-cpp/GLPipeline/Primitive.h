@@ -49,12 +49,13 @@ const float cuboid_with_texture[48] = {//World
         0.5f,0.5f,-0.5f,    1.0f,1.0f,0.0f,
         -0.5f,0.5f,-0.5f,   0.0f,1.0f,0.0f,
 };
-const unsigned int cuboid_indices[36] = { 0,1,2,0,2,3,	//front
-                                          4,6,7,4,5,6,	//back
-                                          4,0,3,4,3,7,	//left
-                                          1,5,6,1,6,2,	//right
-                                          3,2,6,3,6,7,	//top
-                                          4,5,1,4,1,0,	//bottom
+const unsigned int cuboid_indices[36] = {
+        0,1,2,0,2,3,	//front
+        4,6,7,4,5,6,	//back
+        4,0,3,4,3,7,	//left
+        1,5,6,1,6,2,	//right
+        3,2,6,3,6,7,	//top
+        4,5,1,4,1,0,	//bottom
 };
 
 #endif

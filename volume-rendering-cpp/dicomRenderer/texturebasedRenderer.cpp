@@ -33,9 +33,9 @@ void texvrRenderer::init_vertices(){
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &vao_slice);
-    unsigned int VBO, EBO;
+    unsigned int VBO, ibo;
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    glGenBuffers(1, &ibo);
 
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray((GLuint)vao_slice);
@@ -43,12 +43,11 @@ void texvrRenderer::init_vertices(){
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * 4, quad_vertices_2d, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*6, quad_indices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
-
     glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
@@ -63,11 +62,12 @@ void texvrRenderer::draw_scene(){
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
-
+  
     GLuint sp = shader_->Use();
 
     glActiveTexture(GL_TEXTURE0 + dvr::BAKED_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
+  
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
     Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * vrController::ModelMat_);
 
@@ -75,7 +75,6 @@ void texvrRenderer::draw_scene(){
     glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
     if(dir.z < 0) glFrontFace(GL_CCW);
     else glFrontFace(GL_CW);
-
     glBindVertexArray(vao_slice); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
 
     shader_->UnUse();
@@ -86,8 +85,8 @@ void texvrRenderer::draw_scene(){
 
 void texvrRenderer::Draw(){
     if(!b_init_successful) init_vertices();
-    if(DRAW_BAKED) {draw_baked(); return;}
-    draw_scene();
+    if(DRAW_BAKED || vrController::param_bool[dvr::CHECK_ARENABLED]) draw_baked();
+    else draw_scene();
 }
 
 void texvrRenderer::onCuttingChange(float percent){
@@ -104,16 +103,14 @@ void texvrRenderer::updatePrecomputation(GLuint sp) {
 }
 
 void texvrRenderer::draw_baked() {
-    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
+    if(!baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
-    //render to texture
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    screenQuad::instance()->Draw();
     baked_dirty_ = false;
 }
 void texvrRenderer::setDimension(int dims){dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;}
