@@ -11,6 +11,8 @@
 #include <unordered_map>
 #include <vector>
 
+#include <platforms/android/Jnis/jni_main.h>
+
 class vrController:public nEntrance{
 public:
     static Camera* camera;
@@ -21,23 +23,32 @@ public:
     static glm::vec3 ScaleVec3_, PosVec3_;
     static bool baked_dirty_;
     static bool cutDirty;
-
     unsigned int mask_num_, mask_bits_;
-
+    
     static vrController* instance();
+    static void setMMS(dvr::ModelMatStatus mms);
+    static void getMMS(dvr::ModelMatStatus& mms);
 
     vrController();
     ~vrController();
     void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims);
+    void onDrawOverlays();
+    Texture* getTex(dvr::TEX_IDS id){
+        if(id == dvr::BAKED_TEX_ID) return tex_baked;
+        return ray_baked;
+    }
 
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
+    void onViewChange(int rot, int width, int height);
     void onDraw();
     void onReset();
+    void onPause();
     void onDestroy();
+    void onResume(void* env, void* context, void* activity);
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);
@@ -59,7 +70,7 @@ private:
 
     //Textures
     Texture *tex_volume = nullptr, *tex_baked = nullptr;
-
+    
     //volume datas
     glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;
@@ -70,16 +81,11 @@ private:
 
     //flags
     bool volume_model_dirty = true;
-
-    void updateVolumeModelMat(){
-        ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
-                     * RotateMat_
-                     * glm::scale(glm::mat4(1.0), ScaleVec3_);
-    }
-    void precompute();
     bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }
 
+    void updateVolumeModelMat();
+    void precompute();
 };
 #endif

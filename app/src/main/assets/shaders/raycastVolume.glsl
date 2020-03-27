@@ -1,6 +1,7 @@
 #version 310 es
 
 #pragma multi_compile CUTTING_PLANE
+#pragma multi_compile ENABLE_AR
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -19,7 +20,6 @@ uniform mat4 u_CamToWorld;
 
 uniform vec4 u_plane_color;
 uniform vec3 uCamposObjSpace;
-uniform float uViewDir;
 uniform float usample_step_inverse;
 struct Plane{
     vec3 p;
@@ -91,8 +91,13 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     }
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
-
-vec4 tracing(float u, float v){
+vec4 getBackground(ivec2 pos){
+    #ifdef ENABLE_AR
+        return imageLoad(bgTex, pos);
+    #endif
+    return vec4(.0);
+}
+vec4 tracing(float u, float v, ivec2 spos){
     float tangent = tan(u_fov / 2.0); // angle in radians
     float ar = (float(u_con_size.x) / u_con_size.y);
 
@@ -106,21 +111,23 @@ vec4 tracing(float u, float v){
     bool drawed_square=false; bool blocked_by_plane=false;
     //plane
     #ifdef CUTTING_PLANE
-    float t;
-    if(dot(uPlane.normal, -uCamposObjSpace) > .0){
-        t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
-        blocked_by_plane = (t <= intersect.x);
-        intersect.x = max(intersect.x, t);
-    }
-    else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
+        float t;
+        if(dot(uPlane.normal, -uCamposObjSpace) > .0){
+            t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
+            blocked_by_plane = (t <= intersect.x);
+            intersect.x = max(intersect.x, t);
+        }
+        else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-    drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
+        drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
 
-    if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
+        if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
     #endif
-    if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);
+    if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, getBackground(spos), u_plane_color.a):getBackground(spos);
 
     return Volume(ro + 0.5, rd, intersect.x, intersect.y);
+//    vec4 sampled = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+//    return (sampled.a<0.1)?getBackground(spos):sampled;
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
@@ -128,5 +135,5 @@ void main() {
     if ( cx >= u_con_size.x ||  cy >= u_con_size.y) return;
     cy = u_con_size.y - cy;
     vec2 uv = (vec2(cx, cy) + 0.5) / u_con_size * 2.0 - 1.0;
-    imageStore(destTex, ivec2(cx, cy), tracing(uv.x, uv.y));
+    imageStore(destTex, ivec2(cx, cy), tracing(uv.x, uv.y, ivec2(cx, cy)));
 }

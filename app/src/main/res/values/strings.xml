@@ -6,6 +6,8 @@
     <!--    <string name="DEFAULT_HOST">137.110.118.222</string>-->
     <string name="DEFAULT_PORT">23333</string>
 
+    <string name="ar_enable">true</string>
+
     <string name="cf_b_cache">true</string>
     <string name="cf_cache_folder_name">helmsley_cached</string>
     <string name="cf_config_name">pacs_local.txt</string>

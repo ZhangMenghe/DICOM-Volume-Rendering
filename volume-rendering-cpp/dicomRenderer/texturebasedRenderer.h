@@ -27,6 +27,7 @@ private:
 
 public:
     texvrRenderer(bool screen_baked = true);
+  
     void setDimension(int dims);
     void onCuttingChange(float percent);
     void Draw();
