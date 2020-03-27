@@ -22,18 +22,18 @@ vrController* vrController::instance(){
     if(!myPtr_) myPtr_ = new vrController;
     return myPtr_;
 }
-void vrController::setMMS(dvr::ModelMatStatus mms){
-    ScaleVec3_ = mms.scaleVec;
-    RotateMat_ = mms.rotMat;
-    PosVec3_ = mms.posVec;
-    ModelMat_ =  mms.modelMat;
-}
-void vrController::getMMS(dvr::ModelMatStatus& mms){
-    mms.scaleVec = ScaleVec3_;
-    mms.rotMat = RotateMat_;
-    mms.posVec = PosVec3_;
-    mms.modelMat =ModelMat_;
-}
+//void vrController::setMMS(dvr::ModelMatStatus mms){
+//    ScaleVec3_ = mms.scaleVec;
+//    RotateMat_ = mms.rotMat;
+//    PosVec3_ = mms.posVec;
+//    ModelMat_ =  mms.modelMat;
+//}
+//void vrController::getMMS(dvr::ModelMatStatus& mms){
+//    mms.scaleVec = ScaleVec3_;
+//    mms.rotMat = RotateMat_;
+//    mms.posVec = PosVec3_;
+//    mms.modelMat =ModelMat_;
+//}
 vrController::vrController(){
     shader_contents = std::vector<std::string>(SHADER_ANDROID_END);
 //    onReset();

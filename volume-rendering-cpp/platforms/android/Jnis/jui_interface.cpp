@@ -72,12 +72,12 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
 //            vrController::camera = value? &arCam : &virtualCam; //vrController::instance()->camera->Reset();
             if(value){
                 vrController::camera = &arCam;
-                vrController::getMMS(virtualMMS);
-                vrController::setMMS(arMMS);
+//                vrController::getMMS(virtualMMS);
+//                vrController::setMMS(arMMS);
             }else{
                 vrController::camera = &virtualCam;
-                vrController::getMMS(arMMS);
-                vrController::setMMS(virtualMMS);
+//                vrController::getMMS(arMMS);
+//                vrController::setMMS(virtualMMS);
             }
         }
         vrController::baked_dirty_ = true;

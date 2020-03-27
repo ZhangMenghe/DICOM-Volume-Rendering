@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <platforms/android/Jnis/jni_main.h>
+//#include <platforms/android/Jnis/jni_main.h>
 
 class vrController:public nEntrance{
 public:
@@ -26,8 +26,8 @@ public:
     unsigned int mask_num_, mask_bits_;
     
     static vrController* instance();
-    static void setMMS(dvr::ModelMatStatus mms);
-    static void getMMS(dvr::ModelMatStatus& mms);
+//    static void setMMS(dvr::ModelMatStatus mms);
+//    static void getMMS(dvr::ModelMatStatus& mms);
 
     vrController();
     ~vrController();
@@ -35,10 +35,6 @@ public:
     void updateTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims);
     void onDrawOverlays();
-    Texture* getTex(dvr::TEX_IDS id){
-        if(id == dvr::BAKED_TEX_ID) return tex_baked;
-        return ray_baked;
-    }
 
     /*Override*/
     void onViewCreated();
