@@ -69,11 +69,14 @@ void texvrRenderer::draw_scene(){
     glActiveTexture(GL_TEXTURE0 + dvr::BAKED_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
-    Shader::Uniform(sp,"uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * vrController::ModelMat_);
+
+    glm::mat4 modelmat = vrController::instance()->getModelMatrix();
+    Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * modelmat);
 
     //for backface rendering! don't erase
-    glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
-    if(dir.z < 0) glFrontFace(GL_CCW);
+    glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
+    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
+    if(glm::dot(vrController::camera->getViewDirection(), dir) < 0) glFrontFace(GL_CCW);
     else glFrontFace(GL_CW);
 
     glBindVertexArray(vao_slice); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);

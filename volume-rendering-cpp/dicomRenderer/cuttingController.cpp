@@ -13,11 +13,12 @@ cuttingController* cuttingController::instance(){
     return _mptr;
 }
 cuttingController::cuttingController(){
-    mat4 vm_inv = transpose(inverse(vrController::ModelMat_));
+    auto model_mat = vrController::instance()->getModelMatrix();
+    mat4 vm_inv = transpose(inverse(model_mat));
     update_plane_(vec3MatNorm(vm_inv, vrController::camera->getViewDirection()));
 
     p_point_ = p_start_;
-    p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
+    p_point_world = glm::vec3(model_mat* glm::vec4(p_point_,1.0f));
 
     update_modelMat_o();
 
@@ -40,7 +41,7 @@ void cuttingController::setCuttingParams(GLuint sp,bool includePoints){
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
     if(includePoints){
-        mat4 p2m_mat = inverse(vrController::ModelMat_)*p_p2w_mat;
+        mat4 p2m_mat = inverse(vrController::instance()->getModelMatrix())*p_p2w_mat;
         vec3 pms[3];int i=0;
         for(vec4 p: P_Points)
             pms[i++] = vec3(p2m_mat * p);
@@ -53,20 +54,22 @@ void cuttingController::setCuttingParams(GLuint sp,bool includePoints){
 }
 void cuttingController::Update(){
     update_modelMat_o();
+    auto model_mat = vrController::instance()->getModelMatrix();
+
     if(keep_cutting_position()){//keep it static
-        p_p2o_mat = glm::inverse(vrController::ModelMat_) * p_p2w_mat;
+        p_p2o_mat = glm::inverse(model_mat) * p_p2w_mat;
         update_plane_(rotateNormal(p_p2o_mat, glm::vec3(.0,.0,1.0)));
-        p_point_ = glm::vec3(glm::inverse(vrController::ModelMat_) * glm::vec4(p_point_world,1.0f));
+        p_point_ = glm::vec3(glm::inverse(model_mat) * glm::vec4(p_point_world,1.0f));
         if(cmove_value){
-            p_point_+=cmove_value * p_norm_;
+            p_point_ += cmove_value * p_norm_;
             p_p2o_mat = glm::translate(glm::mat4(1.0), cmove_value * p_norm_)*p_p2o_mat;
-            p_p2w_mat = vrController::ModelMat_ * p_p2o_mat;
-            p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
+            p_p2w_mat = model_mat * p_p2o_mat;
+            p_point_world = glm::vec3(model_mat * glm::vec4(p_point_,1.0f));
         }
     }
     else{
-        p_point_world = glm::vec3(vrController::ModelMat_ * glm::vec4(p_point_,1.0f));
-        p_p2w_mat = vrController::ModelMat_ * p_p2o_mat;
+        p_point_world = glm::vec3(model_mat * glm::vec4(p_point_,1.0f));
+        p_p2w_mat = model_mat * p_p2o_mat;
     }
 }
 
@@ -151,7 +154,7 @@ void cuttingController::update_plane_(glm::mat4 rotMat){
 }
 void cuttingController::update_plane_(glm::vec3 pNorm){
     p_norm_ = pNorm;
-    mat4 vm_inv = transpose(inverse(vrController::ModelMat_));
+    mat4 vm_inv = transpose(inverse(vrController::instance()->getModelMatrix()));
     p_rotate_mat_ = rotMatFromDir(pNorm);
     glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
     //cloest point
