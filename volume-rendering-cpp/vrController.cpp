@@ -7,9 +7,9 @@ vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
 std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
-std::vector<std::string> vrController::shader_contents = std::vector<std::string>(14);
-bool vrController::baked_dirty_ = true;
-bool vrController::cutDirty = true;
+std::vector<std::string> vrController::shader_contents;
+bool vrController::baked_dirty_;
+bool vrController::cutDirty;
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -18,15 +18,16 @@ vrController::~vrController(){
 }
 
 vrController::vrController(){
-    camera = new Camera;
-    myPtr_ = this;
     onReset();
+    myPtr_ = this;
 }
 void vrController::onReset() {
-//    ScaleVec3_ = DEFAULT_SCALE;
-//    RotateMat_ = DEFAULT_ROTATE;
-//    PosVec3_ = DEFAULT_POS;
-//    updateVolumeModelMat();
+    if(camera){delete camera; camera= nullptr;}
+    if(shader_contents.empty())shader_contents = std::vector<std::string>(dvr::SHADER_END);
+    baked_dirty_ = true; cutDirty=true;
+    Mouse_old = glm::fvec2(.0);
+    rStates_.clear();
+    cst_name="";
     setStatus("default_status");
 }
 void vrController::setVolumeConfig(int width, int height, int dims){

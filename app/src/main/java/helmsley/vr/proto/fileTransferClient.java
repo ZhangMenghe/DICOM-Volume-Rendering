@@ -46,6 +46,7 @@ public class fileTransferClient {
     private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
     final private String local_index_filename;
+    private boolean local_initialized = false;
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
         target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
@@ -69,6 +70,7 @@ public class fileTransferClient {
         }
     }
     public void SetupLocal(){
+        if(local_initialized) return;
         List<String> lpc = fileUtils.readLines(local_index_filename);
 
         if(lpc.isEmpty()){
@@ -92,6 +94,7 @@ public class fileTransferClient {
 
             update_local_info(tinfo, vol_info);
         }
+        local_initialized = true;
     }
 
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
