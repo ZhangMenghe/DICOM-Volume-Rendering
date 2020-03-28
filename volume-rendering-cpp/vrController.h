@@ -92,7 +92,7 @@ private:
     glm::vec3 ScaleVec3_, PosVec3_;
 
     //ui
-    glm::fvec2 Mouse_old = glm::fvec2(.0);
+    glm::fvec2 Mouse_old;
     float _screen_w, _screen_h;
 
     //flags

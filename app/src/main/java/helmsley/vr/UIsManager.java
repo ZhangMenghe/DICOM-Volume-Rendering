@@ -17,19 +17,20 @@ public class UIsManager {
     private final WeakReference<Activity> actRef;
     final static String TAG = "UIsManager";
     // UIs
-    private Spinner spinner_tune, spinner_check, spinner_func;
+    private Spinner spinner_tune;
+    private Spinner spinner_check;
     private cutplaneUIs cuttingController;
-    protected dialogUIs dialogController;
+    private dialogUIs dialogController;
     private maskUIs masksController;
 
     //Spinner adapter
-    SeekbarAdapter seekbarAdapter = null;
-    checkboxAdapter cbAdapter = null;
+    private SeekbarAdapter seekbarAdapter = null;
+    private checkboxAdapter cbAdapter = null;
 
     final static public int tex_id=0, raycast_id=1;
     static private int current_texray_id = -1;
 
-    public UIsManager(final Activity activity_){
+    UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);
         cuttingController = new cutplaneUIs(activity_);
@@ -48,12 +49,12 @@ public class UIsManager {
         spinner_check.setAdapter(cbAdapter.getListAdapter());
 
         //function spinners
-        spinner_func = (Spinner)actRef.get().findViewById(R.id.funcSpinner);
+        Spinner spinner_func = (Spinner) actRef.get().findViewById(R.id.funcSpinner);
         funcAdapter fAdapter = new funcAdapter(actRef.get(), this);
         spinner_func.setAdapter(fAdapter.createFuncAdapter());
     }
     public void RequestSetupServerConnection(){
-        dialogController.SetupConnect();
+        dialogController.SetupConnectRemote();
     }
     public void RequestSetupLocalDataServer(){
         dialogController.SetupConnectLocal();

@@ -24,58 +24,69 @@ public class dialogUIs {
     private static fileTransferClient downloader;
     private TextView errText;
     private Button sendButton;
-
-    private static AlertDialog download_dialog, progress_dialog;
+    private boolean remote_connection_success = false;
+    private static AlertDialog loadlocal_dialog, loadremote_dialog, progress_dialog;
     public dialogUIs(final Activity activity_){
         activity = activity_;
     }
 
-    public void SetupConnect(){
-        final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
-        final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, null);
-        //widgets
-        sendButton = (Button) dialogView.findViewById(R.id.connect_req_button);
-        EditText hostEdit = (EditText) dialogView.findViewById(R.id.host_edit_text);
-        hostEdit.setHint(activity.getString(R.string.DEFAULT_HOST));
-        EditText portEdit = (EditText) dialogView.findViewById(R.id.port_edit_text);
-        portEdit.setHint(activity.getString(R.string.DEFAULT_PORT));
+    public void SetupConnectRemote(){
+        if(remote_connection_success) {
+            loadremote_dialog.show();
+        }else{
+            final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
+            final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, null);
+            //widgets
+            sendButton = (Button) dialogView.findViewById(R.id.connect_req_button);
+            EditText hostEdit = (EditText) dialogView.findViewById(R.id.host_edit_text);
+            hostEdit.setHint(activity.getString(R.string.DEFAULT_HOST));
+            EditText portEdit = (EditText) dialogView.findViewById(R.id.port_edit_text);
+            portEdit.setHint(activity.getString(R.string.DEFAULT_PORT));
 
-        errText = (TextView) dialogView.findViewById(R.id.grpc_err_msg);
-        errText.setMovementMethod(new ScrollingMovementMethod());
+            errText = (TextView) dialogView.findViewById(R.id.grpc_err_msg);
+            errText.setMovementMethod(new ScrollingMovementMethod());
 
+            layoutDialog_builder.setTitle(activity.getString(R.string.dialog_connect_title));
+            layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
 
-        layoutDialog_builder.setTitle(activity.getString(R.string.dialog_connect_title));
-        layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
+            layoutDialog_builder.setView(dialogView);
+            AlertDialog connect_dialog = layoutDialog_builder.create();
 
-        layoutDialog_builder.setView(dialogView);
-        AlertDialog dialog = layoutDialog_builder.create();
+    //        dialog.setCanceledOnTouchOutside(false);
 
-//        dialog.setCanceledOnTouchOutside(false);
-
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                sendButton.setEnabled(false);
-                errText.setText("");
-                String host_addr = hostEdit.getText().toString();
-                host_addr = host_addr.isEmpty()?hostEdit.getHint().toString():host_addr;
-                String port_addr = portEdit.getText().toString();
-                port_addr = port_addr.isEmpty()?portEdit.getHint().toString():port_addr;
-
-                if(SetupDownloader(host_addr, port_addr)){
-                    Log.i(TAG, "=====Connect to server successfully=====");
-                    dialog.dismiss();
-                    SetupDownloadDialog(false);
+            sendButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    sendButton.setEnabled(false);
+                    errText.setText("");
+                    String host_addr = hostEdit.getText().toString();
+                    host_addr = host_addr.isEmpty() ? hostEdit.getHint().toString() : host_addr;
+                    String port_addr = portEdit.getText().toString();
+                    port_addr = port_addr.isEmpty() ? portEdit.getHint().toString() : port_addr;
+                    if (downloader == null) downloader = new fileTransferClient(activity);
+                    String res_msg = downloader.Setup(host_addr, port_addr);
+                    if (res_msg.equals("")) {
+                        Log.i(TAG, "=====Connect to server successfully=====");
+                        connect_dialog.dismiss();
+                        remote_connection_success = true;
+                        if (loadremote_dialog == null) SetupDownloadDialog(false);
+                        loadremote_dialog.show();
+                    } else {
+                        errText.setText(res_msg);
+                        errText.setVisibility(View.VISIBLE);
+                        sendButton.setEnabled(true);
+                    }
                 }
-            }
-        });
-
-        dialog.show();
+            });
+            connect_dialog.show();
+        }
     }
     public void SetupConnectLocal(){
-        downloader = new fileTransferClient(activity);
+        if(downloader == null)downloader = new fileTransferClient(activity);
         downloader.SetupLocal();
-        SetupDownloadDialog(true);
+
+        if(loadlocal_dialog == null) SetupDownloadDialog(true);
+        loadlocal_dialog.show();
     }
     private void SetupDownloadDialog(boolean local){
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
@@ -83,7 +94,6 @@ public class dialogUIs {
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, null);
 
         //recycle view
-
         RecyclerView content_view = dialogView.findViewById(R.id.contentRecView);
 //        content_view.setHasFixedSize(true);
         //layout manager
@@ -95,11 +105,9 @@ public class dialogUIs {
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_select_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
         layoutDialog_builder.setView(dialogView);
-        download_dialog = layoutDialog_builder.create();
+        if(local) loadlocal_dialog = layoutDialog_builder.create();
+        else loadremote_dialog = layoutDialog_builder.create();
 //        download_dialog.setCanceledOnTouchOutside(false);
-
-        download_dialog.show();
-
     }
     private static void SetupProgressDialog(String info){
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
@@ -115,19 +123,6 @@ public class dialogUIs {
         progress_dialog.setCanceledOnTouchOutside(false);
         progress_dialog.show();
     }
-
-    private boolean SetupDownloader(String host, String port){
-        downloader = new fileTransferClient(activity);//new fileTransferClient(host, port);
-
-        String res_msg = downloader.Setup(host, port);
-        if(res_msg.equals(""))
-            return true;
-
-        errText.setText(res_msg);
-        errText.setVisibility(View.VISIBLE);
-        sendButton.setEnabled(true);
-        return false;
-    }
     static void RequestVolumeFromDataset(String dataset_name, int pos, boolean isLocal){
         volumeResponse.volumeInfo vol_info = downloader.getAvailableVolumes(dataset_name, isLocal).get(pos);
         JNIInterface.JNIsetupDCMIConfig(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums(), vol_info.getMaskAvailable());
@@ -138,7 +133,8 @@ public class dialogUIs {
         activity.runOnUiThread(new Runnable()  {
             @Override
             public void run()  {
-                download_dialog.dismiss();
+                if(isLocal)loadlocal_dialog.dismiss();
+                else loadremote_dialog.dismiss();
                 SetupProgressDialog(dataset_name);
             }});
     }
