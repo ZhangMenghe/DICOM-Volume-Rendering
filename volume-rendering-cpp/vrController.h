@@ -12,8 +12,6 @@
 #include <vector>
 #include <map>
 
-//#include <platforms/android/Jnis/jni_main.h>
-
 class vrController:public nEntrance{
 public:
     static Camera* camera;
@@ -26,8 +24,6 @@ public:
     unsigned int mask_num_, mask_bits_;
 
     static vrController* instance();
-//    static void setMMS(dvr::ModelMatStatus mms);
-//    static void getMMS(dvr::ModelMatStatus& mms);
 
     vrController();
     ~vrController();
@@ -54,6 +50,7 @@ public:
     //setter funcs
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setStatus(std::string status_name);
+    void setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv; volume_model_dirty=true;}
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(){return ModelMat_;}
@@ -106,8 +103,5 @@ private:
     bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }
-
-    void updateVolumeModelMat();
-    void precompute();
 };
 #endif

@@ -75,12 +75,14 @@ void texvrRenderer::draw_scene(){
 
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
-    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
-    if(glm::dot(vrController::camera->getViewDirection(), dir) < 0) glFrontFace(GL_CCW);
+//    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
+//    if(glm::dot(vrController::camera->getViewDirection(), dir) < 0) glFrontFace(GL_CCW);
+    if(rotmat[2][2] > 0) glFrontFace(GL_CCW);
     else glFrontFace(GL_CW);
     glBindVertexArray(vao_slice); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
 
     shader_->UnUse();
+    glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);

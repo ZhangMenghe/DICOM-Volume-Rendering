@@ -117,9 +117,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
             //update model mat of volume
             auto tplanes = arController::instance()->getTrackedPlanes();
             if(!tplanes.empty()){
-                vrController::ScaleVec3_ = glm::vec3(0.2f);
-                vrController::RotateMat_ = tplanes[0].rotMat;
-                vrController::PosVec3_ = tplanes[0].centerVec;
+                vrController::instance()->setVolumeRST(tplanes[0].rotMat, glm::vec3(0.2f), tplanes[0].centerVec);
                 arInitialized = true;
                 nativeApp(nativeAddr)->onDraw();
             }

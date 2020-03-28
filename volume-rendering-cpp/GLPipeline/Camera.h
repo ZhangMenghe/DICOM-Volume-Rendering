@@ -28,6 +28,7 @@ class Camera{
         pose_ = glm::translate(glm::mat4(1.0), _eyePos);
     }
 public:
+    Camera(){Reset();}
     Camera(const char* cam_name)
     :name_(cam_name){
         Reset();

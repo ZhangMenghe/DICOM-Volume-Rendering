@@ -15,18 +15,6 @@ vrController* vrController::instance(){
     if(!myPtr_) myPtr_ = new vrController;
     return myPtr_;
 }
-//void vrController::setMMS(dvr::ModelMatStatus mms){
-//    ScaleVec3_ = mms.scaleVec;
-//    RotateMat_ = mms.rotMat;
-//    PosVec3_ = mms.posVec;
-//    ModelMat_ =  mms.modelMat;
-//}
-//void vrController::getMMS(dvr::ModelMatStatus& mms){
-//    mms.scaleVec = ScaleVec3_;
-//    mms.rotMat = RotateMat_;
-//    mms.posVec = PosVec3_;
-//    mms.modelMat =ModelMat_;
-//}
 vrController::vrController(){
     shader_contents = std::vector<std::string>(SHADER_ANDROID_END);
 //    onReset();
@@ -213,15 +201,16 @@ void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content)
     if(fid < dvr::SHADER_END)
         shader_contents[fid] = content;
 }
-void vrController::onDrawOverlays(){
+void vrController::onDrawOverlays() {
     funcRenderer_->Draw();
+}
 
 void vrController::updateVolumeModelMat(){
     ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
                  * RotateMat_
                  * glm::scale(glm::mat4(1.0), ScaleVec3_);
 }
-  
+
 void vrController::setStatus(std::string status_name){
     //save changes to current status
     if(status_name == cst_name) return;

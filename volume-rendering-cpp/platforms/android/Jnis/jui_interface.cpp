@@ -48,6 +48,7 @@ JUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray
 
     //!!debug only,
 //    vrController::instance()->setStatus(vrController::param_bool[0]?"Raycasting":"texturebased");
+    vrController::instance()->setStatus(vrController::param_bool[dvr::CHECK_ARENABLED]?"ARCam":"VirtualCam");
 
     vrController::baked_dirty_ = true;
 }
@@ -69,7 +70,7 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     if (it != param_checks.end()){
       vrController::param_bool[it -param_checks.begin()] = value;
       if(key==freeze_keyworkd) vrController::cutDirty = true;
-      else if(keystr == ar_keyword) vrController::instance()->setStatus(value? "ARCam":"VirtualCam");
+      else if(key == ar_keyword) vrController::instance()->setStatus(value? "ARCam":"VirtualCam");
       vrController::baked_dirty_ = true;
     }
 }
