@@ -31,24 +31,34 @@ public class GLActivity extends AppCompatActivity {
     //For touch event
     protected GestureDetectorCalVR gestureDetector;
 
+    protected boolean viewportChanged = false;
+    protected int viewportWidth;
+    protected int viewportHeight;
+    // Opaque native pointer to the native application instance.
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         setupSurfaceView();
-        nativeAddr = JNIInterface.JNIonCreate(getAssets());
+        JNIInterface.assetManager = getAssets();
+        nativeAddr = JNIInterface.JNIonCreate(JNIInterface.assetManager);
         setupTouchDetector();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        surfaceView.onResume();
+//        surfaceView.onResume();
     }
     @Override
     protected void onPause(){
         super.onPause();
         surfaceView.onPause();
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
     }
     private void setupTouchDetector() {
         gestureDetector = new GestureDetectorCalVR(this);
@@ -103,13 +113,26 @@ public class GLActivity extends AppCompatActivity {
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            JNIInterface.JNIonSurfaceChanged(width, height);
+            viewportWidth = width;
+            viewportHeight = height;
+            viewportChanged = true;
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
-            JNIInterface.JNIdrawFrame();
-            updateOnFrame();
+            // Synchronized to avoid racing onDestroy.
+            synchronized (this) {
+                if (nativeAddr == 0) {
+                    return;
+                }
+                if (viewportChanged) {
+                    int displayRotation = getWindowManager().getDefaultDisplay().getRotation();
+                    JNIInterface.JNIonSurfaceChanged(displayRotation, viewportWidth, viewportHeight);
+                    viewportChanged = false;
+                }
+                JNIInterface.JNIdrawFrame();
+                updateOnFrame();
+            }
         }
     }
 }

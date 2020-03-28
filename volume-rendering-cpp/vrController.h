@@ -12,6 +12,8 @@
 #include <vector>
 #include <map>
 
+//#include <platforms/android/Jnis/jni_main.h>
+
 class vrController:public nEntrance{
 public:
     static Camera* camera;
@@ -24,19 +26,25 @@ public:
     unsigned int mask_num_, mask_bits_;
 
     static vrController* instance();
+//    static void setMMS(dvr::ModelMatStatus mms);
+//    static void getMMS(dvr::ModelMatStatus& mms);
 
     vrController();
     ~vrController();
     void assembleTexture(GLubyte * data, int channel_num = 4);
     void updateTexture(GLubyte * data);
     void setVolumeConfig(int width, int height, int dims);
+    void onDrawOverlays();
 
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
+    void onViewChange(int rot, int width, int height);
     void onDraw();
     void onReset();
+    void onPause();
     void onDestroy();
+    void onResume(void* env, void* context, void* activity);
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);
@@ -99,5 +107,7 @@ private:
         return param_bool[dvr::CHECK_RAYCAST];
     }
 
+    void updateVolumeModelMat();
+    void precompute();
 };
 #endif

@@ -45,16 +45,17 @@ void uiController::InitTuneParam(int id, int num, const char*keys[], float value
 }
 
 void uiController::InitCheckParam(){
-    const char* keys[5] = {
+    const char* keys[6] = {
+        "AR Enabled",
         "Raycasting",
         "Color Transfer",
         "Cutting",
         "ShowMask",
         "Freeze Volume"
     };
-    
-    bool values[5] = {
-            false,
+    bool values[6] = {
+        false,
+        true,
         false,
         false,
         false,

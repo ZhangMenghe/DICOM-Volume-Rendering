@@ -12,12 +12,15 @@ if(CMAKE_SYSTEM_NAME STREQUAL Linux)
         )
     set(ASSET_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../app/src/main/assets)
 
+
 elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
     set(OpenGL_LIBS
         GLESv3
         EGL
         log)
+    include_directories(${ARCORE_INCLUDE})
 endif()
+
 set(GLM_DIRECTORY /usr/local/include/glm)
 
 SET(GL_PIPELINE_FILES

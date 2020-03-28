@@ -2,13 +2,16 @@
 #include <android/asset_manager_jni.h>
 #include "jui_interface.h"
 #include <vrController.h>
+#include <platforms/android/ARHelpers/arController.h>
+
 using namespace dvr;
 
 namespace {
     std::vector<std::string> param_tex_names, param_ray_names, param_checks;
     const int TEX_ID = 0, RAY_ID = 1;
     //todo:currently should manully keep consistence with R.string....
-    const std::string cutting_keyword = "Cutting", freeze_keyworkd="Freeze Plane";
+    const std::string cutting_keyword = "Cutting", freeze_keyworkd="Freeze Plane", ar_keyword = "AR Enable";
+
 }
 
 JUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobjectArray jkeys, jfloatArray jvalues){
@@ -60,18 +63,15 @@ JUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jf
     }
 }
 JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
-    std::string key = dvr::jstring2string(env,jkey);
+    std::string key = dvr::jstring2string(env, jkey);
 
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
-        vrController::param_bool[it -param_checks.begin()] = value;
-//        LOGE("======SET  %s, %d", key.c_str(), value);
-        if(key==freeze_keyworkd) vrController::cutDirty = true;
-            //!!debug only,
-//        else if(key == "Raycasting") vrController::instance()->setStatus(value?"Raycasting":"texturebased");
-        vrController::baked_dirty_ = true;
+      vrController::param_bool[it -param_checks.begin()] = value;
+      if(key==freeze_keyworkd) vrController::cutDirty = true;
+      else if(keystr == ar_keyword) vrController::instance()->setStatus(value? "ARCam":"VirtualCam");
+      vrController::baked_dirty_ = true;
     }
-
 }
 JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value, jboolean freeze_plane){
     auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
@@ -97,6 +97,10 @@ JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass){
     nativeApp(nativeAddr)->onReset();
 }
 
+JUI_METHOD(void ,JUIonDoubleTouchDown)(JNIEnv *, jclass, jfloat x, jfloat y){
+    if(vrController::param_bool[dvr::CHECK_ARENABLED])
+        arController::instance()->onSingleTouchDown(x,y);
+}
 JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
     nativeApp(nativeAddr)->onSingleTouchDown(x, y);
 }

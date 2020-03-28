@@ -17,6 +17,8 @@ private:
 
     void draw_baked();
     void draw_scene();
+    void draw_to_texture();
+
 public:
     raycastRenderer(bool screen_baked = true);
 

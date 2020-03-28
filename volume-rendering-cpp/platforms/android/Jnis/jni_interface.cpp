@@ -1,46 +1,25 @@
-#include <assetLoader.h>
+#include <Utils/assetLoader.h>
 #include <android/asset_manager_jni.h>
 #include <GLES3/gl32.h>
 #include "jni_interface.h"
-#include "vrController.h"
-
-#include <android/bitmap.h>
 #include <vector>
+
+#include <platforms/android/ARHelpers/arController.h>
+#include <vrController.h>
+#include <dicomRenderer/screenQuad.h>
+#include <Utils/assetLoader.h>
 
 using namespace dvr;
 namespace {
+    bool arInitialized = false;
     const int LOAD_DCMI_ID = 0, LOAD_MASK_ID = 1;
     int CHANEL_NUM = 4;
     //globally
     GLubyte* g_VolumeTexData = nullptr;
-//    GLubyte* g_VolumeMaskData = nullptr;
     int g_img_h, g_img_w, g_vol_dim;
     size_t g_ssize_schanel, g_ssize = 0, g_vol_len;
-//    g_mask_ssize, g_mask_len;
     size_t n_data_offset[2] = {0};
-    AAssetManager * _asset_manager;
 
-    std::string LoadTextFile(const char* file_name) {
-        std::string* out_file_text_string = new std::string();
-        AAsset* asset =
-                AAssetManager_open(_asset_manager, file_name, AASSET_MODE_STREAMING);
-        if (asset == nullptr) {
-            LOGE("Error opening asset %s", file_name);
-            return "";
-        }
-
-        off_t file_size = AAsset_getLength(asset);
-        out_file_text_string->resize(file_size);
-        int ret = AAsset_read(asset, &out_file_text_string->front(), file_size);
-
-        if (ret <= 0) {
-            LOGE("Failed to open file: %s", file_name);
-            AAsset_close(asset);
-            return "";
-        }
-        AAsset_close(asset);
-        return *out_file_text_string;
-    }
     void setupShaderContents(){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
         const char* shader_file_names[14] = {
@@ -59,27 +38,98 @@ namespace {
                 "shaders/opaViz.vert",
                 "shaders/opaViz.frag"
         };
-        for(int i = 0; i<int(dvr::SHADER_END); i++)
-            vrc->setShaderContents(SHADER_FILES (i), LoadTextFile(shader_file_names[i]));
+        const char* android_shader_file_names[6] = {
+                "shaders/arcore_screen_quad.vert",
+                "shaders/arcore_screen_quad.frag",
+                "shaders/pointcloud.vert",
+                "shaders/pointcloud.frag",
+                "shaders/plane.vert",
+                "shaders/plane.frag"
+        };
+        for(int i = 0; i<int(dvr::SHADER_END); i++){
+            std::string content;
+            assetLoader::instance()->LoadTextFileFromAssetManager(shader_file_names[i], &content);
+            vrc->setShaderContents(SHADER_FILES (i), content);
+        }
+
+        for(int i=0; i<int(dvr::SHADER_ANDROID_END) - int(dvr::SHADER_END); i++){
+            std::string content;
+            assetLoader::instance()->LoadTextFileFromAssetManager(android_shader_file_names[i], &content);
+            vrController::shader_contents[dvr::SHADER_END + i] = content;
+        }
     }
 }
+
+jint JNI_OnLoad(JavaVM *vm, void *) {
+    g_vm = vm;
+    return JNI_VERSION_1_6;
+}
+
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
-    _asset_manager = AAssetManager_fromJava(env, asset_manager);
+    new assetLoader(AAssetManager_fromJava(env, asset_manager));
+
     nativeAddr =  getNativeClassAddr(new vrController());
+    vrController::camera = &virtualCam;
     setupShaderContents();
     return nativeAddr;
 }
 
-JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    nativeApp(nativeAddr)->onViewCreated();
+JNI_METHOD(void, JNIonPause)(JNIEnv* env, jclass){
+    nativeApp(nativeAddr)->onPause();
+    arController::instance()->onPause();
 }
 
-JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
-    nativeApp(nativeAddr)->onViewChange(w, h);
+JNI_METHOD(void, JNIonDestroy)(JNIEnv* env, jclass){
+    nativeApp(nativeAddr)->onDestroy();
+    arController::instance()->onDestroy();
+
+    delete nativeApp(nativeAddr);
+    delete arController::instance();
+
+    nativeAddr = 0;
+}
+
+JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject context, jobject activity){
+    nativeApp(nativeAddr)->onResume(env, context, activity);
+    arController::instance()->onResume(env, context, activity);
+}
+
+JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
+    nativeApp(nativeAddr)->onViewCreated();
+    arController::instance()->onViewCreated();
+}
+
+JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
+    nativeApp(nativeAddr)->onViewChange(rot, w, h);
+    arController::instance()->onViewChange(rot,w,h);
+    screenQuad::instance()->onScreenSizeChange(w, h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
-    nativeApp(nativeAddr)->onDraw();
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    //order matters
+    screenQuad::instance()->Clear();
+
+    if(vrController::param_bool[dvr::CHECK_ARENABLED]){
+        arController::instance()->onDraw();
+        if(!arInitialized){
+            //update model mat of volume
+            auto tplanes = arController::instance()->getTrackedPlanes();
+            if(!tplanes.empty()){
+                vrController::ScaleVec3_ = glm::vec3(0.2f);
+                vrController::RotateMat_ = tplanes[0].rotMat;
+                vrController::PosVec3_ = tplanes[0].centerVec;
+                arInitialized = true;
+                nativeApp(nativeAddr)->onDraw();
+            }
+        }else{nativeApp(nativeAddr)->onDraw();}
+    }else{
+        nativeApp(nativeAddr)->onDraw();
+    }
+
+    screenQuad::instance()->Draw();
+    vrController::instance()->onDrawOverlays();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){
@@ -132,4 +182,15 @@ JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
     jbyteArray gdata = env->NewByteArray(g_vol_len);
     env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
     return gdata;
+}
+
+JNIEnv *GetJniEnv() {
+    JNIEnv *env;
+    jint result = g_vm->AttachCurrentThread(&env, nullptr);
+    return result == JNI_OK ? env : nullptr;
+}
+
+jclass FindClass(const char *classname) {
+    JNIEnv *env = GetJniEnv();
+    return env->FindClass(classname);
 }
