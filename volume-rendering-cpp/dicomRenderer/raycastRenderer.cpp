@@ -36,9 +36,10 @@ void raycastRenderer::draw_scene(){
 
     Shader::Uniform(sp, "uProjMat", vrController::camera->getProjMat());
     Shader::Uniform(sp, "uViewMat", vrController::camera->getViewMat());
-    Shader::Uniform(sp, "uModelMat", vrController::ModelMat_);
+    Shader::Uniform(sp, "uModelMat", vrController::instance()->getModelMatrix());
 
-    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_* dim_scale_mat);
+    glm::mat4 modelmat = vrController::instance()->getModelMatrix();
+    glm::mat4 model_inv = glm::inverse(modelmat * dim_scale_mat);
     Shader::Uniform(sp, "uCamposObjSpace",
             glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
@@ -49,8 +50,9 @@ void raycastRenderer::draw_scene(){
     cutter_->setCuttingParams(sp);
 
     //for backface rendering! don't erase
-    glm::vec3 dir = glm::vec3(vrController::RotateMat_ * glm::vec4(.0,.0,-1.0,1.0));
-    if(dir.z <= 0) glFrontFace(GL_CCW);
+    glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
+    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
+    if(glm::dot(vrController::camera->getViewDirection(), dir) < 0) glFrontFace(GL_CCW);
     else glFrontFace(GL_CW);
 
     glBindVertexArray(vao_cube_);
@@ -91,12 +93,11 @@ void raycastRenderer::draw_baked(){
     Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
-    glm::mat4 model_inv = glm::inverse(vrController::ModelMat_ * dim_scale_mat);
+    glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrix() * dim_scale_mat);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-    Shader::Uniform(sp, "uViewDir", vrController::camera->getViewDirection().z);
-    Shader::Uniform(sp,"usample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
+    Shader::Uniform(sp, "usample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
     cutter_->Update();
     cutter_->setCuttingParams(sp, true);
 

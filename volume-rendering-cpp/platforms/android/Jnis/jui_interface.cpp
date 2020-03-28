@@ -43,6 +43,9 @@ JUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray
     param_checks.push_back(freeze_keyworkd);
     vrController::param_bool.push_back(false);
 
+    //!!debug only,
+//    vrController::instance()->setStatus(vrController::param_bool[0]?"Raycasting":"texturebased");
+
     vrController::baked_dirty_ = true;
 }
 
@@ -63,7 +66,9 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
 //        LOGE("======SET  %s, %d", key.c_str(), value);
-        if(jstring2string(env, jkey)==freeze_keyworkd) vrController::cutDirty = true;
+        if(key==freeze_keyworkd) vrController::cutDirty = true;
+            //!!debug only,
+//        else if(key == "Raycasting") vrController::instance()->setStatus(value?"Raycasting":"texturebased");
         vrController::baked_dirty_ = true;
     }
 

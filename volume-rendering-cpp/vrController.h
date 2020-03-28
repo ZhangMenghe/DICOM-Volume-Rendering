@@ -10,6 +10,7 @@
 #include "dicomRenderer/Constants.h"
 #include <unordered_map>
 #include <vector>
+#include <map>
 
 class vrController:public nEntrance{
 public:
@@ -17,11 +18,9 @@ public:
     static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
     static std::vector<std::string> shader_contents;
-    static glm::mat4 ModelMat_, RotateMat_;
-    static glm::vec3 ScaleVec3_, PosVec3_;
+
     static bool baked_dirty_;
     static bool cutDirty;
-
     unsigned int mask_num_, mask_bits_;
 
     static vrController* instance();
@@ -44,8 +43,13 @@ public:
     void onScale(float sx, float sy);
     void onPan(float x, float y);
 
+    //setter funcs
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
+    void setStatus(std::string status_name);
+    //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
+    glm::mat4 getModelMatrix(){return ModelMat_;}
+    glm::mat4 getRotationMatrix(){return RotateMat_;}
 private:
     static vrController* myPtr_;
 
@@ -64,18 +68,32 @@ private:
     glm::uvec3 VOL_DIMS = glm::uvec3(0);
     uint32_t* vol_data = nullptr;
 
+    struct reservedStatus{
+        glm::mat4 model_mat, rot_mat;
+        glm::vec3 scale_vec, pos_vec;
+        Camera* vcam;
+        reservedStatus(glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){
+            model_mat=mm; rot_mat=rm; scale_vec=sv; pos_vec=pv; vcam=cam;
+        }
+        reservedStatus():rot_mat(dvr::DEFAULT_ROTATE), scale_vec(dvr::DEFAULT_SCALE), pos_vec(dvr::DEFAULT_POS), vcam(new Camera){
+            model_mat =  glm::translate(glm::mat4(1.0), pos_vec)
+                         * rot_mat
+                         * glm::scale(glm::mat4(1.0), scale_vec);
+        }
+    };
+    std::string cst_name;
+    std::map<std::string, reservedStatus> rStates_;
+    glm::mat4 ModelMat_, RotateMat_;
+    glm::vec3 ScaleVec3_, PosVec3_;
+
     //ui
     glm::fvec2 Mouse_old = glm::fvec2(.0);
     float _screen_w, _screen_h;
 
     //flags
-    bool volume_model_dirty = true;
+    bool volume_model_dirty;
 
-    void updateVolumeModelMat(){
-        ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
-                     * RotateMat_
-                     * glm::scale(glm::mat4(1.0), ScaleVec3_);
-    }
+    void updateVolumeModelMat();
     void precompute();
     bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
