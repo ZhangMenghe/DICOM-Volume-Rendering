@@ -46,6 +46,9 @@ JUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray
     param_checks.push_back(freeze_keyworkd);
     vrController::param_bool.push_back(false);
 
+    //!!debug only,
+//    vrController::instance()->setStatus(vrController::param_bool[0]?"Raycasting":"texturebased");
+
     vrController::baked_dirty_ = true;
 }
 
@@ -64,25 +67,11 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
 
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
-        vrController::param_bool[it - param_checks.begin()] = value;
-        std::string keystr = jstring2string(env, jkey);
-
-        if(keystr == freeze_keyworkd) vrController::cutDirty = true;
-        else if(keystr == ar_keyword){
-//            vrController::camera = value? &arCam : &virtualCam; //vrController::instance()->camera->Reset();
-            if(value){
-                vrController::camera = &arCam;
-//                vrController::getMMS(virtualMMS);
-//                vrController::setMMS(arMMS);
-            }else{
-                vrController::camera = &virtualCam;
-//                vrController::getMMS(arMMS);
-//                vrController::setMMS(virtualMMS);
-            }
-        }
-        vrController::baked_dirty_ = true;
+      vrController::param_bool[it -param_checks.begin()] = value;
+      if(key==freeze_keyworkd) vrController::cutDirty = true;
+      else if(keystr == ar_keyword) vrController::instance()->setStatus(value? "ARCam":"VirtualCam");
+      vrController::baked_dirty_ = true;
     }
-
 }
 JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value, jboolean freeze_plane){
     auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;

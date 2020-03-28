@@ -53,7 +53,6 @@ void uiController::InitCheckParam(){
         "ShowMask",
         "Freeze Volume"
     };
-    
     bool values[6] = {
         false,
         true,
