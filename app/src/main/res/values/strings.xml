@@ -2,7 +2,7 @@
     <string name="app_name">DICOM Viewer</string>
     <string name="fps">0.0 FPS</string>
 
-    <string name="DEFAULT_HOST">10.68.2.100</string>
+    <string name="DEFAULT_HOST">10.68.2.130</string>
     <!--    <string name="DEFAULT_HOST">137.110.118.222</string>-->
     <string name="DEFAULT_PORT">23333</string>
 

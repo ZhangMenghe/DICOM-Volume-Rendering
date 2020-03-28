@@ -55,7 +55,7 @@ public class funcAdapter{
                             holder.text_name.setTextAppearance(R.style.itemHighlightText);
                             switch (position){
                                 case 0:onClickResetButton();break;
-                                case 1:onClickDataChangeButton();break;
+                                case 1:onClickRemoteDataButton();break;
                                 case 2:onClickLocalDataButton();break;
                                 default:break;
                             }
@@ -79,7 +79,7 @@ public class funcAdapter{
             TextView text_name;
         }
     }
-    private void onClickDataChangeButton(){
+    private void onClickRemoteDataButton(){
         mUIManagerRef.get().RequestSetupServerConnection();
         //todo: unfinish!
     }
