@@ -2,6 +2,7 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
+import helmsley.vr.Utils.SwipeDetector;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
@@ -96,6 +98,8 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         if(isLocal) createListViewContent(holder.lstViewVol, info.getFolderName());
 
         holder.lstViewVol.setVisibility(View.GONE);
+
+        //Perform selection of a volume
         holder.lstViewVol.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -109,6 +113,25 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 loader.Download(dsname, vol_info);
             }
         });
+
+        //Perform "more" options with a fling gesture
+        final class lstSwipeDetector extends SwipeDetector{
+            private int current_id = -1;
+            protected void onSwipeRightToLeft(View v, int x, int y){
+                //todo: some notification about the operation
+                //perform local deletion
+                int pos = holder.lstViewVol.pointToPosition(x,y);
+                if(pos == current_id) return;
+                current_id = pos;
+                if(downloaderReference.get().deleteLocalData(info.getFolderName(), pos))
+                    dialogUIs.NotifyChanges();
+                current_id = -1;
+            }
+            protected void onSwipeLeftToRight(View v){
+                Log.i(TAG, "Swipe Left to Right");
+            }
+        }
+        holder.lstViewVol.setOnTouchListener(new lstSwipeDetector());
     }
 
     // Return the size of your dataset (invoked by the layout manager)

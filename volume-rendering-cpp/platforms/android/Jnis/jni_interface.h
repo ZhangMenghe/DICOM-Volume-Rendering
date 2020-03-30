@@ -16,6 +16,8 @@ JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint, jint, jint, jboolean
 
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass);
 
+JNI_METHOD(void, JNIreleaseBuffer)(JNIEnv*, jclass);
+
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv*, jclass);
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass);
