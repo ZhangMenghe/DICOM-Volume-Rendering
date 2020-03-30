@@ -14,6 +14,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.fileTransferClient;
@@ -25,15 +26,16 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private final WeakReference<RecyclerView> recyclerView;
     private final WeakReference<fileTransferClient> downloaderReference;
     private boolean isLocal;
+    private ArrayAdapter<String> contentAdapter;
 
     //config of each card
-    public static class cardHolder extends RecyclerView.ViewHolder {
+    static class cardHolder extends RecyclerView.ViewHolder {
         // each data item is just a string in this case
         TextView textViewDate;
         TextView textViewPatient;
         TextView textViewDetail;
         ListView lstViewVol;
-        public cardHolder(View view) {
+        cardHolder(View view) {
             super(view);
             this.textViewDate = (TextView) itemView.findViewById(R.id.textDate);
             this.textViewPatient = (TextView) itemView.findViewById(R.id.textPatientName);
@@ -43,7 +45,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, boolean local) {
+    DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, boolean local) {
         downloaderReference = new WeakReference<>(downloader);
         activityReference = new WeakReference<>(activity);
         recyclerView = new WeakReference<>(recycle_view);
@@ -97,7 +99,14 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         holder.lstViewVol.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                dialogUIs.RequestVolumeFromDataset(info.getFolderName(), position, isLocal);
+                //load data from local / remote
+                String dsname = info.getFolderName();
+                dialogUIs.onDownloadingUI(dsname, isLocal);
+
+                fileTransferClient loader = downloaderReference.get();
+                volumeResponse.volumeInfo vol_info = loader.getAvailableVolumes(dsname, isLocal).get(position);
+                JNIInterface.JNIsendDataPrepare(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums(), vol_info.getMaskAvailable());
+                loader.Download(dsname, vol_info);
             }
         });
     }
@@ -108,21 +117,23 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         return downloaderReference.get().getAvailableDataset(isLocal).size();
     }
 
+    public void onContentChange(){contentAdapter.notifyDataSetChanged();}
+
     private void createListViewContent(ListView lv, String ds_name){
         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
         ArrayList<String> volcon_lst = new ArrayList<>();
         for (volumeResponse.volumeInfo vinfo : vol_lst)
             volcon_lst.add(activityReference.get().getString(R.string.volume_lst_item, vinfo.getFolderName(), vinfo.getImgWidth(), vinfo.getImgHeight(), vinfo.getFileNums()));
-        final ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>
+        contentAdapter = new ArrayAdapter<String>
                 (activityReference.get(), android.R.layout.simple_list_item_1, volcon_lst);
         //init listview
-        lv.setAdapter(arrayAdapter);
+        lv.setAdapter(contentAdapter);
 
         ViewGroup.LayoutParams params = lv.getLayoutParams();
-        params.height = lv.getDividerHeight() * arrayAdapter.getCount();
+        params.height = lv.getDividerHeight() * contentAdapter.getCount();
 
-        for (int pos = 0; pos < arrayAdapter.getCount(); pos++) {
-            View cv = arrayAdapter.getView(pos, null, lv);
+        for (int pos = 0; pos < contentAdapter.getCount(); pos++) {
+            View cv = contentAdapter.getView(pos, null, lv);
             cv.measure(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             params.height += cv.getMeasuredHeight()
                     + 40 * vol_lst.get(pos).getFolderName().length() / 24;

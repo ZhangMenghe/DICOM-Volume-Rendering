@@ -245,7 +245,6 @@ public class fileTransferClient {
 
                 @Override
                 public void onError(Throwable t) {
-
                 }
 
                 @Override
@@ -291,6 +290,7 @@ public class fileTransferClient {
         Activity activity = activityReference.get();
         //update local data
         update_local_info(target_ds, target_vol);
+        dialogUIs.local_dirty = true;
 
         //save to local file
         if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){

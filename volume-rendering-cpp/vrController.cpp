@@ -15,59 +15,57 @@ vrController* vrController::instance(){
     return myPtr_;
 }
 vrController::~vrController(){
+    if(camera) delete camera;
+    if(texvrRenderer_) delete texvrRenderer_;
+    if(raycastRenderer_) delete raycastRenderer_;
+    if(funcRenderer_) delete funcRenderer_;
+    if(bakeShader_) delete bakeShader_;
+    if(tex_volume) delete tex_volume;
+    if(tex_baked) delete tex_baked;
+    rStates_.clear();
+    param_tex.clear();
+    param_ray.clear();
+    param_bool.clear();
+    shader_contents.clear();
 }
 
 vrController::vrController(){
     onReset();
+    shader_contents = std::vector<std::string>(dvr::SHADER_END);
     myPtr_ = this;
 }
 void vrController::onReset() {
     if(camera){delete camera; camera= nullptr;}
-    if(shader_contents.empty())shader_contents = std::vector<std::string>(dvr::SHADER_END);
     baked_dirty_ = true; cutDirty=true;
     Mouse_old = glm::fvec2(.0);
     rStates_.clear();
     cst_name="";
     setStatus("default_status");
 }
-void vrController::setVolumeConfig(int width, int height, int dims){
-    VOL_DIMS = glm::uvec3(width, height, dims);
-}
-void vrController::assembleTexture(GLubyte * data, int nc){
-    texvrRenderer_->setDimension(VOL_DIMS.z);
-    raycastRenderer_->setDimension(VOL_DIMS.z);
-    auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
-    vol_data = new uint32_t[vsize];
+void vrController::assembleTexture(int w, int h, int d, GLubyte * data, int channel_num){
+    texvrRenderer_->setDimension(d);
+    raycastRenderer_->setDimension(d);
+    auto vsize= w*h*d;
+    uint32_t* vol_data  = new uint32_t[vsize];
     uint16_t tm;
     //fuse volume data
-    for(auto i=0, shift = 0; i<vsize; i++, shift+=nc) {
+    for(auto i=0, shift = 0; i<vsize; i++, shift+=channel_num) {
         vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
-        tm = (nc==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
+        tm = (channel_num==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
         vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
         // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
     }
-    tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, vol_data);
+    if(tex_volume!= nullptr){delete tex_volume; tex_volume= nullptr;}
+    tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, w, h, d, vol_data);
 
     auto* tb_data = new GLubyte[vsize * 4];
-    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, VOL_DIMS.x, VOL_DIMS.y, VOL_DIMS.z, tb_data);
+    if(tex_baked!= nullptr){delete tex_baked; tex_baked= nullptr;}
+    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, w, h, d, tb_data);
     delete[]tb_data;
-}
-
-void vrController::updateTexture(GLubyte* data){
-    if(!vol_data) return;
-    auto vsize= VOL_DIMS.x * VOL_DIMS.y * VOL_DIMS.z;
-    uint16_t tm;
-    //fuse volume data
-    for(auto i=0; i<vsize; i++) {
-        vol_data[i] = uint32_t((((uint32_t)data[4*i+1])<<8) + (uint32_t)data[4*i]);
-        tm = uint16_t((((uint16_t)data[4*i+3])<<8)+data[4*i+2]);
-        vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
-        // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
-    }
-
-    tex_volume->Update(vol_data);
+    delete[]vol_data;
     baked_dirty_ = true;
 }
+
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
     raycastRenderer_ = new raycastRenderer;
@@ -152,6 +150,7 @@ void vrController::precompute(){
         if(!bakeShader_->AddShader(GL_COMPUTE_SHADER, shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL])
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
+        shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
     }
 
     if(param_bool[dvr::CHECK_COLOR_TRANS]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
@@ -182,9 +181,7 @@ void vrController::precompute(){
     baked_dirty_ = false;
     isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
-void vrController::onDestroy(){
-    //todo: do sth
-}
+
 void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content){
     if(fid < dvr::SHADER_END)
         shader_contents[fid] = content;

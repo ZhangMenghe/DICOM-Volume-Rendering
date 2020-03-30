@@ -13,27 +13,32 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.lang.ref.WeakReference;
+
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
-import helmsley.vr.proto.volumeResponse;
 
 public class dialogUIs {
-    public static Activity activity;
+    private static WeakReference<Activity> activityReference;
     final static String TAG = "dialogUIs";
     private static fileTransferClient downloader;
     private TextView errText;
     private Button sendButton;
     private boolean remote_connection_success = false;
     private static AlertDialog loadlocal_dialog, loadremote_dialog, progress_dialog;
+    private DSCardRecyclerViewAdapter loadlocal_adapter;
+    public static boolean local_dirty = true;
     public dialogUIs(final Activity activity_){
-        activity = activity_;
+        activityReference = new WeakReference<>(activity_);
     }
 
     public void SetupConnectRemote(){
         if(remote_connection_success) {
+            loadremote_dialog.invalidateOptionsMenu();
             loadremote_dialog.show();
         }else{
+            Activity activity = activityReference.get();
             final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
             final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, null);
             //widgets
@@ -82,13 +87,16 @@ public class dialogUIs {
         }
     }
     public void SetupConnectLocal(){
-        if(downloader == null)downloader = new fileTransferClient(activity);
+        if(downloader == null)downloader = new fileTransferClient(activityReference.get());
         downloader.SetupLocal();
 
-        if(loadlocal_dialog == null) SetupDownloadDialog(true);
+        if(loadlocal_dialog == null) {SetupDownloadDialog(true); local_dirty = false;}
+        if(local_dirty){ loadlocal_adapter.onContentChange();loadlocal_adapter.notifyDataSetChanged();local_dirty=false;}
         loadlocal_dialog.show();
     }
     private void SetupDownloadDialog(boolean local){
+        final Activity activity = activityReference.get();
+
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
 
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, null);
@@ -100,7 +108,8 @@ public class dialogUIs {
         RecyclerView.LayoutManager layout_manager = new LinearLayoutManager(activity);
         content_view.setLayoutManager(layout_manager);
         //adapter
-        content_view.setAdapter(new DSCardRecyclerViewAdapter(activity, content_view, downloader, local));
+        if(local) {loadlocal_adapter = new DSCardRecyclerViewAdapter(activity, content_view, downloader, true);content_view.setAdapter(loadlocal_adapter);}
+        else content_view.setAdapter(new DSCardRecyclerViewAdapter(activity, content_view, downloader, false));
 
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_select_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
@@ -110,40 +119,37 @@ public class dialogUIs {
 //        download_dialog.setCanceledOnTouchOutside(false);
     }
     private static void SetupProgressDialog(String info){
+        Activity activity = activityReference.get();
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.progress_dialog, null);
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_progress_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
         layoutDialog_builder.setView(dialogView);
 
-        TextView tv = dialogView.findViewById(R.id.textProgressInfo);
-        tv.setText(info);
+        //todo: if the info is needed, use adapter
+//        TextView tv = dialogView.findViewById(R.id.textProgressInfo);
+//        tv.setText(info);
 
         progress_dialog = layoutDialog_builder.create();
         progress_dialog.setCanceledOnTouchOutside(false);
-        progress_dialog.show();
+
     }
-    static void RequestVolumeFromDataset(String dataset_name, int pos, boolean isLocal){
-        volumeResponse.volumeInfo vol_info = downloader.getAvailableVolumes(dataset_name, isLocal).get(pos);
-        JNIInterface.JNIsetupDCMIConfig(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums(), vol_info.getMaskAvailable());
-
-        downloader.Download(dataset_name, vol_info);
-
-        //downloading...
-        activity.runOnUiThread(new Runnable()  {
+    static void onDownloadingUI(String dataset_name, boolean isLocal){
+        activityReference.get().runOnUiThread(new Runnable()  {
             @Override
             public void run()  {
                 if(isLocal)loadlocal_dialog.dismiss();
                 else loadremote_dialog.dismiss();
-                SetupProgressDialog(dataset_name);
+                if(progress_dialog == null) SetupProgressDialog(dataset_name);
+                progress_dialog.show();
             }});
     }
 
     public static void FinishMaskLoading(){
-        activity.runOnUiThread(new Runnable()  {
+        activityReference.get().runOnUiThread(new Runnable()  {
             @Override
             public void run()  {
-                Toast.makeText(activity, "Masks Loaded!", Toast.LENGTH_LONG).show();
+                Toast.makeText( activityReference.get(), "Masks Loaded!", Toast.LENGTH_LONG).show();
 
             }});
     }
@@ -151,8 +157,8 @@ public class dialogUIs {
         if(downloader == null) return;
         if(downloader.isDownloadingProcessFinished()){
             downloader.Reset();
-            JNIInterface.JNIAssembleVolume();
-            activity.runOnUiThread(new Runnable()  {
+            JNIInterface.JNIsendDataDone();
+            activityReference.get().runOnUiThread(new Runnable()  {
                 @Override
                 public void run()  {
                     if(progress_dialog!=null) progress_dialog.dismiss();
@@ -160,7 +166,8 @@ public class dialogUIs {
         }
         if(downloader.isDownloadingMaskProcessFinished()){
             downloader.ResetMast();
-            JNIInterface.JNIAssembleVolume();
+            JNIInterface.JNIsendDataDone();
         }
     }
+
 }

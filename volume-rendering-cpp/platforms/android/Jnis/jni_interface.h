@@ -12,9 +12,9 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager);
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*, jclass, jint, jint, jint, jint, jbyteArray);
 
-JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint, jint, jint, jboolean);
+JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint, jint, jint, jboolean);
 
-JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass);
+JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass);
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv*, jclass);
 
