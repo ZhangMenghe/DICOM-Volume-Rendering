@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -95,7 +96,7 @@ public class fileUtils {
         }
     }
 
-    static public boolean deleteDirectory(File path) {
+     public static boolean deleteDirectory(File path) {
         if (path.exists()) {
             File[] files = path.listFiles();
             for (int i = 0; i < files.length; i++) {
@@ -165,6 +166,19 @@ public class fileUtils {
         try{
             Path path = Paths.get(filename);
             Files.write(path, content.getBytes(), StandardOpenOption.APPEND);
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void writeToFile(String filename, List<String> lines){
+        try{
+            File cf = new File(filename);
+            if(cf.exists() && cf.isFile()) cf.delete();
+            FileWriter writer = new FileWriter(filename);
+            for(String str: lines) {
+                writer.write(str + System.lineSeparator());
+            }
+            writer.close();
         }catch (IOException e) {
             e.printStackTrace();
         }

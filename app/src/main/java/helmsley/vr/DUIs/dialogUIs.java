@@ -27,7 +27,7 @@ public class dialogUIs {
     private Button sendButton;
     private boolean remote_connection_success = false;
     private static AlertDialog loadlocal_dialog, loadremote_dialog, progress_dialog;
-    private DSCardRecyclerViewAdapter loadlocal_adapter;
+    private static DSCardRecyclerViewAdapter loadlocal_adapter;
     public static boolean local_dirty = true;
     public dialogUIs(final Activity activity_){
         activityReference = new WeakReference<>(activity_);
@@ -91,9 +91,10 @@ public class dialogUIs {
         downloader.SetupLocal();
 
         if(loadlocal_dialog == null) {SetupDownloadDialog(true); local_dirty = false;}
-        if(local_dirty){ loadlocal_adapter.onContentChange();loadlocal_adapter.notifyDataSetChanged();local_dirty=false;}
+        if(local_dirty){ NotifyChanges(); local_dirty=false;}
         loadlocal_dialog.show();
     }
+    public static void NotifyChanges(){loadlocal_adapter.onContentChange();loadlocal_adapter.notifyDataSetChanged();}
     private void SetupDownloadDialog(boolean local){
         final Activity activity = activityReference.get();
 

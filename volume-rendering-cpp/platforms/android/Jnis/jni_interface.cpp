@@ -170,7 +170,6 @@ JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
     if(n_data_offset[LOAD_DCMI_ID] == 0 && n_data_offset[LOAD_MASK_ID] == 0) return;
     vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_VolumeTexData, CHANEL_NUM);
     //todo:!!attention, is the data change or not? delete here to save memory
-    delete[]g_VolumeTexData; g_VolumeTexData = nullptr;
     n_data_offset[LOAD_DCMI_ID] = 0; n_data_offset[LOAD_MASK_ID] = 0;
 }
 
@@ -178,6 +177,10 @@ JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
     jbyteArray gdata = env->NewByteArray(g_vol_len);
     env->SetByteArrayRegion(gdata,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
     return gdata;
+}
+
+JNI_METHOD(void, JNIreleaseBuffer)(JNIEnv*, jclass){
+    delete[]g_VolumeTexData; g_VolumeTexData = nullptr;
 }
 
 JNIEnv *GetJniEnv() {

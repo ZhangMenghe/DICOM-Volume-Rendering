@@ -2,7 +2,6 @@ package helmsley.vr.proto;
 
 import android.app.Activity;
 import android.os.AsyncTask;
-import android.renderscript.ScriptGroup;
 import android.util.Log;
 
 import helmsley.vr.DUIs.dialogUIs;
@@ -20,13 +19,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
@@ -110,6 +106,36 @@ public class fileTransferClient {
         Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(dataset_name).build();
         dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
         return blockingStub.getVolumeFromDataset(req).getVolumesList();
+    }
+    public boolean deleteLocalData(String dsname, int pos){
+        //delete from local list
+        if(!local_dv_map.containsKey(dsname)) return false;
+        List<volumeInfo> infolist = local_dv_map.get(dsname);
+        volumeInfo rinfo = infolist.get(pos);
+        if(rinfo == null) return false;
+
+        //remove data directory
+        File tar_ds_dir = Paths.get(target_root_dir, dsname).toFile();
+        if(!tar_ds_dir.exists()) return false;
+        if(!fileUtils.deleteDirectory(new File(tar_ds_dir, rinfo.getFolderName()))) return false;
+
+        //remove from local index file
+        //todo: flush if many changes, avoid write line by line
+        List<String> lines = fileUtils.readLines(local_index_filename);
+        for(String line : lines){
+            String[] info = line.split(",");
+            if(info[2].equals(dsname)
+                    && info[3].equals(rinfo.getFolderName())){
+                lines.remove(line);
+                fileUtils.writeToFile(local_index_filename, lines);
+
+                //update local data
+                infolist.remove(pos);
+                local_dv_map.put(dsname, infolist);
+                return true;
+            }
+        }
+        return false;
     }
 
     public void Download(String ds_name, volumeInfo target_volume){

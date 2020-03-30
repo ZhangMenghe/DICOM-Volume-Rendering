@@ -25,6 +25,7 @@ public class JNIInterface {
     public static native void JNIsendDataPrepare(int width, int height, int dims, boolean b_wmask);
     public static native void JNIsendData(int target, int idx, int chunk_size, int unit_size, byte[] data);
     public static native void JNIsendDataDone();
+    public static native void JNIreleaseBuffer();
     public static native byte[] JNIgetVolumeData();
     public static Bitmap loadImage(String imageName) {
         try {
