@@ -13,6 +13,8 @@ DRAW_BAKED(screen_baked){
             ||!shader_->AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG])
             ||!shader_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
+    vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
+
     cutter_ = new cuttingController;
 }
 
@@ -85,6 +87,8 @@ void raycastRenderer::draw_baked(){
         if(!cshader_->AddShader(GL_COMPUTE_SHADER, vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
            ||!cshader_->CompileAndLink())
             LOGE("Raycast=====Failed to create raycast geometry shader");
+        vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL]="";
+
     }
 
     if(vrController::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");

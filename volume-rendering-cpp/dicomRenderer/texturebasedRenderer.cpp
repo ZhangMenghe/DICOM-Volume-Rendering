@@ -11,6 +11,8 @@ texvrRenderer::texvrRenderer(bool screen_baked)
        ||!shader_->AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG])
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
+    vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
+
     onCuttingChange(.0f);
 }
 

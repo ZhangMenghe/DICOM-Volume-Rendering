@@ -22,9 +22,9 @@ public class JNIInterface {
     public static native void JNIonSurfaceChanged(int rotation, int width, int height);
     public static native void JNIdrawFrame();
 
+    public static native void JNIsendDataPrepare(int width, int height, int dims, boolean b_wmask);
     public static native void JNIsendData(int target, int idx, int chunk_size, int unit_size, byte[] data);
-    public static native void JNIsetupDCMIConfig(int width, int height, int dims, boolean b_wmask);
-    public static native void JNIAssembleVolume();
+    public static native void JNIsendDataDone();
     public static native byte[] JNIgetVolumeData();
     public static Bitmap loadImage(String imageName) {
         try {

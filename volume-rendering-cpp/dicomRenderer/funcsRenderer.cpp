@@ -9,14 +9,18 @@ FuncRenderer::FuncRenderer(){
        ||!shader_func.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_OPA_VIZ_FRAG])
        ||!shader_func.CompileAndLink())
         LOGE("FuncsVisual===Failed to create opacity shader program===");
+
     if(!shader_quad.AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_OPA_VIZ_VERT])
        ||!shader_quad.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_OPA_VIZ_FRAG])
        ||!shader_quad.CompileAndLink())
         LOGE("FuncsVisual===Failed to create shader_quad shader program===");
+
     if(!shader_colorbar.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_COLOR_VIZ_VERT])
        ||!shader_colorbar.AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_COLOR_VIZ_FRAG])
        ||!shader_colorbar.CompileAndLink())
         LOGE("FuncsVisual===Failed to create shader_colorbar shader program===");
+    vrController::shader_contents[dvr::SHADER_OPA_VIZ_VERT] = "";vrController::shader_contents[dvr::SHADER_OPA_VIZ_FRAG]="";
+    vrController::shader_contents[dvr::SHADER_COLOR_VIZ_VERT] = "";vrController::shader_contents[dvr::SHADER_COLOR_VIZ_FRAG]="";
 
     GLuint sp = shader_func.Use();
     Shader::Uniform(sp, "uScale", glm::vec2(1.8f, .15f));

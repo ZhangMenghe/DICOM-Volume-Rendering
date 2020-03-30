@@ -16,8 +16,8 @@ namespace {
     int CHANEL_NUM = 4;
     //globally
     GLubyte* g_VolumeTexData = nullptr;
-    int g_img_h, g_img_w, g_vol_dim;
-    size_t g_ssize_schanel, g_ssize = 0, g_vol_len;
+    int g_img_h=0, g_img_w=0, g_img_d=0;
+    size_t g_ssize = 0, g_vol_len;
     size_t n_data_offset[2] = {0};
 
     void setupShaderContents(){
@@ -152,27 +152,25 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
         }
     }
     n_data_offset[target] += CHANEL_NUM / unit_size * chunk_size;
+    env->ReleaseByteArrayElements(jdata, data, 0);
 }
 
-JNI_METHOD(void, JNIsetupDCMIConfig)(JNIEnv*, jclass, jint width, jint height, jint dims, jboolean b_wmask){
+JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint width, jint height, jint dims, jboolean b_wmask){
     CHANEL_NUM = b_wmask? 4:2;
-    g_img_h = height; g_img_w = width;
-    g_ssize_schanel = width * height;
-    g_vol_dim = dims;
-    g_ssize = CHANEL_NUM * g_ssize_schanel;
+    g_img_h = height; g_img_w = width; g_img_d = dims;
+    g_ssize = CHANEL_NUM * width * height;
     g_vol_len = g_ssize* dims;
 
+    if(g_VolumeTexData!= nullptr){delete[]g_VolumeTexData; g_VolumeTexData = nullptr;}
     g_VolumeTexData = new GLubyte[ g_vol_len];
     memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
-
-    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-    vrc->setVolumeConfig(width, height, dims);
 }
 
-JNI_METHOD(void, JNIAssembleVolume)(JNIEnv*, jclass){
+JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
     if(n_data_offset[LOAD_DCMI_ID] == 0 && n_data_offset[LOAD_MASK_ID] == 0) return;
-    vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-    vrc->assembleTexture(g_VolumeTexData, CHANEL_NUM);
+    vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_VolumeTexData, CHANEL_NUM);
+    //todo:!!attention, is the data change or not? delete here to save memory
+    delete[]g_VolumeTexData; g_VolumeTexData = nullptr;
     n_data_offset[LOAD_DCMI_ID] = 0; n_data_offset[LOAD_MASK_ID] = 0;
 }
 
