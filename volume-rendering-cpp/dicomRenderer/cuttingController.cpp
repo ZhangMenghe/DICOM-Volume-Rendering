@@ -80,6 +80,8 @@ void cuttingController::draw_plane(){
            ||!pshader->AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_CPLANE_FRAG])
            ||!pshader->CompileAndLink())
             LOGE("Raycast===Failed to create cutting plane shader program===");
+        vrController::shader_contents[dvr::SHADER_CPLANE_VERT] = "";vrController::shader_contents[dvr::SHADER_CPLANE_FRAG]="";
+
     }
     GLuint sp = pshader->Use();
     Shader::Uniform(sp,"uMVP", vrController::camera->getVPMat()* p_p2w_mat);

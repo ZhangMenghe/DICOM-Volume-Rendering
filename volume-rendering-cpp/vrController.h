@@ -27,16 +27,13 @@ public:
 
     vrController();
     ~vrController();
-    void assembleTexture(GLubyte * data, int channel_num = 4);
-    void updateTexture(GLubyte * data);
-    void setVolumeConfig(int width, int height, int dims);
+    void assembleTexture(int w, int h, int d, GLubyte * data, int channel_num = 4);
 
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
     void onDraw();
     void onReset();
-    void onDestroy();
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);
@@ -63,10 +60,6 @@ private:
 
     //Textures
     Texture *tex_volume = nullptr, *tex_baked = nullptr;
-
-    //volume datas
-    glm::uvec3 VOL_DIMS = glm::uvec3(0);
-    uint32_t* vol_data = nullptr;
 
     struct reservedStatus{
         glm::mat4 model_mat, rot_mat;
