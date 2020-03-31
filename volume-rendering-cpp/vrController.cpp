@@ -40,6 +40,7 @@ void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
     rStates_.clear();
     cst_name="";
+    _screen_w = 0; _screen_h = 0;
     setStatus("default_status");
 }
 void vrController::assembleTexture(int w, int h, int d, GLubyte * data, int channel_num){
@@ -203,7 +204,7 @@ void vrController::setStatus(std::string status_name){
         //LOGE("===create status for %s\n", status_name.c_str());
         // for debug camera only
         //if(status_name == "Raycasting") rStates_[status_name].vcam->setPosition();
-        if(!cst_name.empty())rStates_[status_name].vcam->setProjMat(_screen_w, _screen_h);
+        if(_screen_w != 0)rStates_[status_name].vcam->setProjMat(_screen_w, _screen_h);
     }
 
     auto rstate_ = rStates_[status_name];
