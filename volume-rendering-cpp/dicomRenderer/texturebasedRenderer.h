@@ -13,6 +13,7 @@ private:
     const float DENSE_FACTOR = 1.0f;
     int dimensions; float dimension_inv;
     const int MAX_DIMENSIONS = 200;
+    const float MAX_DIMENSIONS_INV = 1.0f/MAX_DIMENSIONS;
 
     Shader* shader_;
     GLuint frame_buff_ = 0;

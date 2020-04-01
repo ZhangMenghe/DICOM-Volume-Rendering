@@ -52,10 +52,11 @@ void texvrRenderer::update_instance_data(){
     if(dimensions == 0) return;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
-    float mappedZVal = -scale_inv, zTex = .0f;
+    float zTex = .0f;
+    float mappedZVal = -scale_inv + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
     for (int i = 0; i < dimensions; i++){
         zInfos[i].x = mappedZVal; zInfos[i].y = zTex;
-        mappedZVal+=2.0 * dimension_inv* scale_inv; zTex+=dimension_inv;
+        mappedZVal+=MAX_DIMENSIONS_INV; zTex+=dimension_inv;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
