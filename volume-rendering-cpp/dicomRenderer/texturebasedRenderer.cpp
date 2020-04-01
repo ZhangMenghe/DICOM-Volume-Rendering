@@ -17,21 +17,9 @@ texvrRenderer::texvrRenderer(bool screen_baked)
 }
 
 void texvrRenderer::init_vertices(){
-    if(dimensions == 0) return;
-    glm::vec2 *zInfos = new glm::vec2[dimensions];
-
-    float mappedZVal = -scale_inv, zTex = .0f;
-    for (int i = 0; i < dimensions; i++){
-        zInfos[i].x = mappedZVal; zInfos[i].y = zTex;
-        mappedZVal+=2.0 * dimension_inv* scale_inv; zTex+=dimension_inv;
-    }
-
-    // store instance data in an array buffer
-    // --------------------------------------
-    unsigned int instanceVBO;
-    glGenBuffers(1, &instanceVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * dimensions, zInfos, GL_STATIC_DRAW);
+    glGenBuffers(1, &vbo_instance);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * MAX_DIMENSIONS, nullptr, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &vao_slice);
@@ -52,11 +40,29 @@ void texvrRenderer::init_vertices(){
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
     glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, instanceVBO); // this attribute comes from a different vertex buffer
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_instance); // this attribute comes from a different vertex buffer
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute.
     b_init_successful = true;
+
+    update_instance_data();
+}
+void texvrRenderer::update_instance_data(){
+    if(dimensions == 0) return;
+    glm::vec2 *zInfos = new glm::vec2[dimensions];
+
+    float mappedZVal = -scale_inv, zTex = .0f;
+    for (int i = 0; i < dimensions; i++){
+        zInfos[i].x = mappedZVal; zInfos[i].y = zTex;
+        mappedZVal+=2.0 * dimension_inv* scale_inv; zTex+=dimension_inv;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, dimensions *sizeof(glm::vec2), zInfos);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    delete[]zInfos;
 }
 //BE SUPER CAUTIOUS TO CHANGE!
 void texvrRenderer::draw_scene(){
@@ -122,4 +128,8 @@ void texvrRenderer::draw_baked() {
     screenQuad::instance()->Draw();
     baked_dirty_ = false;
 }
-void texvrRenderer::setDimension(int dims){dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;}
+
+void texvrRenderer::setDimension(int dims){
+    dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
+    update_instance_data();
+}
