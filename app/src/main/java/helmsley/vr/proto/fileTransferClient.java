@@ -348,6 +348,9 @@ public class fileTransferClient {
             local_dv_map.put(dsname, new ArrayList<>());
         }
         List<volumeInfo> infolist = local_dv_map.get(dsname);
+        for(volumeInfo info:infolist){
+            if(info.getFolderName().equals(tvol.getFolderName())) return;
+        }
         infolist.add(tvol);
         local_dv_map.put(dsname, infolist);
     }
