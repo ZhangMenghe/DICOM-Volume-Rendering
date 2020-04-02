@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--debug:review the style-->
+<!--<android.support.constraint.ConstraintLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent">-->
+
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:background="@color/paneColor"
+    android:fillAfter="true"
+    android:fillEnabled="true"
+    app:layout_constraintHeight_percent="0.1"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent">
+
+    <LinearLayout
+        android:id="@+id/cutting_widgets_group"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/paneColor"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="horizontal">
+    </LinearLayout>
+    <SeekBar
+        android:id="@+id/cutting_seekbar"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="20dp"
+        android:theme="@style/Seekbar"
+        app:layout_constraintWidth_percent="0.9"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/cutting_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_centerInParent="true"
+        app:backgroundTint="@color/brightBlue"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintDimensionRatio="1:1"/>
+</android.support.constraint.ConstraintLayout>
+
+<!--</android.support.constraint.ConstraintLayout>-->

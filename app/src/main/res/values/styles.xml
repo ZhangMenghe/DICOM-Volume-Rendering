@@ -25,6 +25,13 @@
         <!-- inactive track color (30% transparency) -->
         <item name="android:colorForeground">#D8464242</item>
     </style>
+    <style name="CommonButton" parent="AppTheme">
+        <item name="colorButtonNormal">@color/brightBlue</item>
+        <item name="colorControlHighlight">@color/yellowOrange</item>
+        <item name="android:textColor">@color/darkBlue</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">18sp</item>
+    </style>
     <style name="titleText" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/brightBlue</item>
         <item name="android:gravity">center</item>

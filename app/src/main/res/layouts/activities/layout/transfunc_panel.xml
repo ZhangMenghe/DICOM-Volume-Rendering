@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--debug:review the style-->
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:gravity="center"
+    android:orientation="horizontal"
+    android:background="@color/paneColor"
+    android:fillAfter="true"
+    android:fillEnabled="true"
+    app:layout_constraintHeight_percent="@dimen/activity_trans_bottom_panel_percent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent">
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/trans_graph_panel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/brightBlue"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/trans_gray_panel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/redOrange"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/trans_graph_panel"/>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/trans_color_mix_panel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/yellowOrange"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/trans_gray_panel"/>
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/trans_color_tune_panel"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/brightYellow"
+        app:layout_constraintHeight_percent="0.1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/trans_color_mix_panel"/>
+       <LinearLayout
+            android:id="@+id/trans_widgets_group"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/paneColor"
+            app:layout_constraintHeight_percent="0.2"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/trans_color_tune_panel"
+            android:orientation="horizontal">
+            <Spinner
+                android:id="@+id/render_mode_spinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                style="@style/Spinner"/>
+            <Spinner
+                android:id="@+id/render_color_spinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:spinnerMode="dropdown"
+                style="@style/Spinner"/>
+        </LinearLayout>
+    </android.support.constraint.ConstraintLayout>
+</android.support.constraint.ConstraintLayout>
