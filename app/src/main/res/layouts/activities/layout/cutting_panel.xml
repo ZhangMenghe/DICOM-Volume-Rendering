@@ -16,20 +16,35 @@
     android:background="@color/paneColor"
     android:fillAfter="true"
     android:fillEnabled="true"
-    app:layout_constraintHeight_percent="0.1"
+    app:layout_constraintHeight_percent="0.13"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintBottom_toBottomOf="parent">
 
-    <LinearLayout
-        android:id="@+id/cutting_widgets_group"
-        android:layout_width="match_parent"
+    <CheckBox
+        android:id="@+id/check_cutting_show"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/paneColor"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:text="@string/cutting_check_name"
+        android:theme="@style/CommonCheckBox"
+        android:textColor="@color/brightBlue"
+        app:layout_constraintWidth_percent="0.5"
         app:layout_constraintHeight_percent="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <Spinner
+        android:id="@+id/spinner_check_cutting_control"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+
+        android:gravity="center"
+        android:spinnerMode="dropdown"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:orientation="horizontal">
-    </LinearLayout>
+        style="@style/SpinnerCompat"/>
     <SeekBar
         android:id="@+id/cutting_seekbar"
         android:layout_width="0dp"

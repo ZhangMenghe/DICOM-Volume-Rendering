@@ -25,6 +25,12 @@
         <!-- inactive track color (30% transparency) -->
         <item name="android:colorForeground">#D8464242</item>
     </style>
+    <style name="CommonCheckBox" parent="@style/Widget.AppCompat.CompoundButton.CheckBox">
+        <item name="android:colorControlNormal">@color/brightBlue</item>
+        <item name="android:colorControlActivated">@color/yellowOrange</item>
+        <item name="android:colorControlHighlight">@color/yellowOrange</item>
+        <item name="android:textAppearance">@style/itemTextCompat</item>
+    </style>
     <style name="CommonButton" parent="AppTheme">
         <item name="colorButtonNormal">@color/brightBlue</item>
         <item name="colorControlHighlight">@color/yellowOrange</item>
@@ -46,6 +52,10 @@
         <item name="android:textSize">18sp</item>
         <item name="android:paddingTop">8dp</item>
         <item name="android:paddingBottom">8dp</item>
+    </style>
+    <style name="itemTextCompat" parent="TextAppearance.AppCompat">
+        <item name="android:textColor">@color/brightBlue</item>
+        <item name="android:textSize">18sp</item>
     </style>
     <style name="itemHighlightText" parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/yellowOrange</item>
@@ -90,5 +100,13 @@
         <item name="android:textColor">@color/brightBlue</item>
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
+    </style>
+    <style name="SpinnerCompat" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
+        <item name="android:popupBackground">@color/midBlue</item>
+        <item name ="android:colorBackground">@color/midBlue</item>
+        <item name="android:backgroundTint">@color/brightBlue</item>
+
+        <item name="android:textColor">@color/brightBlue</item>
+        <item name="android:textSize">18sp</item>
     </style>
 </resources>

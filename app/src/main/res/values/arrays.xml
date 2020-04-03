@@ -16,6 +16,16 @@
         <item>false</item>
     </string-array>
 
+    <string-array name="check_cutting_params">
+        <item>@string/freezeVolume_check_name</item>
+        <item>@string/freezeplane_check_name</item>
+    </string-array>
+    <string-array name="check_cutting_values">
+        <item>false</item><!-- is cutting-->
+        <item>false</item>
+        <item>false</item>
+    </string-array>
+
 <!--    name, value, maxvalue, toggle_bar_max-->
     <string-array name="raycastParams">
         <item>@array/raycast_density</item>

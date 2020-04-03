@@ -17,19 +17,23 @@ import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
 public class checkboxAdapter {
-    private checkboxListAdapter mAdapter;
-    private final WeakReference<Context> contexRef;
+    checkboxListAdapter mAdapter;
+    final WeakReference<Context> contexRef;
     private final WeakReference<UIsManager> mUIManagerRef;
 
-    private static LinkedHashMap<String, Boolean> check_map;
+    static LinkedHashMap<String, Boolean> check_map;
     private static String mask_name, raycast_name, cutting_name, freeze_plane_name, freeze_volume_name;
-
+    public checkboxAdapter(Context context){
+        contexRef = new WeakReference<>(context);
+        mUIManagerRef = null;
+        Reset();
+    }
     public checkboxAdapter(Context context, UIsManager manager){
         contexRef = new WeakReference<>(context);
         mUIManagerRef = new WeakReference<>(manager);
         Reset();
     }
-    private void setupCheckMapValue(Resources res) {
+    protected void setupCheckMapValue(Resources res) {
         //setup check map values
         String check_items[] = res.getStringArray(R.array.checkParams);
         TypedArray check_values = res.obtainTypedArray(R.array.checkValues);
@@ -67,29 +71,29 @@ public class checkboxAdapter {
     }
 
     public class checkboxListAdapter extends ListAdapter{
-        private ArrayList<Boolean> item_values;
+        ArrayList<Boolean> item_values;
 
-        public checkboxListAdapter(Context context,
-                           ArrayList<String> item_names, ArrayList<Boolean> item_values,
-                           String title) {
+        checkboxListAdapter(Context context,
+                            ArrayList<String> item_names, ArrayList<Boolean> item_values,
+                            String title) {
             super(context, title);
             this.item_names = item_names;
             this.item_values = item_values;
         }
-        public void addItem(String name, boolean value){
+        void addItem(String name, boolean value){
             if(this.item_names.contains(name)) return;
             this.item_names.add(name);
             this.item_values.add(value);
             notifyDataSetChanged();
         }
-        public void removeItem(String name){
+        void removeItem(String name){
             int id = this.item_names.indexOf(name);
             if(id == -1) return;
             this.item_names.remove(id);
             this.item_values.remove(id);
             notifyDataSetChanged();
         }
-        public boolean getItemValue(String name){
+        boolean getItemValue(String name){
             int position = this.item_names.indexOf(name);
             return position==-1? false:this.item_values.get(position);
         }
@@ -155,7 +159,7 @@ public class checkboxAdapter {
 
     }
     private void onFreezePlaneSwitch(boolean isChecked){
-        cutplaneUIs.isPlaneFreeze = isChecked;
+//        cutplaneUIs.isPlaneFreeze = isChecked;
         //mutual exclusion true
         if(isChecked && mAdapter.getItemValue(freeze_volume_name)){
             int position = mAdapter.item_names.indexOf(freeze_volume_name);
@@ -167,7 +171,7 @@ public class checkboxAdapter {
     private void onFreezeVolumeSwitch(boolean isChecked){
         //mutual exclusion true
         if(isChecked && mAdapter.getItemValue(freeze_plane_name)){
-            cutplaneUIs.isPlaneFreeze = false;
+//            cutplaneUIs.isPlaneFreeze = false;
             int position = mAdapter.item_names.indexOf(freeze_plane_name);
             mAdapter.item_values.set(position, false);
             JUIInterface.JUIsetChecks(mAdapter.item_names.get(position), false);

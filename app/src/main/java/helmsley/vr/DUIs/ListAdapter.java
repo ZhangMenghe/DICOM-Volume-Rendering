@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.List;
 
 import helmsley.vr.R;
 
@@ -18,7 +19,7 @@ public abstract class ListAdapter extends BaseAdapter {
     protected String title;
     protected final WeakReference<Context> contexRef;
 
-    protected ArrayList<String> item_names;
+    protected List<String> item_names;
 
 
     public ListAdapter(Context context, String title) {

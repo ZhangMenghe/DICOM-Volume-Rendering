@@ -1,6 +1,8 @@
 package helmsley.vr;
 
 import android.app.Activity;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
@@ -16,10 +18,13 @@ import helmsley.vr.DUIs.maskUIs;
 public class UIsManager {
     private final WeakReference<Activity> actRef;
     final static String TAG = "UIsManager";
+    //Panels
+    private cutplaneUIs cuttingController;
+
     // UIs
     private Spinner spinner_tune;
     private Spinner spinner_check;
-    private cutplaneUIs cuttingController;
+
     private dialogUIs dialogController;
     private maskUIs masksController;
 
@@ -33,11 +38,16 @@ public class UIsManager {
     UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);
-        cuttingController = new cutplaneUIs(activity_);
         masksController = new maskUIs(activity_);
+        setupSubPanels(activity_);
         setupTopPanelSpinners();
-    }
 
+    }
+    private void setupSubPanels(Activity activity_){
+        final ViewGroup parent_view = (ViewGroup)activity_.findViewById(R.id.parentPanel);
+        cuttingController = new cutplaneUIs(activity_, parent_view);
+
+    }
     private void setupTopPanelSpinners(){
         //Tune spinners
         spinner_tune =  (Spinner)actRef.get().findViewById(R.id.tuneSpinner);
