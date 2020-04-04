@@ -6,64 +6,48 @@
 <!--    android:layout_width="match_parent"-->
 <!--    android:layout_height="match_parent">-->
 
-<android.support.constraint.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="0dp"
+    android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="horizontal"
     android:background="@color/paneColor"
     android:fillAfter="true"
     android:fillEnabled="true"
-    app:layout_constraintHeight_percent="@dimen/activity_top_panel_percent"
+
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/topPanel">
-<!--    app:layout_constraintTop_toTopOf="parent">-->
-<!--    app:layout_constraintTop_toBottomOf="parent">-->
-<!--    app:layout_constraintTop_toBottomOf="@+id/topPanel">-->
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/tune_widget_group"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
 
-        app:layout_constraintHeight_percent="0.3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-        <Spinner
-            android:id="@+id/tune_widget_id_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            app:layout_constraintStart_toStartOf="parent"
-            style="@style/Spinner"/>
-        <Button
-            android:id="@+id/tune_widget_add_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Add One"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/tune_widget_delete_button"
-            style="@style/CommonButton"/>
+    <!--    app:layout_constraintTop_toTopOf="parent">-->
 
-        <Button
-            android:id="@+id/tune_widget_delete_button"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="Delete"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            style="@style/CommonButton"/>
-    </android.support.constraint.ConstraintLayout>
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/tune_seekbar_recycle_view"
+    <Spinner
+        android:id="@+id/tune_widget_id_spinner"
         android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_centerInParent="true"
-        app:layout_constraintWidth_percent="0.9"
-        app:layout_constraintHeight_percent="0.7"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-</android.support.constraint.ConstraintLayout>
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        style="@style/Spinner"/>
+    <Spinner
+        android:id="@+id/tune_seekbar_spinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        style="@style/Spinner"/>
+    <Button
+        android:id="@+id/tune_widget_add_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Add"
+        android:layout_weight="0.8"
+        style="@style/CommonButton"/>
+    <Button
+        android:id="@+id/tune_widget_delete_button"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:layout_weight="0.8"
+        style="@style/CommonButton"/>
+</LinearLayout>
 
 <!--</android.support.constraint.ConstraintLayout>-->

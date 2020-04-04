@@ -19,23 +19,18 @@
         android:fillEnabled="true"
         app:layout_constraintHeight_percent="0.15"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/topPanel">
         <CheckBox
             android:id="@+id/check_mask_show"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/mask_check_name"
+            android:theme="@style/CommonCheckBox"
+            android:textColor="@color/brightBlue"
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
-        <TextView
-            android:id="@+id/text_mask_show"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:text="@string/mask_check_name"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toEndOf="@+id/check_mask_show"
-            app:layout_constraintTop_toTopOf="parent"
-            style="@style/itemText"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/mask_recycle"
             android:scrollbars="horizontal"

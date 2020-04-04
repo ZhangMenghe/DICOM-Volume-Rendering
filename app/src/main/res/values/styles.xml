@@ -32,6 +32,7 @@
         <item name="android:textAppearance">@style/itemTextCompat</item>
     </style>
     <style name="CommonButton" parent="AppTheme">
+        <item name="android:backgroundTint">@color/brightBlue</item>
         <item name="colorButtonNormal">@color/brightBlue</item>
         <item name="colorControlHighlight">@color/yellowOrange</item>
         <item name="android:textColor">@color/darkBlue</item>
@@ -101,12 +102,23 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textStyle">bold</item>
     </style>
-    <style name="SpinnerCompat" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
-        <item name="android:popupBackground">@color/midBlue</item>
-        <item name ="android:colorBackground">@color/midBlue</item>
-        <item name="android:backgroundTint">@color/brightBlue</item>
-
+    <style name="SpinnerItem">
         <item name="android:textColor">@color/brightBlue</item>
-        <item name="android:textSize">18sp</item>
+        <item name="android:colorBackground">@color/midBlue</item>
+        <item name="android:popupBackground">@color/midBlue</item>
+
+        <item name="android:textSize">10sp</item>
+    </style>
+    <style name="SpinnerDropDownItem">
+        <item name="android:textColor">@color/brightBlue</item>
+        <item name="android:colorBackground">@color/midBlue</item>
+        <item name="android:popupBackground">@color/midBlue</item>
+
+        <item name="android:textSize">10sp</item>
+
+    </style>
+    <style name="SpinnerCompat" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
+        <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+        <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItem</item>
     </style>
 </resources>

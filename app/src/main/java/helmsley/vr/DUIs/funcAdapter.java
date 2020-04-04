@@ -32,7 +32,7 @@ public class funcAdapter{
         return mAdapterRef.get();
     }
     public class funcListAdapter extends ListAdapter{
-        public funcListAdapter(Context context, String[] item_names, String title){
+        funcListAdapter(Context context, String[] item_names, String title){
             super(context, title);
             this.item_names = new ArrayList<>(Arrays.asList(item_names));
         }

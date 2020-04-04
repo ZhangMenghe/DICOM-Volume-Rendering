@@ -73,16 +73,12 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     }
 
 }
-JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value, jboolean freeze_plane){
+JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value){
     auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
     auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
 //    LOGE("======CUTTING %d, %f, %d", id, value, freeze_plane?1:0);
     auto it = std::find (vec->begin(), vec->end(), cutting_keyword);
     (*tvec)[it - vec->begin()] = value;
-    if(id == RAY_ID){
-        auto it_freeze = std::find (param_checks.begin(), param_checks.end(), freeze_keyworkd);
-        vrController::param_bool[it_freeze-param_checks.begin()] = freeze_plane;
-    }
     vrController::cutDirty = true;
     vrController::baked_dirty_ = true;
 }

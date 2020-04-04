@@ -10,6 +10,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -46,12 +47,24 @@ public class cutplaneUIs {
         final LayoutInflater mInflater = LayoutInflater.from(activity);
 
         panel_ = mInflater.inflate(R.layout.cutting_panel, parent_view, false);
-        parent_view.addView(panel_);
+        panel_visible = false;
 
-        //setup buttons
+        //setup spinner
         Spinner spinner_check =  (Spinner)panel_.findViewById(R.id.spinner_check_cutting_control);
         cbAdapter_ = new ctCheckboxListAdapter(activity);
         spinner_check.setAdapter(cbAdapter_);
+
+        //setup checkbox
+        String check_cutting_show_str = activity.getResources().getString(R.string.cutting_check_name);
+        CheckBox checkbox = (CheckBox)panel_.findViewById(R.id.check_cutting_show);
+        checkbox.setChecked(cbAdapter_.getSeparateCheckBoxValue());
+        checkbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                JUIInterface.JUIsetChecks(check_cutting_show_str, isChecked);
+            }
+        });
 
         //setup seekbar
         seek_bar_ = (SeekBar)panel_.findViewById(R.id.cutting_seekbar);
@@ -61,7 +74,7 @@ public class cutplaneUIs {
         seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                JUIInterface.JUIsetCuttingPlane(UIsManager.tex_id, 1.0f * i / max_seek_value, false);
+                JUIInterface.JUIsetCuttingPlane(UIsManager.tex_id, 1.0f * i / max_seek_value);
             }
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {}
@@ -84,7 +97,7 @@ public class cutplaneUIs {
                         break;
 
                     case MotionEvent.ACTION_MOVE:
-                        JUIInterface.JUIsetCuttingPlane(UIsManager.raycast_id, event.getRawX() - down_e_x, true);
+                        JUIInterface.JUIsetCuttingPlane(UIsManager.raycast_id, event.getRawX() - down_e_x);
                         view.setX(e_v_offset + event.getRawX());
                         break;
 
@@ -103,7 +116,11 @@ public class cutplaneUIs {
         Reset();
     }
     public void Reset(){
-        parentRef.get().removeView(panel_);
+        if(panel_visible){
+            panel_visible = false;
+            parentRef.get().removeView(panel_);
+        }
+
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         int max_seek_value = Integer.valueOf(params[1]);
         seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
@@ -139,6 +156,7 @@ public class cutplaneUIs {
             item_values = new ArrayList<>();
             for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+1, false));
         }
+        boolean getSeparateCheckBoxValue(){return is_cutting;}
 
         public View getDropDownView(int position, View convertView, ViewGroup parent){
             ViewContentHolder holder;
@@ -147,13 +165,30 @@ public class cutplaneUIs {
                 convertView = mInflater.inflate(R.layout.spinner_check_layout, null);
                 holder.text_name = (TextView) convertView.findViewById(R.id.checkName);
                 holder.checkBox = (CheckBox) convertView.findViewById(R.id.checkCheckBox);
+
                 convertView.setTag(R.layout.spinner_check_layout, holder);
 
             } else {
                 holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
             }
             holder.text_name.setText(item_names.get(position));
-            //set listener
+            holder.checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView,
+                                             boolean isChecked) {
+                    if(item_values.get(position) == isChecked) return;
+                    item_values.set(position, isChecked);
+                    JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
+
+                    int relpos = 1-position;
+                    if(isChecked && item_values.get(relpos)){
+                        //update another one
+                        JUIInterface.JUIsetChecks(item_names.get(relpos), false);
+                        item_values.set(relpos, false);
+                        notifyDataSetChanged();
+                    }
+                }
+            });
             holder.checkBox.setTag(position);
             holder.checkBox.setChecked(item_values.get(position));
             return convertView;

@@ -21,15 +21,13 @@ import helmsley.vr.UIsManager;
 public class SeekbarAdapter {
     private ArrayList<seekbarListAdapter> mAdapters;
     private final WeakReference<Context> contexRef;
-    private final WeakReference<UIsManager> mUIManagerRef;
     private final static String[] TuneTitles = {"Opacity", "Tune"};
     private ArrayList<float[]>tune_maxs;
     private ArrayList<int[]>tune_seek_max;
     private ArrayList<LinkedHashMap<String, Float>> tune_maps;
 
-    public SeekbarAdapter(Context context, UIsManager manager){
+    public SeekbarAdapter(Context context){
         contexRef = new WeakReference<>(context);
-        mUIManagerRef = new WeakReference<>(manager);
         Reset();
     }
     public seekbarListAdapter getListAdapter(int index){
