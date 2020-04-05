@@ -1,6 +1,7 @@
 package helmsley.vr.DUIs;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -74,23 +75,27 @@ class textSimpleListAdapter extends ListAdapter {
     void setTitleByText(String title) {this.title = title;}
     void setTitleById(int id){if(id<item_names.size())this.title = item_names.get(id);}
     public View getView(int position, View convertView, ViewGroup parent){
-        return getViewWithText(convertView, title, false);
+        return getViewWithText(convertView, title, -1);
     }
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
-        return getViewWithText(convertView, item_names.get(position), true);
+        return getViewWithText(convertView, item_names.get(position), position);
     }
-    private View getViewWithText(View convertView, String content, boolean is_item){
+    void onItemClick(int position){
+        Log.e("TAG", "===onItemClick: " + position );
+    }
+    private View getViewWithText(View convertView, String content, int position){
         ViewTitleHolder holder;
 
         if (convertView == null) {
             holder = new ViewTitleHolder();
             convertView = mInflater.inflate(R.layout.thin_spinner_item, null);
             holder.text_title = (TextView) convertView.findViewById(R.id.titleName);
-            if(is_item)
+            if(position >= 0)
                 holder.text_title.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v) {
                         title = ((TextView)v).getText().toString();
+                        onItemClick(position);
                         notifyDataSetChanged();
                     }
                 } );

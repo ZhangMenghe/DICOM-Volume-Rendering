@@ -27,6 +27,9 @@
     <string name="panel_rendering_name">Rendering</string>
     <string name="panel_mask_name">Organs</string>
 
+    <string name="default_render_mode">Raycasting</string>
+    <string name="default_color_mode">Grayscale</string>
+
     <string name="mask_check_name">ShowMask</string>
     <string name="texray_check_name">Raycasting</string>
     <string name="cutting_check_name">Cutting</string>

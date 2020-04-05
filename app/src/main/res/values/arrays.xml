@@ -39,13 +39,12 @@
         <item>false</item>
         <item>false</item>
     </string-array>
-
     <string-array name="rendering_mode">
-        <item>Raycasting</item>
+        <item>@string/default_render_mode</item>
         <item>Slice by slice</item>
     </string-array>
     <string-array name="color_schemes">
-        <item>Grayscale</item>
+        <item>@string/default_color_mode</item>
         <item>HSV</item>
         <item>Bright Color</item>
     </string-array>
@@ -56,7 +55,7 @@
         <item>@array/opa_overall</item>
         <item>@array/opa_lowest</item>
         <item>@array/opa_cutoff</item>
-        <item>@array/opa_center</item>
+<!--        <item>@array/opa_center</item>-->
     </string-array>
 
     <string-array name="raycast_density">

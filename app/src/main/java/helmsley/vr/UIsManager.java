@@ -18,14 +18,11 @@ public class UIsManager {
     //Panels
     private cutplaneUIs cuttingController;
     private renderUIs renderController;
-
-    // UIs
-    private Spinner spinner_tune;
-    private Spinner spinner_check;
-
-    private dialogUIs dialogController;
     private maskUIs masksController;
 
+    // UIs
+    private Spinner spinner_check;
+    private dialogUIs dialogController;
     //Spinner adapter
     private checkpanelAdapter cb_panel_adapter = null;
 
@@ -42,7 +39,7 @@ public class UIsManager {
     private void setupSubPanels(Activity activity_){
         final ViewGroup parent_view = (ViewGroup)activity_.findViewById(R.id.parentPanel);
         cuttingController = new cutplaneUIs(activity_, parent_view);
-        renderController = new renderUIs(activity_, parent_view);
+        renderController = new renderUIs(activity_, this, parent_view);
         masksController = new maskUIs(activity_, parent_view);
     }
     private void setupTopPanelSpinners(){
@@ -68,7 +65,6 @@ public class UIsManager {
     public void onTexRaySwitch(boolean isRaycast){
         current_texray_id = isRaycast?raycast_id:tex_id;
         cuttingController.onCuttingStateChange(isRaycast);
-        renderController.onTexRaySwitch(isRaycast);
     }
     public void onCuttingPlaneSwitch(boolean isPanelOn){
         cuttingController.onCuttingStateChange(isPanelOn, current_texray_id==raycast_id);

@@ -26,11 +26,11 @@ public class SeekbarAdapter {
     private ArrayList<int[]>tune_seek_max;
     private ArrayList<LinkedHashMap<String, Float>> tune_maps;
 
-    public SeekbarAdapter(Context context){
+    SeekbarAdapter(Context context){
         contexRef = new WeakReference<>(context);
         Reset();
     }
-    public seekbarListAdapter getListAdapter(int index){
+    seekbarListAdapter getListAdapter(int index){
         if(index > TuneTitles.length) return null;
         return mAdapters.get(index);
     }
