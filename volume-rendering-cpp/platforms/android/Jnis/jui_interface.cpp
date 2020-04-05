@@ -82,6 +82,13 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     }
 
 }
+JUI_METHOD(void, JUIsetCheckById)(JNIEnv * env, jclass, jint id, jboolean value){
+    if(id >= vrController::param_bool.size()) return;
+    vrController::param_bool[id] = value;
+    //todo: freeze keyword
+    if(id == 4) vrController::cutDirty = true;
+    vrController::baked_dirty_ = true;
+}
 JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value){
     auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
     auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;

@@ -20,6 +20,15 @@
         <item>@string/freezeVolume_check_name</item>
         <item>@string/freezeplane_check_name</item>
     </string-array>
+
+    <string-array name="checkJNIParams">
+        <item>@string/texray_check_name</item>
+        <item>@string/mask_check_name</item>
+        <item>@string/cutting_check_name</item>
+        <item>@string/freezeVolume_check_name</item>
+        <item>@string/freezeplane_check_name</item>
+    </string-array>
+
     <string-array name="check_cutting_params">
         <item>@string/freezeVolume_check_name</item>
         <item>@string/freezeplane_check_name</item>
@@ -30,8 +39,8 @@
         <item>false</item>
     </string-array>
     <string-array name="rendering_mode">
-        <item>Raycasting</item>
         <item>Slice by slice</item>
+        <item>Raycasting</item>
     </string-array>
     <string-array name="color_schemes">
         <item>Grayscale</item>

@@ -14,6 +14,7 @@ extern "C"{
 
     JUI_METHOD(void, JUIsetTuneParam)(JNIEnv *, jclass, jint, jstring , jfloat);
     JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring, jboolean);
+    JUI_METHOD(void, JUIsetCheckById)(JNIEnv * env, jclass, jint, jboolean);
 
     JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat);
     JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint, jint);

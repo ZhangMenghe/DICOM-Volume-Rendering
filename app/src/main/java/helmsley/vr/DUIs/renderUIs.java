@@ -2,6 +2,7 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +26,8 @@ public class renderUIs {
     private SeekbarAdapter seekbarAdapter = null;
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private boolean panel_visible;
-    final private static int RAYCAST_ID = 0;
+    final private static int RAYCAST_ID = 1;
+    private static String CHECK_TEXRAY_NAME;
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
         mUIManagerRef = new WeakReference<>(manager);
         parentRef = new WeakReference<>(parent_view);
@@ -56,9 +58,12 @@ public class renderUIs {
         colorAdapter = new colorListAdapter(activity, R.array.color_schemes);
         color_spinner.setAdapter(colorAdapter);
 
-        Reset(activity);
+        Resources res = activity.getResources();
+        //todo:decent way??
+        CHECK_TEXRAY_NAME = res.getString(R.string.texray_check_name);
+        Reset(res);
     }
-    public void Reset(Activity activity){
+    public void Reset(Resources res){
         if(panel_visible){
             panel_visible = false;
             parentRef.get().removeView(tune_panel_);parentRef.get().removeView(control_panel_);
@@ -66,14 +71,15 @@ public class renderUIs {
 
         seekbarAdapter.Reset();
         //render mode should be the first to set!!
-        int rm_id = Integer.parseInt(activity.getResources().getString(R.string.default_render_mode_id));
+        int rm_id = Integer.parseInt(res.getString(R.string.default_render_mode_id));
         rendermodeAdapter.setTitleById(rm_id);
-        int color_id = Integer.parseInt(activity.getResources().getString(R.string.default_color_mode_id));
+        int color_id = Integer.parseInt(res.getString(R.string.default_color_mode_id));
         colorAdapter.setTitleById(color_id);
     }
     public boolean isRaycasting(){return ((renderListAdapter)rendermodeAdapter).getRenderingModeById() == RAYCAST_ID;}
     private void onTexRaySwitch(boolean isRaycast){
         seekbar_spinner.setAdapter(seekbarAdapter.getListAdapter(isRaycast?1:0));
+        JUIInterface.JUIsetChecks(CHECK_TEXRAY_NAME, isRaycast);
     }
     public void showHidePanel(boolean show_panel){
         if(panel_visible && !show_panel) {parentRef.get().removeView(tune_panel_);parentRef.get().removeView(control_panel_);}

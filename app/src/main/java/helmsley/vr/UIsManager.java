@@ -78,7 +78,7 @@ public class UIsManager {
         masksController.showHidePanel(isPanelOn);
     }
     public void RequestReset(){
-        renderController.Reset(actRef.get());
+        renderController.Reset(actRef.get().getResources());
         cuttingController.Reset();
         masksController.Reset();
 
