@@ -1,6 +1,8 @@
 package helmsley.vr;
 
 import android.app.Activity;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 import java.lang.ref.WeakReference;
@@ -34,7 +36,7 @@ public class UIsManager {
         dialogController = new dialogUIs(activity_);
         setupSubPanels(activity_);
         setupTopPanelSpinners();
-
+        RequestReset();
     }
     private void setupSubPanels(Activity activity_){
         final ViewGroup parent_view = (ViewGroup)activity_.findViewById(R.id.parentPanel);
@@ -76,13 +78,22 @@ public class UIsManager {
         masksController.showHidePanel(isPanelOn);
     }
     public void RequestReset(){
-        renderController.Reset();
+        renderController.Reset(actRef.get());
         cuttingController.Reset();
         masksController.Reset();
 
         cb_panel_adapter.Reset();
         spinner_check.setAdapter(cb_panel_adapter);
-        JUIInterface.JUIonReset();
+
+        //setup check map values
+        //todo:more decent way????
+        Resources res = actRef.get().getResources();
+        String[] check_items = res.getStringArray(R.array.checkParams);
+        boolean[] values = new boolean[check_items.length];
+        values[0] = renderController.isRaycasting();
+        values[1] = masksController.isMaskOn();
+        values = cuttingController.setCuttingStatus(2, values);
+        JUIInterface.JUIonReset(check_items.length, check_items, values);
     }
     void updateOnFrame(){
         dialogController.updateOnFrame();

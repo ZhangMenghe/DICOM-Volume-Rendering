@@ -34,24 +34,24 @@ public class checkboxAdapter {
         Reset();
     }
     protected void setupCheckMapValue(Resources res) {
-        //setup check map values
-        String check_items[] = res.getStringArray(R.array.checkParams);
-        TypedArray check_values = res.obtainTypedArray(R.array.checkValues);
-        boolean values[] = new boolean[check_items.length];
-
-        for(int i=0; i<check_items.length; i++){
-            values[i] = check_values.getBoolean(i, false);
-            check_map.put(check_items[i], values[i]);
-        }
-        mask_name = res.getString(R.string.mask_check_name);
-        raycast_name = res.getString(R.string.texray_check_name);
-        cutting_name = res.getString(R.string.cutting_check_name);
-        freeze_plane_name=res.getString(R.string.freezeplane_check_name);
-        freeze_volume_name = res.getString(R.string.freezeVolume_check_name);
-
-        mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
-        mUIManagerRef.get().onMaskPanelSwitch(check_map.get(mask_name));
-        JUIInterface.JUIInitCheckParam(check_items.length, check_items, values);
+//        //setup check map values
+//        String check_items[] = res.getStringArray(R.array.checkParams);
+//        TypedArray check_values = res.obtainTypedArray(R.array.checkValues);
+//        boolean values[] = new boolean[check_items.length];
+//
+//        for(int i=0; i<check_items.length; i++){
+//            values[i] = check_values.getBoolean(i, false);
+//            check_map.put(check_items[i], values[i]);
+//        }
+//        mask_name = res.getString(R.string.mask_check_name);
+//        raycast_name = res.getString(R.string.texray_check_name);
+//        cutting_name = res.getString(R.string.cutting_check_name);
+//        freeze_plane_name=res.getString(R.string.freezeplane_check_name);
+//        freeze_volume_name = res.getString(R.string.freezeVolume_check_name);
+//
+//        mUIManagerRef.get().onTexRaySwitch(check_map.get(raycast_name));
+//        mUIManagerRef.get().onMaskPanelSwitch(check_map.get(mask_name));
+//        JUIInterface.JUIInitCheckParam(check_items.length, check_items, values);
     }
     public void Reset(){
         check_map=new LinkedHashMap<>();

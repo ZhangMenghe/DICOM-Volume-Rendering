@@ -96,7 +96,7 @@ void FuncRenderer::draw_color_bar(){
 }
 void FuncRenderer::draw_opacity_func(){
     float trans_color_offset = .0f;
-    if(vrController::param_bool[dvr::CHECK_COLOR_TRANS])
+    if(vrController::color_scheme_id == 1)
         trans_color_offset = 0.08f;
 //    if(!vrController::param_bool[dvr::CHECK_RAYCAST])
         UpdateFuncPoints(OPACITY_FUN);
@@ -125,7 +125,7 @@ void FuncRenderer::draw_opacity_func(){
     glDisable(GL_BLEND);
 }
 void FuncRenderer::Draw(){
-    if(vrController::param_bool[dvr::CHECK_COLOR_TRANS])draw_color_bar();
+    if(vrController::color_scheme_id == 1)draw_color_bar();
     draw_opacity_func();
 
 }

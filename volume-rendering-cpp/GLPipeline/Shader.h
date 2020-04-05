@@ -30,6 +30,7 @@ public:
 
 	void EnableKeyword(std::string keyword);
 	void DisableKeyword(std::string keyword);
+	void DisableAllKeyword();
 
 	// set int
 	static void Uniform(GLuint program, const GLchar* name, int x){glUniform1i(glGetUniformLocation(program, name), x);}

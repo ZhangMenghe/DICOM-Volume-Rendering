@@ -25,7 +25,7 @@ public class renderUIs {
     private SeekbarAdapter seekbarAdapter = null;
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private boolean panel_visible;
-
+    final private static int RAYCAST_ID = 0;
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
         mUIManagerRef = new WeakReference<>(manager);
         parentRef = new WeakReference<>(parent_view);
@@ -50,27 +50,26 @@ public class renderUIs {
         Spinner rm_spinner = (Spinner)control_panel_.findViewById(R.id.render_mode_spinner);
         rendermodeAdapter = new renderListAdapter(activity, R.array.rendering_mode);
         //get default rendering mode
-        String drm = activity.getResources().getString(R.string.default_render_mode);
-        rendermodeAdapter.setTitleByText(drm);
         rm_spinner.setAdapter(rendermodeAdapter);
-//        onTexRaySwitch(drm.equals(activity.getResources().getString(R.string.texray_check_name)));
 
         Spinner color_spinner = (Spinner)control_panel_.findViewById(R.id.render_color_spinner);
-        colorAdapter = new textSimpleListAdapter(activity, R.array.color_schemes);
-        colorAdapter.setTitleByText(activity.getResources().getString(R.string.default_color_mode));
+        colorAdapter = new colorListAdapter(activity, R.array.color_schemes);
         color_spinner.setAdapter(colorAdapter);
 
-        Reset();
-//        mUIManagerRef.get().onTexRaySwitch(drm.equals(activity.getResources().getString(R.string.texray_check_name)));
+        Reset(activity);
     }
-    public void Reset(){
+    public void Reset(Activity activity){
         if(panel_visible){
             panel_visible = false;
             parentRef.get().removeView(tune_panel_);parentRef.get().removeView(control_panel_);
         }
-
+        int rm_id = Integer.parseInt(activity.getResources().getString(R.string.default_render_mode_id));
+        rendermodeAdapter.setTitleById(rm_id);
+        int color_id = Integer.parseInt(activity.getResources().getString(R.string.default_color_mode_id));
+        colorAdapter.setTitleById(color_id);
     }
-    public void onTexRaySwitch(boolean isRaycast){
+    public boolean isRaycasting(){return ((renderListAdapter)rendermodeAdapter).getRenderingModeById() == RAYCAST_ID;}
+    private void onTexRaySwitch(boolean isRaycast){
         seekbar_spinner.setAdapter(seekbarAdapter.getListAdapter(isRaycast?1:0));
     }
     public void showHidePanel(boolean show_panel){
@@ -92,23 +91,36 @@ public class renderUIs {
     }
     private class renderListAdapter extends textSimpleListAdapter{
         //TODO: SET THIS!
-        int RAYCAST_ID = 0;
+
+        int current_id = -1;
         renderListAdapter(Context context, int arrayId){
             super(context, arrayId);
-            mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == 0);
-            onTexRaySwitch(RAYCAST_ID == 0);
         }
         void onItemClick(int position){
+            if(position == current_id) return;
             mUIManagerRef.get().onTexRaySwitch(position == RAYCAST_ID);
             onTexRaySwitch(RAYCAST_ID == position);
+            current_id = position;
         }
+        void setTitleById(int id){
+            if(id == current_id) return;
+            super.setTitleById(id);
+            mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == id);
+            onTexRaySwitch(RAYCAST_ID == id);
+            current_id = id;
+        }
+        int getRenderingModeById(){return current_id;}
     }
     private class colorListAdapter extends textSimpleListAdapter{
         colorListAdapter(Context context, int arrayId){
             super(context, arrayId);
         }
+        void setTitleById(int id){
+            super.setTitleById(id);
+            JUIInterface.JuisetColorScheme(id);
+        }
         void onItemClick(int position){
-//            JUIInterface.JuisetColorScheme(position);
+            JUIInterface.JuisetColorScheme(position);
         }
     }
 }

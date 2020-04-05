@@ -4,9 +4,8 @@
 namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,
-        CHECK_COLOR_TRANS,
-        CHECK_CUTTING,
         CHECK_MASKON,
+        CHECK_CUTTING,
         CHECK_FREEZE_VOLUME,
         CHECK_FREEZE_CPLANE
     };
@@ -44,6 +43,7 @@ namespace dvr{
         BAKED_TEX_ID=0,
         SCREEN_QUAD_TEX_ID,
     };
+
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
@@ -54,6 +54,7 @@ namespace dvr{
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f,0.5f);
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
 
-
+    //color scheme
+    constexpr char* COLOR_SCHEMES[3]={"COLOR_GRAYSCALE", "COLOR_HSV", "COLOR_BRIGHT"};
 }
 #endif

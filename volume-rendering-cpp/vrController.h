@@ -21,6 +21,7 @@ public:
 
     static bool baked_dirty_;
     static bool cutDirty;
+    static int color_scheme_id;
     unsigned int mask_num_, mask_bits_;
 
     static vrController* instance();

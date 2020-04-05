@@ -47,7 +47,10 @@ public class maskUIs {
         }
         recyclerViewAdapter.Reset();
     }
-
+    public boolean isMaskOn(){
+        //todo:
+        return false;
+    }
     public void showHidePanel(boolean isPanelOn){
         if(panel_visible && !isPanelOn) parentRef.get().removeView(panel_);
         else if(!panel_visible && isPanelOn) parentRef.get().addView(panel_);

@@ -10,6 +10,7 @@ std::vector<bool> vrController::param_bool;
 std::vector<std::string> vrController::shader_contents;
 bool vrController::baked_dirty_;
 bool vrController::cutDirty;
+int vrController::color_scheme_id;
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -153,9 +154,8 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
     }
-
-    if(param_bool[dvr::CHECK_COLOR_TRANS]) bakeShader_->EnableKeyword("TRANSFER_COLOR");
-    else bakeShader_->DisableKeyword("TRANSFER_COLOR");
+    bakeShader_->DisableAllKeyword();
+    bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
 
     if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");

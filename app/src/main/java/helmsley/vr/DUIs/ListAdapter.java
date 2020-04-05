@@ -72,8 +72,13 @@ class textSimpleListAdapter extends ListAdapter {
         super(context, "");
         item_names = items;
     }
-    void setTitleByText(String title) {this.title = title;}
-    void setTitleById(int id){if(id<item_names.size())this.title = item_names.get(id);}
+    void setTitleByText(String title) {this.title = title;notifyDataSetChanged();}
+    void setTitleById(int id){
+        if(id<item_names.size()){
+            this.title = item_names.get(id);
+            notifyDataSetChanged();
+        }
+    }
     public View getView(int position, View convertView, ViewGroup parent){
         return getViewWithText(convertView, title, -1);
     }

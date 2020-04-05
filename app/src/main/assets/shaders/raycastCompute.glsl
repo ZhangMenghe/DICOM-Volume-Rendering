@@ -1,7 +1,7 @@
 #version 310 es
 
 #pragma multi_compile SHOW_ORGANS
-#pragma multi_compile TRANSFER_COLOR
+#pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 
 #extension GL_EXT_shader_io_blocks:require
@@ -77,7 +77,7 @@ uvec4 Sample(ivec3 pos){
     return color;
 }
 uvec4 post_process(uvec4 color){
-    #ifdef TRANSFER_COLOR
+    #ifdef COLOR_HSV
         color.rgb = transfer_scheme(CURRENT_INTENSITY);
     #endif
 

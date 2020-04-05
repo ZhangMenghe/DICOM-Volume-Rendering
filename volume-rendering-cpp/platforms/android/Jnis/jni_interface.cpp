@@ -68,15 +68,15 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-//    nativeApp(nativeAddr)->onViewCreated();
+    nativeApp(nativeAddr)->onViewCreated();
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
-//    nativeApp(nativeAddr)->onViewChange(w, h);
+    nativeApp(nativeAddr)->onViewChange(w, h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
-//    nativeApp(nativeAddr)->onDraw();
+    nativeApp(nativeAddr)->onDraw();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){

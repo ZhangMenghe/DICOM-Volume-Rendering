@@ -43,12 +43,21 @@ JUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray
     param_checks.push_back(freeze_keyworkd);
     vrController::param_bool.push_back(false);
 
-    //!!debug only,
-//    vrController::instance()->setStatus(vrController::param_bool[0]?"Raycasting":"texturebased");
-
     vrController::baked_dirty_ = true;
 }
-
+void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
+    param_checks.clear();
+    vrController::param_bool.clear();
+    jboolean* values = env->GetBooleanArrayElements(jvalues, 0);
+    for(int i=0; i<num; i++){
+        jstring jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
+        std::string key = dvr::jstring2string(env,jkey);
+        param_checks.push_back(key);
+        vrController::param_bool.push_back(values[i]);
+//        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
+    }
+    vrController::baked_dirty_ = true;
+}
 JUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jfloat value){
     auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
     std::string key = dvr::jstring2string(env,jkey);
@@ -87,9 +96,13 @@ JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint num, jint mbits){
     vrController::instance()->mask_bits_ = (unsigned int)mbits;
     vrController::baked_dirty_ = true;
 }
+JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
+    vrController::color_scheme_id = id;
+    vrController::baked_dirty_ = true;
+}
 
-
-JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass){
+JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
+    InitCheckParam(env, num, jkeys, jvalues);
     nativeApp(nativeAddr)->onReset();
 }
 

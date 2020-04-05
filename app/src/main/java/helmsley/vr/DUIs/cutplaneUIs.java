@@ -125,6 +125,13 @@ public class cutplaneUIs {
         int max_seek_value = Integer.valueOf(params[1]);
         seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
     }
+    public boolean[] setCuttingStatus(int offset, boolean[]valuse){
+        //todo:set real valuses
+        valuse[offset] = false;
+        valuse[offset+1] = false;
+        valuse[offset+2] = false;
+        return valuse;
+    }
     public void onCuttingStateChange(boolean show_panel, boolean isRaycast){
         if(panel_visible && !show_panel) parentRef.get().removeView(panel_);
         else if(!panel_visible && show_panel) parentRef.get().addView(panel_);

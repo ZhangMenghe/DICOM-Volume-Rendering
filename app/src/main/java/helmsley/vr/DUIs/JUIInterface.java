@@ -1,7 +1,7 @@
 package helmsley.vr.DUIs;
 
 public class JUIInterface {
-    public static native void JUIonReset();
+    public static native void JUIonReset(int num, String[] key, boolean[] value);
     public static native void JUIInitTuneParam(int id, int num, String[] key, float[] value);
     public static native void JUIInitCheckParam(int num, String[] key, boolean[] value);
 
@@ -10,6 +10,7 @@ public class JUIInterface {
 
     public static native void JUIsetCuttingPlane(int id, float value);
     public static native void JUIsetMaskBits(int num, int mbits);
+    public static native void JuisetColorScheme(int id);
 
     //touch action
     public static native void JUIonSingleTouchDown(float x, float y);

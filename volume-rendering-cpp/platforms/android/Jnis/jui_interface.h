@@ -3,7 +3,7 @@
 #include "jni_main.h"
 
 extern "C"{
-    JUI_METHOD(void, JUIonReset)(JNIEnv*, jclass);
+    JUI_METHOD(void, JUIonReset)(JNIEnv*, jclass, jint, jobjectArray, jbooleanArray);
     JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass, jfloat, jfloat);
     JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat, jfloat);
     JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat, jfloat);
@@ -17,6 +17,7 @@ extern "C"{
 
     JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat);
     JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint, jint);
+    JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint);
 }
 
 
