@@ -21,7 +21,7 @@ import helmsley.vr.UIsManager;
 public class SeekbarAdapter {
     private ArrayList<seekbarListAdapter> mAdapters;
     private final WeakReference<Context> contexRef;
-    private final static String[] TuneTitles = {"Opacity", "Tune"};
+    private final static String[] TuneTitles = {"Tune", "Tune"};
     private ArrayList<float[]>tune_maxs;
     private ArrayList<int[]>tune_seek_max;
     private ArrayList<LinkedHashMap<String, Float>> tune_maps;

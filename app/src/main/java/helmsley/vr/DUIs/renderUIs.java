@@ -63,6 +63,9 @@ public class renderUIs {
             panel_visible = false;
             parentRef.get().removeView(tune_panel_);parentRef.get().removeView(control_panel_);
         }
+
+        seekbarAdapter.Reset();
+        //render mode should be the first to set!!
         int rm_id = Integer.parseInt(activity.getResources().getString(R.string.default_render_mode_id));
         rendermodeAdapter.setTitleById(rm_id);
         int color_id = Integer.parseInt(activity.getResources().getString(R.string.default_color_mode_id));
@@ -97,13 +100,13 @@ public class renderUIs {
             super(context, arrayId);
         }
         void onItemClick(int position){
-            if(position == current_id) return;
+//            if(position == current_id) return;
             mUIManagerRef.get().onTexRaySwitch(position == RAYCAST_ID);
             onTexRaySwitch(RAYCAST_ID == position);
             current_id = position;
         }
         void setTitleById(int id){
-            if(id == current_id) return;
+//            if(id == current_id) return;
             super.setTitleById(id);
             mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == id);
             onTexRaySwitch(RAYCAST_ID == id);
