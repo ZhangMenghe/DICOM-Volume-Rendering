@@ -3,7 +3,7 @@
 <!--UIManager: panels show/hide + JNI check params-->
     <string-array name="checkShowPanelName">
         <item>@string/panel_rendering_name</item>
-        <item>@string/cutting_check_name</item>
+        <item>@string/panel_cut_name</item>
         <item>@string/panel_mask_name</item>
     </string-array>
     <string-array name="checkShowPanelValues">

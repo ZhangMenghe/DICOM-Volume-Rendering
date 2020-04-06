@@ -106,7 +106,7 @@ public class cutplaneUIs extends BasePanel{
 
         });
         sub_panels_.add(panel_);
-        Reset();
+//        Reset();
     }
     public void Reset(){
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);

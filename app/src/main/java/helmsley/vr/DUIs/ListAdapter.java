@@ -26,6 +26,7 @@ public abstract class ListAdapter extends BaseAdapter {
         this.title = title;
     }
 
+    public List<String> getItem_names(){return item_names;}
     @Override
     public int getCount() {
         return item_names.size();

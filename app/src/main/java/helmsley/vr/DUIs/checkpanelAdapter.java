@@ -37,7 +37,7 @@ public class checkpanelAdapter extends ListAdapter {
         item_values = new ArrayList<>();
         for (int i = 0; i < item_names.size(); i++)
             item_values.add(check_values.getBoolean(i, false));
-        cutting_name = res.getString(R.string.cutting_check_name);
+        cutting_name = res.getString(R.string.panel_cut_name);
         rendering_name = res.getString(R.string.panel_rendering_name);
         mask_name = res.getString(R.string.panel_mask_name);
         check_values.recycle();;

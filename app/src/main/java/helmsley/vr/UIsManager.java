@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import android.widget.Spinner;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
@@ -22,9 +24,10 @@ public class UIsManager {
     private final WeakReference<Activity> actRef;
     final static String TAG = "UIsManager";
     //Panels
-    private BasePanel cuttingController;
-    private BasePanel renderController;
-    private BasePanel masksController;
+    private LinkedHashMap<Integer, BasePanel> sub_panels_;
+//    private BasePanel cuttingController;
+//    private BasePanel renderController;
+//    private BasePanel masksController;
 
     // UIs
     private Spinner spinner_check;
@@ -35,19 +38,27 @@ public class UIsManager {
     final static public int tex_id=0, raycast_id=1;
     final static private int PANEL_NUM = 3;
     static private int current_texray_id = -1;
+    private final static Integer[] sub_panel_name_ids_ ={
+            R.string.panel_rendering_name,
+            R.string.panel_cut_name,
+            R.string.panel_mask_name
+    };
 
     UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
         dialogController = new dialogUIs(activity_);
-        setupSubPanels(activity_);
         setupTopPanelSpinners();
+        setupSubPanels(activity_);
         RequestReset();
     }
     private void setupSubPanels(Activity activity_){
         final ViewGroup parent_view = (ViewGroup)activity_.findViewById(R.id.parentPanel);
-        cuttingController = new cutplaneUIs(activity_, parent_view);
-        renderController = new renderUIs(activity_, this, parent_view);
-        masksController = new maskUIs(activity_, parent_view);
+        sub_panels_ = new LinkedHashMap<>();
+
+        //order matters
+        sub_panels_.put(sub_panel_name_ids_[0], new renderUIs(activity_, this, parent_view));
+        sub_panels_.put(sub_panel_name_ids_[1], new cutplaneUIs(activity_, parent_view));
+        sub_panels_.put(sub_panel_name_ids_[2], new maskUIs(activity_, parent_view));
     }
     private void setupTopPanelSpinners(){
         //checkbox spinners
@@ -71,26 +82,22 @@ public class UIsManager {
     }
     public void onTexRaySwitch(boolean isRaycast){
         current_texray_id = isRaycast?raycast_id:tex_id;
-        cuttingController.onTexRayChange(isRaycast);
+        sub_panels_.get(R.string.panel_cut_name).onTexRayChange(isRaycast);
     }
     public void onCuttingPlaneSwitch(boolean isPanelOn){
-        cuttingController.showHidePanel(isPanelOn, current_texray_id==raycast_id);
+        sub_panels_.get(R.string.panel_cut_name).showHidePanel(isPanelOn, current_texray_id==raycast_id);
     }
     public void onRenderingSwitch(boolean isPanelOn){
-        renderController.showHidePanel(isPanelOn);
+        sub_panels_.get(R.string.panel_rendering_name).showHidePanel(isPanelOn);
     }
     public void onMaskPanelSwitch(boolean isPanelOn){
-        masksController.showHidePanel(isPanelOn);
+        sub_panels_.get(R.string.panel_mask_name).showHidePanel(isPanelOn);
     }
     public void RequestReset(){
-        renderController.showHidePanel(false);
-        renderController.Reset();
-
-        cuttingController.showHidePanel(false);
-        cuttingController.Reset();
-
-        masksController.showHidePanel(false);
-        masksController.Reset();
+        for(BasePanel p: sub_panels_.values()){
+            p.Reset();
+            p.showHidePanel(false);
+        }
 
         cb_panel_adapter.Reset();
         spinner_check.setAdapter(cb_panel_adapter);

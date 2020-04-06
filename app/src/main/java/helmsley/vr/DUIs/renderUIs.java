@@ -58,7 +58,7 @@ public class renderUIs extends BasePanel{
         default_check_values_id = R.array.render_check_values;
 
         CHECK_TEXRAY_NAME = activity.getResources().getString(R.string.texray_check_name);
-        Reset();
+//        Reset();
     }
     public void Reset(){
         Resources res = actRef.get().getResources();
