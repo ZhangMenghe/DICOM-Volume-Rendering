@@ -4,10 +4,10 @@
 namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,
-        CHECK_MASKON,
         CHECK_CUTTING,
         CHECK_FREEZE_VOLUME,
-        CHECK_FREEZE_CPLANE
+        CHECK_FREEZE_CPLANE,
+        CHECK_MASKON,
     };
     enum PARAM_TEX{
         TT_OVERALL=0,

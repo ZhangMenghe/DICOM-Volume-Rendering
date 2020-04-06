@@ -33,6 +33,8 @@ public class maskUIs extends BasePanel{
 
         recyclerViewAdapter = new maskRecyclerViewAdapter(activity, recyclerView);
         recyclerView.setAdapter(recyclerViewAdapter);
+        default_check_array_id = R.array.mask_check_params;
+        default_check_values_id = R.array.mask_check_values;
     }
     public void Reset(){
         recyclerViewAdapter.Reset();

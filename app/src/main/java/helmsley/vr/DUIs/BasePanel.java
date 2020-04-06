@@ -37,14 +37,17 @@ public abstract class BasePanel {
     }
     public void onTexRayChange(boolean israycasting){}
     public void Reset(){}
-    public ArrayList<Boolean> setCheckParams(Resources res, ArrayList<Boolean> values){
+    public ArrayList<Boolean> setCheckParams(Resources res, ArrayList<String> names, ArrayList<Boolean> values){
         if(default_check_array_id!=0){
             check_names_ = res.getStringArray(default_check_array_id);
             TypedArray ta_values = res.obtainTypedArray(default_check_values_id);
-            if(check_names_.length == ta_values.length())
-                for(int i=0; i<check_names_.length;i++) values.add(ta_values.getBoolean(i, false));
-            else
-                Arrays.fill(check_names_, null);
+//            if(check_names_.length == ta_values.length())
+                for(int i=0; i<check_names_.length;i++){
+                    names.add(check_names_[i]);
+                    values.add(ta_values.getBoolean(i, false));
+                }
+//            else
+//                Arrays.fill(check_names_, null);
             ta_values.recycle();
         }
         return values;

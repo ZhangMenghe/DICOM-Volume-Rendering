@@ -6,10 +6,14 @@ import android.content.res.TypedArray;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Spinner;
+
+import com.google.common.primitives.Booleans;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.function.BinaryOperator;
 
 import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
@@ -64,7 +68,6 @@ public class UIsManager {
         //checkbox spinners
         spinner_check =  (Spinner)actRef.get().findViewById(R.id.checkPanelSpinner);
         cb_panel_adapter = new checkpanelAdapter(actRef.get(), this);
-        spinner_check.setAdapter(cb_panel_adapter);
 
         //function spinners
         Spinner spinner_func = (Spinner) actRef.get().findViewById(R.id.funcSpinner);
@@ -94,16 +97,33 @@ public class UIsManager {
         sub_panels_.get(R.string.panel_mask_name).showHidePanel(isPanelOn);
     }
     public void RequestReset(){
-        for(BasePanel p: sub_panels_.values()){
+        Resources res = actRef.get().getResources();
+        String[] check_items_panel = new String[sub_panel_name_ids_.length];
+        boolean[] check_values_panel = new boolean[sub_panel_name_ids_.length];
+        //check params
+        ArrayList<String> check_items_param = new ArrayList<>();
+        ArrayList<Boolean> check_values_param = new ArrayList<>();
+
+        TypedArray check_values_type = res.obtainTypedArray(R.array.checkShowPanelValues);
+
+        for(int i=0;i<check_items_panel.length;i++){
+            check_items_panel[i] = res.getString(sub_panel_name_ids_[i]);
+            check_values_panel[i] = check_values_type.getBoolean(i, false);
+
+            BasePanel p = sub_panels_.get(sub_panel_name_ids_[i]);
             p.Reset();
             p.showHidePanel(false);
+            p.setCheckParams(res,check_items_param, check_values_param);
         }
+        check_values_type.recycle();
 
-        cb_panel_adapter.Reset();
+        cb_panel_adapter.Reset(check_items_panel, check_values_panel);
         spinner_check.setAdapter(cb_panel_adapter);
 
+
+
         //reset values
-        Resources res = actRef.get().getResources();
+
 //        TypedArray params = res.obtainTypedArray(R.array.checkJNIParams);
 //        if(params.length()!=PANEL_NUM){
 //            Log.e(TAG, "RequestReset: number of panels NOT equal to check parameters" );
@@ -115,13 +135,15 @@ public class UIsManager {
 //            check_values = renderController.resetCheckParams(0, check_values);
 //
 //        }
-        String[] check_items = res.getStringArray(R.array.checkParams);
-        boolean[] values = new boolean[check_items.length];
-        for(int i=0;i<values.length;i++)values[i] = false;
+//        String[] check_items = res.getStringArray(R.array.checkParams);
+//        boolean[] values = new boolean[check_items.length];
+//        for(int i=0;i<values.length;i++)values[i] = false;
 //        values[0] = false;//renderController.isRaycasting();
 //        values[1] = false;//masksController.isMaskOn();
 //        values = cuttingController.setCuttingStatus(2, values);
-        JUIInterface.JUIonReset(check_items.length, check_items, values);
+//        boolean[] jni_values = Booleans.toArray(check_values_param);
+        Log.e(TAG, "=======RequestReset: " + check_items_param.size());
+        JUIInterface.JUIonReset(check_items_param.size(), check_items_param.toArray(new String[0]), Booleans.toArray(check_values_param));
     }
     void updateOnFrame(){
         dialogController.updateOnFrame();

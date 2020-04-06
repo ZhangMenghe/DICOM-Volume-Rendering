@@ -106,7 +106,8 @@ public class cutplaneUIs extends BasePanel{
 
         });
         sub_panels_.add(panel_);
-//        Reset();
+        default_check_array_id = R.array.cut_check_params;
+        default_check_values_id = R.array.cut_check_values;
     }
     public void Reset(){
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
