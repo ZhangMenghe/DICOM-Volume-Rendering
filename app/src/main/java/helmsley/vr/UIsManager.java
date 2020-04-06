@@ -3,9 +3,12 @@ package helmsley.vr;
 import android.app.Activity;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.util.Log;
 import android.view.ViewGroup;
 import android.widget.Spinner;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+
 import helmsley.vr.DUIs.JUIInterface;
 import helmsley.vr.DUIs.checkpanelAdapter;
 import helmsley.vr.DUIs.cutplaneUIs;
@@ -29,6 +32,7 @@ public class UIsManager {
     private checkpanelAdapter cb_panel_adapter = null;
 
     final static public int tex_id=0, raycast_id=1;
+    final static private int PANEL_NUM = 3;
     static private int current_texray_id = -1;
 
     UIsManager(final Activity activity_){
@@ -78,6 +82,7 @@ public class UIsManager {
         masksController.showHidePanel(isPanelOn);
     }
     public void RequestReset(){
+        renderController.showHidePanel(false);
         renderController.Reset(actRef.get().getResources());
         cuttingController.Reset();
         masksController.Reset();
@@ -85,9 +90,19 @@ public class UIsManager {
         cb_panel_adapter.Reset();
         spinner_check.setAdapter(cb_panel_adapter);
 
-        //setup check map values
-        //todo:more decent way????
+        //reset values
         Resources res = actRef.get().getResources();
+//        TypedArray params = res.obtainTypedArray(R.array.checkJNIParams);
+//        if(params.length()!=PANEL_NUM){
+//            Log.e(TAG, "RequestReset: number of panels NOT equal to check parameters" );
+//            return;
+//        }
+//        //order matters!
+//        ArrayList<Boolean> check_values = new ArrayList<>();
+//        for(int i=0; i<PANEL_NUM; i++){
+//            check_values = renderController.resetCheckParams(0, check_values);
+//
+//        }
         String[] check_items = res.getStringArray(R.array.checkParams);
         boolean[] values = new boolean[check_items.length];
         values[0] = renderController.isRaycasting();

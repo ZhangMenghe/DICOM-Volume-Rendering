@@ -96,6 +96,7 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
             mask_bits+= values[i]? (int)Math.pow(2, i) : 0;
         }
         JUIInterface.JUIsetMaskBits(mask_num, mask_bits);
+        tvalues.recycle();
     }
     void Reset(){
         set_initial_values();

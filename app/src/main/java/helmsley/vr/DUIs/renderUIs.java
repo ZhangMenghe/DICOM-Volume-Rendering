@@ -15,12 +15,12 @@ import java.util.ArrayList;
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
-public class renderUIs {
-    private final WeakReference<ViewGroup> parentRef;
+public class renderUIs extends BasePanel{
+//    private final WeakReference<ViewGroup> parentRef;
     private final WeakReference<UIsManager> mUIManagerRef;
     //panel
-    final private View tune_panel_;
-    final private View control_panel_;
+//    final private View tune_panel_;
+//    final private View control_panel_;
 
     private Spinner seekbar_spinner;
     private SeekbarAdapter seekbarAdapter = null;
@@ -29,13 +29,14 @@ public class renderUIs {
     final private static int RAYCAST_ID = 1;
     private static String CHECK_TEXRAY_NAME;
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
+        super(activity, parent_view);
         mUIManagerRef = new WeakReference<>(manager);
-        parentRef = new WeakReference<>(parent_view);
+//        parentRef = new WeakReference<>(parent_view);
 
         //panels
         final LayoutInflater mInflater = LayoutInflater.from(activity);
-        tune_panel_ = mInflater.inflate(R.layout.tune_panel, parent_view, false);
-        control_panel_ = mInflater.inflate(R.layout.transfunc_panel, parent_view, false);
+        View tune_panel_ = mInflater.inflate(R.layout.tune_panel, parent_view, false);
+        View control_panel_ = mInflater.inflate(R.layout.transfunc_panel, parent_view, false);
         panel_visible = false;
 
         //details of tune panel
@@ -58,17 +59,17 @@ public class renderUIs {
         colorAdapter = new colorListAdapter(activity, R.array.color_schemes);
         color_spinner.setAdapter(colorAdapter);
 
+        sub_panels_.add(tune_panel_);
+        sub_panels_.add(control_panel_);
+
         Resources res = activity.getResources();
-        //todo:decent way??
+        default_check_array_id = R.array.render_check_params;
+        default_check_values_id = R.array.render_check_values;
+
         CHECK_TEXRAY_NAME = res.getString(R.string.texray_check_name);
         Reset(res);
     }
     public void Reset(Resources res){
-        if(panel_visible){
-            panel_visible = false;
-            parentRef.get().removeView(tune_panel_);parentRef.get().removeView(control_panel_);
-        }
-
         seekbarAdapter.Reset();
         //render mode should be the first to set!!
         int rm_id = Integer.parseInt(res.getString(R.string.default_render_mode_id));
@@ -82,9 +83,7 @@ public class renderUIs {
         JUIInterface.JUIsetChecks(CHECK_TEXRAY_NAME, isRaycast);
     }
     public void showHidePanel(boolean show_panel){
-        if(panel_visible && !show_panel) {parentRef.get().removeView(tune_panel_);parentRef.get().removeView(control_panel_);}
-        else if(!panel_visible && show_panel) {parentRef.get().addView(tune_panel_);parentRef.get().addView(control_panel_);}
-        panel_visible = show_panel;
+        super.showHidePanel(show_panel);
     }
     private class widgetListAdapter extends ListAdapter {
         int current_id = 0;

@@ -157,11 +157,12 @@ public class cutplaneUIs {
             super(context, context.getString(R.string.check_freeze_name));
             //setup values
             Resources res = context.getResources();
-            item_names = Arrays.asList(res.getStringArray(R.array.check_cutting_params));
-            TypedArray check_values = res.obtainTypedArray(R.array.check_cutting_values);
+            item_names = Arrays.asList(res.getStringArray(R.array.cut_freeze_params));
+            TypedArray check_values = res.obtainTypedArray(R.array.cut_check_values);
             is_cutting = check_values.getBoolean(0, false);
             item_values = new ArrayList<>();
             for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+1, false));
+            check_values.recycle();
         }
         boolean getSeparateCheckBoxValue(){return is_cutting;}
 

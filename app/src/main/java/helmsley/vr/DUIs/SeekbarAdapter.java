@@ -79,6 +79,7 @@ public class SeekbarAdapter {
         tune_maxs.add(max_values); tune_seek_max.add(max_seeks);tune_maps.add(value_map);
 
         JUIInterface.JUIInitTuneParam(tex_ray_id, item_numbers, names, values);
+        params.recycle();
     }
     public class seekbarListAdapter extends ListAdapter {
         private ArrayList<Float> item_values;

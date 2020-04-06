@@ -40,6 +40,7 @@ public class checkpanelAdapter extends ListAdapter {
         cutting_name = res.getString(R.string.cutting_check_name);
         rendering_name = res.getString(R.string.panel_rendering_name);
         mask_name = res.getString(R.string.panel_mask_name);
+        check_values.recycle();;
     }
 
     public View getDropDownView(int position, View convertView, ViewGroup parent) {

@@ -1,43 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-<!--    check params and value-->
+<!--UIManager: panels show/hide + JNI check params-->
     <string-array name="checkShowPanelName">
         <item>@string/panel_rendering_name</item>
         <item>@string/cutting_check_name</item>
         <item>@string/panel_mask_name</item>
     </string-array>
-
     <string-array name="checkShowPanelValues">
         <item>false</item>
         <item>false</item>
         <item>false</item>
     </string-array>
-
-    <string-array name="checkParams">
-        <item>@string/texray_check_name</item>
-        <item>@string/mask_check_name</item>
-        <item>@string/cutting_check_name</item>
-        <item>@string/freezeVolume_check_name</item>
-        <item>@string/freezeplane_check_name</item>
-    </string-array>
-
     <string-array name="checkJNIParams">
-        <item>@string/texray_check_name</item>
-        <item>@string/mask_check_name</item>
-        <item>@string/cutting_check_name</item>
-        <item>@string/freezeVolume_check_name</item>
-        <item>@string/freezeplane_check_name</item>
+        <item>@array/render_check_params</item>
+        <item>@array/mask_check_params</item>
+        <item>@array/cut_check_params</item>
     </string-array>
 
-    <string-array name="check_cutting_params">
-        <item>@string/freezeVolume_check_name</item>
-        <item>@string/freezeplane_check_name</item>
+
+<!--    rendering panel-->
+    <string-array name="render_check_params">
+        <item>@string/texray_check_name</item>
     </string-array>
-    <string-array name="check_cutting_values">
-        <item>false</item><!-- is cutting-->
+    <array name="render_check_values">
         <item>false</item>
-        <item>false</item>
-    </string-array>
+    </array>
+
     <string-array name="rendering_mode">
         <item>Slice by slice</item>
         <item>Raycasting</item>
@@ -47,6 +35,34 @@
         <item>HSV</item>
         <item>Bright Color</item>
     </string-array>
+
+
+<!--    mask panel-->
+    <string-array name="mask_check_params">
+        <item>@string/mask_check_name</item>
+    </string-array>
+    <array name="mask_check_values">
+        <item>false</item>
+    </array>
+
+
+<!--    cutting panel-->
+    <string-array name="cut_check_params">
+        <item>@string/cutting_check_name</item>
+        <item>@array/cut_freeze_params</item>
+    </string-array>
+    <string-array name="cut_freeze_params">
+        <item>@string/freezeVolume_check_name</item>
+        <item>@string/freezeplane_check_name</item>
+    </string-array>
+    <string-array name="cut_check_values">
+        <item>false</item><!-- is cutting-->
+        <item>false</item>
+        <item>false</item>
+    </string-array>
+
+
+
 
 <!--    name, value, maxvalue, toggle_bar_max-->
     <string-array name="raycastParams">
@@ -154,5 +170,12 @@
     </string-array>
     <string-array name="bottomArr">
         <item>cut</item>
+    </string-array>
+    <string-array name="checkParams">
+        <item>@string/texray_check_name</item>
+        <item>@string/mask_check_name</item>
+        <item>@string/cutting_check_name</item>
+        <item>@string/freezeVolume_check_name</item>
+        <item>@string/freezeplane_check_name</item>
     </string-array>
 </resources>
