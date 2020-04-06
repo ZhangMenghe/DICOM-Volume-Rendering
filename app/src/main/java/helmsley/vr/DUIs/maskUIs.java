@@ -6,15 +6,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-
-import java.lang.ref.WeakReference;
-
 import helmsley.vr.R;
 
 public class maskUIs extends BasePanel{
-    RecyclerView recyclerView;
-    maskRecyclerViewAdapter recyclerViewAdapter;
+    private RecyclerView recyclerView;
+    private maskRecyclerViewAdapter recyclerViewAdapter;
 
     public maskUIs(final Activity activity, ViewGroup parent_view) {
         super(activity, parent_view);
@@ -22,8 +18,6 @@ public class maskUIs extends BasePanel{
 
         View panel_ = mInflater.inflate(R.layout.mask_panel, parent_view, false);
         sub_panels_.add(panel_);
-        panel_visible = false;
-
         recyclerView = (RecyclerView)panel_.findViewById(R.id.mask_recycle);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager HorizontalLayout = new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false);
@@ -33,16 +27,17 @@ public class maskUIs extends BasePanel{
 
         recyclerViewAdapter = new maskRecyclerViewAdapter(activity, recyclerView);
         recyclerView.setAdapter(recyclerViewAdapter);
-        default_check_array_id = R.array.mask_check_params;
-        default_check_values_id = R.array.mask_check_values;
+
+        setup_checks(
+                panel_,
+                R.array.mask_check_params, R.array.mask_check_values,
+                R.id.check_mask_show, 0);
     }
+    @Override
     public void Reset(){
         recyclerViewAdapter.Reset();
     }
-    public boolean isMaskOn(){
-        //todo:
-        return false;
-    }
+    @Override
     public void showHidePanel(boolean isPanelOn){
         super.showHidePanel(isPanelOn);
     }

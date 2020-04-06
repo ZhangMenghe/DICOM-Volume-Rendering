@@ -29,7 +29,6 @@ public class renderUIs extends BasePanel{
         final LayoutInflater mInflater = LayoutInflater.from(activity);
         View tune_panel_ = mInflater.inflate(R.layout.tune_panel, parent_view, false);
         View control_panel_ = mInflater.inflate(R.layout.transfunc_panel, parent_view, false);
-        panel_visible = false;
 
         //details of tune panel
         Spinner widget_spinner = (Spinner)tune_panel_.findViewById(R.id.tune_widget_id_spinner);
@@ -54,11 +53,8 @@ public class renderUIs extends BasePanel{
         sub_panels_.add(tune_panel_);
         sub_panels_.add(control_panel_);
 
-        default_check_array_id = R.array.render_check_params;
-        default_check_values_id = R.array.render_check_values;
-
+        setup_checks(R.array.render_check_params, R.array.render_check_values);
         CHECK_TEXRAY_NAME = activity.getResources().getString(R.string.texray_check_name);
-//        Reset();
     }
     public void Reset(){
         Resources res = actRef.get().getResources();

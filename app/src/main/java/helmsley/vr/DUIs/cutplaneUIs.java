@@ -39,24 +39,11 @@ public class cutplaneUIs extends BasePanel{
         final LayoutInflater mInflater = LayoutInflater.from(activity);
 
         View panel_ = mInflater.inflate(R.layout.cutting_panel, parent_view, false);
-        panel_visible = false;
 
         //setup spinner
         Spinner spinner_check =  (Spinner)panel_.findViewById(R.id.spinner_check_cutting_control);
         cbAdapter_ = new ctCheckboxListAdapter(activity);
         spinner_check.setAdapter(cbAdapter_);
-
-        //setup checkbox
-        String check_cutting_show_str = activity.getResources().getString(R.string.cutting_check_name);
-        CheckBox checkbox = (CheckBox)panel_.findViewById(R.id.check_cutting_show);
-        checkbox.setChecked(cbAdapter_.getSeparateCheckBoxValue());
-        checkbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                JUIInterface.JUIsetChecks(check_cutting_show_str, isChecked);
-            }
-        });
 
         //setup seekbar
         seek_bar_ = (SeekBar)panel_.findViewById(R.id.cutting_seekbar);
@@ -106,8 +93,11 @@ public class cutplaneUIs extends BasePanel{
 
         });
         sub_panels_.add(panel_);
-        default_check_array_id = R.array.cut_check_params;
-        default_check_values_id = R.array.cut_check_values;
+
+        setup_checks(
+                panel_,
+                R.array.cut_check_params, R.array.cut_check_values,
+                R.id.check_cutting_show, 0);
     }
     public void Reset(){
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);

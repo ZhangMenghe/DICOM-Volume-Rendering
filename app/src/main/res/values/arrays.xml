@@ -17,7 +17,6 @@
         <item>@array/cut_check_params</item>
     </string-array>
 
-
 <!--    rendering panel-->
     <string-array name="render_check_params">
         <item>@string/texray_check_name</item>
