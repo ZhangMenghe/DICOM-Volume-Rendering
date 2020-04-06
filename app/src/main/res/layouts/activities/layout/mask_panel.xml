@@ -17,6 +17,7 @@
         android:background="@color/paneColor"
         android:fillAfter="true"
         android:fillEnabled="true"
+        android:alpha="0.8"
         app:layout_constraintHeight_percent="0.15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topPanel">

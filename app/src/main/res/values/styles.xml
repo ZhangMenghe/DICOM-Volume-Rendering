@@ -113,12 +113,6 @@
         <item name="android:textColor">@color/brightBlue</item>
         <item name="android:colorBackground">@color/midBlue</item>
         <item name="android:popupBackground">@color/midBlue</item>
-
         <item name="android:textSize">10sp</item>
-
-    </style>
-    <style name="SpinnerCompat" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
-        <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
-        <item name="android:spinnerDropDownItemStyle">@style/SpinnerDropDownItem</item>
     </style>
 </resources>
