@@ -16,23 +16,15 @@ import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
 public class renderUIs extends BasePanel{
-//    private final WeakReference<ViewGroup> parentRef;
     private final WeakReference<UIsManager> mUIManagerRef;
-    //panel
-//    final private View tune_panel_;
-//    final private View control_panel_;
-
     private Spinner seekbar_spinner;
     private SeekbarAdapter seekbarAdapter = null;
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
-    private boolean panel_visible;
     final private static int RAYCAST_ID = 1;
     private static String CHECK_TEXRAY_NAME;
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
         super(activity, parent_view);
         mUIManagerRef = new WeakReference<>(manager);
-//        parentRef = new WeakReference<>(parent_view);
-
         //panels
         final LayoutInflater mInflater = LayoutInflater.from(activity);
         View tune_panel_ = mInflater.inflate(R.layout.tune_panel, parent_view, false);

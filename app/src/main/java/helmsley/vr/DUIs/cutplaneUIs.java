@@ -24,29 +24,21 @@ import java.util.List;
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
-public class cutplaneUIs {
-    private final WeakReference<Activity> actRef;
-    private final WeakReference<ViewGroup> parentRef;
-
+public class cutplaneUIs extends BasePanel{
     final static String TAG = "cutplaneUIs";
 
     //widgets
     private SeekBar seek_bar_;
     private FloatingActionButton button_;
 
-    //panel
-    final private View panel_;
-
     private ctCheckboxListAdapter cbAdapter_;
-    private boolean panel_visible;
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
-        actRef = new WeakReference<>(activity);
-        parentRef = new WeakReference<>(parent_view);
+        super(activity, parent_view);
 
         final LayoutInflater mInflater = LayoutInflater.from(activity);
 
-        panel_ = mInflater.inflate(R.layout.cutting_panel, parent_view, false);
+        View panel_ = mInflater.inflate(R.layout.cutting_panel, parent_view, false);
         panel_visible = false;
 
         //setup spinner
@@ -113,14 +105,10 @@ public class cutplaneUIs {
             }
 
         });
+        sub_panels_.add(panel_);
         Reset();
     }
     public void Reset(){
-        if(panel_visible){
-            panel_visible = false;
-            parentRef.get().removeView(panel_);
-        }
-
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         int max_seek_value = Integer.valueOf(params[1]);
         seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
@@ -133,9 +121,7 @@ public class cutplaneUIs {
         return valuse;
     }
     public void onCuttingStateChange(boolean show_panel, boolean isRaycast){
-        if(panel_visible && !show_panel) parentRef.get().removeView(panel_);
-        else if(!panel_visible && show_panel) parentRef.get().addView(panel_);
-        panel_visible = show_panel;
+        super.showHidePanel(show_panel);
 
         if(isRaycast){
             button_.show();

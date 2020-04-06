@@ -12,22 +12,16 @@ import java.lang.ref.WeakReference;
 
 import helmsley.vr.R;
 
-public class maskUIs {
-    private final WeakReference<ViewGroup> parentRef;
-
-    //panel
-    final private View panel_;
-
+public class maskUIs extends BasePanel{
     RecyclerView recyclerView;
     maskRecyclerViewAdapter recyclerViewAdapter;
-    private boolean panel_visible;
 
     public maskUIs(final Activity activity, ViewGroup parent_view) {
-        parentRef = new WeakReference<>(parent_view);
-
+        super(activity, parent_view);
         final LayoutInflater mInflater = LayoutInflater.from(activity);
 
-        panel_ = mInflater.inflate(R.layout.mask_panel, parent_view, false);
+        View panel_ = mInflater.inflate(R.layout.mask_panel, parent_view, false);
+        sub_panels_.add(panel_);
         panel_visible = false;
 
         recyclerView = (RecyclerView)panel_.findViewById(R.id.mask_recycle);
@@ -41,10 +35,6 @@ public class maskUIs {
         recyclerView.setAdapter(recyclerViewAdapter);
     }
     public void Reset(){
-        if(panel_visible){
-            panel_visible = false;
-            parentRef.get().removeView(panel_);
-        }
         recyclerViewAdapter.Reset();
     }
     public boolean isMaskOn(){
@@ -52,8 +42,6 @@ public class maskUIs {
         return false;
     }
     public void showHidePanel(boolean isPanelOn){
-        if(panel_visible && !isPanelOn) parentRef.get().removeView(panel_);
-        else if(!panel_visible && isPanelOn) parentRef.get().addView(panel_);
-        panel_visible = isPanelOn;
+        super.showHidePanel(isPanelOn);
     }
 }

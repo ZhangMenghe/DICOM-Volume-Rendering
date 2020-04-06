@@ -84,7 +84,11 @@ public class UIsManager {
     public void RequestReset(){
         renderController.showHidePanel(false);
         renderController.Reset(actRef.get().getResources());
+
+        cuttingController.showHidePanel(false);
         cuttingController.Reset();
+
+        masksController.showHidePanel(false);
         masksController.Reset();
 
         cb_panel_adapter.Reset();
