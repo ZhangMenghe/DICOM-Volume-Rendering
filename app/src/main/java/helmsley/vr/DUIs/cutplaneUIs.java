@@ -141,7 +141,6 @@ public class cutplaneUIs extends BasePanel{
             for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+1, false));
             check_values.recycle();
         }
-        boolean getSeparateCheckBoxValue(){return is_cutting;}
 
         public View getDropDownView(int position, View convertView, ViewGroup parent){
             ViewContentHolder holder;

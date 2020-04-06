@@ -112,7 +112,7 @@ public class UIsManager {
 
             BasePanel p = sub_panels_.get(sub_panel_name_ids_[i]);
             p.Reset();
-            p.showHidePanel(false);
+            p.showHidePanel(check_values_panel[i]);
             p.setCheckParams(res,check_items_param, check_values_param);
         }
         check_values_type.recycle();
