@@ -9,6 +9,7 @@ import android.widget.Spinner;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
 import helmsley.vr.DUIs.checkpanelAdapter;
 import helmsley.vr.DUIs.cutplaneUIs;
@@ -21,9 +22,9 @@ public class UIsManager {
     private final WeakReference<Activity> actRef;
     final static String TAG = "UIsManager";
     //Panels
-    private cutplaneUIs cuttingController;
-    private renderUIs renderController;
-    private maskUIs masksController;
+    private BasePanel cuttingController;
+    private BasePanel renderController;
+    private BasePanel masksController;
 
     // UIs
     private Spinner spinner_check;
@@ -70,10 +71,10 @@ public class UIsManager {
     }
     public void onTexRaySwitch(boolean isRaycast){
         current_texray_id = isRaycast?raycast_id:tex_id;
-        cuttingController.onCuttingStateChange(isRaycast);
+        cuttingController.onTexRayChange(isRaycast);
     }
     public void onCuttingPlaneSwitch(boolean isPanelOn){
-        cuttingController.onCuttingStateChange(isPanelOn, current_texray_id==raycast_id);
+        cuttingController.showHidePanel(isPanelOn, current_texray_id==raycast_id);
     }
     public void onRenderingSwitch(boolean isPanelOn){
         renderController.showHidePanel(isPanelOn);
@@ -83,7 +84,7 @@ public class UIsManager {
     }
     public void RequestReset(){
         renderController.showHidePanel(false);
-        renderController.Reset(actRef.get().getResources());
+        renderController.Reset();
 
         cuttingController.showHidePanel(false);
         cuttingController.Reset();
@@ -109,9 +110,10 @@ public class UIsManager {
 //        }
         String[] check_items = res.getStringArray(R.array.checkParams);
         boolean[] values = new boolean[check_items.length];
-        values[0] = renderController.isRaycasting();
-        values[1] = masksController.isMaskOn();
-        values = cuttingController.setCuttingStatus(2, values);
+        for(int i=0;i<values.length;i++)values[i] = false;
+//        values[0] = false;//renderController.isRaycasting();
+//        values[1] = false;//masksController.isMaskOn();
+//        values = cuttingController.setCuttingStatus(2, values);
         JUIInterface.JUIonReset(check_items.length, check_items, values);
     }
     void updateOnFrame(){

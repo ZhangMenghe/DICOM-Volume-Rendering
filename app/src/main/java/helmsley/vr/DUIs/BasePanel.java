@@ -32,6 +32,10 @@ public abstract class BasePanel {
             for(View v:sub_panels_)parentRef.get().addView(v);
         panel_visible = isPanelOn;
     }
+    public void showHidePanel(boolean isPanelOn, boolean isRaycasting){
+        showHidePanel(isPanelOn);
+    }
+    public void onTexRayChange(boolean israycasting){}
     public void Reset(){}
     public ArrayList<Boolean> setCheckParams(Resources res, ArrayList<Boolean> values){
         if(default_check_array_id!=0){

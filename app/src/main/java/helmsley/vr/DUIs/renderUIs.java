@@ -54,14 +54,14 @@ public class renderUIs extends BasePanel{
         sub_panels_.add(tune_panel_);
         sub_panels_.add(control_panel_);
 
-        Resources res = activity.getResources();
         default_check_array_id = R.array.render_check_params;
         default_check_values_id = R.array.render_check_values;
 
-        CHECK_TEXRAY_NAME = res.getString(R.string.texray_check_name);
-        Reset(res);
+        CHECK_TEXRAY_NAME = activity.getResources().getString(R.string.texray_check_name);
+        Reset();
     }
-    public void Reset(Resources res){
+    public void Reset(){
+        Resources res = actRef.get().getResources();
         seekbarAdapter.Reset();
         //render mode should be the first to set!!
         int rm_id = Integer.parseInt(res.getString(R.string.default_render_mode_id));

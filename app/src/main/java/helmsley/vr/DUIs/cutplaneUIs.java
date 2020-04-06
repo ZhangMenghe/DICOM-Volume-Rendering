@@ -120,7 +120,7 @@ public class cutplaneUIs extends BasePanel{
         valuse[offset+2] = false;
         return valuse;
     }
-    public void onCuttingStateChange(boolean show_panel, boolean isRaycast){
+    public void showHidePanel(boolean show_panel, boolean isRaycast){
         super.showHidePanel(show_panel);
 
         if(isRaycast){
@@ -133,8 +133,8 @@ public class cutplaneUIs extends BasePanel{
             if(panel_visible)Toast.makeText(actRef.get(), "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();
         }
     }
-    public void onCuttingStateChange(boolean isRaycast){
-        onCuttingStateChange(panel_visible, isRaycast);
+    public void onTexRayChange(boolean isRaycast){
+        showHidePanel(panel_visible, isRaycast);
     }
     private class ctCheckboxListAdapter extends ListAdapter {
         List<Boolean> item_values;
