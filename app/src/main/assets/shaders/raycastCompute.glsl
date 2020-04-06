@@ -36,10 +36,14 @@ vec3 hsv2rgb(vec3 c){
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 uvec3 transfer_scheme(float gray){
-    return uvec3(hsv2rgb(vec3(gray * 0.8, 1.0, 1.0)) * 255.0);
+    return uvec3(hsv2rgb(vec3(gray, 1.0, 1.0)) * 255.0);
 }
 uvec3 transfer_scheme(float cat, float gray){
     return uvec3(hsv2rgb(vec3(cat, 1.0, gray)) * 255.0);
+}
+//hot to color. H(0~180)
+uvec3 bright_scheme(float gray){
+    return uvec3(hsv2rgb(vec3(gray * 180.0 / 255.0, 1.0, 1.0)) * 255.0);
 }
 uint UpdateOpacityAlpha(uint sampled_alpha){
     float falpha = float(sampled_alpha) * 0.003921;
@@ -78,6 +82,8 @@ uvec4 Sample(ivec3 pos){
 }
 uvec4 post_process(uvec4 color){
     #ifdef COLOR_HSV
+        color.rgb = transfer_scheme(CURRENT_INTENSITY);
+    #elif defined(COLOR_BRIGHT)
         color.rgb = transfer_scheme(CURRENT_INTENSITY);
     #endif
 

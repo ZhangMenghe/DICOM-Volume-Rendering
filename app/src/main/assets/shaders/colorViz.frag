@@ -22,7 +22,7 @@ vec3 transfer_scheme(float gray){
     // float s = off_h>.0? BASE_S_VALUE + off_h / (1.0 - BASE_S_H) * 0.3: BASE_S_VALUE + off_h / (BASE_S_H - START_H_VALUE) * 0.5;
     // float v = off_h >.0? BASE_V_VALUE: BASE_V_VALUE + off_h / (BASE_S_H - START_H_VALUE)*0.3;
     // return hsv2rgb(vec3(h,s,v));
-    return hsv2rgb(vec3(gray * 0.8, 1.0, 1.0));
+    return hsv2rgb(vec3(gray * 0.5, 1.0, 1.0));
 
 }
 
