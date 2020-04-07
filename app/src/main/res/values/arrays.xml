@@ -71,8 +71,9 @@
         <item>@array/raycast_density</item>
         <item>@array/opa_overall</item>
         <item>@array/opa_lowest</item>
-        <item>@array/opa_cutoff</item>
-<!--        <item>@array/opa_center</item>-->
+        <item>@array/opa_width_bottom</item>
+        <item>@array/opa_width_top</item>
+        <item>@array/opa_center</item>
     </string-array>
 
     <string-array name="raycast_density">
@@ -86,8 +87,9 @@
     <string-array name="texParams">
         <item>@array/opa_overall</item>
         <item>@array/opa_lowest</item>
-        <item>@array/opa_cutoff</item>
-<!--        <item>@array/opa_center</item>-->
+        <item>@array/opa_width_bottom</item>
+        <item>@array/opa_width_top</item>
+        <item>@array/opa_center</item>
     </string-array>
     <string-array name="opa_overall">
         <item>Overall</item>
@@ -102,9 +104,16 @@
         <item>1.0</item>
         <item>50</item>
     </string-array>
-    <string-array name="opa_cutoff">
-        <item>Cut-off</item>
-        <item>0.0</item>
+
+    <string-array name="opa_width_top">
+        <item>Top Width</item>
+        <item>1.0</item>
+        <item>1.0</item>
+        <item>50</item>
+    </string-array>
+    <string-array name="opa_width_bottom">
+        <item>Bottom Width</item>
+        <item>1.0</item>
         <item>1.0</item>
         <item>50</item>
     </string-array>

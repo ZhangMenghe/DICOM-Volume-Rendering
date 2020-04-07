@@ -53,21 +53,21 @@ void FuncRenderer::CreateFunction(FUNC_TYPE type){
     }
 }
 void FuncRenderer::UpdateFuncPoints(FUNC_TYPE type){
-    if(type == OPACITY_FUN){
-        if(vrController::param_bool[dvr::CHECK_RAYCAST]){
-            UpdateFuncPoints(
-                    OPACITY_FUN,
-                    glm::vec2(vrController::param_ray[dvr::TR_CUTOFF]-0.5f,
-                              vrController::param_ray[dvr::TR_LOWEST] * vrController::param_ray[dvr::TR_OVERALL]),
-                    glm::vec2(0.5f, vrController::param_ray[dvr::TR_OVERALL]));
-        }else{
-            UpdateFuncPoints(
-                    OPACITY_FUN,
-                    glm::vec2(vrController::param_tex[dvr::TT_CUTOFF]-0.5f,
-                              vrController::param_tex[dvr::TT_LOWEST] * vrController::param_tex[dvr::TT_OVERALL]),
-                    glm::vec2(0.5f, vrController::param_tex[dvr::TT_OVERALL]));
-        }
-    }
+//    if(type == OPACITY_FUN){
+//        if(vrController::param_bool[dvr::CHECK_RAYCAST]){
+//            UpdateFuncPoints(
+//                    OPACITY_FUN,
+//                    glm::vec2(vrController::param_ray[dvr::TR_CUTOFF]-0.5f,
+//                              vrController::param_ray[dvr::TR_LOWEST] * vrController::param_ray[dvr::TR_OVERALL]),
+//                    glm::vec2(0.5f, vrController::param_ray[dvr::TR_OVERALL]));
+//        }else{
+//            UpdateFuncPoints(
+//                    OPACITY_FUN,
+//                    glm::vec2(vrController::param_tex[dvr::TT_CUTOFF]-0.5f,
+//                              vrController::param_tex[dvr::TT_LOWEST] * vrController::param_tex[dvr::TT_OVERALL]),
+//                    glm::vec2(0.5f, vrController::param_tex[dvr::TT_OVERALL]));
+//        }
+//    }
 
 }
 void FuncRenderer::UpdateFuncPoints(FUNC_TYPE type, glm::vec2 p1, glm::vec2 p2, bool is_quad){

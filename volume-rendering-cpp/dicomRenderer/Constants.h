@@ -13,14 +13,18 @@ namespace dvr{
     enum PARAM_TEX{
         TT_OVERALL=0,
         TT_LOWEST,
-        TT_CUTOFF,
+        TT_WIDTHBOTTOM,
+        TT_WIDTHTOP,
+        TT_CENTER,
         TT_CUTTING_TEX
     };
     enum PARAM_RAYCAST{
         TR_DENSITY = 0,
         TR_OVERALL,
         TR_LOWEST,
-        TR_CUTOFF,
+        TR_WIDTHBOTTOM,
+        TR_WIDTHTOP,
+        TR_CENTER,
         TR_CUTTING_RAY
     };
     enum SHADER_FILES{

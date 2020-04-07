@@ -24,14 +24,27 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     void setUniform(const char* key, int id){
-        GLuint  sp = shader_.Use();
+        GLuint sp = shader_.Use();
         Shader::Uniform(sp, key, id);
         shader_.UnUse();
     }
+//    void setUniforms(float values[]){
+//        GLuint sp = shader_.Use();
+//        for(int i=0;i<OPACITY_VALUE_NUM;i++)
+//            Shader::Uniform(sp, opacity_names[i], values[i]);
+//        shader_.UnUse();
+//    }
     virtual void Draw()=0;
 
 protected:
     GLuint vao_, vbo_;
     Shader shader_;
+//    const int OPACITY_VALUE_NUM = 4;
+//    const char* opacity_names[OPACITY_VALUE_NUM] = {
+//        "uOpacitys.overall",
+//        "uOpacitys.bottom_width",
+//        "uOpacitys.top_width",
+//        "uOpacitys.center"
+//    };
 };
 #endif

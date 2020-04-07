@@ -74,7 +74,7 @@ void raycastRenderer::onCuttingChange(float percent){
 void raycastRenderer::updatePrecomputation(GLuint sp){
     Shader::Uniform(sp,"uOpacitys.overall", vrController::param_ray[dvr::TR_OVERALL]);
     Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_ray[dvr::TR_LOWEST]);
-    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_ray[dvr::TR_CUTOFF]);
+    Shader::Uniform(sp,"uOpacitys.cutoff", 1.0f - vrController::param_ray[dvr::TR_WIDTHBOTTOM]);
 }
 void raycastRenderer::draw_baked(){
     if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
