@@ -107,7 +107,9 @@ JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
     vrController::color_scheme_id = id;
     vrController::baked_dirty_ = true;
 }
-
+JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint id, jint width, jint height, jint left, jint bottom){
+    vrController::instance()->setOverlayRect(id, width, height, left, bottom);
+}
 JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     InitCheckParam(env, num, jkeys, jvalues);
     nativeApp(nativeAddr)->onReset();

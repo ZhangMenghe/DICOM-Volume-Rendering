@@ -3,15 +3,19 @@ package helmsley.vr.DUIs;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Rect;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.Spinner;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
+import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
@@ -53,6 +57,20 @@ public class renderUIs extends BasePanel{
         sub_panels_.add(tune_panel_);
         sub_panels_.add(control_panel_);
 
+        View trans_graph_panel = control_panel_.findViewById(R.id.trans_graph_panel);
+        trans_graph_panel.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect graph_rect = new Rect();
+                trans_graph_panel.getLocalVisibleRect(graph_rect);
+                JUIInterface.JuisetGraphRect(0, graph_rect.width(), graph_rect.height(),graph_rect.left, Math.min(graph_rect.bottom, graph_rect.top));
+                Log.e("asdfa", "=====renderUIs: " + graph_rect.left+ " "+ graph_rect.bottom + " " + graph_rect.top + " " +graph_rect.height() + " " + graph_rect.width() );
+                trans_graph_panel.setVisibility(View.INVISIBLE);
+                trans_graph_panel.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+            }
+        });
+
+
         setup_checks(R.array.render_check_params, R.array.render_check_values);
         CHECK_TEXRAY_NAME = activity.getResources().getString(R.string.texray_check_name);
     }
@@ -64,6 +82,8 @@ public class renderUIs extends BasePanel{
         rendermodeAdapter.setTitleById(rm_id);
         int color_id = Integer.parseInt(res.getString(R.string.default_color_mode_id));
         colorAdapter.setTitleById(color_id);
+
+
     }
     public boolean isRaycasting(){return ((renderListAdapter)rendermodeAdapter).getRenderingModeById() == RAYCAST_ID;}
     private void onTexRaySwitch(boolean isRaycast){

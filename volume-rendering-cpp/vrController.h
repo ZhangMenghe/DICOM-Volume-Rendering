@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <vector>
 #include <map>
+#include <dicomRenderer/graphRenderer.h>
 
 class vrController:public nEntrance{
 public:
@@ -44,6 +45,7 @@ public:
     //setter funcs
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setStatus(std::string status_name);
+    void setOverlayRect(int id, int width, int height, int left, int bottom);
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(){return ModelMat_;}
@@ -54,7 +56,8 @@ private:
     //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
-    FuncRenderer* funcRenderer_ = nullptr;
+//    FuncRenderer* funcRenderer_ = nullptr;
+    GraphRenderer* graphRenderer = nullptr;
 
     //Shader
     Shader* bakeShader_ = nullptr;
@@ -86,6 +89,9 @@ private:
 
     //flags
     bool volume_model_dirty;
+
+    //overlay
+    std::unordered_map<dvr::DRAW_OVERLAY_IDS, dvr::Rect> overlay_rects;
 
     void updateVolumeModelMat();
     void precompute();

@@ -19,7 +19,8 @@ vrController::~vrController(){
     if(camera) delete camera;
     if(texvrRenderer_) delete texvrRenderer_;
     if(raycastRenderer_) delete raycastRenderer_;
-    if(funcRenderer_) delete funcRenderer_;
+//    if(funcRenderer_) delete funcRenderer_;
+    if(graphRenderer) delete graphRenderer;
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
@@ -72,9 +73,11 @@ void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
     raycastRenderer_ = new raycastRenderer;
 
-    funcRenderer_ = new FuncRenderer;
-    funcRenderer_->CreateFunction(COLOR_BAR);
-    funcRenderer_->CreateFunction(OPACITY_FUN);
+//    funcRenderer_ = new FuncRenderer;
+//    funcRenderer_->CreateFunction(COLOR_BAR);
+//    funcRenderer_->CreateFunction(OPACITY_FUN);
+
+    graphRenderer = new GraphRenderer;
 }
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
@@ -82,6 +85,16 @@ void vrController::onViewChange(int width, int height){
     _screen_w = width; _screen_h = height;
     glClear(GL_COLOR_BUFFER_BIT);
     screenQuad::instance()->onScreenSizeChange(width, height);
+    //setup overlay rect
+    for(auto &rect:overlay_rects){
+        auto& r=rect.second;
+        if(r.width > 1.0f){
+            r.width/=_screen_w; r.left/=_screen_w;
+            r.height/=_screen_h; r.bottom/=_screen_h;
+        }
+        if(rect.first == dvr::OVERLAY_GRAPH) graphRenderer->setRelativeRenderRect(r.width, r.height, r.left, r.bottom);
+    }
+
 }
 void vrController::onDraw() {
     if(!tex_volume) return;
@@ -97,7 +110,8 @@ void vrController::onDraw() {
 
     if(isRayCasting())  raycastRenderer_->Draw();
     else texvrRenderer_->Draw();
-    funcRenderer_->Draw();
+//    funcRenderer_->Draw();
+    graphRenderer->Draw();
 }
 
 void vrController::onTouchMove(float x, float y) {
@@ -154,6 +168,7 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
     }
+    graphRenderer->updateVertices();
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
 
@@ -214,4 +229,14 @@ void vrController::setStatus(std::string status_name){
     cst_name = status_name;
 //    auto cpos= camera->getCameraPosition();
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
+}
+void vrController::setOverlayRect(int id, int width, int height, int left, int bottom){
+    LOGE("=====screen %f", _screen_w);
+    if(_screen_w != 0){
+        dvr::Rect r{width/_screen_w, height/_screen_h, left/_screen_w, bottom/_screen_h};
+        overlay_rects[(dvr::DRAW_OVERLAY_IDS)id] = r;
+    }else{
+        dvr::Rect r{(float)width, (float)height, (float)left, (float)bottom};
+        overlay_rects[(dvr::DRAW_OVERLAY_IDS)id] = r;
+    }
 }

@@ -19,6 +19,7 @@ extern "C"{
     JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat);
     JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint, jint);
     JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint);
+    JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint, jint, jint, jint, jint);
 }
 
 

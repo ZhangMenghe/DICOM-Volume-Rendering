@@ -43,6 +43,12 @@ namespace dvr{
         BAKED_TEX_ID=0,
         SCREEN_QUAD_TEX_ID,
     };
+    enum DRAW_OVERLAY_IDS{
+        OVERLAY_GRAPH=0,
+        OVERLAY_COLOR_INTENSITY,
+        OVERLAY_COLOR_MIX,
+        OVERLAY_COLOR_SCHEME
+    };
 
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
@@ -56,5 +62,10 @@ namespace dvr{
 
     //color scheme
     constexpr char* COLOR_SCHEMES[3]={"COLOR_GRAYSCALE", "COLOR_HSV", "COLOR_BRIGHT"};
+
+    struct Rect{
+        float width;float height;
+        float left;float bottom;
+    };
 }
 #endif

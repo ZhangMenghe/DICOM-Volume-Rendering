@@ -18,7 +18,7 @@ public:
 protected:
     const size_t MAX_VERTICS=10;
 
-    GLuint VAO_FUNC, VBO_FUNC,EBO_Func;
+    GLuint VAO_FUNC, VBO_FUNC, EBO_Func;
     GLuint VAO_QUAD;
     GLuint VAO_COLOR_BAR;
 
