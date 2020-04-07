@@ -98,6 +98,7 @@ private:
     bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }
+    void update_overlay_graph();
 
 };
 #endif

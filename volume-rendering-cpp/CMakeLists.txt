@@ -29,11 +29,11 @@ SET(GL_PIPELINE_FILES
 #        )
 SET(DICOM_RENDERERS
         dicomRenderer/funcsRenderer.cpp
-        dicomRenderer/graphRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp
         dicomRenderer/cuttingController.cpp
-
+        dicomRenderer/colorbarRenderer.cpp
+        dicomRenderer/graphRenderer.cpp
         dicomRenderer/screenQuad.cpp)
 
 include_directories(${GLM_DIRECTORY})

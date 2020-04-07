@@ -77,7 +77,7 @@ void vrController::onViewCreated(){
 //    funcRenderer_->CreateFunction(COLOR_BAR);
 //    funcRenderer_->CreateFunction(OPACITY_FUN);
 
-    graphRenderer = new GraphRenderer;
+    graphRenderer = new GraphRenderer(shader_contents[dvr::SHADER_OPA_VIZ_VERT], shader_contents[dvr::SHADER_OPA_VIZ_FRAG]);
 }
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
@@ -158,6 +158,26 @@ void vrController::onPan(float x, float y){
     PosVec3_.y += offy * ScaleVec3_.y;
     volume_model_dirty = true;
 }
+void vrController::update_overlay_graph(){
+    float x1, y1, x2 = 0.5f, y2;
+    if(vrController::param_bool[dvr::CHECK_RAYCAST]){
+        x1 =vrController::param_ray[dvr::TR_CUTOFF]-0.5f;
+        y1 = vrController::param_ray[dvr::TR_LOWEST] * vrController::param_ray[dvr::TR_OVERALL];
+        y2=vrController::param_ray[dvr::TR_OVERALL];
+    }else{
+        x1 = vrController::param_tex[dvr::TT_CUTOFF]-0.5f;
+        y1 = vrController::param_tex[dvr::TT_LOWEST] * vrController::param_tex[dvr::TT_OVERALL];
+        y2 = vrController::param_tex[dvr::TT_OVERALL];
+    }
+
+    float vertices[] = {
+        x2, y2, .0f,//top-right
+        x1, y1,.0f,//top-left
+        x1, .0f,.0f,//bottom-left
+        0.5f, .0f, .0f,//bottom-right
+    };
+    graphRenderer->updateVertices(vertices, 12* sizeof(float));
+}
 void vrController::precompute(){
     if(!baked_dirty_) return;
     if(!bakeShader_){
@@ -168,7 +188,7 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
     }
-    graphRenderer->updateVertices();
+    update_overlay_graph();
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
 
