@@ -68,7 +68,7 @@ public class renderUIs extends BasePanel{
             @Override
             public void onGlobalLayout() {
                 ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)control_panel_.getLayoutParams();
-                params.setMargins(0, 0, 0, trans_constraint.getHeight()); //substitute parameters for left, top, right, bottom
+                params.setMargins(0, 0, 0, trans_constraint.getHeight());
                 control_panel_.setLayoutParams(params);
                 control_panel_.requestLayout();
 

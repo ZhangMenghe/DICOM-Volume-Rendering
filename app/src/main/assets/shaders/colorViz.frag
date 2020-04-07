@@ -16,7 +16,7 @@ vec3 transfer_scheme(float gray){
     if(uScheme == 1)
         color = hsv2rgb(vec3(gray, 1.0, 1.0));
     else if(uScheme == 2)
-        color = hsv2rgb(vec3(gray * 0.5, 1.0, 1.0));
+        color = hsv2rgb(vec3(gray * 180.0 / 255.0, 1.0, 1.0));
     return color;
 }
 
