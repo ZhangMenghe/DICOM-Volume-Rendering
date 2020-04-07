@@ -58,8 +58,9 @@ private:
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
 //    FuncRenderer* funcRenderer_ = nullptr;
-    baseQuad* graphRenderer = nullptr;
-    baseQuad* colorbarRenderer = nullptr;
+//    baseQuad* graphRenderer = nullptr;
+//    baseQuad* colorbarRenderer = nullptr;
+
 
     //Shader
     Shader* bakeShader_ = nullptr;
@@ -95,6 +96,7 @@ private:
 
     //overlay
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, dvr::Rect> overlay_rects;
+    std::unordered_map<dvr::DRAW_OVERLAY_IDS, baseQuad*> ol_renders;
 
     void updateVolumeModelMat();
     void precompute();
