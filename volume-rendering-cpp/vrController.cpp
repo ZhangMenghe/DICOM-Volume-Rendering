@@ -196,8 +196,7 @@ void vrController::precompute(){
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
     }
     update_overlay_graph();
-//    colorbarRenderer->getShader()->DisableAllKeyword();
-//    colorbarRenderer->getShader()->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
+    colorbarRenderer->setUniform("uScheme", color_scheme_id);
 
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);

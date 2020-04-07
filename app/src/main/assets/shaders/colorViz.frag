@@ -1,8 +1,7 @@
 #version 300 es
 
-//#pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT
-
 precision mediump float;
+uniform int uScheme;
 out vec4 gl_FragColor;
 in vec2 vTexcoord;
 
@@ -13,14 +12,14 @@ vec3 hsv2rgb(vec3 c){
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 vec3 transfer_scheme(float gray){
-//    #ifdef COLOR_HSV
-//        return hsv2rgb(vec3(gray, 1.0, 1.0));
-//    #elif defined(COLOR_BRIGHT)
-//        return hsv2rgb(vec3(gray * 0.5, 1.0, 1.0));
-//    #endif
-    return vec3(gray);
+    vec3 color = vec3(gray);
+    if(uScheme == 1)
+        color = hsv2rgb(vec3(gray, 1.0, 1.0));
+    else if(uScheme == 2)
+        color = hsv2rgb(vec3(gray * 0.5, 1.0, 1.0));
+    return color;
 }
 
 void main(){
-    gl_FragColor = vec4(vTexcoord.x, .0,.0,1.0);//vec4(transfer_scheme(vTexcoord.x), 1.0);
+    gl_FragColor = vec4(transfer_scheme(vTexcoord.x), 1.0);
 }
