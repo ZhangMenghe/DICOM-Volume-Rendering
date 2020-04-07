@@ -19,7 +19,7 @@ public abstract class BasePanel {
     final WeakReference<ViewGroup> parentRef;
     private int default_check_array_id;
     private int default_check_values_id;
-    private String[] check_names_;
+    String[] check_names_;
 
     ArrayList<View> sub_panels_ = new ArrayList<>();
     boolean panel_visible;
@@ -44,8 +44,6 @@ public abstract class BasePanel {
     public void Reset(){}
     public void setCheckParams(Resources res, ArrayList<String> names, ArrayList<Boolean> values){
         if(default_check_array_id==0) return;
-
-        check_names_ = res.getStringArray(default_check_array_id);
         TypedArray ta_values = res.obtainTypedArray(default_check_values_id);
         for(int i=0; i<check_names_.length;i++){
             names.add(check_names_[i]);
@@ -56,6 +54,7 @@ public abstract class BasePanel {
     void setup_checks(int check_array_id, int check_value_id){
         default_check_array_id = check_array_id;
         default_check_values_id = check_value_id;
+        check_names_ = actRef.get().getResources().getStringArray(default_check_array_id);
     }
     void setup_checks(View parent_view,  int check_array_id, int check_value_id, int main_checkbox_resid, int main_checkbox_index) {
         setup_checks(check_array_id, check_value_id);

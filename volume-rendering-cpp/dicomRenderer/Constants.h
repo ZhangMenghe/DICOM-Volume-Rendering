@@ -4,6 +4,7 @@
 namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,
+        CHECK_OVERLAY,
         CHECK_CUTTING,
         CHECK_FREEZE_VOLUME,
         CHECK_FREEZE_CPLANE,

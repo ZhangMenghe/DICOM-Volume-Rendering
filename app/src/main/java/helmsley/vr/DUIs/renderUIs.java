@@ -3,7 +3,7 @@ package helmsley.vr.DUIs;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Rect;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,7 +15,6 @@ import android.widget.Spinner;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 
-import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
@@ -25,14 +24,15 @@ public class renderUIs extends BasePanel{
     private SeekbarAdapter seekbarAdapter = null;
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     final private static int RAYCAST_ID = 1;
-    private static String CHECK_TEXRAY_NAME;
+    private static String CHECK_TEXRAY_NAME, CHECK_OVERLAYS;
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
         super(activity, parent_view);
         mUIManagerRef = new WeakReference<>(manager);
         //panels
         final LayoutInflater mInflater = LayoutInflater.from(activity);
         View tune_panel_ = mInflater.inflate(R.layout.tune_panel, parent_view, false);
-        View control_panel_ = mInflater.inflate(R.layout.transfunc_panel, parent_view, false);
+        View trans_panel_ = mInflater.inflate(R.layout.transfunc_panel, parent_view, false);
+        View control_panel_ = mInflater.inflate(R.layout.render_control_panel, parent_view, false);
 
         //details of tune panel
         Spinner widget_spinner = (Spinner)tune_panel_.findViewById(R.id.tune_widget_id_spinner);
@@ -55,16 +55,23 @@ public class renderUIs extends BasePanel{
         color_spinner.setAdapter(colorAdapter);
 
         sub_panels_.add(tune_panel_);
+        sub_panels_.add(trans_panel_);
         sub_panels_.add(control_panel_);
 
-        View trans_graph_panel = control_panel_.findViewById(R.id.trans_graph_panel);
-        View trans_gray_panel = control_panel_.findViewById(R.id.trans_gray_panel);
-        View trans_color_mix_panel = control_panel_.findViewById(R.id.trans_color_mix_panel);
-        View trans_colorscheme_panel = control_panel_.findViewById(R.id.trans_color_tune_panel);
+        View trans_constraint = trans_panel_.findViewById(R.id.trans_func_panel);
+        View trans_graph_panel = trans_panel_.findViewById(R.id.trans_graph_panel);
+        View trans_gray_panel = trans_panel_.findViewById(R.id.trans_gray_panel);
+        View trans_color_mix_panel = trans_panel_.findViewById(R.id.trans_color_mix_panel);
+        View trans_colorscheme_panel = trans_panel_.findViewById(R.id.trans_color_tune_panel);
 
         trans_graph_panel.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams)control_panel_.getLayoutParams();
+                params.setMargins(0, 0, 0, trans_constraint.getHeight()); //substitute parameters for left, top, right, bottom
+                control_panel_.setLayoutParams(params);
+                control_panel_.requestLayout();
+
                 int[]location = new int[2];
                 trans_graph_panel.getLocationInWindow(location);
                 JUIInterface.JuisetGraphRect(0,trans_graph_panel.getWidth(),trans_graph_panel.getHeight(),location[0],location[1]);
@@ -93,24 +100,10 @@ public class renderUIs extends BasePanel{
             }
         });
 
-//        trans_colorscheme_panel.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                Rect graph_rect = new Rect();
-//                trans_colorscheme_panel.getLocalVisibleRect(graph_rect);
-//
-//                int[]out_loc = new int[2];
-//                trans_colorscheme_panel.getLocationOnScreen(out_loc);
-//                Log.e("TAG", "=====onGlobalLayout: "+out_loc[0] + "  " + out_loc[1] );
-//                JUIInterface.JuisetGraphRect(3, graph_rect.width(), graph_rect.height(),graph_rect.left, Math.min(graph_rect.bottom, graph_rect.top));
-//                Log.e("asdfa", "=====renderUIs: " + graph_rect.left+ " "+ graph_rect.bottom + " " + graph_rect.top + " " +graph_rect.height() + " " + graph_rect.width() );
-//                trans_colorscheme_panel.setVisibility(View.INVISIBLE);
-//                trans_colorscheme_panel.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//            }
-//        });
-
         setup_checks(R.array.render_check_params, R.array.render_check_values);
-        CHECK_TEXRAY_NAME = activity.getResources().getString(R.string.texray_check_name);
+        Resources res = activity.getResources();
+        CHECK_TEXRAY_NAME = check_names_[0];//res.getStringArray(R.array.render_check_params)[0];
+        CHECK_OVERLAYS = check_names_[1];//res.getStringArray(R.array.render_check_params)[1];
     }
     public void Reset(){
         Resources res = actRef.get().getResources();
@@ -120,16 +113,20 @@ public class renderUIs extends BasePanel{
         rendermodeAdapter.setTitleById(rm_id);
         int color_id = Integer.parseInt(res.getString(R.string.default_color_mode_id));
         colorAdapter.setTitleById(color_id);
-
-
     }
-    public boolean isRaycasting(){return ((renderListAdapter)rendermodeAdapter).getRenderingModeById() == RAYCAST_ID;}
     private void onTexRaySwitch(boolean isRaycast){
         seekbar_spinner.setAdapter(seekbarAdapter.getListAdapter(isRaycast?1:0));
         JUIInterface.JUIsetChecks(CHECK_TEXRAY_NAME, isRaycast);
     }
     public void showHidePanel(boolean show_panel){
-        super.showHidePanel(show_panel);
+        if(panel_visible && !show_panel){
+            for(View v:sub_panels_)parentRef.get().removeView(v);
+            JUIInterface.JUIsetChecks(CHECK_OVERLAYS, false);
+        } else if(!panel_visible && show_panel){
+            for(View v:sub_panels_)parentRef.get().addView(v);
+            JUIInterface.JUIsetChecks(CHECK_OVERLAYS, true);
+        }
+        panel_visible = show_panel;
     }
     private class widgetListAdapter extends ListAdapter {
         int current_id = 0;

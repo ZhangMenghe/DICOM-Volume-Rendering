@@ -119,10 +119,13 @@ void vrController::onDraw() {
 
     if(isRayCasting())  raycastRenderer_->Draw();
     else texvrRenderer_->Draw();
+
+}
+void vrController::onDrawOverlays(){
+    if(!tex_volume) return;
     for(auto olr:ol_renders)
         olr.second->Draw();
 }
-
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
     if(!param_bool[dvr::CHECK_CUTTING]&&param_bool[dvr::CHECK_FREEZE_VOLUME]) return;

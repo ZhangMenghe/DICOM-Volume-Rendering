@@ -77,6 +77,7 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     nativeApp(nativeAddr)->onDraw();
+    if(vrController::param_bool[dvr::CHECK_OVERLAY]) vrController::instance()->onDrawOverlays();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){

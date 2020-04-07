@@ -20,9 +20,11 @@
 <!--    rendering panel-->
     <string-array name="render_check_params">
         <item>@string/texray_check_name</item>
+        <item>Overlays</item>
     </string-array>
     <array name="render_check_values">
         <item>false</item>
+        <item>true</item>
     </array>
 
     <string-array name="rendering_mode">
