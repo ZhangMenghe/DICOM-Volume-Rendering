@@ -65,7 +65,7 @@ namespace dvr{
 
     struct Rect{
         float width;float height;
-        float left;float bottom;
+        float left;float top;
     };
 }
 #endif

@@ -12,6 +12,7 @@
 #include <vector>
 #include <map>
 #include <dicomRenderer/graphRenderer.h>
+#include <dicomRenderer/colorbarRenderer.h>
 
 class vrController:public nEntrance{
 public:
@@ -45,7 +46,7 @@ public:
     //setter funcs
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setStatus(std::string status_name);
-    void setOverlayRect(int id, int width, int height, int left, int bottom);
+    void setOverlayRect(int id, int width, int height, int left, int top);
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(){return ModelMat_;}
@@ -57,7 +58,8 @@ private:
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
 //    FuncRenderer* funcRenderer_ = nullptr;
-    GraphRenderer* graphRenderer = nullptr;
+    baseQuad* graphRenderer = nullptr;
+    baseQuad* colorbarRenderer = nullptr;
 
     //Shader
     Shader* bakeShader_ = nullptr;
@@ -86,6 +88,7 @@ private:
     //ui
     glm::fvec2 Mouse_old;
     float _screen_w, _screen_h;
+    int _screen_h_offset;
 
     //flags
     bool volume_model_dirty;

@@ -23,6 +23,7 @@ public:
         glBufferSubData(GL_ARRAY_BUFFER, 0, data_size, vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
+    Shader* getShader(){return &shader_;}
     virtual void Draw()=0;
 
 protected:

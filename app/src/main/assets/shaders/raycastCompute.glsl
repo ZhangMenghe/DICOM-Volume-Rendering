@@ -84,7 +84,7 @@ uvec4 post_process(uvec4 color){
     #ifdef COLOR_HSV
         color.rgb = transfer_scheme(CURRENT_INTENSITY);
     #elif defined(COLOR_BRIGHT)
-        color.rgb = transfer_scheme(CURRENT_INTENSITY);
+        color.rgb = bright_scheme(CURRENT_INTENSITY);
     #endif
 
     #ifdef SHOW_ORGANS

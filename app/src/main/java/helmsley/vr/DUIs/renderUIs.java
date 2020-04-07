@@ -58,18 +58,56 @@ public class renderUIs extends BasePanel{
         sub_panels_.add(control_panel_);
 
         View trans_graph_panel = control_panel_.findViewById(R.id.trans_graph_panel);
+        View trans_gray_panel = control_panel_.findViewById(R.id.trans_gray_panel);
+        View trans_color_mix_panel = control_panel_.findViewById(R.id.trans_color_mix_panel);
+        View trans_colorscheme_panel = control_panel_.findViewById(R.id.trans_color_tune_panel);
+
         trans_graph_panel.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
-                Rect graph_rect = new Rect();
-                trans_graph_panel.getLocalVisibleRect(graph_rect);
-                JUIInterface.JuisetGraphRect(0, graph_rect.width(), graph_rect.height(),graph_rect.left, Math.min(graph_rect.bottom, graph_rect.top));
-                Log.e("asdfa", "=====renderUIs: " + graph_rect.left+ " "+ graph_rect.bottom + " " + graph_rect.top + " " +graph_rect.height() + " " + graph_rect.width() );
+                int[]location = new int[2];
+                trans_graph_panel.getLocationInWindow(location);
+                JUIInterface.JuisetGraphRect(0,trans_graph_panel.getWidth(),trans_graph_panel.getHeight(),location[0],location[1]);
                 trans_graph_panel.setVisibility(View.INVISIBLE);
+                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
+
+
+                trans_gray_panel.getLocationInWindow(location);
+                JUIInterface.JuisetGraphRect(1,trans_gray_panel.getWidth(),trans_gray_panel.getHeight(),location[0],location[1]);
+                trans_gray_panel.setVisibility(View.INVISIBLE);
+                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
+
+                trans_color_mix_panel.getLocationInWindow(location);
+                JUIInterface.JuisetGraphRect(2,trans_color_mix_panel.getWidth(),trans_color_mix_panel.getHeight(),location[0],location[1]);
+                trans_color_mix_panel.setVisibility(View.INVISIBLE);
+                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
+
+
+                trans_colorscheme_panel.getLocationInWindow(location);
+                JUIInterface.JuisetGraphRect(3,trans_colorscheme_panel.getWidth(),trans_colorscheme_panel.getHeight(),location[0],location[1]);
+                trans_colorscheme_panel.setVisibility(View.INVISIBLE);
+                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
+
+//                Log.e("TAG", "=====color scheme: "+schemeloc[0] + "  " + schemeloc[1] );
                 trans_graph_panel.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
         });
 
+//        trans_colorscheme_panel.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                Rect graph_rect = new Rect();
+//                trans_colorscheme_panel.getLocalVisibleRect(graph_rect);
+//
+//                int[]out_loc = new int[2];
+//                trans_colorscheme_panel.getLocationOnScreen(out_loc);
+//                Log.e("TAG", "=====onGlobalLayout: "+out_loc[0] + "  " + out_loc[1] );
+//                JUIInterface.JuisetGraphRect(3, graph_rect.width(), graph_rect.height(),graph_rect.left, Math.min(graph_rect.bottom, graph_rect.top));
+//                Log.e("asdfa", "=====renderUIs: " + graph_rect.left+ " "+ graph_rect.bottom + " " + graph_rect.top + " " +graph_rect.height() + " " + graph_rect.width() );
+//                trans_colorscheme_panel.setVisibility(View.INVISIBLE);
+//                trans_colorscheme_panel.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//            }
+//        });
 
         setup_checks(R.array.render_check_params, R.array.render_check_values);
         CHECK_TEXRAY_NAME = activity.getResources().getString(R.string.texray_check_name);

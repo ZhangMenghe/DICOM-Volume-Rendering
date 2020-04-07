@@ -1,9 +1,7 @@
-#ifndef GRAPH_RENDERER_H
-#define GRAPH_RENDERER_H
+#ifndef COLORBAR_RENDERER_H
+#define COLORBAR_RENDERER_H
 
 #include <dicomRenderer/basequadRenderer.h>
-#include <GLES3/gl32.h>
-#include <GLPipeline/Shader.h>
 
 class ColorbarRenderer:public baseQuad{
 public:
