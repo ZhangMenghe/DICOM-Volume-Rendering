@@ -100,22 +100,22 @@
 
     <string-array name="opa_lowest">
         <item>Lowest</item>
-        <item>1.0</item>
+        <item>.0</item>
         <item>1.0</item>
         <item>50</item>
     </string-array>
 
     <string-array name="opa_width_top">
         <item>Top Width</item>
-        <item>1.0</item>
-        <item>1.0</item>
-        <item>50</item>
+        <item>.0</item>
+        <item>2.0</item>
+        <item>100</item>
     </string-array>
     <string-array name="opa_width_bottom">
         <item>Bottom Width</item>
-        <item>1.0</item>
-        <item>1.0</item>
-        <item>50</item>
+        <item>2.0</item>
+        <item>2.0</item>
+        <item>100</item>
     </string-array>
     <string-array name="opa_center">
         <item>Center</item>

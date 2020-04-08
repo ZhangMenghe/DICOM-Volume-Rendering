@@ -3,6 +3,7 @@
 
 #include <GLES3/gl32.h>
 #include <GLPipeline/Shader.h>
+#include <algorithm>
 
 class baseQuad{
 public:
@@ -28,12 +29,31 @@ public:
         Shader::Uniform(sp, key, id);
         shader_.UnUse();
     }
-//    void setUniforms(float values[]){
-//        GLuint sp = shader_.Use();
-//        for(int i=0;i<OPACITY_VALUE_NUM;i++)
-//            Shader::Uniform(sp, opacity_names[i], values[i]);
-//        shader_.UnUse();
-//    }
+    void setUniforms(float values[]){
+        glm::vec2 lb, lm, lt, rb, rm, rt;
+        float half_top = values[2] / 2.0f;
+        float half_bottom = std::max(values[1] / 2.0f, half_top);
+        
+        float lb_x = std::max(.0f, values[3] - half_bottom);
+        float rb_x = std::min(1.0f, values[3] + half_bottom);
+        lb = glm::vec2(lb_x, .0f);
+        rb = glm::vec2(rb_x, .0f);
+
+        float mid_y = values[4] * values[0];
+        lm = glm::vec2(lb_x, mid_y);
+        rm = glm::vec2(rb_x, mid_y);
+
+        lt = glm::vec2(std::max(.0f, values[3] - half_top), values[0]);
+        rt = glm::vec2(std::min(1.0f, values[3] + half_top), values[0]);
+
+        float vertices[12] = {
+            lb.x, lb.y, lm.x, lm.y, lt.x, lt.y,
+            rb.x, rb.y, rm.x, rm.y, rt.x, rt.y
+        };
+        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, 12* sizeof(float), vertices);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
     virtual void Draw()=0;
 
 protected:
@@ -45,6 +65,7 @@ protected:
 //        "uOpacitys.bottom_width",
 //        "uOpacitys.top_width",
 //        "uOpacitys.center"
+//          "lowest"
 //    };
 };
 #endif

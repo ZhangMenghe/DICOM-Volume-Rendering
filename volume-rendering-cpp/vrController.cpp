@@ -171,38 +171,22 @@ void vrController::onPan(float x, float y){
     volume_model_dirty = true;
 }
 void vrController::update_overlay_graph(){
-    float x1, y1, x2 = 0.5f, y2;
-    if(vrController::param_bool[dvr::CHECK_RAYCAST]){
-        x1 = (1.0f - vrController::param_ray[dvr::TR_WIDTHBOTTOM])-0.5f;
-        y1 = vrController::param_ray[dvr::TR_LOWEST] * vrController::param_ray[dvr::TR_OVERALL];
-        y2=vrController::param_ray[dvr::TR_OVERALL];
-    }else{
-        x1 = (1.0f - vrController::param_tex[dvr::TT_WIDTHBOTTOM])-0.5f;
-        y1 = vrController::param_tex[dvr::TT_LOWEST] * vrController::param_tex[dvr::TT_OVERALL];
-        y2 = vrController::param_tex[dvr::TT_OVERALL];
-    }
-
-    float vertices[] = {
-        x2, y2, .0f,//top-right
-        x1, y1,.0f,//top-left
-        x1, .0f,.0f,//bottom-left
-        0.5f, .0f, .0f,//bottom-right
-    };
-    ol_renders[dvr::OVERLAY_GRAPH]->updateVertices(vertices, 12* sizeof(float));
-//    if(vrController::param_bool[dvr::CHECK_RAYCAST])
-//        ol_renders[dvr::OVERLAY_GRAPH]->setUniforms(new float[4]{
-//                param_ray[dvr::TR_OVERALL],
-//                param_ray[dvr::TR_WIDTHBOTTOM],
-//                param_ray[dvr::TR_WIDTHTOP],
-//                param_ray[dvr::TR_CENTER]
-//            });
-//    else
-//        ol_renders[dvr::OVERLAY_GRAPH]->setUniforms(new float[4]{
-//                param_tex[dvr::TT_OVERALL],
-//                param_tex[dvr::TT_WIDTHBOTTOM],
-//                param_tex[dvr::TT_WIDTHTOP],
-//                param_tex[dvr::TT_CENTER]
-//        });
+    if(vrController::param_bool[dvr::CHECK_RAYCAST])
+        ol_renders[dvr::OVERLAY_GRAPH]->setUniforms(new float[5]{
+                param_ray[dvr::TR_OVERALL],
+                param_ray[dvr::TR_WIDTHBOTTOM],
+                param_ray[dvr::TR_WIDTHTOP],
+                param_ray[dvr::TR_CENTER],
+                param_ray[dvr::TR_LOWEST]
+            });
+    else
+        ol_renders[dvr::OVERLAY_GRAPH]->setUniforms(new float[5]{
+                param_tex[dvr::TT_OVERALL],
+                param_tex[dvr::TT_WIDTHBOTTOM],
+                param_tex[dvr::TT_WIDTHTOP],
+                param_tex[dvr::TT_CENTER],
+                param_tex[dvr::TT_LOWEST]
+        });
 }
 void vrController::precompute(){
     if(!baked_dirty_) return;
