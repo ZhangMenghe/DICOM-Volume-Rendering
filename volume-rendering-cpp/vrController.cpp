@@ -172,21 +172,21 @@ void vrController::onPan(float x, float y){
 }
 void vrController::update_overlay_graph(){
     if(vrController::param_bool[dvr::CHECK_RAYCAST])
-        ol_renders[dvr::OVERLAY_GRAPH]->setUniforms(new float[5]{
+        ol_renders[dvr::OVERLAY_GRAPH]->getGraphPoints(new float[5]{
                 param_ray[dvr::TR_OVERALL],
                 param_ray[dvr::TR_WIDTHBOTTOM],
                 param_ray[dvr::TR_WIDTHTOP],
                 param_ray[dvr::TR_CENTER],
                 param_ray[dvr::TR_LOWEST]
-            });
+            }, opacity_points_ray);
     else
-        ol_renders[dvr::OVERLAY_GRAPH]->setUniforms(new float[5]{
+        ol_renders[dvr::OVERLAY_GRAPH]->getGraphPoints(new float[5]{
                 param_tex[dvr::TT_OVERALL],
                 param_tex[dvr::TT_WIDTHBOTTOM],
                 param_tex[dvr::TT_WIDTHTOP],
                 param_tex[dvr::TT_CENTER],
                 param_tex[dvr::TT_LOWEST]
-        });
+        }, opacity_points_tex);
 }
 void vrController::precompute(){
     if(!baked_dirty_) return;
@@ -215,13 +215,15 @@ void vrController::precompute(){
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    Shader::Uniform(sp, "u_maskbits", vrController::mask_bits_);
-    Shader::Uniform(sp, "u_organ_num", vrController::mask_num_);
+    Shader::Uniform(sp, "u_maskbits", mask_bits_);
+    Shader::Uniform(sp, "u_organ_num", mask_num_);
+    if(isRayCasting()) Shader::Uniform(sp, "u_opacity", 6, opacity_points_ray);
+    else Shader::Uniform(sp, "u_opacity", 6, opacity_points_tex);
 
-    if(isRayCasting())
-        raycastRenderer_->updatePrecomputation(sp);
-    else
-        texvrRenderer_->updatePrecomputation(sp);
+//    if(isRayCasting())
+//        raycastRenderer_->updatePrecomputation(sp);
+//    else
+//        texvrRenderer_->updatePrecomputation(sp);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);

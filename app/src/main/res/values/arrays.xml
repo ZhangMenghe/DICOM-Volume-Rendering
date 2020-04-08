@@ -106,13 +106,13 @@
     </string-array>
 
     <string-array name="opa_width_top">
-        <item>Top Width</item>
+        <item>Top W</item>
         <item>.0</item>
         <item>2.0</item>
         <item>100</item>
     </string-array>
     <string-array name="opa_width_bottom">
-        <item>Bottom Width</item>
+        <item>Bottom W</item>
         <item>2.0</item>
         <item>2.0</item>
         <item>100</item>

@@ -29,7 +29,7 @@ public:
         Shader::Uniform(sp, key, id);
         shader_.UnUse();
     }
-    void setUniforms(float values[]){
+    void getGraphPoints(float values[], float*&points){
         glm::vec2 lb, lm, lt, rb, rm, rt;
         float half_top = values[2] / 2.0f;
         float half_bottom = std::max(values[1] / 2.0f, half_top);
@@ -47,12 +47,14 @@ public:
         lm = glm::vec2(lb_x, mid_y);
         rm = glm::vec2(rb_x, mid_y);
 
-        float vertices[12] = {
+        if(points) delete points;
+        points = new float[12] {
             lb.x, lb.y, lm.x, lm.y, lt.x, lt.y,
             rb.x, rb.y, rm.x, rm.y, rt.x, rt.y
         };
+
         glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, 12* sizeof(float), vertices);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, 12* sizeof(float), points);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     virtual void Draw()=0;

@@ -90,6 +90,9 @@ private:
     glm::fvec2 Mouse_old;
     float _screen_w, _screen_h;
     int _screen_h_offset;
+//    glm::vec2 opacity_points_ray[6] = {glm::vec2(.0f, .0f)};
+//    glm::vec2 opacity_points_tex[6] = {glm::vec2(.0f, .0f)};
+    float *opacity_points_ray = nullptr, *opacity_points_tex= nullptr;
 
     //flags
     bool volume_model_dirty;

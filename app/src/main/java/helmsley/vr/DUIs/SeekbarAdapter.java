@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -131,9 +132,9 @@ public class SeekbarAdapter {
                 holder.seekbar.setTag(position);
                 holder.seekbar.setProgress((int)(item_values.get(position) / item_value_max[position] * item_seek_max[position] ));
                 convertView.setMinimumWidth(dropview_width);
-
-
                 convertView.setTag(R.layout.spinner_tune_layout, holder);
+
+//                if(item_names.get(position).equals("Bottom Width")) holder.text_name.setTextSize(12);
             } else {
                 holder = (ViewHolder) convertView.getTag(R.layout.spinner_tune_layout);
             }

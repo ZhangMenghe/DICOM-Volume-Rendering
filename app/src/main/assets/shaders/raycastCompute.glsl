@@ -20,7 +20,8 @@ struct OpacityAdj{
     float cutoff;//0,1
 };
 //shaderd by tex and ray, but mutually exclusive
-uniform OpacityAdj uOpacitys;
+//uniform OpacityAdj uOpacitys;
+uniform vec2 u_opacity[6];
 
 float CURRENT_INTENSITY;
 uint MASKS_;
@@ -47,9 +48,21 @@ uvec3 bright_scheme(float gray){
 }
 uint UpdateOpacityAlpha(uint sampled_alpha){
     float falpha = float(sampled_alpha) * 0.003921;
-    float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
-    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*falpha;
-    return uint(alpha*uOpacitys.overall * 255.0);
+    float alpha = CURRENT_INTENSITY;
+    vec2 lb = u_opacity[0], rb = u_opacity[3];
+    if(alpha < lb.x || alpha > rb.x) return uint(0);
+    vec2 lm = u_opacity[1], lt =u_opacity[2];
+    vec2 rm = u_opacity[4], rt =u_opacity[5];
+    float k = (lt.y - lm.y)/(lt.x - lm.x);
+    if(alpha < lt.x) alpha*= k*(alpha - lm.x)+lm.y;
+    else if(alpha < rt.x) alpha*=rt.y;
+    else alpha*= -k *(alpha - rm.x)+rm.y;
+    return uint(falpha * alpha * 255.0);
+
+//    return uint(CURRENT_INTENSITY * 255.0);
+//    float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
+//    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*falpha;
+//    return uint(alpha*uOpacitys.overall * 255.0);
 }
 
 uvec4 show_organs(uvec4 color){
