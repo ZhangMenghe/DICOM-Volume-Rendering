@@ -33,19 +33,23 @@ public:
         glm::vec2 lb, lm, lt, rb, rm, rt;
         float half_top = values[2] / 2.0f;
         float half_bottom = std::max(values[1] / 2.0f, half_top);
-        
-        float lb_x = std::max(.0f, values[3] - half_bottom);
-        float rb_x = std::min(1.0f, values[3] + half_bottom);
+
+        float raw_lb_x = values[3] - half_bottom;
+        float raw_rb_x = values[3] + half_bottom;
+        float lb_x = std::max(.0f, raw_lb_x);
+        float rb_x = std::min(1.0f, raw_rb_x);
         lb = glm::vec2(lb_x, .0f);
         rb = glm::vec2(rb_x, .0f);
-
-        float mid_y = values[4] * values[0];
-        lm = glm::vec2(lb_x, mid_y);
-        rm = glm::vec2(rb_x, mid_y);
 
         lt = glm::vec2(std::max(.0f, values[3] - half_top), values[0]);
         rt = glm::vec2(std::min(1.0f, values[3] + half_top), values[0]);
 
+        float mid_y = values[4] * values[0];
+        if(lb_x == .0)lm = glm::vec2(lb_x,lt.y/(lt.x - raw_lb_x) * (-raw_lb_x));
+        else lm = glm::vec2(lb_x, mid_y);
+        if(rb_x == 1.0)rm = glm::vec2(rb_x, rt.y / (rt.x - raw_rb_x) *(1-raw_rb_x));
+        else rm = glm::vec2(rb_x, mid_y);
+        
         float vertices[12] = {
             lb.x, lb.y, lm.x, lm.y, lt.x, lt.y,
             rb.x, rb.y, rm.x, rm.y, rt.x, rt.y
