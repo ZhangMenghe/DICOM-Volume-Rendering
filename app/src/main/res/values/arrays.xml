@@ -63,9 +63,6 @@
         <item>false</item>
     </string-array>
 
-
-
-
 <!--    name, value, maxvalue, toggle_bar_max-->
     <string-array name="raycastParams">
         <item>@array/raycast_density</item>
@@ -79,8 +76,8 @@
     <string-array name="raycast_density">
         <item>Density</item>
         <item>400.0</item>
-        <item>800.0</item>
-        <item>800</item>
+        <item>600.0</item>
+        <item>600</item>
     </string-array>
 
     <!--name, value, maxvalue, toggle_bar_max-->

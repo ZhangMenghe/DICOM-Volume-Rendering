@@ -197,6 +197,10 @@ void vrController::precompute(){
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
+
+        GLuint sp = bakeShader_->Use();
+        Shader::Uniform(sp, "u_tex_size", glm::vec3(tex_volume->Width(), tex_volume->Height(), tex_volume->Depth()));
+        bakeShader_->UnUse();
         //OVERLAYS
         ol_renders[dvr::OVERLAY_COLOR_SCHEME]->setUniform("uType", 0);
         ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("uType", 1);
@@ -212,7 +216,9 @@ void vrController::precompute(){
 
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
-
+    //todo!!!! add flip stuff
+    if(tex_volume->Depth() == 144)
+    bakeShader_->EnableKeyword("FLIPY");
     if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
 
@@ -222,6 +228,7 @@ void vrController::precompute(){
 
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
     Shader::Uniform(sp, "u_organ_num", mask_num_);
+
     if(isRayCasting()) Shader::Uniform(sp, "u_opacity", 6, opacity_points_ray);
     else Shader::Uniform(sp, "u_opacity", 6, opacity_points_tex);
 

@@ -3,6 +3,7 @@
 #pragma multi_compile SHOW_ORGANS
 #pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
+#pragma multi_compile FLIPY
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -29,6 +30,7 @@ uint MASKS_;
 //last bit indicates body(which doesn't belong to organs)
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
+uniform vec3 u_tex_size;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -81,10 +83,15 @@ uvec4 show_organs(uvec4 color){
     return color;
 }
 uvec4 Sample(ivec3 pos){
+    #ifdef FLIPY
+        pos = ivec3(pos.x, uint(512-pos.y),pos.z);
+    #endif
     uint value = imageLoad(srcTex, pos).r;
     //lower part as color
     uvec4 color = uvec4(uvec3(value&uint(0xffff)), 255);
     CURRENT_INTENSITY = float(color.r) * 0.003921;
+
+//    uint msk_value = imageLoad(srcTex, ivec3(pos.x, uint(512-pos.y),pos.z)).r;
     MASKS_ = value>>uint(16);
     return color;
 }
