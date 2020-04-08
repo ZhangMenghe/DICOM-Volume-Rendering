@@ -198,12 +198,17 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
         //OVERLAYS
-        ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("uScheme", 0);
+        ol_renders[dvr::OVERLAY_COLOR_SCHEME]->setUniform("uType", 0);
+        ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("uType", 1);
         ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uScheme", 0);
-
+        ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uType", 2);
     }
     update_overlay_graph();
     ol_renders[dvr::OVERLAY_COLOR_SCHEME]->setUniform("uScheme", color_scheme_id);
+
+    ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
+    ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
+    ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uScheme", color_scheme_id);
 
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);

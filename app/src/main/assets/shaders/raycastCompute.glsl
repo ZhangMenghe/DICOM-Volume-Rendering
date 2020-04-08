@@ -58,11 +58,6 @@ uint UpdateOpacityAlpha(uint sampled_alpha){
     else if(alpha < rt.x) alpha*=rt.y;
     else alpha*= -k *(alpha - rm.x)+rm.y;
     return uint(falpha * alpha * 255.0);
-
-//    return uint(CURRENT_INTENSITY * 255.0);
-//    float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
-//    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*falpha;
-//    return uint(alpha*uOpacitys.overall * 255.0);
 }
 
 uvec4 show_organs(uvec4 color){

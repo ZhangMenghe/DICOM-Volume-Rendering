@@ -19,14 +19,14 @@ public:
         Shader::Uniform(sp, "uOffset", glm::vec2(left, -1.0f + bottom * 2.0));
         shader_.UnUse();
     }
-    void updateVertices(float* vertices, int data_size){
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, data_size, vertices);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
     void setUniform(const char* key, int id){
         GLuint sp = shader_.Use();
         Shader::Uniform(sp, key, id);
+        shader_.UnUse();
+    }
+    void setUniform(const char* key, const int count, float*data){
+        GLuint sp = shader_.Use();
+        Shader::Uniform(sp, key, count, data);
         shader_.UnUse();
     }
     void getGraphPoints(float values[], float*&points){
