@@ -164,7 +164,7 @@ void vrController::onPan(float x, float y){
 }
 void vrController::update_overlay_graph(){
     if(vrController::param_bool[dvr::CHECK_RAYCAST])
-        ol_renders[dvr::OVERLAY_GRAPH]->getGraphPoints(new float[5]{
+        GraphRenderer::getGraphPoints(new float[5]{
                 param_ray[dvr::TR_OVERALL],
                 param_ray[dvr::TR_WIDTHBOTTOM],
                 param_ray[dvr::TR_WIDTHTOP],
@@ -172,7 +172,7 @@ void vrController::update_overlay_graph(){
                 param_ray[dvr::TR_LOWEST]
             }, opacity_points_ray);
     else
-        ol_renders[dvr::OVERLAY_GRAPH]->getGraphPoints(new float[5]{
+        GraphRenderer::getGraphPoints(new float[5]{
                 param_tex[dvr::TT_OVERALL],
                 param_tex[dvr::TT_WIDTHBOTTOM],
                 param_tex[dvr::TT_WIDTHTOP],
@@ -199,13 +199,16 @@ void vrController::precompute(){
         ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uScheme", 0);
         ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uType", 2);
     }
+
+    //get opacity points
     update_overlay_graph();
-    ol_renders[dvr::OVERLAY_COLOR_SCHEME]->setUniform("uScheme", color_scheme_id);
-
-    ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
-    ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
-    ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uScheme", color_scheme_id);
-
+    if(param_bool[dvr::CHECK_OVERLAY]) {
+        ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
+        ol_renders[dvr::OVERLAY_COLOR_SCHEME]->setUniform("uScheme", color_scheme_id);
+        ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
+        ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
+        ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uScheme", color_scheme_id);
+    }
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
     //todo!!!! add flip stuff

@@ -19,43 +19,15 @@ public:
         Shader::Uniform(sp, "uOffset", glm::vec2(left, -1.0f + bottom * 2.0));
         shader_.UnUse();
     }
-    void setUniform(const char* key, int id){
-        GLuint sp = shader_.Use();
-        Shader::Uniform(sp, key, id);
-        shader_.UnUse();
-    }
-    void setUniform(const char* key, const int count, float*data){
+    void setUniform(const char* key, const int count, float* data){
         GLuint sp = shader_.Use();
         Shader::Uniform(sp, key, count, data);
         shader_.UnUse();
     }
-    void getGraphPoints(float values[], float*&points){
-        glm::vec2 lb, lm, lt, rb, rm, rt;
-        float half_top = values[2] / 2.0f;
-        float half_bottom = std::max(values[1] / 2.0f, half_top);
-
-        float lb_x = values[3] - half_bottom;
-        float rb_x = values[3] + half_bottom;
-
-        lb = glm::vec2(lb_x, .0f);
-        rb = glm::vec2(rb_x, .0f);
-
-        lt = glm::vec2(values[3] - half_top, values[0]);
-        rt = glm::vec2(values[3] + half_top, values[0]);
-
-        float mid_y = values[4] * values[0];
-        lm = glm::vec2(lb_x, mid_y);
-        rm = glm::vec2(rb_x, mid_y);
-
-        if(points) delete points;
-        points = new float[12] {
-            lb.x, lb.y, lm.x, lm.y, lt.x, lt.y,
-            rb.x, rb.y, rm.x, rm.y, rt.x, rt.y
-        };
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, 12* sizeof(float), points);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    void setUniform(const char* key, int id){
+        GLuint sp = shader_.Use();
+        Shader::Uniform(sp, key, id);
+        shader_.UnUse();
     }
     virtual void Draw()=0;
 
