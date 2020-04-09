@@ -68,17 +68,10 @@ void vrController::assembleTexture(int w, int h, int d, GLubyte * data, int chan
     delete[]vol_data;
     baked_dirty_ = true;
 }
-
+//1-baldder, 2-kidn 4 color 8 spleen
 void vrController::onViewCreated(){
     texvrRenderer_ = new texvrRenderer;
     raycastRenderer_ = new raycastRenderer;
-
-//    funcRenderer_ = new FuncRenderer;
-//    funcRenderer_->CreateFunction(COLOR_BAR);
-//    funcRenderer_->CreateFunction(OPACITY_FUN);
-
-//    graphRenderer = new GraphRenderer(shader_contents[dvr::SHADER_OPA_VIZ_VERT], shader_contents[dvr::SHADER_OPA_VIZ_FRAG]);
-//    colorbarRenderer = new ColorbarRenderer(shader_contents[dvr::SHADER_COLOR_VIZ_VERT], shader_contents[dvr::SHADER_COLOR_VIZ_FRAG]);
 }
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
@@ -119,7 +112,6 @@ void vrController::onDraw() {
 
     if(isRayCasting())  raycastRenderer_->Draw();
     else texvrRenderer_->Draw();
-
 }
 void vrController::onDrawOverlays(){
     if(!tex_volume) return;
@@ -232,10 +224,6 @@ void vrController::precompute(){
     if(isRayCasting()) Shader::Uniform(sp, "u_opacity", 6, opacity_points_ray);
     else Shader::Uniform(sp, "u_opacity", 6, opacity_points_tex);
 
-//    if(isRayCasting())
-//        raycastRenderer_->updatePrecomputation(sp);
-//    else
-//        texvrRenderer_->updatePrecomputation(sp);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);

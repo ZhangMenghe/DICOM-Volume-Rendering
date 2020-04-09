@@ -57,10 +57,6 @@ private:
     //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
-//    FuncRenderer* funcRenderer_ = nullptr;
-//    baseQuad* graphRenderer = nullptr;
-//    baseQuad* colorbarRenderer = nullptr;
-
 
     //Shader
     Shader* bakeShader_ = nullptr;
