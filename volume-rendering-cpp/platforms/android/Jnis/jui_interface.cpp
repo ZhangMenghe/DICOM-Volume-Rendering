@@ -74,7 +74,7 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
-//        LOGE("======SET  %s, %d", key.c_str(), value);
+        LOGE("======SET  %s, %d", key.c_str(), value);
         if(key==freeze_keyworkd) vrController::cutDirty = true;
             //!!debug only,
 //        else if(key == "Raycasting") vrController::instance()->setStatus(value?"Raycasting":"texturebased");

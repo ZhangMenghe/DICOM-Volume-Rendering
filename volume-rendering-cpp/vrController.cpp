@@ -284,4 +284,5 @@ void vrController::setOverlayRect(int id, int width, int height, int left, int t
         overlay_rects[(dvr::DRAW_OVERLAY_IDS)id] = r;
     }
     isOverlayRectSet = true;
+    baked_dirty_ = true;
 }
