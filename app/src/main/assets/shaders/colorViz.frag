@@ -2,7 +2,7 @@
 
 precision mediump float;
 uniform int uScheme;
-uniform int uType;
+//uniform int uType;
 uniform vec2 u_opacity[6];
 
 out vec4 gl_FragColor;
@@ -37,12 +37,12 @@ vec4 get_mixture(float posx){
     return vec4(hsv2rgb(color_hsv),gray);
 }
 void main(){
-    if(uType == 0){
-        if(uScheme == 0) gl_FragColor = vec4(vec3(vTexcoord.x), 1.0);
-        else gl_FragColor = vec4(hsv2rgb(transfer_scheme_hsv(vTexcoord.x)), 1.0);
-    }
-    else if(uType == 1)
+//    if(uType == 0){
+//        if(uScheme == 0) gl_FragColor = vec4(vec3(vTexcoord.x), 1.0);
+//        else gl_FragColor = vec4(hsv2rgb(transfer_scheme_hsv(vTexcoord.x)), 1.0);
+//    }
+//    else if(uType == 1)
         gl_FragColor = vec4(get_intensity(vTexcoord.x), 1.0);
-    else
-        gl_FragColor = get_mixture(vTexcoord.x);
+//    else
+//        gl_FragColor = get_mixture(vTexcoord.x);
 }

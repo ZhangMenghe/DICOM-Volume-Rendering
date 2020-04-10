@@ -76,28 +76,35 @@ void vrController::onViewCreated(){
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
     camera->setProjMat(width, height);
-    _screen_w = width; _screen_h = height;
+
     glClear(GL_COLOR_BUFFER_BIT);
     screenQuad::instance()->onScreenSizeChange(width, height);
-    //setup overlay rect
-    for(auto &rect:overlay_rects){
-        auto& r=rect.second;
-        if(r.width > 1.0f){
-            r.width/=_screen_w; r.left/=_screen_w;
-            r.height/=_screen_h; r.top/=_screen_h;
+    if(!overlay_rects.empty()){
+        //setup overlay rect
+        for(auto &rect:overlay_rects){
+            auto& r=rect.second;
+            if(r.width > 1.0f){
+                r.width/=width; r.left/=width;
+                r.height/=height; r.top/=height;
+            }else if(_screen_w!=0){
+                r.width*=_screen_w/width; r.left*=_screen_w/width;
+                r.height*=_screen_h/height; r.top*=_screen_h/height;
+            }
+            setup_overlays(rect.first, r);
         }
-        LOGE("====width, height %d, %d", width, height);
-        //todo: not window pos..now..aaaafan
-        float rel_bottom = r.top - r.height;
-        if(rect.first == dvr::OVERLAY_GRAPH){
-            if(!ol_renders[rect.first])ol_renders[rect.first] = new GraphRenderer(shader_contents[dvr::SHADER_OPA_VIZ_VERT], shader_contents[dvr::SHADER_OPA_VIZ_FRAG]);
-        }else if(!ol_renders[rect.first]){
-            ol_renders[rect.first] = new ColorbarRenderer(shader_contents[dvr::SHADER_COLOR_VIZ_VERT], shader_contents[dvr::SHADER_COLOR_VIZ_FRAG]);
-        }
-        ol_renders[rect.first] ->setRelativeRenderRect(r.width, r.height, r.left, rel_bottom);
     }
-
+    _screen_w = width; _screen_h = height;
 }
+void vrController::setup_overlays(dvr::DRAW_OVERLAY_IDS id, dvr::Rect r){
+    float rel_bottom = r.top - r.height;
+    auto it = ol_renders.find(id);
+    if(it == ol_renders.end()){
+        if(id == dvr::OVERLAY_GRAPH) ol_renders[id] = new GraphRenderer(shader_contents[dvr::SHADER_OPA_VIZ_VERT], shader_contents[dvr::SHADER_OPA_VIZ_FRAG]);
+        else ol_renders[id] = new ColorbarRenderer(shader_contents[dvr::SHADER_COLOR_VIZ_VERT], shader_contents[dvr::SHADER_COLOR_VIZ_FRAG]);
+    }
+    ol_renders[id] ->setRelativeRenderRect(r.width, r.height, r.left, rel_bottom);
+}
+
 void vrController::onDraw() {
     if(!tex_volume) return;
 
@@ -193,21 +200,16 @@ void vrController::precompute(){
         GLuint sp = bakeShader_->Use();
         Shader::Uniform(sp, "u_tex_size", glm::vec3(tex_volume->Width(), tex_volume->Height(), tex_volume->Depth()));
         bakeShader_->UnUse();
-        //OVERLAYS
-        ol_renders[dvr::OVERLAY_COLOR_SCHEME]->setUniform("uType", 0);
-        ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("uType", 1);
-        ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uScheme", 0);
-        ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uType", 2);
     }
 
     //get opacity points
     update_overlay_graph();
-    if(param_bool[dvr::CHECK_OVERLAY]) {
+    if(param_bool[dvr::CHECK_OVERLAY] && isOverlayRectSet) {
+        if(ol_renders.size() != 2) for(auto &rect:overlay_rects) setup_overlays(rect.first, rect.second);
+
         ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
-        ol_renders[dvr::OVERLAY_COLOR_SCHEME]->setUniform("uScheme", color_scheme_id);
-        ol_renders[dvr::OVERLAY_COLOR_INTENSITY]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
-        ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
-        ol_renders[dvr::OVERLAY_COLOR_MIX]->setUniform("uScheme", color_scheme_id);
+        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", color_scheme_id);
+        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
     }
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
@@ -272,9 +274,7 @@ void vrController::setStatus(std::string status_name){
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
 void vrController::setOverlayRect(int id, int width, int height, int left, int top){
-    LOGE("=====screen %f", _screen_w);
     if(id == 0) _screen_h_offset = top + height;
-
     top = _screen_h_offset - top;
     if(_screen_w != 0){
         dvr::Rect r{width/_screen_w, height/_screen_h, left/_screen_w, top/_screen_h};
@@ -283,5 +283,5 @@ void vrController::setOverlayRect(int id, int width, int height, int left, int t
         dvr::Rect r{(float)width, (float)height, (float)left, (float)top};
         overlay_rects[(dvr::DRAW_OVERLAY_IDS)id] = r;
     }
-    ol_renders[(dvr::DRAW_OVERLAY_IDS)id] = nullptr;
+    isOverlayRectSet = true;
 }

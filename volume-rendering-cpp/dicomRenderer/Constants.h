@@ -50,9 +50,7 @@ namespace dvr{
     };
     enum DRAW_OVERLAY_IDS{
         OVERLAY_GRAPH=0,
-        OVERLAY_COLOR_INTENSITY,
-        OVERLAY_COLOR_MIX,
-        OVERLAY_COLOR_SCHEME
+        OVERLAY_COLOR_BARS
     };
 
     //UIs

@@ -92,7 +92,8 @@ private:
 
     //flags
     bool volume_model_dirty;
-
+    //todo:decent way?
+    bool isOverlayRectSet = false;
     //overlay
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, dvr::Rect> overlay_rects;
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, baseQuad*> ol_renders;
@@ -103,6 +104,7 @@ private:
         return param_bool[dvr::CHECK_RAYCAST];
     }
     void update_overlay_graph();
+    void setup_overlays(dvr::DRAW_OVERLAY_IDS id, dvr::Rect r);
 
 };
 #endif
