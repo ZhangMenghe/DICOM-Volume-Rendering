@@ -10,9 +10,6 @@ import android.widget.CompoundButton;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
-
-import helmsley.vr.R;
 
 public abstract class BasePanel {
     final WeakReference<Activity> actRef;

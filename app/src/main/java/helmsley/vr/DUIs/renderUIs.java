@@ -104,7 +104,6 @@ public class renderUIs extends BasePanel{
         });
 
         setup_checks(R.array.render_check_params, R.array.render_check_values);
-        Resources res = activity.getResources();
         CHECK_TEXRAY_NAME = check_names_[0];//res.getStringArray(R.array.render_check_params)[0];
         CHECK_OVERLAYS = check_names_[1];//res.getStringArray(R.array.render_check_params)[1];
     }

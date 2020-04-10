@@ -12,8 +12,6 @@ import com.google.common.primitives.Booleans;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.function.BinaryOperator;
 
 import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
@@ -29,9 +27,6 @@ public class UIsManager {
     final static String TAG = "UIsManager";
     //Panels
     private LinkedHashMap<Integer, BasePanel> sub_panels_;
-//    private BasePanel cuttingController;
-//    private BasePanel renderController;
-//    private BasePanel masksController;
 
     // UIs
     private Spinner spinner_check;
@@ -120,28 +115,6 @@ public class UIsManager {
         cb_panel_adapter.Reset(check_items_panel, check_values_panel);
         spinner_check.setAdapter(cb_panel_adapter);
 
-
-
-        //reset values
-
-//        TypedArray params = res.obtainTypedArray(R.array.checkJNIParams);
-//        if(params.length()!=PANEL_NUM){
-//            Log.e(TAG, "RequestReset: number of panels NOT equal to check parameters" );
-//            return;
-//        }
-//        //order matters!
-//        ArrayList<Boolean> check_values = new ArrayList<>();
-//        for(int i=0; i<PANEL_NUM; i++){
-//            check_values = renderController.resetCheckParams(0, check_values);
-//
-//        }
-//        String[] check_items = res.getStringArray(R.array.checkParams);
-//        boolean[] values = new boolean[check_items.length];
-//        for(int i=0;i<values.length;i++)values[i] = false;
-//        values[0] = false;//renderController.isRaycasting();
-//        values[1] = false;//masksController.isMaskOn();
-//        values = cuttingController.setCuttingStatus(2, values);
-//        boolean[] jni_values = Booleans.toArray(check_values_param);
         Log.e(TAG, "=======RequestReset: " + check_items_param.size());
         JUIInterface.JUIonReset(check_items_param.size(), check_items_param.toArray(new String[0]), Booleans.toArray(check_values_param));
     }

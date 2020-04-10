@@ -7,7 +7,7 @@
         <item>@string/panel_mask_name</item>
     </string-array>
     <string-array name="checkShowPanelValues">
-        <item>false</item>
+        <item>@bool/default_render_panel_on</item>
         <item>false</item>
         <item>false</item>
     </string-array>
@@ -24,7 +24,7 @@
     </string-array>
     <array name="render_check_values">
         <item>false</item>
-        <item>false</item>
+        <item>@bool/default_render_panel_on</item>
     </array>
 
     <string-array name="rendering_mode">
