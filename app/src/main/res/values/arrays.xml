@@ -65,7 +65,7 @@
 
 <!--    name, value, maxvalue, toggle_bar_max-->
     <string-array name="raycastParams">
-        <item>@array/raycast_density</item>
+<!--        <item>@array/raycast_density</item>-->
         <item>@array/opa_overall</item>
         <item>@array/opa_lowest</item>
         <item>@array/opa_width_bottom</item>

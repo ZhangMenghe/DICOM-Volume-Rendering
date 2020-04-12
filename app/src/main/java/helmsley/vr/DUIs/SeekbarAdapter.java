@@ -3,12 +3,8 @@ package helmsley.vr.DUIs;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 

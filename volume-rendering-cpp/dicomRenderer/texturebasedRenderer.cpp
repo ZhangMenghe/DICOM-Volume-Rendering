@@ -13,7 +13,7 @@ texvrRenderer::texvrRenderer(bool screen_baked)
         LOGE("TextureBas===Failed to create texture based shader program===");
     vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
 
-    onCuttingChange(.0f);
+    setCuttingPlane(.0f);
 }
 
 void texvrRenderer::init_vertices(){
@@ -81,7 +81,7 @@ void texvrRenderer::draw_scene(){
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
     Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * modelmat);
-
+    Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
 //    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
@@ -103,19 +103,6 @@ void texvrRenderer::Draw(){
     draw_scene();
 }
 
-void texvrRenderer::onCuttingChange(float percent){
-    int cut_id = int(dimensions * percent);
-    GLuint sp = shader_->Use();
-    Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
-    shader_->UnUse();
-}
-
-void texvrRenderer::updatePrecomputation(GLuint sp) {
-    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_tex[dvr::TT_OVERALL]);
-    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_tex[dvr::TT_LOWEST]);
-    Shader::Uniform(sp,"uOpacitys.cutoff", 1.0f - vrController::param_tex[dvr::TT_WIDTHBOTTOM]);
-}
-
 void texvrRenderer::draw_baked() {
     if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
@@ -133,4 +120,8 @@ void texvrRenderer::draw_baked() {
 void texvrRenderer::setDimension(int dims){
     dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
     update_instance_data();
+}
+void texvrRenderer::setCuttingPlane(float percent){
+    cut_id = int(dimensions * percent);
+    baked_dirty_ = true;
 }

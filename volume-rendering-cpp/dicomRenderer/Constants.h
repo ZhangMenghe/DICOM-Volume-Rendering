@@ -10,22 +10,13 @@ namespace dvr{
         CHECK_FREEZE_CPLANE,
         CHECK_MASKON,
     };
-    enum PARAM_TEX{
-        TT_OVERALL=0,
-        TT_LOWEST,
-        TT_WIDTHBOTTOM,
-        TT_WIDTHTOP,
-        TT_CENTER,
-        TT_CUTTING_TEX
-    };
-    enum PARAM_RAYCAST{
-        TR_DENSITY = 0,
-        TR_OVERALL,
-        TR_LOWEST,
-        TR_WIDTHBOTTOM,
-        TR_WIDTHTOP,
-        TR_CENTER,
-        TR_CUTTING_RAY
+    enum PARAM_TUNE{
+        TUNE_OVERALL = 0,
+        TUNE_LOWEST,
+        TUNE_WIDTHBOTTOM,
+        TUNE_WIDTHTOP,
+        TUNE_CENTER,
+        TUNE_END
     };
     enum SHADER_FILES{
         SHADER_TEXTUREVOLUME_VERT = 0,
@@ -52,7 +43,6 @@ namespace dvr{
         OVERLAY_GRAPH=0,
         OVERLAY_COLOR_BARS
     };
-
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;

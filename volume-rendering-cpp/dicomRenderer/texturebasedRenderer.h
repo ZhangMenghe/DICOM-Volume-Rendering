@@ -20,6 +20,7 @@ private:
     GLuint vao_slice = 0, vbo_instance;
     bool DRAW_BAKED;
     bool b_init_successful = false;
+    int cut_id = 0;
 
     //for screen baking
     bool baked_dirty_ = true;
@@ -31,9 +32,8 @@ private:
 public:
     texvrRenderer(bool screen_baked = true);
     void setDimension(int dims);
-    void onCuttingChange(float percent);
+    void setCuttingPlane(float percent);
     void Draw();
-    void updatePrecomputation(GLuint sp);
     void dirtyPrecompute(){baked_dirty_ = true;}
 };
 #endif

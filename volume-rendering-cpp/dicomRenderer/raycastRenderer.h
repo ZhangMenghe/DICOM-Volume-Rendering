@@ -20,9 +20,8 @@ private:
 public:
     raycastRenderer(bool screen_baked = true);
 
-    void onCuttingChange(float percent);
+    void setCuttingPlane(float percent);
     void Draw();
-    void updatePrecomputation(GLuint sp);
     void dirtyPrecompute(){baked_dirty_ = true;}
     void setDimension(int dims);
 };

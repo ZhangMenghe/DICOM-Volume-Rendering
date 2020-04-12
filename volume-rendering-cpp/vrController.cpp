@@ -5,12 +5,10 @@
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 Camera* vrController::camera = nullptr;
-std::vector<float> vrController::param_tex, vrController::param_ray;
 std::vector<bool> vrController::param_bool;
 std::vector<std::string> vrController::shader_contents;
 bool vrController::baked_dirty_;
-bool vrController::cutDirty;
-int vrController::color_scheme_id;
+int vrController::color_scheme_id, vrController::widget_id;
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -23,10 +21,10 @@ vrController::~vrController(){
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
     for(auto olr:ol_renders) delete olr.second;
+    for(auto param:render_params) param.clear();
+    render_params.clear();
     ol_renders.clear();
     rStates_.clear();
-    param_tex.clear();
-    param_ray.clear();
     param_bool.clear();
     shader_contents.clear();
 }
@@ -38,12 +36,13 @@ vrController::vrController(){
 }
 void vrController::onReset() {
     if(camera){delete camera; camera= nullptr;}
-    baked_dirty_ = true; cutDirty=true;
+    baked_dirty_ = true;
     Mouse_old = glm::fvec2(.0);
     rStates_.clear();
     cst_name="";
     _screen_w = 0; _screen_h = 0;
-    setStatus("default_status");
+    widget_id = 0;
+    setMVPStatus("default_status");
 }
 void vrController::assembleTexture(int w, int h, int d, GLubyte * data, int channel_num){
     texvrRenderer_->setDimension(d);
@@ -109,11 +108,6 @@ void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    if(cutDirty){ //panel switch to cutting, update cutting result
-        cutDirty = false;
-        texvrRenderer_->onCuttingChange(param_tex[dvr::TT_CUTTING_TEX]);
-        raycastRenderer_->onCuttingChange(param_ray[dvr::TR_CUTTING_RAY]);
-    }
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
 
@@ -169,24 +163,7 @@ void vrController::onPan(float x, float y){
     PosVec3_.y += offy * ScaleVec3_.y;
     volume_model_dirty = true;
 }
-void vrController::update_overlay_graph(){
-    if(vrController::param_bool[dvr::CHECK_RAYCAST])
-        GraphRenderer::getGraphPoints(new float[5]{
-                param_ray[dvr::TR_OVERALL],
-                param_ray[dvr::TR_WIDTHBOTTOM],
-                param_ray[dvr::TR_WIDTHTOP],
-                param_ray[dvr::TR_CENTER],
-                param_ray[dvr::TR_LOWEST]
-            }, opacity_points_ray);
-    else
-        GraphRenderer::getGraphPoints(new float[5]{
-                param_tex[dvr::TT_OVERALL],
-                param_tex[dvr::TT_WIDTHBOTTOM],
-                param_tex[dvr::TT_WIDTHTOP],
-                param_tex[dvr::TT_CENTER],
-                param_tex[dvr::TT_LOWEST]
-        }, opacity_points_tex);
-}
+
 void vrController::precompute(){
     if(!baked_dirty_) return;
     if(!bakeShader_){
@@ -202,14 +179,13 @@ void vrController::precompute(){
         bakeShader_->UnUse();
     }
 
-    //get opacity points
-    update_overlay_graph();
+    GraphRenderer::getGraphPoints(render_params[widget_id].data(), opacity_points);
     if(param_bool[dvr::CHECK_OVERLAY] && isOverlayRectSet) {
         if(ol_renders.size() != 2) for(auto &rect:overlay_rects) setup_overlays(rect.first, rect.second);
 
-        ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
+        ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, opacity_points);
         ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", color_scheme_id);
-        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, isRayCasting()?opacity_points_ray:opacity_points_tex);
+        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, opacity_points);
     }
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
@@ -225,10 +201,7 @@ void vrController::precompute(){
 
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
     Shader::Uniform(sp, "u_organ_num", mask_num_);
-
-    if(isRayCasting()) Shader::Uniform(sp, "u_opacity", 6, opacity_points_ray);
-    else Shader::Uniform(sp, "u_opacity", 6, opacity_points_tex);
-
+    Shader::Uniform(sp, "u_opacity", 6, opacity_points);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -250,7 +223,7 @@ void vrController::updateVolumeModelMat(){
                  * RotateMat_
                  * glm::scale(glm::mat4(1.0), ScaleVec3_);
 }
-void vrController::setStatus(std::string status_name){
+void vrController::setMVPStatus(std::string status_name){
     //save changes to current status
     if(status_name == cst_name) return;
     if(!cst_name.empty()) rStates_[cst_name] = reservedStatus(ModelMat_, RotateMat_, ScaleVec3_, PosVec3_, camera);
@@ -273,6 +246,24 @@ void vrController::setStatus(std::string status_name){
 //    auto cpos= camera->getCameraPosition();
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
+void vrController::setTuneParameter(int wid, std::vector<float> values){
+    while(render_params.size() <= wid) render_params.push_back(std::vector<float>(dvr::TUNE_END, 0));
+    while(values.size() < dvr::TUNE_END) values.push_back(.0f);
+    memcpy(render_params[wid].data(), values.data(), dvr::TUNE_END * sizeof(float));
+    baked_dirty_ = true;
+}
+
+void vrController::setTuneParameter(int wid, int tid, float value){
+    if(wid>=render_params.size() || tid>=dvr::TUNE_END) return;
+    render_params[wid][tid] = value;
+    baked_dirty_ = true;
+}
+
+void vrController::setCuttingPlane(float value){
+    if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);
+    else texvrRenderer_->setCuttingPlane(value);
+}
+
 void vrController::setOverlayRect(int id, int width, int height, int left, int top){
     if(id == 0) _screen_h_offset = top + height;
     top = _screen_h_offset - top;

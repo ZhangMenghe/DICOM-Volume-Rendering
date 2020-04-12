@@ -1,6 +1,8 @@
 #include <GLPipeline/Primitive.h>
 #include <GLPipeline/Mesh.h>
 #include "graphRenderer.h"
+#include "Constants.h"
+
 GraphRenderer::GraphRenderer(std::string vertex_shader, std::string frag_shader)
         :baseQuad(vertex_shader, frag_shader){
     glGenVertexArrays(1, &vao_);
@@ -37,19 +39,19 @@ GraphRenderer::GraphRenderer(std::string vertex_shader, std::string frag_shader)
 
 void GraphRenderer::getGraphPoints(float values[], float* &points){
     glm::vec2 lb, lm, lt, rb, rm, rt;
-    float half_top = values[2] / 2.0f;
-    float half_bottom = std::max(values[1] / 2.0f, half_top);
+    float half_top = values[dvr::TUNE_WIDTHTOP] / 2.0f;
+    float half_bottom = std::max(values[dvr::TUNE_WIDTHBOTTOM] / 2.0f, half_top);
 
-    float lb_x = values[3] - half_bottom;
-    float rb_x = values[3] + half_bottom;
+    float lb_x = values[dvr::TUNE_CENTER] - half_bottom;
+    float rb_x = values[dvr::TUNE_CENTER] + half_bottom;
 
     lb = glm::vec2(lb_x, .0f);
     rb = glm::vec2(rb_x, .0f);
 
-    lt = glm::vec2(values[3] - half_top, values[0]);
-    rt = glm::vec2(values[3] + half_top, values[0]);
+    lt = glm::vec2(values[dvr::TUNE_CENTER] - half_top, values[dvr::TUNE_OVERALL]);
+    rt = glm::vec2(values[dvr::TUNE_CENTER] + half_top, values[dvr::TUNE_OVERALL]);
 
-    float mid_y = values[4] * values[0];
+    float mid_y = values[dvr::TUNE_LOWEST] * values[dvr::TUNE_OVERALL];
     lm = glm::vec2(lb_x, mid_y);
     rm = glm::vec2(rb_x, mid_y);
 

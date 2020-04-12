@@ -44,8 +44,8 @@ void raycastRenderer::draw_scene(){
     glm::mat4 model_inv = glm::inverse(modelmat * dim_scale_mat);
     Shader::Uniform(sp, "uCamposObjSpace",
             glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-    Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
-
+//    Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
+    Shader::Uniform(sp,"sample_step_inverse", 1.0f/400);
     if(vrController::param_bool[dvr::CHECK_CUTTING])shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
 
@@ -67,15 +67,11 @@ void raycastRenderer::draw_scene(){
     glDisable(GL_DEPTH_TEST);
 }
 
-void raycastRenderer::onCuttingChange(float percent){
+void raycastRenderer::setCuttingPlane(float percent){
     cutter_->setCutPlane(percent);
-//    dirtyPrecompute();
+    baked_dirty_ = true;
 }
-void raycastRenderer::updatePrecomputation(GLuint sp){
-    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_ray[dvr::TR_OVERALL]);
-    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_ray[dvr::TR_LOWEST]);
-    Shader::Uniform(sp,"uOpacitys.cutoff", 1.0f - vrController::param_ray[dvr::TR_WIDTHBOTTOM]);
-}
+
 void raycastRenderer::draw_baked(){
     if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
     if(!cshader_){
@@ -102,7 +98,7 @@ void raycastRenderer::draw_baked(){
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-    Shader::Uniform(sp, "usample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
+    Shader::Uniform(sp, "usample_step_inverse", 1.0f / 400.0f);
     cutter_->Update();
     cutter_->setCuttingParams(sp, true);
 

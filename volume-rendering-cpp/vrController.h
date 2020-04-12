@@ -16,13 +16,12 @@
 class vrController:public nEntrance{
 public:
     static Camera* camera;
-    static std::vector<float> param_tex, param_ray;
     static std::vector<bool> param_bool;
     static std::vector<std::string> shader_contents;
 
     static bool baked_dirty_;
-    static bool cutDirty;
     static int color_scheme_id;
+    static int widget_id;
     unsigned int mask_num_, mask_bits_;
 
     static vrController* instance();
@@ -44,8 +43,12 @@ public:
 
     //setter funcs
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
-    void setStatus(std::string status_name);
+    void setMVPStatus(std::string status_name);
+    void setTuneParameter(int wid, std::vector<float>values);
+    void setTuneParameter(int wid, int tid, float value);
     void setOverlayRect(int id, int width, int height, int left, int top);
+    void setCuttingPlane(float value);
+
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(){return ModelMat_;}
@@ -85,12 +88,16 @@ private:
     glm::fvec2 Mouse_old;
     float _screen_w, _screen_h;
     int _screen_h_offset;
-    float *opacity_points_ray = nullptr, *opacity_points_tex= nullptr;
+    float *opacity_points = nullptr;
 
     //flags
     bool volume_model_dirty;
     //todo:decent way?
     bool isOverlayRectSet = false;
+
+    //opacity parameters
+
+    std::vector<std::vector<float>> render_params;
     //overlay
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, dvr::Rect> overlay_rects;
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, baseQuad*> ol_renders;
@@ -100,7 +107,6 @@ private:
     bool isRayCasting(){
         return param_bool[dvr::CHECK_RAYCAST];
     }
-    void update_overlay_graph();
     void setup_overlays(dvr::DRAW_OVERLAY_IDS id, dvr::Rect r);
 
 };
