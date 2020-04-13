@@ -249,8 +249,7 @@ void vrController::setMVPStatus(std::string status_name){
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
 void vrController::removeTuneWidget(int wid){
-    if(wid<render_params.size())
-        render_params.erase(render_params.begin()+wid);
+    if(wid<render_params.size()) render_params.erase(render_params.begin()+wid);
     baked_dirty_ = true;
 }
 void vrController::removeAllTuneWidgets(){

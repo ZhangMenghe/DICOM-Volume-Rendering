@@ -234,7 +234,7 @@ public class renderUIs extends BasePanel{
             SeekBar seekbar;
         }
     }
-    private class widgetListAdapter extends textSimpleListAdapter {
+    private static class widgetListAdapter extends textSimpleListAdapter {
         private final WeakReference<tunerListAdapter> mTunerRef;
         private final static int INIT_ID = 0;
         int current_id;
@@ -246,7 +246,7 @@ public class renderUIs extends BasePanel{
             mTunerRef = new WeakReference<>(tuner_adapter);
             current_id = INIT_ID;
             widget_num = 0;
-            name_prefix = context.getString(R.string.tune_widget_name_prefix);
+            name_prefix = context.getString(R.string.tune_widget_name_prefix) + " ";
             title = name_prefix + INIT_ID;
         }
         public void Reset(){
@@ -277,12 +277,12 @@ public class renderUIs extends BasePanel{
             deleteItem(current_id);
         }
         public void deleteItem(int id){
-            if(id >= widget_num || id<1) return;
+            if(widget_num<2 || id >= widget_num) return;
             JUIInterface.JUIremoveTuneWidgetById(id);
+            widget_num--;
+            setTitleById(id%widget_num);
 
-            setTitleById(id - 1);
-
-            widget_num--;notifyDataSetChanged();
+            notifyDataSetChanged();
         }
         void onItemClick(int position){
             setTitleById(position);

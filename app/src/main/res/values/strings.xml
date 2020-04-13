@@ -22,7 +22,7 @@
     <string name="check_panel_group_name">Panels</string>
     <string name="check_freeze_name">Freeze</string>
     <string name="fund_group_name">Setting</string>
-    <string name="tune_widget_name_prefix">WID </string>
+    <string name="tune_widget_name_prefix">WID</string>
 
     <string name="panel_rendering_name">Rendering</string>
     <string name="panel_mask_name">Organs</string>
