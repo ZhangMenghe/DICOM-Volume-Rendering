@@ -11,7 +11,7 @@ namespace {
 JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jint num, jfloatArray jvalues){
     if(num != dvr::TUNE_END) return;
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    vrController::instance()->setTuneParameter(vrController::widget_id+1, std::vector<float>(values, values+num));
+    vrController::instance()->addWidget(std::vector<float>(values, values+num));
 }
 void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     param_checks.clear();

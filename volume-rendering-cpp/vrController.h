@@ -44,7 +44,7 @@ public:
     //setter funcs
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
-    void setTuneParameter(int wid, std::vector<float>values);
+    void addWidget(std::vector<float>values);
     void setTuneParameter(int tid, float value);
     void removeTuneWidget(int wid);
     void removeAllTuneWidgets();

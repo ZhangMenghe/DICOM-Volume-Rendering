@@ -15,8 +15,12 @@ GraphRenderer::GraphRenderer(std::string vertex_shader, std::string frag_shader)
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12 *MAX_INSTANCES, nullptr, GL_DYNAMIC_DRAW);
 
+    memcpy(indices, single_indices_, sizeof(unsigned int)*12);
+    for(int i=1;i<MAX_INSTANCES;i++)
+        for(int k=0;k<12;k++)
+            indices[12*i+k] = 6*i+single_indices_[k];
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*12*MAX_INSTANCES, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*12*MAX_INSTANCES, indices, GL_DYNAMIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -56,19 +60,10 @@ void GraphRenderer::getGraphPoints(float values[], float* &points){
 }
 //count is the number of points
 void GraphRenderer::setUniform(const char* key, const int count, float* data){
+    num_of_instances = count/6;
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, count * 2* sizeof(float), data);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, num_of_instances*12* sizeof(float), data);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    GLuint indices[12]={
-            0,2,1,
-            0,5,2,
-            0,4,5,
-            0,3,4
-    };
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
-    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count*2*sizeof(GLuint), indices);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void GraphRenderer::Draw(){
@@ -76,7 +71,7 @@ void GraphRenderer::Draw(){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     shader_.Use();
     glBindVertexArray(vao_);
-    glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 12*num_of_instances, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     shader_.UnUse();
     glDisable(GL_BLEND);

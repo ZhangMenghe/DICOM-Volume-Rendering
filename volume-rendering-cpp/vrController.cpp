@@ -261,10 +261,11 @@ void vrController::removeAllTuneWidgets(){
     render_params.clear();
     opacity_points.clear();
 }
-void vrController::setTuneParameter(int wid, std::vector<float> values){
-    if(render_params.size()==0) wid=0;
-    while(render_params.size() <= wid) {render_params.push_back(std::vector<float>(dvr::TUNE_END, 0)); opacity_points.push_back(nullptr);}
+void vrController::addWidget(std::vector<float>values){
+    render_params.push_back(std::vector<float>(dvr::TUNE_END, 0));
+    opacity_points.push_back(nullptr);
     while(values.size() < dvr::TUNE_END) values.push_back(.0f);
+    int wid = render_params.size()-1;
     memcpy(render_params[wid].data(), values.data(), dvr::TUNE_END * sizeof(float));
     GraphRenderer::getGraphPoints(render_params[wid].data(), opacity_points[wid]);
     baked_dirty_ = true;

@@ -34,6 +34,6 @@ public:
 protected:
     GLuint vao_, vbo_, ebo_;
     Shader shader_;
-    const int MAX_INSTANCES = 5;
+    const static int MAX_INSTANCES = 5;
 };
 #endif

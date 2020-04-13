@@ -250,11 +250,11 @@ public class renderUIs extends BasePanel{
         }
         public int getCount(){return widget_num;}
         public void addItem(){
+            if(widget_num >= 5) return;
             float[] values = mTunerRef.get().getDefaultValues();
             JUIInterface.JUIAddTuneParams(values.length, values);
             widget_num++;
             setTitleById(widget_num-1);
-
             notifyDataSetChanged();
         }
         void deleteItem(){
