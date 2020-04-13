@@ -93,26 +93,10 @@ public class renderUIs extends BasePanel{
                 trans_graph_panel.getLocationInWindow(location);
                 JUIInterface.JuisetGraphRect(0,trans_graph_panel.getWidth(),trans_graph_panel.getHeight(),location[0],location[1]);
                 trans_graph_panel.setVisibility(View.INVISIBLE);
-//                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
-
-
-//                trans_gray_panel.getLocationInWindow(location);
-//                JUIInterface.JuisetGraphRect(1,trans_gray_panel.getWidth(),trans_gray_panel.getHeight(),location[0],location[1]);
                 trans_gray_panel.setVisibility(View.INVISIBLE);
-//                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
-
-//                trans_color_mix_panel.getLocationInWindow(location);
-//                JUIInterface.JuisetGraphRect(2,trans_color_mix_panel.getWidth(),trans_color_mix_panel.getHeight(),location[0],location[1]);
                 trans_color_mix_panel.setVisibility(View.INVISIBLE);
-//                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
-
-
                 trans_colorscheme_panel.getLocationInWindow(location);
-//                JUIInterface.JuisetGraphRect(3,trans_colorscheme_panel.getWidth(),trans_colorscheme_panel.getHeight(),location[0],location[1]);
                 trans_colorscheme_panel.setVisibility(View.INVISIBLE);
-//                Log.e("TAG", "=====color scheme: "+location[0] + "  " + location[1] );
-
-//                Log.e("TAG", "=====color scheme: "+schemeloc[0] + "  " + schemeloc[1] );
                 int height = trans_colorscheme_panel.getHeight() + trans_gray_panel.getHeight()+trans_color_mix_panel.getHeight();
                 JUIInterface.JuisetGraphRect(1,trans_colorscheme_panel.getWidth(),height,location[0],location[1]);
 

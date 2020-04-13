@@ -65,7 +65,6 @@ void GraphRenderer::setUniform(const char* key, const int count, float* data){
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, count * 2* sizeof(float), data);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    baseQuad::setUniform(key, count, data);
 }
 
 void GraphRenderer::Draw(){
