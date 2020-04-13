@@ -9,8 +9,12 @@ extern "C"{
     JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat, jfloat);
     JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat, jfloat);
 
-    JUI_METHOD(void, JUIInitTuneParam)(JNIEnv *, jclass, jint, jint, jobjectArray, jfloatArray);
-    JUI_METHOD(void, JUIsetTuneParam)(JNIEnv *, jclass, jint, jstring , jfloat);
+    JUI_METHOD(void, JUIAddTuneParams)(JNIEnv *, jclass, jint, jfloatArray);
+    JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint);
+    JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint);
+    JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass);
+
+    JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint, jfloat);
     JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring, jboolean);
 
     JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat);

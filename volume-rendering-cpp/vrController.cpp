@@ -181,7 +181,9 @@ void vrController::precompute(){
 
     GraphRenderer::getGraphPoints(render_params[widget_id].data(), opacity_points);
     if(param_bool[dvr::CHECK_OVERLAY] && isOverlayRectSet) {
-        if(ol_renders.size() != 2) for(auto &rect:overlay_rects) setup_overlays(rect.first, rect.second);
+        if(ol_renders.size() != 2)
+            for(auto &rect:overlay_rects)
+                setup_overlays(rect.first, rect.second);
 
         ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, opacity_points);
         ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", color_scheme_id);
@@ -246,16 +248,26 @@ void vrController::setMVPStatus(std::string status_name){
 //    auto cpos= camera->getCameraPosition();
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
+void vrController::removeTuneWidget(int wid){
+    if(wid<render_params.size())
+        render_params.erase(render_params.begin()+wid);
+    baked_dirty_ = true;
+}
+void vrController::removeAllTuneWidgets(){
+    for(auto param:render_params) param.clear();
+    render_params.clear();
+}
 void vrController::setTuneParameter(int wid, std::vector<float> values){
+    if(render_params.size()==0) wid=0;
     while(render_params.size() <= wid) render_params.push_back(std::vector<float>(dvr::TUNE_END, 0));
     while(values.size() < dvr::TUNE_END) values.push_back(.0f);
     memcpy(render_params[wid].data(), values.data(), dvr::TUNE_END * sizeof(float));
     baked_dirty_ = true;
 }
 
-void vrController::setTuneParameter(int wid, int tid, float value){
-    if(wid>=render_params.size() || tid>=dvr::TUNE_END) return;
-    render_params[wid][tid] = value;
+void vrController::setTuneParameter(int tid, float value){
+    if(widget_id>=render_params.size() || tid>=dvr::TUNE_END) return;
+    render_params[widget_id][tid] = value;
     baked_dirty_ = true;
 }
 

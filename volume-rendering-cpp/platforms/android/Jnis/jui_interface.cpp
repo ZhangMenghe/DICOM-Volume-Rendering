@@ -5,22 +5,14 @@
 using namespace dvr;
 
 namespace {
-    std::vector<std::string> param_tunes, param_checks;
+    std::vector<std::string> param_checks;
 }
 
-JUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobjectArray jkeys, jfloatArray jvalues){
+JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jint num, jfloatArray jvalues){
     if(num != dvr::TUNE_END) return;
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    vrController::instance()->setTuneParameter(id, std::vector<float>(values, values+num));
-
-    for(int i=0; i<num; i++){
-        jstring jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
-        std::string key = dvr::jstring2string(env,jkey);
-        param_tunes.push_back(key);
-        LOGE("======SET INIT %s, %f", key.c_str(), values[i]);
-    }
+    vrController::instance()->setTuneParameter(vrController::widget_id+1, std::vector<float>(values, values+num));
 }
-
 void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     param_checks.clear();
     vrController::param_bool.clear();
@@ -34,10 +26,19 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
     }
     vrController::baked_dirty_ = true;
 }
-JUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jfloat value){
-    std::string key = dvr::jstring2string(env,jkey);
-    auto it = std::find (param_tunes.begin(), param_tunes.end(), key);
-    if (it != param_tunes.end()) vrController::instance()->setTuneParameter(id, it-param_tunes.begin(), value);
+
+JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint wid){
+    vrController::widget_id = wid;
+    vrController::baked_dirty_ = true;
+}
+JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint wid){
+    vrController::instance()->removeTuneWidget(wid);
+}
+JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass){
+    vrController::instance()->removeAllTuneWidgets();
+}
+JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint pid, jfloat value){
+    if(pid <= dvr::TUNE_END)vrController::instance()->setTuneParameter(pid, value);
 }
 JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
     std::string key = dvr::jstring2string(env,jkey);
@@ -46,7 +47,7 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
 //        LOGE("======SET  %s, %d", key.c_str(), value);
-        if(key=="Raycasting") vrController::widget_id = value?1:0;
+//        if(key=="Raycasting") vrController::widget_id = value?1:0;
 //        if(key==freeze_keyworkd) vrController::cutDirty = true;
 //            //!!debug only,
 ////        else if(key == "Raycasting") vrController::instance()->setMVPStatus(value?"Raycasting":"texturebased");

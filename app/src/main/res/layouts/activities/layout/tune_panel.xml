@@ -19,9 +19,6 @@
     android:alpha="0.8"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/topPanel">
-
-    <!--    app:layout_constraintTop_toTopOf="parent">-->
-
     <Spinner
         android:id="@+id/tune_widget_id_spinner"
         android:layout_width="0dp"

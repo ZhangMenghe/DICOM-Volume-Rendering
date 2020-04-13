@@ -45,7 +45,9 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
     void setTuneParameter(int wid, std::vector<float>values);
-    void setTuneParameter(int wid, int tid, float value);
+    void setTuneParameter(int tid, float value);
+    void removeTuneWidget(int wid);
+    void removeAllTuneWidgets();
     void setOverlayRect(int id, int width, int height, int left, int top);
     void setCuttingPlane(float value);
 

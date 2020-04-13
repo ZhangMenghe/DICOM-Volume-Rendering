@@ -43,6 +43,9 @@ public abstract class ListAdapter extends BaseAdapter {
         // TODO Auto-generated method stub
         return 0;
     }
+    public void addItem(){}
+    public void deleteItem(int id){}
+    public void Reset(){}
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
@@ -89,7 +92,7 @@ class textSimpleListAdapter extends ListAdapter {
     void onItemClick(int position){
         Log.e("TAG", "===onItemClick: " + position );
     }
-    private View getViewWithText(View convertView, String content, int position){
+    View getViewWithText(View convertView, String content, int position){
         ViewTitleHolder holder;
 
         if (convertView == null) {
