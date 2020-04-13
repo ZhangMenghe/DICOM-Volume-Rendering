@@ -90,7 +90,7 @@ private:
     glm::fvec2 Mouse_old;
     float _screen_w, _screen_h;
     int _screen_h_offset;
-    float *opacity_points = nullptr;
+
 
     //flags
     bool volume_model_dirty;
@@ -103,6 +103,7 @@ private:
     //overlay
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, dvr::Rect> overlay_rects;
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, baseQuad*> ol_renders;
+    std::vector<float*> opacity_points;
 
     void updateVolumeModelMat();
     void precompute();

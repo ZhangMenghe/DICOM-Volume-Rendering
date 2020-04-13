@@ -179,15 +179,15 @@ void vrController::precompute(){
         bakeShader_->UnUse();
     }
 
-    GraphRenderer::getGraphPoints(render_params[widget_id].data(), opacity_points);
+//    GraphRenderer::getGraphPoints(render_params[widget_id].data(), opacity_points[widget_id]);
     if(param_bool[dvr::CHECK_OVERLAY] && isOverlayRectSet) {
         if(ol_renders.size() != 2)
             for(auto &rect:overlay_rects)
                 setup_overlays(rect.first, rect.second);
 
-        ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, opacity_points);
+        ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, opacity_points[widget_id]);
         ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", color_scheme_id);
-        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, opacity_points);
+        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, opacity_points[widget_id]);
     }
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
@@ -203,7 +203,7 @@ void vrController::precompute(){
 
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
     Shader::Uniform(sp, "u_organ_num", mask_num_);
-    Shader::Uniform(sp, "u_opacity", 6, opacity_points);
+    Shader::Uniform(sp, "u_opacity", 6, opacity_points[widget_id]);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -249,24 +249,31 @@ void vrController::setMVPStatus(std::string status_name){
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
 void vrController::removeTuneWidget(int wid){
-    if(wid<render_params.size()) render_params.erase(render_params.begin()+wid);
+    if(wid<render_params.size()){
+        render_params.erase(render_params.begin()+wid);
+        opacity_points.erase(opacity_points.begin() + wid);
+    }
     baked_dirty_ = true;
 }
 void vrController::removeAllTuneWidgets(){
     for(auto param:render_params) param.clear();
+    for(auto param:opacity_points) delete[]param;
     render_params.clear();
+    opacity_points.clear();
 }
 void vrController::setTuneParameter(int wid, std::vector<float> values){
     if(render_params.size()==0) wid=0;
-    while(render_params.size() <= wid) render_params.push_back(std::vector<float>(dvr::TUNE_END, 0));
+    while(render_params.size() <= wid) {render_params.push_back(std::vector<float>(dvr::TUNE_END, 0)); opacity_points.push_back(nullptr);}
     while(values.size() < dvr::TUNE_END) values.push_back(.0f);
     memcpy(render_params[wid].data(), values.data(), dvr::TUNE_END * sizeof(float));
+    GraphRenderer::getGraphPoints(render_params[wid].data(), opacity_points[wid]);
     baked_dirty_ = true;
 }
 
 void vrController::setTuneParameter(int tid, float value){
     if(widget_id>=render_params.size() || tid>=dvr::TUNE_END) return;
     render_params[widget_id][tid] = value;
+    GraphRenderer::getGraphPoints(render_params[widget_id].data(), opacity_points[widget_id]);
     baked_dirty_ = true;
 }
 
