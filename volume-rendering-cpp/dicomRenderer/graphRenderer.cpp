@@ -6,24 +6,17 @@
 GraphRenderer::GraphRenderer(std::string vertex_shader, std::string frag_shader)
         :baseQuad(vertex_shader, frag_shader){
     glGenVertexArrays(1, &vao_);
-    unsigned int EBO;
     glGenBuffers(1, &vbo_);
-    glGenBuffers(1, &EBO);
+    glGenBuffers(1, &ebo_);
 
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray((GLuint)vao_);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12 *MAX_INSTANCES, nullptr, GL_DYNAMIC_DRAW);
 
-    GLuint indices[12]={
-            0,2,1,
-            0,5,2,
-            0,4,5,
-            0,3,4
-    };
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*12, indices, GL_STATIC_DRAW);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*12*MAX_INSTANCES, nullptr, GL_DYNAMIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -61,10 +54,21 @@ void GraphRenderer::getGraphPoints(float values[], float* &points){
             rb.x, rb.y, rm.x, rm.y, rt.x, rt.y
     };
 }
+//count is the number of points
 void GraphRenderer::setUniform(const char* key, const int count, float* data){
     glBindBuffer(GL_ARRAY_BUFFER, vbo_);
     glBufferSubData(GL_ARRAY_BUFFER, 0, count * 2* sizeof(float), data);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    GLuint indices[12]={
+            0,2,1,
+            0,5,2,
+            0,4,5,
+            0,3,4
+    };
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count*2*sizeof(GLuint), indices);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void GraphRenderer::Draw(){

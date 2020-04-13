@@ -13,18 +13,18 @@ public:
            ||!shader_.CompileAndLink())
             LOGE("FuncsVisual===Failed to create opacity shader program===");
     }
-    void setRelativeRenderRect(float w, float h, float left, float bottom){
+    virtual void setRelativeRenderRect(float w, float h, float left, float bottom){
         GLuint sp = shader_.Use();
         Shader::Uniform(sp, "uScale", glm::vec2(w*2.0f, h*2.0f));
         Shader::Uniform(sp, "uOffset", glm::vec2(left, -1.0f + bottom * 2.0));
         shader_.UnUse();
     }
-    void setUniform(const char* key, const int count, float* data){
+    virtual void setUniform(const char* key, const int count, float* data){
         GLuint sp = shader_.Use();
         Shader::Uniform(sp, key, count, data);
         shader_.UnUse();
     }
-    void setUniform(const char* key, int id){
+    virtual void setUniform(const char* key, int id){
         GLuint sp = shader_.Use();
         Shader::Uniform(sp, key, id);
         shader_.UnUse();
@@ -32,7 +32,8 @@ public:
     virtual void Draw()=0;
 
 protected:
-    GLuint vao_, vbo_;
+    GLuint vao_, vbo_, ebo_;
     Shader shader_;
+    const int MAX_INSTANCES = 5;
 };
 #endif
