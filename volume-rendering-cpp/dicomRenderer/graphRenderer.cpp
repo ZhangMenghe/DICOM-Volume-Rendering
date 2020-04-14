@@ -12,7 +12,7 @@ GraphRenderer::GraphRenderer(std::string vertex_shader, std::string frag_shader)
     addInstance();
 }
 void GraphRenderer::addInstance(){
-    GLuint ebo_;
+    GLuint vao_, vbo_, ebo_;
     glGenVertexArrays(1, &vao_);
     glGenBuffers(1, &vbo_);
     glGenBuffers(1, &ebo_);
@@ -58,17 +58,25 @@ void GraphRenderer::getGraphPoints(float values[], float* &points){
             rb.x, rb.y, rm.x, rm.y, rt.x, rt.y
     };
 }
+void GraphRenderer::removeInstance(int wid){
+    if(wid<vaos_.size()){
+        vaos_.erase(vaos_.begin()+wid); vbos_.erase(vbos_.begin()+wid);
+    }
+}
+void GraphRenderer::Clear(){
+    vaos_.clear(); vbos_.clear();
+}
 
 void GraphRenderer::setData(float* data, int wid){
-//    if(wid < num_of_instances){
-//        memcpy(vertices + wid*12* sizeof(float), data, 12* sizeof(float));
-//        data_dirty = true;
-//    }
+    while(vaos_.size()<=wid) addInstance();
+    glBindBuffer(GL_ARRAY_BUFFER, vbos_[wid]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 12* sizeof(float), data);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 void GraphRenderer::setData(std::vector<float*> data){
     while(vaos_.size()<data.size()) addInstance();
     for(int i=0; i<data.size(); i++){
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+        glBindBuffer(GL_ARRAY_BUFFER, vbos_[i]);
         glBufferSubData(GL_ARRAY_BUFFER, 0, 12* sizeof(float), data[i]);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

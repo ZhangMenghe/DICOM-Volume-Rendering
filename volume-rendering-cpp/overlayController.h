@@ -34,7 +34,8 @@ private:
     static overlayController* myPtr_;
 
     //flag
-    bool data_dirty, overlay_rect_set;
+    bool overlay_rect_set;
+    int dirty_wid;
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, dvr::Rect> rects_;
     std::unordered_map<dvr::DRAW_OVERLAY_IDS, baseQuad*> renderers_;
 

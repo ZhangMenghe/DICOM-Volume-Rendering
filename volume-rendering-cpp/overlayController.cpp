@@ -24,9 +24,8 @@ overlayController::~overlayController(){
     if(default_widget_points_){delete[]default_widget_points_; default_widget_points_= nullptr;}
 }
 void overlayController::onReset(){
-    //todo:where to reset?
-    data_dirty = true;
     overlay_rect_set = false;
+    dirty_wid = -1;
     _screen_w = 0; _screen_h = 0;
 }
 void overlayController::onViewCreated(){
@@ -56,12 +55,9 @@ void overlayController::onDraw(){
     if(!overlay_rect_set
     ||!vrController::param_bool[dvr::CHECK_OVERLAY]
     || !vrController::instance()->isDrawing()) return;
-    if(data_dirty){
-        renderers_[dvr::OVERLAY_GRAPH]->setData(widget_points_);
-        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", vrController::color_scheme_id);
-        //todo:not only current points
-        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, widget_points_[widget_id]);
-        data_dirty = false;
+    if(dirty_wid >= 0){
+        renderers_[dvr::OVERLAY_GRAPH]->setData(widget_points_[widget_id], widget_id);
+        dirty_wid = -1;
     }
     for(auto render:renderers_) render.second->Draw();
 }
@@ -69,6 +65,7 @@ void overlayController::onDraw(){
 void overlayController::setWidgetId(int id){
     if(id>=widget_points_.size()) return;
     widget_id = id;
+    vrController::baked_dirty_ = true;
 }
 void overlayController::addWidget(std::vector<float> values){
     widget_params_.push_back(std::vector<float>(dvr::TUNE_END, 0));
@@ -78,27 +75,32 @@ void overlayController::addWidget(std::vector<float> values){
     memcpy(widget_params_[wid].data(), values.data(), dvr::TUNE_END * sizeof(float));
     if(!default_widget_points_) GraphRenderer::getGraphPoints(widget_params_[wid].data(), default_widget_points_);
     memcpy(widget_points_[wid], default_widget_points_, 12* sizeof(float));
-    data_dirty = true;
+//    if(renderers_[OVERLAY_GRAPH]) renderers_[dvr::OVERLAY_GRAPH]->setData(default_widget_points_, wid);
+    dirty_wid = wid;
+    vrController::baked_dirty_ = true;
 }
 void overlayController::removeWidget(int wid){
     if(wid>=widget_points_.size()) return;
 
     widget_params_.erase(widget_params_.begin()+wid);
     widget_points_.erase(widget_points_.begin() + wid);
-    data_dirty = true;
+    ((GraphRenderer*)renderers_[dvr::OVERLAY_GRAPH])->removeInstance(wid);
+    vrController::baked_dirty_ = true;
 }
 void overlayController::removeAll(){
     for(auto param:widget_params_) param.clear();
     for(auto param:widget_points_) delete[]param;
     widget_params_.clear();
     widget_points_.clear();
-    data_dirty = true;
+    renderers_[dvr::OVERLAY_GRAPH]->Clear();
+    vrController::baked_dirty_ = true;
 }
 void overlayController::setTuneParameter(int tid, float value){
     if(widget_id>=widget_params_.size() || tid>=dvr::TUNE_END) return;
     widget_params_[widget_id][tid] = value;
     GraphRenderer::getGraphPoints(widget_params_[widget_id].data(), widget_points_[widget_id]);
-    data_dirty = true;
+    dirty_wid = widget_id;
+    vrController::baked_dirty_ = true;
 }
 void overlayController::setOverlayRect(int id, int width, int height, int left, int top){
     if(id == 0) _screen_h_offset = top + height;
@@ -112,7 +114,6 @@ void overlayController::setOverlayRect(int id, int width, int height, int left, 
         rects_[(dvr::DRAW_OVERLAY_IDS)id] = r;
     }
     overlay_rect_set = true;
-    data_dirty = true;
 }
 void overlayController::updateUniforms(){
     renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", vrController::color_scheme_id);
