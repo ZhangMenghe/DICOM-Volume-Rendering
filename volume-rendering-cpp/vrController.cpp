@@ -1,4 +1,5 @@
 #include "vrController.h"
+#include "overlayController.h"
 #include <Utils/mathUtils.h>
 #include <dicomRenderer/screenQuad.h>
 
@@ -8,7 +9,7 @@ Camera* vrController::camera = nullptr;
 std::vector<bool> vrController::param_bool;
 std::vector<std::string> vrController::shader_contents;
 bool vrController::baked_dirty_;
-int vrController::color_scheme_id, vrController::widget_id;
+int vrController::color_scheme_id;
 
 vrController* vrController::instance(){
     return myPtr_;
@@ -20,15 +21,10 @@ vrController::~vrController(){
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
-    for(auto olr:ol_renders) delete olr.second;
-    for(auto param:render_params) param.clear();
-    render_params.clear();
-    ol_renders.clear();
     rStates_.clear();
     param_bool.clear();
     shader_contents.clear();
 }
-
 vrController::vrController(){
     onReset();
     shader_contents = std::vector<std::string>(dvr::SHADER_END);
@@ -41,7 +37,6 @@ void vrController::onReset() {
     rStates_.clear();
     cst_name="";
     _screen_w = 0; _screen_h = 0;
-    widget_id = 0;
     setMVPStatus("default_status");
 }
 void vrController::assembleTexture(int w, int h, int d, GLubyte * data, int channel_num){
@@ -78,32 +73,8 @@ void vrController::onViewChange(int width, int height){
 
     glClear(GL_COLOR_BUFFER_BIT);
     screenQuad::instance()->onScreenSizeChange(width, height);
-    if(!overlay_rects.empty()){
-        //setup overlay rect
-        for(auto &rect:overlay_rects){
-            auto& r=rect.second;
-            if(r.width > 1.0f){
-                r.width/=width; r.left/=width;
-                r.height/=height; r.top/=height;
-            }else if(_screen_w!=0){
-                r.width*=_screen_w/width; r.left*=_screen_w/width;
-                r.height*=_screen_h/height; r.top*=_screen_h/height;
-            }
-            setup_overlays(rect.first, r);
-        }
-    }
     _screen_w = width; _screen_h = height;
 }
-void vrController::setup_overlays(dvr::DRAW_OVERLAY_IDS id, dvr::Rect r){
-    float rel_bottom = r.top - r.height;
-    auto it = ol_renders.find(id);
-    if(it == ol_renders.end()){
-        if(id == dvr::OVERLAY_GRAPH) ol_renders[id] = new GraphRenderer(shader_contents[dvr::SHADER_OPA_VIZ_VERT], shader_contents[dvr::SHADER_OPA_VIZ_FRAG]);
-        else ol_renders[id] = new ColorbarRenderer(shader_contents[dvr::SHADER_COLOR_VIZ_VERT], shader_contents[dvr::SHADER_COLOR_VIZ_FRAG]);
-    }
-    ol_renders[id] ->setRelativeRenderRect(r.width, r.height, r.left, rel_bottom);
-}
-
 void vrController::onDraw() {
     if(!tex_volume) return;
 
@@ -113,11 +84,6 @@ void vrController::onDraw() {
 
     if(isRayCasting())  raycastRenderer_->Draw();
     else texvrRenderer_->Draw();
-}
-void vrController::onDrawOverlays(){
-    if(!tex_volume) return;
-    for(auto olr:ol_renders)
-        olr.second->Draw();
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
@@ -163,7 +129,6 @@ void vrController::onPan(float x, float y){
     PosVec3_.y += offy * ScaleVec3_.y;
     volume_model_dirty = true;
 }
-
 void vrController::precompute(){
     if(!baked_dirty_) return;
     if(!bakeShader_){
@@ -178,17 +143,7 @@ void vrController::precompute(){
         Shader::Uniform(sp, "u_tex_size", glm::vec3(tex_volume->Width(), tex_volume->Height(), tex_volume->Depth()));
         bakeShader_->UnUse();
     }
-
-//    GraphRenderer::getGraphPoints(render_params[widget_id].data(), opacity_points[widget_id]);
-    if(param_bool[dvr::CHECK_OVERLAY] && isOverlayRectSet) {
-        if(ol_renders.size() != 2)
-            for(auto &rect:overlay_rects)
-                setup_overlays(rect.first, rect.second);
-
-        ((GraphRenderer*)ol_renders[dvr::OVERLAY_GRAPH])->setUniform("u_opacity", 6, opacity_points[widget_id]);
-        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", color_scheme_id);
-        ol_renders[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, opacity_points[widget_id]);
-    }
+    overlayController::instance()->updateUniforms();
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
     //todo!!!! add flip stuff
@@ -203,7 +158,7 @@ void vrController::precompute(){
 
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
     Shader::Uniform(sp, "u_organ_num", mask_num_);
-    Shader::Uniform(sp, "u_opacity", 6, opacity_points[widget_id]);
+    Shader::Uniform(sp, "u_opacity", 6, overlayController::instance()->getCurrentWidgetPoints());
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -248,51 +203,7 @@ void vrController::setMVPStatus(std::string status_name){
 //    auto cpos= camera->getCameraPosition();
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
-void vrController::removeTuneWidget(int wid){
-    if(wid<render_params.size()){
-        render_params.erase(render_params.begin()+wid);
-        opacity_points.erase(opacity_points.begin() + wid);
-    }
-    baked_dirty_ = true;
-}
-void vrController::removeAllTuneWidgets(){
-    for(auto param:render_params) param.clear();
-    for(auto param:opacity_points) delete[]param;
-    render_params.clear();
-    opacity_points.clear();
-}
-void vrController::addWidget(std::vector<float>values){
-    render_params.push_back(std::vector<float>(dvr::TUNE_END, 0));
-    opacity_points.push_back(nullptr);
-    while(values.size() < dvr::TUNE_END) values.push_back(.0f);
-    int wid = render_params.size()-1;
-    memcpy(render_params[wid].data(), values.data(), dvr::TUNE_END * sizeof(float));
-    GraphRenderer::getGraphPoints(render_params[wid].data(), opacity_points[wid]);
-    baked_dirty_ = true;
-}
-
-void vrController::setTuneParameter(int tid, float value){
-    if(widget_id>=render_params.size() || tid>=dvr::TUNE_END) return;
-    render_params[widget_id][tid] = value;
-    GraphRenderer::getGraphPoints(render_params[widget_id].data(), opacity_points[widget_id]);
-    baked_dirty_ = true;
-}
-
 void vrController::setCuttingPlane(float value){
     if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);
     else texvrRenderer_->setCuttingPlane(value);
-}
-
-void vrController::setOverlayRect(int id, int width, int height, int left, int top){
-    if(id == 0) _screen_h_offset = top + height;
-    top = _screen_h_offset - top;
-    if(_screen_w != 0){
-        dvr::Rect r{width/_screen_w, height/_screen_h, left/_screen_w, top/_screen_h};
-        overlay_rects[(dvr::DRAW_OVERLAY_IDS)id] = r;
-    }else{
-        dvr::Rect r{(float)width, (float)height, (float)left, (float)top};
-        overlay_rects[(dvr::DRAW_OVERLAY_IDS)id] = r;
-    }
-    isOverlayRectSet = true;
-    baked_dirty_ = true;
 }

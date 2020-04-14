@@ -10,8 +10,6 @@
 #include <unordered_map>
 #include <vector>
 #include <map>
-#include <dicomRenderer/graphRenderer.h>
-#include <dicomRenderer/colorbarRenderer.h>
 
 class vrController:public nEntrance{
 public:
@@ -21,15 +19,14 @@ public:
 
     static bool baked_dirty_;
     static int color_scheme_id;
-    static int widget_id;
     unsigned int mask_num_, mask_bits_;
 
     static vrController* instance();
+    bool isDrawing(){return tex_volume!= nullptr;}
 
     vrController();
     ~vrController();
     void assembleTexture(int w, int h, int d, GLubyte * data, int channel_num = 4);
-    void onDrawOverlays();
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
@@ -44,11 +41,6 @@ public:
     //setter funcs
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
-    void addWidget(std::vector<float>values);
-    void setTuneParameter(int tid, float value);
-    void removeTuneWidget(int wid);
-    void removeAllTuneWidgets();
-    void setOverlayRect(int id, int width, int height, int left, int top);
     void setCuttingPlane(float value);
 
     //getter funcs
@@ -89,28 +81,12 @@ private:
     //ui
     glm::fvec2 Mouse_old;
     float _screen_w, _screen_h;
-    int _screen_h_offset;
-
 
     //flags
     bool volume_model_dirty;
-    //todo:decent way?
-    bool isOverlayRectSet = false;
-
-    //opacity parameters
-
-    std::vector<std::vector<float>> render_params;
-    //overlay
-    std::unordered_map<dvr::DRAW_OVERLAY_IDS, dvr::Rect> overlay_rects;
-    std::unordered_map<dvr::DRAW_OVERLAY_IDS, baseQuad*> ol_renders;
-    std::vector<float*> opacity_points;
 
     void updateVolumeModelMat();
     void precompute();
-    bool isRayCasting(){
-        return param_bool[dvr::CHECK_RAYCAST];
-    }
-    void setup_overlays(dvr::DRAW_OVERLAY_IDS id, dvr::Rect r);
-
+    bool isRayCasting(){return param_bool[dvr::CHECK_RAYCAST];}
 };
 #endif

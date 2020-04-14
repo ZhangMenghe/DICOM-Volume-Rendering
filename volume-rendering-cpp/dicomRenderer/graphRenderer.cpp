@@ -65,11 +65,29 @@ void GraphRenderer::setUniform(const char* key, const int count, float* data){
     glBufferSubData(GL_ARRAY_BUFFER, 0, num_of_instances*12* sizeof(float), data);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
+void GraphRenderer::setData(float* data, int wid){
+//    if(wid < num_of_instances){
+//        memcpy(vertices + wid*12* sizeof(float), data, 12* sizeof(float));
+//        data_dirty = true;
+//    }
+}
+void GraphRenderer::setData(std::vector<float*> data){
+    num_of_instances = 1;
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, num_of_instances*12* sizeof(float), data[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+//    num_of_instances = data.size();
+//    if(vertices){delete[] vertices; vertices = nullptr;}
+//    vertices = new float[12 * num_of_instances];
+//    for(int i=0;i<num_of_instances;i++) memcpy(vertices+i*12* sizeof(float), data[i], 12* sizeof(float));
+//    data_dirty = true;
+}
 void GraphRenderer::Draw(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    shader_.Use();
+    GLuint sp = shader_.Use();
+    Shader::Uniform(sp, "uScale", r_scale_);
+    Shader::Uniform(sp, "uOffset", r_offset_);
     glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, 12*num_of_instances, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);

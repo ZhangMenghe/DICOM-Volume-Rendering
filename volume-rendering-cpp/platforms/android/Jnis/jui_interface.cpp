@@ -2,6 +2,8 @@
 #include <android/asset_manager_jni.h>
 #include "jui_interface.h"
 #include <vrController.h>
+#include <overlayController.h>
+
 using namespace dvr;
 
 namespace {
@@ -11,7 +13,7 @@ namespace {
 JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jint num, jfloatArray jvalues){
     if(num != dvr::TUNE_END) return;
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    vrController::instance()->addWidget(std::vector<float>(values, values+num));
+    overlayController::instance()->addWidget(std::vector<float>(values, values+num));
 }
 void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     param_checks.clear();
@@ -28,17 +30,16 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
 }
 
 JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint wid){
-    vrController::widget_id = wid;
-    vrController::baked_dirty_ = true;
+    overlayController::instance()->setWidgetId(wid);
 }
 JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint wid){
-    vrController::instance()->removeTuneWidget(wid);
+    overlayController::instance()->removeWidget(wid);
 }
 JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass){
-    vrController::instance()->removeAllTuneWidgets();
+    overlayController::instance()->removeAll();
 }
 JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint pid, jfloat value){
-    if(pid <= dvr::TUNE_END)vrController::instance()->setTuneParameter(pid, value);
+    if(pid <= dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
 }
 JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
     std::string key = dvr::jstring2string(env,jkey);
@@ -75,13 +76,12 @@ JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
     vrController::baked_dirty_ = true;
 }
 JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint id, jint width, jint height, jint left, jint top){
-    vrController::instance()->setOverlayRect(id, width, height, left, top);
+    overlayController::instance()->setOverlayRect(id, width, height, left, top);
 }
 JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     InitCheckParam(env, num, jkeys, jvalues);
     nativeApp(nativeAddr)->onReset();
 }
-
 JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
     nativeApp(nativeAddr)->onSingleTouchDown(x, y);
 }

@@ -10,7 +10,8 @@ public:
     static void getGraphPoints(float values[], float* &points);
     void setUniform(const char* key, const int count, float* data);
     void Draw();
-
+    void setData(std::vector<float*> data);
+    void setData(float* data, int wid);
 private:
     const GLuint single_indices_[12]={0,2,1,0,5,2,0,4,5,0,3,4};
     GLuint indices[MAX_INSTANCES * 12] = {0};

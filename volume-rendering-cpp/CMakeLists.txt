@@ -41,6 +41,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(vrNative
         SHARED
         vrController.cpp
+        overlayController.cpp
         ${DICOM_RENDERERS}
         ${GL_PIPELINE_FILES}
 #        ${UTILS_FILES}
