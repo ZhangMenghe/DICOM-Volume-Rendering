@@ -13,17 +13,13 @@ import android.widget.Button;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-
-
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
 public class renderUIs extends BasePanel{
     private final WeakReference<UIsManager> mUIManagerRef;
-    private tunerListAdapter tunerAdapter;
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private widgetListAdapter widAdapter;
     final private static int RAYCAST_ID = 1;
@@ -39,7 +35,7 @@ public class renderUIs extends BasePanel{
 
         //details of tune panel
         Spinner seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.tune_seekbar_spinner);
-        tunerAdapter = new tunerListAdapter(activity);
+        tunerListAdapter tunerAdapter = new tunerListAdapter(activity);
         seekbar_spinner.setAdapter(tunerAdapter);
 
         Spinner widget_spinner = (Spinner)tune_panel_.findViewById(R.id.tune_widget_id_spinner);
@@ -111,7 +107,6 @@ public class renderUIs extends BasePanel{
     public void Reset(){
         Resources res = actRef.get().getResources();
         widAdapter.Reset();
-        tunerAdapter.Reset();
         //render mode should be the first to set!!
         int rm_id = Integer.parseInt(res.getString(R.string.default_render_mode_id));
         rendermodeAdapter.setTitleById(rm_id);
@@ -132,11 +127,14 @@ public class renderUIs extends BasePanel{
         panel_visible = show_panel;
     }
     private static class tunerListAdapter extends ListAdapter{
+        private int dropview_width;
+
         private float[] item_value_max;
         private int[] item_seek_max;
-        private int dropview_width;
         private float[] default_values;
-        private float[] item_values;
+        private ArrayList<float[]> item_values;
+        private int current_wid;
+
         tunerListAdapter(Context context) {
             super(context, context.getString(R.string.tune_group_name));
             dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels *Float.parseFloat(context.getString(R.string.cf_drop_tune_w)) );
@@ -149,7 +147,7 @@ public class renderUIs extends BasePanel{
             item_value_max = new float[item_numbers];
             item_seek_max = new int[item_numbers];
             default_values = new float[item_numbers];
-            item_values = new float[item_numbers];
+            item_values = new ArrayList<>();
             item_names = new ArrayList<>();
 
             for (int i = 0; i < item_numbers; i++) {
@@ -163,14 +161,26 @@ public class renderUIs extends BasePanel{
             }
 
             typed_params.recycle();
-            Reset();
         }
         public void Reset(){
-            item_values = default_values.clone();
+            item_values.clear();
         }
-        float[] getDefaultValues(){
-            return default_values.clone();
+        void addInstance(int nid){
+            item_values.add(default_values.clone());
+            current_wid = nid;
+            notifyDataSetChanged();
         }
+        void removeInstance(int id, int nid){
+            if(id>=item_values.size()) return;
+            item_values.remove(id); current_wid = nid;
+            notifyDataSetChanged();
+        }
+        void setCurrentId(int id){
+            current_wid = id;
+            notifyDataSetChanged();
+        }
+        float[] getDefaultValues(){return default_values.clone();}
+
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
@@ -186,10 +196,10 @@ public class renderUIs extends BasePanel{
                     @Override
                     public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
                         float value = (float)i / item_seek_max[position] * item_value_max[position];
-                        if(value == item_values[position]) return;
-                        item_values[position] = value;
+                        if(value == item_values.get(current_wid)[position]) return;
+                        item_values.get(current_wid)[position] = value;
                         //todo:lowest!!
-                        if(item_names.get(position).equals("Lowest")) value*=item_values[position - 1];
+                        if(item_names.get(position).equals("Lowest")) value*=item_values.get(current_wid)[position - 1];
                         holder.text_value.setText(contexRef.get().getString(R.string.tune_value, value));
                         JUIInterface.JUIsetTuneParamById(position, value);
                     }
@@ -199,15 +209,15 @@ public class renderUIs extends BasePanel{
                     public void onStopTrackingTouch(SeekBar seekBar) {}
                 });
                 holder.seekbar.setTag(position);
-                holder.seekbar.setProgress((int)(item_values[position] / item_value_max[position] * item_seek_max[position]));
                 convertView.setMinimumWidth(dropview_width);
                 convertView.setTag(R.layout.spinner_tune_layout, holder);
             } else {
                 holder = (ViewHolder)convertView.getTag(R.layout.spinner_tune_layout);
             }
-
+            //set
+            holder.seekbar.setProgress((int)(item_values.get(current_wid)[position] / item_value_max[position] * item_seek_max[position]));
             holder.text_name.setText(item_names.get(position));
-            float value = item_values[position];
+            float value = item_values.get(current_wid)[position];
             holder.text_value.setText(contexRef.get().getString(R.string.tune_value, value));
 
             return convertView;
@@ -228,33 +238,42 @@ public class renderUIs extends BasePanel{
         widgetListAdapter(Context context, tunerListAdapter tuner_adapter) {
             super(context, new ArrayList<>());
             mTunerRef = new WeakReference<>(tuner_adapter);
-            current_id = INIT_ID;
             widget_num = 0;
             name_prefix = context.getString(R.string.tune_widget_name_prefix) + " ";
-            title = name_prefix + INIT_ID;
         }
         public void Reset(){
-            JUIInterface.JUIremoveAllTuneWidget();
+            if(widget_num > 0){
+                JUIInterface.JUIremoveAllTuneWidget();
+                mTunerRef.get().Reset();
+                widget_num = 0;
+            }
             current_id = INIT_ID;
-            widget_num = 0;
             title = name_prefix + INIT_ID;
             addItem();
         }
         void setTitleById(int id){
-            if(id < widget_num){
-                current_id = id;
-                title = name_prefix + id;
-                JUIInterface.JUIsetTuneWidgetById(id);
-                notifyDataSetChanged();
-            }
+            if(id >= widget_num) return;
+
+            current_id = id;
+            title = name_prefix + id;
+            mTunerRef.get().setCurrentId(id);
+            JUIInterface.JUIsetTuneWidgetById(id);
+            notifyDataSetChanged();
         }
         public int getCount(){return widget_num;}
         public void addItem(){
-            if(widget_num >= 5) return;
+            if(widget_num >= 5) return;//todo:set maxmum of widget num
+
+            widget_num++;
+            current_id = widget_num-1;
+            title = name_prefix + current_id;
+
+            //change relevant stuff
+            mTunerRef.get().addInstance(current_id);
             float[] values = mTunerRef.get().getDefaultValues();
             JUIInterface.JUIAddTuneParams(values.length, values);
-            widget_num++;
-            setTitleById(widget_num-1);
+            JUIInterface.JUIsetTuneWidgetById(current_id);
+
             notifyDataSetChanged();
         }
         void deleteItem(){
@@ -262,9 +281,15 @@ public class renderUIs extends BasePanel{
         }
         public void deleteItem(int id){
             if(widget_num<2 || id >= widget_num) return;
-            JUIInterface.JUIremoveTuneWidgetById(id);
+
             widget_num--;
-            setTitleById(id%widget_num);
+            current_id = id%widget_num;
+            title = name_prefix + current_id;
+
+            //change relevant stuff
+            mTunerRef.get().removeInstance(id, current_id);
+            JUIInterface.JUIremoveTuneWidgetById(id);
+            JUIInterface.JUIsetTuneWidgetById(current_id);
 
             notifyDataSetChanged();
         }

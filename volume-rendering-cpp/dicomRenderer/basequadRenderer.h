@@ -31,7 +31,7 @@ public:
     virtual void Draw()=0;
 
 protected:
-    GLuint vao_, vbo_, ebo_;
+    GLuint vao_, vbo_;
     Shader shader_;
     glm::vec2 r_scale_, r_offset_;
     const static int MAX_INSTANCES = 5;

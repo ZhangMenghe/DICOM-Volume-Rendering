@@ -137,7 +137,7 @@ void vrController::precompute(){
         if(!bakeShader_->AddShader(GL_COMPUTE_SHADER, shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL])
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
-        shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]= "";
+        shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
 
         GLuint sp = bakeShader_->Use();
         Shader::Uniform(sp, "u_tex_size", glm::vec3(tex_volume->Width(), tex_volume->Height(), tex_volume->Depth()));
