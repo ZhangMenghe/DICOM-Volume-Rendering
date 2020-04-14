@@ -158,7 +158,11 @@ void vrController::precompute(){
 
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
     Shader::Uniform(sp, "u_organ_num", mask_num_);
-    Shader::Uniform(sp, "u_opacity", 6, overlayController::instance()->getCurrentWidgetPoints());
+    float* widget_data_pointer;
+    int widget_num;
+    overlayController::instance()->getWidgetFlatPoints(widget_data_pointer, widget_num);
+    Shader::Uniform(sp, "u_opacity", 6*widget_num, widget_data_pointer);
+    Shader::Uniform(sp, "u_widget_num", widget_num);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);

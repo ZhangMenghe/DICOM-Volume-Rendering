@@ -35,6 +35,7 @@ public class renderUIs extends BasePanel{
 
         //details of tune panel
         Spinner seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.tune_seekbar_spinner);
+        seekbar_spinner.setDropDownVerticalOffset(150);
         tunerListAdapter tunerAdapter = new tunerListAdapter(activity);
         seekbar_spinner.setAdapter(tunerAdapter);
 

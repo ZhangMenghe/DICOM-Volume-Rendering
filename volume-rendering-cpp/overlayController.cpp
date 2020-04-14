@@ -58,14 +58,15 @@ void overlayController::onDraw(){
     if(dirty_wid >= 0){
         renderers_[dvr::OVERLAY_GRAPH]->setData(widget_points_[widget_id], widget_id);
         renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_widget_num", widget_points_.size());
-        int count = 6*widget_points_.size();
-        float* data = new float[2* count];
-        for(int i=0;i<widget_points_.size();i++)memcpy(data+12*i, widget_points_[i], 12* sizeof(float));
-        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", count, data);
-        delete[]data;
+        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6*widget_points_.size(), u_opacity_data_);
         dirty_wid = -1;
     }
     for(auto render:renderers_) render.second->Draw();
+}
+void overlayController::update_widget_points_1d_array(){
+    if(u_opacity_data_){delete[]u_opacity_data_; u_opacity_data_= nullptr;}
+    u_opacity_data_ = new float[12 * widget_points_.size()];
+    for(int i=0;i<widget_points_.size();i++)memcpy(u_opacity_data_+12*i, widget_points_[i], 12* sizeof(float));
 }
 
 void overlayController::setWidgetId(int id){
@@ -82,6 +83,7 @@ void overlayController::addWidget(std::vector<float> values){
     if(!default_widget_points_) GraphRenderer::getGraphPoints(widget_params_[wid].data(), default_widget_points_);
     memcpy(widget_points_[wid], default_widget_points_, 12* sizeof(float));
     dirty_wid = wid;
+    update_widget_points_1d_array();
     vrController::baked_dirty_ = true;
 }
 void overlayController::removeWidget(int wid){
@@ -105,6 +107,7 @@ void overlayController::setTuneParameter(int tid, float value){
     widget_params_[widget_id][tid] = value;
     GraphRenderer::getGraphPoints(widget_params_[widget_id].data(), widget_points_[widget_id]);
     dirty_wid = widget_id;
+    update_widget_points_1d_array();
     vrController::baked_dirty_ = true;
 }
 void overlayController::setOverlayRect(int id, int width, int height, int left, int top){

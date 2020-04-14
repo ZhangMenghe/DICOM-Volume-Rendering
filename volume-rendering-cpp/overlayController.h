@@ -26,9 +26,10 @@ public:
     void updateUniforms();
 
     //getter
-    const std::vector<float*> getWidgetPoints(){return widget_points_;}
     const float* getCurrentWidgetPoints(){return widget_points_[widget_id];}
-
+    void getWidgetFlatPoints(float*& data, int& num){
+        data = u_opacity_data_; num = widget_points_.size();
+    }
 
 private:
     static overlayController* myPtr_;
@@ -44,10 +45,12 @@ private:
     std::vector<std::vector<float>> widget_params_;
     std::vector<float*> widget_points_;
     float* default_widget_points_;
-
+    float* u_opacity_data_;
     //rect
     float _screen_w, _screen_h;
     int _screen_h_offset;
+
+    void update_widget_points_1d_array();
 
 };
 #endif

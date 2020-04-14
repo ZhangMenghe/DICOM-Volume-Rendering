@@ -22,7 +22,8 @@ struct OpacityAdj{
 };
 //shaderd by tex and ray, but mutually exclusive
 //uniform OpacityAdj uOpacitys;
-uniform vec2 u_opacity[6];
+uniform vec2 u_opacity[60];
+uniform int u_widget_num;
 
 float CURRENT_INTENSITY;
 uint MASKS_;
@@ -48,13 +49,13 @@ uvec3 transfer_scheme(float cat, float gray){
 uvec3 bright_scheme(float gray){
     return uvec3(hsv2rgb(vec3(gray * 180.0 / 255.0, 1.0, 1.0)) * 255.0);
 }
-uint UpdateOpacityAlpha(uint sampled_alpha){
+uint UpdateOpacityAlpha(int woffset, uint sampled_alpha){
     float falpha = float(sampled_alpha) * 0.003921;
     float alpha = CURRENT_INTENSITY;
-    vec2 lb = u_opacity[0], rb = u_opacity[3];
+    vec2 lb = u_opacity[woffset], rb = u_opacity[woffset+3];
     if(alpha < lb.x || alpha > rb.x) return uint(0);
-    vec2 lm = u_opacity[1], lt =u_opacity[2];
-    vec2 rm = u_opacity[4], rt =u_opacity[5];
+    vec2 lm = u_opacity[woffset+1], lt =u_opacity[woffset+2];
+    vec2 rm = u_opacity[woffset+4], rt =u_opacity[woffset+5];
     float k = (lt.y - lm.y)/(lt.x - lm.x);
     if(alpha < lt.x) alpha*= k*(alpha - lm.x)+lm.y;
     else if(alpha < rt.x) alpha*=rt.y;
@@ -112,7 +113,8 @@ uvec4 post_process(uvec4 color){
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
     uvec4 sample_color = Sample(storePos);
-    uint alpha = UpdateOpacityAlpha(sample_color.a);
+    uint alpha = uint(0);
+    for(int i=0; i<u_widget_num; i++) alpha = max(alpha, UpdateOpacityAlpha(6*i, sample_color.a));
     uvec4 ufc = post_process(uvec4(sample_color.rgb, alpha));
     imageStore(destTex, storePos, vec4(ufc) * 0.003921);
 }
