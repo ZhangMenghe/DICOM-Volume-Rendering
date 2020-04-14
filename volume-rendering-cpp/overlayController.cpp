@@ -57,6 +57,12 @@ void overlayController::onDraw(){
     || !vrController::instance()->isDrawing()) return;
     if(dirty_wid >= 0){
         renderers_[dvr::OVERLAY_GRAPH]->setData(widget_points_[widget_id], widget_id);
+        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_widget_num", widget_points_.size());
+        int count = 6*widget_points_.size();
+        float* data = new float[2* count];
+        for(int i=0;i<widget_points_.size();i++)memcpy(data+12*i, widget_points_[i], 12* sizeof(float));
+        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", count, data);
+        delete[]data;
         dirty_wid = -1;
     }
     for(auto render:renderers_) render.second->Draw();
@@ -75,7 +81,6 @@ void overlayController::addWidget(std::vector<float> values){
     memcpy(widget_params_[wid].data(), values.data(), dvr::TUNE_END * sizeof(float));
     if(!default_widget_points_) GraphRenderer::getGraphPoints(widget_params_[wid].data(), default_widget_points_);
     memcpy(widget_points_[wid], default_widget_points_, 12* sizeof(float));
-//    if(renderers_[OVERLAY_GRAPH]) renderers_[dvr::OVERLAY_GRAPH]->setData(default_widget_points_, wid);
     dirty_wid = wid;
     vrController::baked_dirty_ = true;
 }
@@ -117,6 +122,5 @@ void overlayController::setOverlayRect(int id, int width, int height, int left, 
 }
 void overlayController::updateUniforms(){
     renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", vrController::color_scheme_id);
-    renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6, widget_points_[widget_id]);
 }
 

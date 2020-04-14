@@ -2,7 +2,8 @@
 
 precision mediump float;
 uniform int uScheme;
-uniform vec2 u_opacity[6];
+uniform int u_widget_num;
+uniform vec2 u_opacity[60];
 
 out vec4 gl_FragColor;
 in vec2 vTexcoord;
@@ -17,16 +18,16 @@ vec3 transfer_scheme_hsv(float gray){
     if(uScheme == 1) return vec3(gray, 1.0, 1.0);
     return vec3(gray * 180.0 / 255.0, 1.0, 1.0);
 }
-vec3 get_intensity(float posx){
-    vec2 lb = u_opacity[0], rb = u_opacity[3];
-    if(posx < lb.x || posx > rb.x) return vec3(.0);
+float get_intensity(int uid_offset, float posx){
+    vec2 lb = u_opacity[uid_offset], rb = u_opacity[uid_offset+3];
+    if(posx < lb.x || posx > rb.x) return .0;
 
-    vec2 lm = u_opacity[1], lt =u_opacity[2];
-    vec2 rm = u_opacity[4], rt =u_opacity[5];
+    vec2 lm = u_opacity[uid_offset+1], lt =u_opacity[uid_offset+2];
+    vec2 rm = u_opacity[uid_offset+4], rt =u_opacity[uid_offset+5];
     float k = (lt.y - lm.y)/(lt.x - lm.x);
-    if(posx < lt.x) return vec3(k*(posx - lm.x)+lm.y);
-    if(posx < rt.x) return vec3(rt.y);
-    return vec3(-k *(posx - rm.x)+rm.y);
+    if(posx < lt.x) return k*(posx - lm.x)+lm.y;
+    if(posx < rt.x) return rt.y;
+    return -k *(posx - rm.x)+rm.y;
 }
 vec4 get_mixture(float posx, vec3 gray){
     if(uScheme == 0) return vec4(gray.r);
@@ -38,8 +39,9 @@ void main(){
         if(uScheme == 0) gl_FragColor = vec4(vec3(vTexcoord.x), 1.0);
         else gl_FragColor = vec4(hsv2rgb(transfer_scheme_hsv(vTexcoord.x)), 1.0);
     }else{
-        vec3 gray = get_intensity(vTexcoord.x);
-        if(vTexcoord.y<0.33) gl_FragColor = vec4(gray, 1.0);
-        else gl_FragColor = get_mixture(vTexcoord.x, gray);
+        float gray = .0;
+        for(int i=0; i<u_widget_num; i++) gray = max(gray, get_intensity(6*i, vTexcoord.x));
+        if(vTexcoord.y<0.33) gl_FragColor = vec4(vec3(gray), 1.0);
+        else gl_FragColor = get_mixture(vTexcoord.x, vec3(gray));
     }
 }
