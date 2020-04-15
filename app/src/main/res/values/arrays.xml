@@ -125,10 +125,10 @@
 <!--    order matters for mask bit order!-->
     <string-array name="masks_list">
         <item>Body</item>
-        <item>Colon</item>
-        <item>Kidneys</item>
-        <item>Spleen</item>
         <item>Bladder</item>
+        <item>Kidneys</item>
+        <item>Colon</item>
+        <item>Spleen</item>
     </string-array>
     <string-array name="masks_status">
         <item>true</item>

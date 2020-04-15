@@ -52,9 +52,8 @@ bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
 }
 
 vec4 Sample(vec3 p){
-    vec3 coord = clamp(p, vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
-    return imageLoad(srcTex, ivec3(VolumeSize *coord));
-//    return vec4(ucolor)/ 256.0;
+    vec3 coord = clamp(p, vec3(.0), vec3(1.0));//vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
+    return clamp(imageLoad(srcTex, ivec3(VolumeSize *coord)), vec4(.0), vec4(1.0));
 }
 vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
     float t0 = t - StepSize * 4.0;
@@ -71,6 +70,9 @@ vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
     return Sample(p);
 }
 vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
+    //todo:better way???
+    if(VolumeSize.z <2.0) return clamp(Sample(ro+rd*head), vec4(.0), vec4(1.0));
+
     vec4 sum = vec4(.0);
     int steps = 0; float pd = .0;
 

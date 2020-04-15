@@ -150,7 +150,7 @@ public class dialogUIs {
         activityReference.get().runOnUiThread(new Runnable()  {
             @Override
             public void run()  {
-                Toast.makeText( activityReference.get(), "Masks Loaded!", Toast.LENGTH_LONG).show();
+                Toast.makeText( activityReference.get(), "Mask Loaded!", Toast.LENGTH_LONG).show();
 
             }});
     }

@@ -131,7 +131,12 @@ public class fileTransferClient {
 
                 //update local data
                 infolist.remove(pos);
-                local_dv_map.put(dsname, infolist);
+                if(infolist.isEmpty()){
+                    local_dv_map.remove(dsname);
+                    for(datasetInfo dsinfo:available_local_datasets){
+                        if(dsinfo.getFolderName().equals(dsname)) {available_local_datasets.remove(dsinfo); break;}
+                    }
+                }else local_dv_map.put(dsname, infolist);
                 return true;
             }
         }
@@ -144,7 +149,8 @@ public class fileTransferClient {
             new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
     }
     private void DownloadMasks(String target_path){
-        Log.e(TAG, "====DownloadMasks: " + target_path );
+        if(!target_vol.getMaskAvailable()) return;
+        Log.e(TAG, "====Start to DownloadMasks: " + target_path );
         new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(target_path);
     }
 
