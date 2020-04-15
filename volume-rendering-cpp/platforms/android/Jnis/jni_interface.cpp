@@ -120,9 +120,8 @@ JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint width, jint height, j
 }
 
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
-    for(auto id:n_data_offset)
-        if(id!=0) {vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_VolumeTexData, CHANEL_NUM); break;}
-    for(int i=0;i<3;i++) n_data_offset[i]=0;
+    for(auto &id:n_data_offset)
+        if(id!=0) {vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_VolumeTexData, CHANEL_NUM); id=0;break;}
 }
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){

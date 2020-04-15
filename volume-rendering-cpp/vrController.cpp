@@ -147,7 +147,7 @@ void vrController::precompute(){
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
     //todo!!!! add flip stuff
-    if(tex_volume->Depth() == 144)
+//    if(tex_volume->Depth() == 144)
     bakeShader_->EnableKeyword("FLIPY");
     if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");

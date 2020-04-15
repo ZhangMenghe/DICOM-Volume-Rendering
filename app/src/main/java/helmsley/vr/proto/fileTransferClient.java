@@ -235,7 +235,7 @@ public class fileTransferClient {
             return "success";
         }
         private void loadTextureOnly(String folder_name, dataTransferGrpc.dataTransferStub asyncStub){
-            RequestWholeVolume req = RequestWholeVolume.newBuilder().setClientId(1).setReqMsg(folder_name).setUnitSize(2).build();
+            Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_name).build();
             StreamObserver<volumeWholeResponse> mask_observer = new StreamObserver<volumeWholeResponse>() {
                 int id = 0;
                 @Override
@@ -246,6 +246,7 @@ public class fileTransferClient {
 
                 @Override
                 public void onError(Throwable t) {
+                    Log.i(TAG, "==============error========= " );
 
                 }
 
@@ -257,7 +258,7 @@ public class fileTransferClient {
                     id = 0;
                 }
             };
-            asyncStub.downloadVolume(req, mask_observer);
+            asyncStub.downloadMasksVolume(req, mask_observer);
         }
         private void loadMaskAsDCMIImage(String folder_name, dataTransferGrpc.dataTransferStub asyncStub){
             Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_name).build();
