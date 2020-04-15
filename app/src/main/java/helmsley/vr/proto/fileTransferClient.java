@@ -143,7 +143,7 @@ public class fileTransferClient {
         if(!LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))
             new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
     }
-    public void DownloadMasks(String target_path){
+    private void DownloadMasks(String target_path){
         Log.e(TAG, "====DownloadMasks: " + target_path );
         new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(target_path);
     }
@@ -292,6 +292,16 @@ public class fileTransferClient {
         String file_name = target_vol.getMaskAvailable()? activity.getString(R.string.cf_dcmwmask_name):fname;
         File tar_ds_dir = Paths.get(target_root_dir, target_ds.getFolderName()).toFile();
         if(!tar_ds_dir.exists()) tar_ds_dir.mkdir();
+
+        //check relevant sub dirs
+        String[] vol_dir_tree = target_vol.getFolderName().split("/");
+        String vol_dir_prefix="";
+        for(String vol_dir:vol_dir_tree){
+            vol_dir_prefix = vol_dir_prefix+vol_dir;
+            File tar_vol_dir = new File(tar_ds_dir, vol_dir_prefix);
+            if(!tar_vol_dir.exists()) tar_vol_dir.mkdir();
+        }
+
         File tar_vol_dir = new File(tar_ds_dir, target_vol.getFolderName());
         if(!tar_vol_dir.exists()) tar_vol_dir.mkdir();
         File datafile = new File(tar_vol_dir, file_name);
@@ -367,7 +377,7 @@ public class fileTransferClient {
         try{
 
             if(DwM.exists()){
-                loadVolumeData(new FileInputStream(DwM), -1, 4);
+                loadVolumeData(new FileInputStream(DwM), 2, 4);
                 finished = true; finished_mask = true;
             }else{
                 //load data and path separately
@@ -393,7 +403,8 @@ public class fileTransferClient {
         return true;
     }
 
-    //0 for dcmi, 1 for mask, unit_size for single type usually 2, together will be 4
+    //2 for dcm+mask, usually 4 bits,
+    // 0 for dcmi, 1 for mask, unit_size for single type usually 2, together will be 4
     private void loadVolumeData(InputStream instream, int target, int unit_size)
         throws IOException{
             byte[] chunk = new byte[1024];

@@ -16,7 +16,7 @@ namespace {
     GLubyte* g_VolumeTexData = nullptr;
     int g_img_h=0, g_img_w=0, g_img_d=0;
     size_t g_ssize = 0, g_vol_len;
-    size_t n_data_offset[2] = {0};
+    size_t n_data_offset[3] = {0};
     AAssetManager * _asset_manager;
     std::string LoadTextFile(const char* file_name) {
         std::string* out_file_text_string = new std::string();
@@ -97,7 +97,7 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
                 buffer[CHANEL_NUM* idx] = GLubyte(data[2*idx]);
                 buffer[CHANEL_NUM* idx + 1] = GLubyte(data[2*idx+1]);
             }
-        }else{
+        }else if(target == LOAD_MASK_ID){
             for(auto idx = 0; idx<num; idx++){
                 buffer[CHANEL_NUM* idx + 2] = GLubyte(data[2*idx]);
                 buffer[CHANEL_NUM* idx + 3] = GLubyte(data[2*idx+1]);
@@ -120,10 +120,9 @@ JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint width, jint height, j
 }
 
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
-    if(n_data_offset[LOAD_DCMI_ID] == 0 && n_data_offset[LOAD_MASK_ID] == 0) return;
-    vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_VolumeTexData, CHANEL_NUM);
-    //todo:!!attention, is the data change or not? delete here to save memory
-    n_data_offset[LOAD_DCMI_ID] = 0; n_data_offset[LOAD_MASK_ID] = 0;
+    for(auto id:n_data_offset)
+        if(id!=0) {vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_VolumeTexData, CHANEL_NUM); break;}
+    for(int i=0;i<3;i++) n_data_offset[i]=0;
 }
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){

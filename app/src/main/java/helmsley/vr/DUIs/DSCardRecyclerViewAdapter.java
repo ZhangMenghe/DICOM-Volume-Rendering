@@ -91,9 +91,8 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         datasetInfo info = downloaderReference.get().getAvailableDataset(isLocal).get(position);
         holder.textViewDate.setText(info.getDate());
         holder.textViewPatient.setText(info.getPatientName());
-        //todo:nothing
-        holder.textViewDetail.setText("Details:..");
-//        holder.textViewDetail.setText(activityReference.get().getString(R.string.card_data_detail,info.getFolderName(),info.getFileNums()));
+        holder.textViewDetail.setText(info.getFolderName());
+        holder.textViewDetail.setTextSize(9);
 
         if(isLocal) createListViewContent(holder.lstViewVol, info.getFolderName());
 
@@ -140,15 +139,17 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         return downloaderReference.get().getAvailableDataset(isLocal).size();
     }
 
-    public void onContentChange(){contentAdapter.notifyDataSetChanged();}
+    void onContentChange(){contentAdapter.notifyDataSetChanged();}
 
     private void createListViewContent(ListView lv, String ds_name){
         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
         ArrayList<String> volcon_lst = new ArrayList<>();
         for (volumeResponse.volumeInfo vinfo : vol_lst)
-            volcon_lst.add(activityReference.get().getString(R.string.volume_lst_item, vinfo.getFolderName(), vinfo.getImgWidth(), vinfo.getImgHeight(), vinfo.getFileNums()));
-        contentAdapter = new ArrayAdapter<String>
-                (activityReference.get(), android.R.layout.simple_list_item_1, volcon_lst);
+            volcon_lst.add(activityReference.get().getString(
+                    R.string.volume_lst_item, vinfo.getFolderName(), vinfo.getImgWidth(), vinfo.getImgHeight(), vinfo.getFileNums())
+                    +(vinfo.getMaskAvailable()?"\nWith Mask":""));
+
+        contentAdapter = new ArrayAdapter<>(activityReference.get(), android.R.layout.simple_list_item_1, volcon_lst);
         //init listview
         lv.setAdapter(contentAdapter);
 

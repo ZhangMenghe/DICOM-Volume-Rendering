@@ -12,7 +12,8 @@ message datasetResponse{
         string folder_name = 1;
         string patient_name = 2;
         string date = 3;
-        string default_folder = 4;
+        string physican_name = 4;
+        repeated string mask_folders = 5;
     }
     repeated datasetInfo datasets = 1;
 }
@@ -23,8 +24,7 @@ message volumeResponse{
         int32 file_nums = 2;
         int32 img_width = 3;
         int32 img_height = 4;
-        bool order_flipped = 5;
-        bool mask_available = 6;
+        bool mask_available = 5;
     }
     repeated volumeInfo volumes = 1;
 }

@@ -81,7 +81,11 @@ void texvrRenderer::draw_scene(){
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
     Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * modelmat);
-    Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
+    if(vrController::param_bool[dvr::CHECK_CUTTING])
+        Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
+    else
+        Shader::Uniform(sp, "u_cut_texz", 1.0f);
+
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
 //    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
