@@ -11,15 +11,26 @@ namespace dvr{
         CHECK_MASKON,
     };
     enum PARAM_TUNE{
-        TUNE_OVERALL = 0,
+        TUNE_OVERALL=0,
         TUNE_LOWEST,
         TUNE_WIDTHBOTTOM,
         TUNE_WIDTHTOP,
         TUNE_CENTER,
         TUNE_END
     };
+    enum PARAM_DUAL{
+        CONTRAST_LIMIT=0,
+        DUAL_END
+    };
+    enum PARAM_RENDER_TUNE{
+        RENDER_CONTRAST_LEVEL=0,
+        RENDER_CONTRAST_LOW,
+        RENDER_CONTRAST_HIGH,
+        RENDER_BRIGHTNESS,
+        PARAM_RENDER_TUNE_END
+    };
     enum SHADER_FILES{
-        SHADER_TEXTUREVOLUME_VERT = 0,
+        SHADER_TEXTUREVOLUME_VERT=0,
         SHADER_TEXTUREVOLUME_FRAG,
         SHADER_RAYCASTVOLUME_VERT,
         SHADER_RAYCASTVOLUME_FRAG,

@@ -10,10 +10,14 @@ namespace {
     std::vector<std::string> param_checks;
 }
 
-JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jint num, jfloatArray jvalues){
-    if(num != dvr::TUNE_END) return;
+JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jintArray jnums, jfloatArray jvalues){
+
+    jint* nums = env->GetIntArrayElements(jnums, 0);
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    overlayController::instance()->addWidget(std::vector<float>(values, values+num));
+    overlayController::instance()->addWidget(std::vector<float>(values, values+nums[0]));
+
+    env->ReleaseFloatArrayElements(jvalues,values,0);
+    env->ReleaseIntArrayElements(jnums, nums, 0);
 }
 void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     param_checks.clear();
@@ -38,8 +42,12 @@ JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint wid){
 JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass){
     overlayController::instance()->removeAll();
 }
-JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint pid, jfloat value){
-    if(pid <= dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
+JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint wid, jint pid, jfloat value){
+    if(wid == 0 && pid < dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
+    else if(wid == 1) vrController::instance()->setRenderParam(pid, value);
+}
+JUI_METHOD(void, JUIsetDualParamById)(JNIEnv *, jclass, jint pid, jfloat minv, jfloat maxv){
+    if(pid < dvr::DUAL_END)vrController::instance()->setDualParameter(pid, minv, maxv);
 }
 JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
     std::string key = dvr::jstring2string(env,jkey);
@@ -77,6 +85,14 @@ JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
 }
 JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint id, jint width, jint height, jint left, jint top){
     overlayController::instance()->setOverlayRect(id, width, height, left, top);
+}
+JUI_METHOD(void, JUIResetValues)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
+    if(id == 1){
+        jfloat* values = env->GetFloatArrayElements(jvalues, 0);
+        vrController::instance()->setRenderParam(values);
+
+        env->ReleaseFloatArrayElements(jvalues,values,0);
+    }
 }
 JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     InitCheckParam(env, num, jkeys, jvalues);

@@ -9,13 +9,12 @@
         android:layout_height="match_parent"
         android:singleLine="true"
         android:gravity="center"
-        android:textSize="16sp"
         style="@style/itemTextCompat"/>
-    <SeekBar
-        android:id="@+id/tuneSeekbar"
+    <com.yahoo.mobile.client.android.util.rangeseekbar.RangeSeekBar
+        android:id="@+id/rangeSeekbar"
+        android:layout_height="match_parent"
         android:layout_width="0dp"
         android:layout_weight="3"
-        android:layout_height="match_parent"
         android:gravity="center"
         android:theme="@style/Seekbar_top"/>
     <TextView

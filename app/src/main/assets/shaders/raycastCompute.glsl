@@ -1,6 +1,7 @@
 #version 310 es
 
 #pragma multi_compile SHOW_ORGANS
+#pragma multi_compile CONTRAST_ABSOLUTE
 #pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 #pragma multi_compile FLIPY
@@ -32,6 +33,13 @@ uint MASKS_;
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
 uniform vec3 u_tex_size;
+uniform float u_contrast_low;
+uniform float u_contrast_high;
+uniform float u_brightness;
+uniform float u_contrast_level;
+
+//float contrastTop = 255.0;
+//float contrastBottom = .0;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -85,14 +93,19 @@ uvec4 show_organs(uvec4 color){
 }
 uvec4 Sample(ivec3 pos){
     #ifdef FLIPY
-        pos = ivec3(pos.x, uint(512-pos.y),pos.z);
+        pos = ivec3(pos.x, uint(u_tex_size.y-float(pos.y)),pos.z);
     #endif
     uint value = imageLoad(srcTex, pos).r;
     //lower part as color
-    uvec4 color = uvec4(uvec3(value&uint(0xffff)), 255);
-    CURRENT_INTENSITY = float(color.r) * 0.003921;
+    float intensity = float(value&uint(0xff));
+    if(intensity > u_contrast_high||intensity < u_contrast_low) intensity = .0;
+    #ifdef CONTRAST_ABSOLUTE
+        intensity = (intensity - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
+    #endif
+    intensity = clamp(u_brightness+intensity, .0, 255.0);
 
-//    uint msk_value = imageLoad(srcTex, ivec3(pos.x, uint(512-pos.y),pos.z)).r;
+    uvec4 color = uvec4(uvec3(uint(intensity)), 255);
+    CURRENT_INTENSITY = float(color.r) * 0.003921;
     MASKS_ = value>>uint(16);
     return color;
 }

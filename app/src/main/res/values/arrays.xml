@@ -70,6 +70,45 @@
         <item>600</item>
     </string-array>
 
+    <string-array name="contrastParams">
+        <item>@array/contrast_level</item>
+        <item>@array/contrast_low</item>
+        <item>@array/contrast_high</item>
+        <item>@array/brightness</item>
+
+    </string-array>
+    <string-array name="contrast_level">
+        <item>Level</item>
+        <item>255</item>
+        <item>255</item>
+        <item>255</item>
+    </string-array>
+    <string-array name="brightness">
+        <item>Brightness</item>
+        <item>0</item>
+        <item>255</item>
+        <item>255</item>
+    </string-array>
+    <string-array name="contrast_low">
+        <item>Low Range</item>
+        <item>.0</item>
+        <item>255.0</item>
+        <item>255</item>
+    </string-array>
+    <string-array name="contrast_high">
+        <item>High Range</item>
+        <item>255.0</item>
+        <item>255.0</item>
+        <item>255</item>
+    </string-array>
+    <string-array name="contrast_limit">
+        <item>Limit</item>
+        <item>.0</item>
+        <item>255.0</item>
+        <item>.0</item>
+        <item>255.0</item>
+    </string-array>
+
     <!--name, value, maxvalue, toggle_bar_max-->
     <string-array name="opaParams">
         <item>@array/opa_overall</item>

@@ -42,6 +42,9 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
     void setCuttingPlane(float value);
+    void setDualParameter(int id, float lv, float rv);
+    void setRenderParam(int id, float value);
+    void setRenderParam(float* values){memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));baked_dirty_=true;}
 
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
@@ -77,6 +80,7 @@ private:
     std::map<std::string, reservedStatus> rStates_;
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
+    float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
 
     //ui
     glm::fvec2 Mouse_old;

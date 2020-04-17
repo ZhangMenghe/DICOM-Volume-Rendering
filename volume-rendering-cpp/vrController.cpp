@@ -37,6 +37,8 @@ void vrController::onReset() {
     rStates_.clear();
     cst_name="";
     _screen_w = 0; _screen_h = 0;
+//    contrast_low=.0f;contrast_high=255.0f;
+
     setMVPStatus("default_status");
 }
 void vrController::assembleTexture(int w, int h, int d, GLubyte * data, int channel_num){
@@ -138,10 +140,6 @@ void vrController::precompute(){
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
-
-        GLuint sp = bakeShader_->Use();
-        Shader::Uniform(sp, "u_tex_size", glm::vec3(tex_volume->Width(), tex_volume->Height(), tex_volume->Depth()));
-        bakeShader_->UnUse();
     }
     overlayController::instance()->updateUniforms();
     bakeShader_->DisableAllKeyword();
@@ -149,6 +147,7 @@ void vrController::precompute(){
     //todo!!!! add flip stuff
 //    if(tex_volume->Depth() == 144)
     bakeShader_->EnableKeyword("FLIPY");
+    bakeShader_->EnableKeyword("CONTRAST_ABSOLUTE");
     if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
 
@@ -156,6 +155,7 @@ void vrController::precompute(){
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
+    Shader::Uniform(sp, "u_tex_size", glm::vec3(float(tex_volume->Width()), float(tex_volume->Height()), float(tex_volume->Depth())));
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
     Shader::Uniform(sp, "u_organ_num", mask_num_);
     float* widget_data_pointer;
@@ -163,6 +163,11 @@ void vrController::precompute(){
     overlayController::instance()->getWidgetFlatPoints(widget_data_pointer, widget_num);
     Shader::Uniform(sp, "u_opacity", 6*widget_num, widget_data_pointer);
     Shader::Uniform(sp, "u_widget_num", widget_num);
+
+    Shader::Uniform(sp, "u_contrast_low", render_params_[RENDER_CONTRAST_LOW]);
+    Shader::Uniform(sp, "u_contrast_high", render_params_[RENDER_CONTRAST_HIGH]);
+    Shader::Uniform(sp, "u_contrast_level", render_params_[RENDER_CONTRAST_LEVEL]);
+    Shader::Uniform(sp, "u_brightness", render_params_[RENDER_BRIGHTNESS]);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -211,3 +216,10 @@ void vrController::setCuttingPlane(float value){
     if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);
     else texvrRenderer_->setCuttingPlane(value);
 }
+void vrController::setDualParameter(int id, float lv, float rv){
+//    if(id == CONTRAST_LIMIT){contrast_low=lv; contrast_high=rv;baked_dirty_=true;}
+}
+void vrController::setRenderParam(int id, float value){
+    render_params_[id] = value;baked_dirty_ = true;
+}
+

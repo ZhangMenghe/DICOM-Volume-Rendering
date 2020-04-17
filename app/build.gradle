@@ -85,7 +85,8 @@ protobuf {
 dependencies {
     //imebra
 //    implementation project(':imebrajni')
-
+    //range seekbar
+    implementation 'com.yahoo.mobile.client.android.util.rangeseekbar:rangeseekbar-library:0.1.0'
     // You need to build grpc-java to obtain these libraries below.
     implementation 'io.grpc:grpc-okhttp:1.25.0' // CURRENT_GRPC_VERSION
     implementation 'io.grpc:grpc-protobuf-lite:1.25.0' // CURRENT_GRPC_VERSION

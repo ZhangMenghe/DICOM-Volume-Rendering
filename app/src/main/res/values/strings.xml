@@ -17,7 +17,10 @@
     <string name="dialog_select_title">Select a Dataset</string>
     <string name="dialog_progress_title">Loading...</string>
 
+    <string name="opacity_group_name">Opacity</string>
+    <string name="contrast_group_name">Contrast</string>
     <string name="tune_group_name">Tune</string>
+
     <string name="check_group_name">Check</string>
     <string name="check_panel_group_name">Panels</string>
     <string name="check_freeze_name">Freeze</string>
@@ -38,6 +41,7 @@
     <string name="freezeVolume_check_name">Freeze Volume</string>
 
     <string name="tune_value">%1$.2f </string>
+    <string name="tune_value_dual">%1$.2f-%2$.2f</string>
     <string name="cf_drop_tune_w">1.0</string>
     <string name="volume_lst_item">%1$s:\n%2$d x %3$d x %4$d</string>
 </resources>
