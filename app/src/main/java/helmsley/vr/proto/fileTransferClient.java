@@ -79,13 +79,14 @@ public class fileTransferClient {
             if(info.length < 7) continue;
             //eg: "Larry Smarr" ,"2016-10-26" ,"Larry-2016-10-26-MRI"
             datasetInfo tinfo = datasetInfo.newBuilder().setPatientName(info[0]).setFolderName(info[2]).setDate(info[1]).build();
-            // eg. "series_214_DYN_COR_VIBE_3_RUNS" 512, 512, 48, 2, 2
+            // eg. "series_214_DYN_COR_VIBE_3_RUNS" 512, 512, 48, 243.10002131, 2, 2
             volumeInfo vol_info = volumeInfo.newBuilder()
                     .setFolderName(info[3])
                     .setFileNums(Integer.parseInt(info[6]))
                     .setImgHeight(Integer.parseInt(info[4]))
                     .setImgWidth(Integer.parseInt(info[5]))
-                    .setMaskAvailable(Integer.parseInt(info[8]) != 0)
+                    .setVolThickness(Float.parseFloat(info[7]))
+                    .setMaskAvailable(Integer.parseInt(info[9]) != 0)
                     .build();
 
             update_local_info(tinfo, vol_info);
@@ -345,6 +346,7 @@ public class fileTransferClient {
                         +target_vol.getImgHeight()+","
                         +target_vol.getImgWidth()+","
                         +target_vol.getFileNums() + ","
+                        +target_vol.getVolThickness()+","
                         +(target_vol.getMaskAvailable()?"2,2":"2,0")
                         +"\n";
                 fileUtils.addToFile(local_index_filename, content);

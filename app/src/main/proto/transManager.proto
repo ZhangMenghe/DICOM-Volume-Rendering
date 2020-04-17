@@ -24,7 +24,8 @@ message volumeResponse{
         int32 file_nums = 2;
         int32 img_width = 3;
         int32 img_height = 4;
-        bool mask_available = 5;
+        float vol_thickness = 5;
+        bool mask_available = 6;
     }
     repeated volumeInfo volumes = 1;
 }

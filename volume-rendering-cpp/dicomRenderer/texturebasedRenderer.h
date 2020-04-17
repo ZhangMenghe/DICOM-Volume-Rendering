@@ -10,9 +10,10 @@
 class texvrRenderer{
 private:
     const float scale_inv = 0.5f;
-    const float DENSE_FACTOR = 1.0f;
+    const float DENSE_FACTOR = 2.0f;
     int dimensions; float dimension_inv;
-    const int MAX_DIMENSIONS = 200;
+    float vol_thickness_factor = 10.0f;
+    const int MAX_DIMENSIONS = 2000;
     const float MAX_DIMENSIONS_INV = 1.0f/MAX_DIMENSIONS;
 
     Shader* shader_;
@@ -31,7 +32,7 @@ private:
 
 public:
     texvrRenderer(bool screen_baked = true);
-    void setDimension(int dims);
+    void setDimension(int dims, float thickness);
     void setCuttingPlane(float percent);
     void Draw();
     void dirtyPrecompute(){baked_dirty_ = true;}

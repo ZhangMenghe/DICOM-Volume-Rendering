@@ -55,7 +55,7 @@ void texvrRenderer::update_instance_data(){
     float zTex = .0f;
     float mappedZVal = -scale_inv + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
     for (int i = 0; i < dimensions; i++){
-        zInfos[i].x = mappedZVal; zInfos[i].y = zTex;
+        zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
         mappedZVal+=MAX_DIMENSIONS_INV; zTex+=dimension_inv;
     }
 
@@ -121,8 +121,9 @@ void texvrRenderer::draw_baked() {
     baked_dirty_ = false;
 }
 
-void texvrRenderer::setDimension(int dims){
+void texvrRenderer::setDimension(int dims, float thickness){
     dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
+    vol_thickness_factor = (thickness<0)?vol_thickness_factor:(thickness / 20.0f);
     update_instance_data();
 }
 void texvrRenderer::setCuttingPlane(float percent){

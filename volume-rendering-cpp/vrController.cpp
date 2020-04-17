@@ -41,9 +41,9 @@ void vrController::onReset() {
 
     setMVPStatus("default_status");
 }
-void vrController::assembleTexture(int w, int h, int d, GLubyte * data, int channel_num){
-    texvrRenderer_->setDimension(d);
-    raycastRenderer_->setDimension(d);
+void vrController::assembleTexture(int w, int h, int d, float vol_thickness, GLubyte * data, int channel_num){
+    texvrRenderer_->setDimension(d, vol_thickness);
+    raycastRenderer_->setDimension(d, vol_thickness);
     auto vsize= w*h*d;
     uint32_t* vol_data  = new uint32_t[vsize];
     uint16_t tm;

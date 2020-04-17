@@ -26,7 +26,7 @@ public:
 
     vrController();
     ~vrController();
-    void assembleTexture(int w, int h, int d, GLubyte * data, int channel_num = 4);
+    void assembleTexture(int w, int h, int d, float vt, GLubyte * data, int channel_num = 4);
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);

@@ -108,7 +108,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 
                 fileTransferClient loader = downloaderReference.get();
                 volumeResponse.volumeInfo vol_info = loader.getAvailableVolumes(dsname, isLocal).get(position);
-                JNIInterface.JNIsendDataPrepare(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums(), vol_info.getMaskAvailable());
+                JNIInterface.JNIsendDataPrepare(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums(), vol_info.getVolThickness(), vol_info.getMaskAvailable());
                 loader.Download(dsname, vol_info);
             }
         });
