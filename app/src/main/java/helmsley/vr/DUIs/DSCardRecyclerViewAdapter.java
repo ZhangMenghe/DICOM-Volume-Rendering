@@ -147,9 +147,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         for (volumeResponse.volumeInfo vinfo : vol_lst)
             volcon_lst.add(activityReference.get().getString(
                     R.string.volume_lst_item, vinfo.getFolderName(), vinfo.getImgWidth(), vinfo.getImgHeight(), vinfo.getFileNums())
-                    +(vinfo.getMaskAvailable()?"\nWith Mask":""));
+                    +(vinfo.getMaskAvailable()?"\n===>>With Mask<<===":""));
 
         contentAdapter = new ArrayAdapter<>(activityReference.get(), android.R.layout.simple_list_item_1, volcon_lst);
+
         //init listview
         lv.setAdapter(contentAdapter);
 

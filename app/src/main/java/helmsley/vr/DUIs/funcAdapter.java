@@ -27,7 +27,7 @@ public class funcAdapter{
         if(mAdapterRef == null) mAdapterRef = new WeakReference<>(new funcListAdapter(
                 contexRef.get(),
                 contexRef.get().getResources().getStringArray(R.array.functions),
-                contexRef.get().getString(R.string.fund_group_name)));
+                contexRef.get().getString(R.string.data_group_name)));
         return mAdapterRef.get();
     }
     public class funcListAdapter extends ListAdapter{
