@@ -26,6 +26,7 @@ message volumeResponse{
         int32 img_height = 4;
         float vol_thickness = 5;
         bool mask_available = 6;
+        float quality_score = 7;
     }
     repeated volumeInfo volumes = 1;
 }

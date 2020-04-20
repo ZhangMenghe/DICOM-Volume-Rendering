@@ -45,15 +45,16 @@ public class UIsManager {
 
     UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
-        dialogController = new dialogUIs(activity_);
+
         setupTopPanelSpinners();
         setupSubPanels(activity_);
         RequestReset();
     }
     private void setupSubPanels(Activity activity_){
         final ViewGroup parent_view = (ViewGroup)activity_.findViewById(R.id.parentPanel);
-        sub_panels_ = new LinkedHashMap<>();
+        dialogController = new dialogUIs(activity_, parent_view);
 
+        sub_panels_ = new LinkedHashMap<>();
         //order matters
         sub_panels_.put(sub_panel_name_ids_[0], new renderUIs(activity_, this, parent_view));
         sub_panels_.put(sub_panel_name_ids_[1], new cutplaneUIs(activity_, parent_view));

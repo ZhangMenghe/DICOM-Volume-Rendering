@@ -5,9 +5,12 @@ import android.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,8 +32,15 @@ public class dialogUIs {
     private static AlertDialog loadlocal_dialog, loadremote_dialog, progress_dialog;
     private static DSCardRecyclerViewAdapter loadlocal_adapter;
     public static boolean local_dirty = true;
-    public dialogUIs(final Activity activity_){
+    private final WeakReference<ViewGroup> parentRef;
+    private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
+    public dialogUIs(final Activity activity_, ViewGroup parent_view){
         activityReference = new WeakReference<>(activity_);
+        parentRef = new WeakReference<>(parent_view);
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        activity_.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        DIALOG_HEIGHT_LIMIT = (int)(displayMetrics.heightPixels * 0.85);
+        DIALOG_WIDTH_LIMIT = (int)(displayMetrics.widthPixels * 0.9);
     }
 
     public void SetupConnectRemote(){
@@ -40,7 +50,7 @@ public class dialogUIs {
         }else{
             Activity activity = activityReference.get();
             final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
-            final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, null);
+            final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, parentRef.get(), false);
             //widgets
             sendButton = (Button) dialogView.findViewById(R.id.connect_req_button);
             EditText hostEdit = (EditText) dialogView.findViewById(R.id.host_edit_text);
@@ -56,6 +66,7 @@ public class dialogUIs {
 
             layoutDialog_builder.setView(dialogView);
             AlertDialog connect_dialog = layoutDialog_builder.create();
+
 
     //        dialog.setCanceledOnTouchOutside(false);
 
@@ -75,11 +86,14 @@ public class dialogUIs {
                         connect_dialog.dismiss();
                         remote_connection_success = true;
                         if (loadremote_dialog == null) SetupDownloadDialog(false);
+                        //order matters
                         loadremote_dialog.show();
+                        loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
                     } else {
                         errText.setText(res_msg);
                         errText.setVisibility(View.VISIBLE);
                         sendButton.setEnabled(true);
+                        connect_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
                     }
                 }
             });
@@ -93,15 +107,16 @@ public class dialogUIs {
         if(loadlocal_dialog == null) {SetupDownloadDialog(true); local_dirty = false;}
         if(local_dirty){ NotifyChanges(); local_dirty=false;}
         loadlocal_dialog.show();
+        loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
-    public static void NotifyChanges(){loadlocal_adapter.onContentChange();loadlocal_adapter.notifyDataSetChanged();}
+    static void NotifyChanges(){loadlocal_adapter.onContentChange();loadlocal_adapter.notifyDataSetChanged();}
     private void SetupDownloadDialog(boolean local){
         final Activity activity = activityReference.get();
 
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
 
-        final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, null);
-
+//        final ViewGroup parent_view = (ViewGroup)activity.findViewById(R.id.parentPanel);
+        final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, parentRef.get(), false);
         //recycle view
         RecyclerView content_view = dialogView.findViewById(R.id.contentRecView);
 //        content_view.setHasFixedSize(true);
@@ -115,9 +130,9 @@ public class dialogUIs {
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_select_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
         layoutDialog_builder.setView(dialogView);
+
         if(local) loadlocal_dialog = layoutDialog_builder.create();
         else loadremote_dialog = layoutDialog_builder.create();
-//        download_dialog.setCanceledOnTouchOutside(false);
     }
     private static void SetupProgressDialog(String info){
         Activity activity = activityReference.get();
@@ -133,7 +148,6 @@ public class dialogUIs {
 
         progress_dialog = layoutDialog_builder.create();
         progress_dialog.setCanceledOnTouchOutside(false);
-
     }
     static void onDownloadingUI(String dataset_name, boolean isLocal){
         activityReference.get().runOnUiThread(new Runnable()  {
