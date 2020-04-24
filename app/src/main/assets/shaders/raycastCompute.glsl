@@ -97,15 +97,19 @@ uvec4 Sample(ivec3 pos){
     #endif
     uint value = imageLoad(srcTex, pos).r;
     //lower part as color
-    float intensity = float(value&uint(0xff));
-    if(intensity > u_contrast_high||intensity < u_contrast_low) intensity = .0;
-    #ifdef CONTRAST_ABSOLUTE
-        intensity = (intensity - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
-    #endif
-    intensity = clamp(u_brightness+intensity, .0, 255.0);
+    //max value 4095
+    float intensity = float(value&uint(0xffff));
+    float intensity_01 = intensity * 0.0002442002442002442;
 
-    uvec4 color = uvec4(uvec3(uint(intensity)), 255);
-    CURRENT_INTENSITY = float(color.r) * 0.003921;
+    if(intensity_01 > u_contrast_high||intensity_01 < u_contrast_low) intensity_01 = .0;
+
+    #ifdef CONTRAST_ABSOLUTE
+        intensity_01 = (intensity_01 - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
+    #endif
+    intensity_01 = clamp(u_brightness+intensity_01 - 0.5, .0, 1.0);
+
+    uvec4 color = uvec4(uvec3(uint(intensity_01 * 255.0)), 255);
+    CURRENT_INTENSITY = intensity_01;//float(color.r) * 0.003921;
     MASKS_ = value>>uint(16);
     return color;
 }
