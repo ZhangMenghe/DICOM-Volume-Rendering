@@ -27,6 +27,7 @@ vrController::~vrController(){
 }
 vrController::vrController(){
     onReset();
+    _screen_w = 0; _screen_h = 0;
     shader_contents = std::vector<std::string>(dvr::SHADER_END);
     myPtr_ = this;
 }
@@ -36,9 +37,6 @@ void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
     rStates_.clear();
     cst_name="";
-    _screen_w = 0; _screen_h = 0;
-//    contrast_low=.0f;contrast_high=255.0f;
-
     setMVPStatus("default_status");
 }
 void vrController::assembleTexture(int w, int h, int d, float vol_thickness, GLubyte * data, int channel_num){
@@ -89,6 +87,7 @@ void vrController::onDraw() {
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
+
     if(!param_bool[dvr::CHECK_CUTTING]&&param_bool[dvr::CHECK_FREEZE_VOLUME]) return;
 
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
@@ -109,7 +108,7 @@ void vrController::onTouchMove(float x, float y) {
 }
 void vrController::onScale(float sx, float sy){
     if(!tex_volume) return;
-
+    LOGE("====SCALE");
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     //unified scaling
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
@@ -124,7 +123,7 @@ void vrController::onScale(float sx, float sy){
 }
 void vrController::onPan(float x, float y){
     if(!tex_volume|| vrController::param_bool[dvr::CHECK_FREEZE_VOLUME]) return;
-
+    LOGE("====PAN");
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;

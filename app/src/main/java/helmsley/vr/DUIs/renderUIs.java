@@ -429,6 +429,9 @@ public class renderUIs extends BasePanel{
         void onItemClick(int position){
             setTitleById(position);
         }
+        void onItemClick(String text_title){
+            setTitleById(Integer.parseInt(text_title.substring(text_title.length()-1)));
+        }
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             return super.getViewWithText(convertView, name_prefix + position, position);
         }
@@ -446,6 +449,7 @@ public class renderUIs extends BasePanel{
             onTexRaySwitch(RAYCAST_ID == position);
             current_id = position;
         }
+
         void setTitleById(int id){
 //            if(id == current_id) return;
             super.setTitleById(id);

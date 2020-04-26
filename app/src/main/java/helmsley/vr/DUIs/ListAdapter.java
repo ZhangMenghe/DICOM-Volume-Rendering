@@ -92,6 +92,7 @@ class textSimpleListAdapter extends ListAdapter {
     void onItemClick(int position){
         Log.e("TAG", "===onItemClick: " + position );
     }
+    void onItemClick(String text_title_content){onItemClick(item_names.indexOf(text_title_content));}
     View getViewWithText(View convertView, String content, int position){
         ViewTitleHolder holder;
 
@@ -103,8 +104,9 @@ class textSimpleListAdapter extends ListAdapter {
                 holder.text_title.setOnClickListener(new View.OnClickListener(){
                     @Override
                     public void onClick(View v) {
-                        title = ((TextView)v).getText().toString();
-                        onItemClick(position);
+                        String text_title_content = ((TextView)v).getText().toString();
+                        title = text_title_content;
+                        onItemClick(text_title_content);
                         notifyDataSetChanged();
                     }
                 } );
