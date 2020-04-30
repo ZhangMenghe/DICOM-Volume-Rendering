@@ -55,7 +55,7 @@ vec3 transfer_scheme(float cat, float gray){
 }
 //hot to color. H(0~180)
 vec3 bright_scheme(float gray){
-    return hsv2rgb(vec3(gray * 180.0 / 255.0, 1.0, 1.0));
+    return hsv2rgb(vec3((1.0 -gray) * 180.0 / 255.0, 1.0, 1.0));
 }
 
 float UpdateOpacityAlpha(int woffset, float alpha){

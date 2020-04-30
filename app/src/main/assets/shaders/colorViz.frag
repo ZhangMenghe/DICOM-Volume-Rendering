@@ -16,7 +16,7 @@ vec3 hsv2rgb(vec3 c){
 }
 vec3 transfer_scheme_hsv(float gray){
     if(uScheme == 1) return vec3(gray, 1.0, 1.0);
-    return vec3(gray * 180.0 / 255.0, 1.0, 1.0);
+    return vec3((1.0 -gray) * 180.0 / 255.0, 1.0, 1.0);
 }
 float get_intensity(int uid_offset, float posx){
     vec2 lb = u_opacity[uid_offset], rb = u_opacity[uid_offset+3];
