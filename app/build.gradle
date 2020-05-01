@@ -83,6 +83,8 @@ protobuf {
     }
 }
 dependencies {
+    //yaml
+    implementation 'com.github.bmoliveira:snake-yaml:v1.18-android'
     //imebra
 //    implementation project(':imebrajni')
     //range seekbar

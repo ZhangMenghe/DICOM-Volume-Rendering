@@ -30,7 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:orientation="horizontal">
             <Spinner
-                android:id="@+id/checkPanelSpinner"
+                android:id="@+id/funcSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
@@ -38,7 +38,7 @@
                 android:spinnerMode="dropdown"
                 style="@style/Spinner"/>
             <Spinner
-                android:id="@+id/funcSpinner"
+                android:id="@+id/checkPanelSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"

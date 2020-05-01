@@ -102,9 +102,11 @@ float TransferIntensityStepOne(uint intensity){
 
     if(intensity_01 > u_contrast_high||intensity_01 < u_contrast_low) intensity_01 = .0;
 
-    #ifdef CONTRAST_ABSOLUTE
-    intensity_01 = (intensity_01 - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
-    #endif
+//    #ifdef CONTRAST_ABSOLUTE
+    intensity_01 = smoothstep(u_contrast_low, u_contrast_high, intensity_01);
+
+//    intensity_01 = (intensity_01 - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
+//    #endif
     intensity_01 = clamp(u_brightness+intensity_01 - 0.5, .0, 1.0);
     return intensity_01;
 }

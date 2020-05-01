@@ -15,8 +15,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.google.common.primitives.Floats;
-import com.google.common.primitives.Ints;
-import com.yahoo.mobile.client.android.util.rangeseekbar.RangeSeekBar;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -142,102 +140,6 @@ public class renderUIs extends BasePanel{
         }
         panel_visible = show_panel;
     }
-//    private static class contrastListAdapter extends ListAdapter{
-//        private int dropview_width;
-//        private int current_wid;
-//        private float[] value_min, value_max;
-//        private float[] default_left_values, default_right_values;
-//        private ArrayList<float[]> item_value_left, item_value_right;
-//
-//        contrastListAdapter(Context context){
-//            super(context, context.getString(R.string.contrast_group_name));
-//            dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels *Float.parseFloat(context.getString(R.string.cf_drop_tune_w)) );
-//            //setup values
-//            Resources res = context.getResources();
-//            TypedArray typed_params = res.obtainTypedArray(R.array.contrastParams);
-//            int item_numbers = typed_params.length();
-//            value_max = new float[item_numbers];value_min = new float[item_numbers];
-//            default_left_values = new float[item_numbers];default_right_values = new float[item_numbers];
-//            item_value_left = new ArrayList<>();item_value_right = new ArrayList<>();
-//            item_names = new ArrayList<>();
-//            for (int i = 0; i < item_numbers; i++) {
-//                int resId = typed_params.getResourceId(i, -1);
-//                if (resId == -1) continue;
-//                String[] param = res.getStringArray(resId);
-//                item_names.add(param[0]);
-//                value_min[i] = Float.parseFloat(param[1]);value_max[i] = Float.parseFloat(param[2]);
-//                default_left_values[i] = Float.parseFloat(param[3]);default_right_values[i] = Float.parseFloat(param[4]);
-//            }
-//            typed_params.recycle();
-//        }
-//        public void Reset(){
-//            item_value_left.clear();item_value_right.clear();
-//        }
-//        void addInstance(int nid){
-//            item_value_left.add(default_left_values.clone());
-//            item_value_right.add(default_right_values.clone());
-//            current_wid = nid;
-//            notifyDataSetChanged();
-//        }
-//        void removeInstance(int id, int nid){
-//            if(id>=item_value_left.size()) return;
-//            item_value_left.remove(id); item_value_right.remove(id);
-//            current_wid = nid;
-//            notifyDataSetChanged();
-//        }
-//        void setCurrentId(int id){
-//            current_wid = id;
-//            notifyDataSetChanged();
-//        }
-//        float[] getDefaultLeftValues(){return default_left_values.clone();}
-//        float[] getDefaultRightValues(){return default_right_values.clone();}
-//        public View getDropDownView(int position, View convertView, ViewGroup parent) {
-//            ViewHolder holder;
-//            if (convertView == null) {
-//                holder = new ViewHolder();
-//                convertView = mInflater.inflate(R.layout.spinner_dualseekbar, null);
-//                holder.text_name = (TextView) convertView.findViewById(R.id.tuneName);
-//                holder.text_value = (TextView) convertView.findViewById(R.id.tuneValue);
-//
-//                holder.seekbar = convertView.findViewById(R.id.rangeSeekbar);
-//
-//                holder.seekbar.setRangeValues(value_min[position], value_max[position]);
-//                holder.seekbar.setOnRangeSeekBarChangeListener(new RangeSeekBar.OnRangeSeekBarChangeListener<Float>() {
-//                    @Override
-//                    public void onRangeSeekBarValuesChanged(RangeSeekBar<?> bar, Float minValue, Float maxValue){
-//                        if(minValue == item_value_left.get(current_wid)[position] && maxValue==item_value_right.get(current_wid)[position]) return;
-//                        item_value_left.get(current_wid)[position] = minValue;
-//                        item_value_right.get(current_wid)[position] = maxValue;
-//                        holder.text_value.setText(contexRef.get().getString(R.string.tune_value_dual, minValue, maxValue));
-//                        JUIInterface.JUIsetDualParamById(position, minValue, maxValue);
-//                    }
-//                });
-//
-//                holder.seekbar.setTag(position);
-//                convertView.setMinimumWidth(dropview_width);
-//                convertView.setTag(R.layout.spinner_tune_layout, holder);
-//            } else {
-//                holder = (ViewHolder)convertView.getTag(R.layout.spinner_tune_layout);
-//            }
-//            //set progress
-//            float value_left = item_value_left.get(current_wid)[position];
-//            float value_right = item_value_right.get(current_wid)[position];
-//            holder.seekbar.setSelectedMaxValue(value_right);
-//            holder.seekbar.setSelectedMinValue(value_left);
-//
-////            holder.seekbar.setProgress((int)(item_values.get(current_wid)[position] / item_value_max[position] * item_seek_max[position]));
-//            holder.text_name.setText(item_names.get(position));
-////            float value = item_values.get(current_wid)[position];
-//            holder.text_value.setText(contexRef.get().getString(R.string.tune_value_dual, value_left, value_right));
-//
-//            return convertView;
-//        }
-//        static class ViewHolder {
-//            TextView text_name;
-//            TextView text_value;
-//            RangeSeekBar<Float> seekbar;
-//        }
-//    }
     private static class tunerListAdapter extends ListAdapter{
         public int TID;
         private int dropview_width;

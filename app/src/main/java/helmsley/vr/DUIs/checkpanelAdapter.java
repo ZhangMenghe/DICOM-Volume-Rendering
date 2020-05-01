@@ -1,6 +1,7 @@
 package helmsley.vr.DUIs;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -18,15 +19,20 @@ public class checkpanelAdapter extends ListAdapter {
     private final WeakReference<UIsManager> mUIManagerRef;
     private boolean[] item_values;
 
-    public checkpanelAdapter(Context context, UIsManager manager) {
+    checkpanelAdapter(Context context, UIsManager manager) {
         super(context, context.getString(R.string.check_panel_group_name));
         contexRef = new WeakReference<>(context);
         mUIManagerRef = new WeakReference<>(manager);
+        item_names = Arrays.asList(context.getResources().getStringArray(R.array.checkShowPanelName));
+        item_values = new boolean[item_names.size()];
     }
-    public void Reset(String[] names, boolean[] values){
-        item_names = Arrays.asList(names);
-        item_values = values.clone();
+    public void Reset(){
+        TypedArray check_values_type = contexRef.get().getResources().obtainTypedArray(R.array.checkShowPanelValues);
+        for(int i=0; i<item_values.length; i++)
+            item_values[i] = check_values_type.getBoolean(i, false);
+        check_values_type.recycle();
     }
+    public boolean[] getAllValues(){return item_values;}
 
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         ViewContentHolder holder;

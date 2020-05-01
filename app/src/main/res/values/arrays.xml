@@ -151,9 +151,11 @@
     </string-array>
 <!--other functions-->
     <string-array name="functions">
-        <item>Reset</item>
-        <item>Remote Data</item>
-        <item>Local Data</item>
+        <item>@string/sys_reset</item>
+        <item>@string/sys_template_save</item>
+        <item>@string/sys_template_load</item>
+        <item>@string/sys_data_remote</item>
+        <item>@string/sys_data_local</item>
     </string-array>
 
     <string-array name="cutting_plane">

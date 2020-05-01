@@ -45,4 +45,12 @@
     <string name="tune_value_dual">%1$.2f-%2$.2f</string>
     <string name="cf_drop_tune_w">1.0</string>
     <string name="volume_lst_item">%1$s:\n%2$d x %3$d x %4$d</string>
+
+<!--    sys operation names-->
+    <string name="sys_name">System</string>
+    <string name="sys_reset">Reset</string>
+    <string name="sys_template_save">Save Workspace As..</string>
+    <string name="sys_template_load">Open Workspace..</string>
+    <string name="sys_data_remote">Remote Data</string>
+    <string name="sys_data_local">Local Data</string>
 </resources>
