@@ -66,12 +66,17 @@ void raycastRenderer::draw_scene(){
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 }
-
+void raycastRenderer::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
+    cutter_->setCutPlane(pp, pn);
+    baked_dirty_ = true;
+}
 void raycastRenderer::setCuttingPlane(float percent){
     cutter_->setCutPlane(percent);
     baked_dirty_ = true;
 }
-
+float* raycastRenderer::getCuttingPlane(){
+    return cutter_->getCutPlane();
+}
 void raycastRenderer::draw_baked(){
     if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
     if(!cshader_){

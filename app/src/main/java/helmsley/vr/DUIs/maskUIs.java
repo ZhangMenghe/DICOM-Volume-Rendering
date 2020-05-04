@@ -51,6 +51,12 @@ public class maskUIs extends BasePanel{
         primary_checkbox.setChecked(status);
         recyclerViewAdapter.Reset(Booleans.toArray((ArrayList<Boolean>)maskmap.getOrDefault("value", null)));
     }
+    public LinkedHashMap getCurrentStates(){
+        LinkedHashMap map = new LinkedHashMap();
+        map.put("status", primary_checkbox.isChecked());
+        map.put("value", recyclerViewAdapter.getValues());
+        return map;
+    }
     @Override
     public void showHidePanel(boolean isPanelOn){
         super.showHidePanel(isPanelOn);

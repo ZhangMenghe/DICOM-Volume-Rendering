@@ -160,7 +160,15 @@ public class renderUIs extends BasePanel{
         values.add((render_mode.equals("Raycasting")));
         values.add(panel_visible);
     }
-
+    public LinkedHashMap getCurrentStates(){
+        LinkedHashMap map = new LinkedHashMap();
+        map.put("contrast", rendertuneAdapter.getCurrentValues());
+        ArrayList<float[]> opa_values = new ArrayList<>();
+        opa_values.addAll(widAdapter.getAllValues());
+        map.put("opacity", opa_values);
+        map.put("color scheme", colorAdapter.getTitle());
+        return map;
+    }
     private void onTexRaySwitch(boolean isRaycast){
         JUIInterface.JUIsetChecks(CHECK_TEXRAY_NAME, isRaycast);
     }
@@ -237,7 +245,7 @@ public class renderUIs extends BasePanel{
         }
         float[] getDefaultValues(){return default_values.clone();}
         float[] getCurrentValues(){return item_values.get(current_wid);}
-
+        ArrayList<float[]> getAllValues(){return item_values;}
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
             ViewHolder holder;
@@ -326,6 +334,7 @@ public class renderUIs extends BasePanel{
             current_id = INIT_ID;
             title = name_prefix + INIT_ID;
         }
+        ArrayList<float[]> getAllValues(){return mTunerRefs.get(0).get().getAllValues();}
         void setTitleById(int id){
             if(id >= widget_num) return;
 
@@ -340,7 +349,7 @@ public class renderUIs extends BasePanel{
         public void addItem(){
             add_item(jui_default_values);
         }
-        public void addItemWithValues(float[] values){
+        void addItemWithValues(float[] values){
             add_item((values.length == jui_default_values.length)?values:jui_default_values);
         }
         private void add_item(float[] values){

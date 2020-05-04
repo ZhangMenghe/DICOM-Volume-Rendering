@@ -27,14 +27,10 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
 
     private int mask_num, mask_bits;
     class MyView extends RecyclerView.ViewHolder {
-
         TextView textView;
-
         MyView(View view) {
             super(view);
-
             textView = (TextView) view.findViewById( R.id.horizontal_card_text);
-
         }
     }
 
@@ -113,5 +109,6 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
             setButtonStyle(recyRef.get().getChildAt(i), i);
         }
     }
+    boolean[] getValues(){return values;}
 }
 

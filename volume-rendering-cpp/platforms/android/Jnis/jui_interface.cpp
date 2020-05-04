@@ -63,7 +63,16 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
         vrController::baked_dirty_ = true;
     }
 }
-
+JUI_METHOD(jfloatArray, JUIgetVCStates)(JNIEnv * env, jclass){
+    jfloatArray res = env->NewFloatArray(31);
+    env->SetFloatArrayRegion(res,0,31, reinterpret_cast<jfloat *>(vrController::instance()->getCurrentReservedStates()));
+    return res;
+}
+JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatus)(JNIEnv * env, jclass){
+    jfloatArray res= env->NewFloatArray(7);
+    env->SetFloatArrayRegion(res,0,7, reinterpret_cast<jfloat *>(vrController::instance()->getCuttingPlane()));
+    return res;
+}
 JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value){
 //    auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
 //    auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
@@ -87,11 +96,11 @@ JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint id, jint width, jin
     overlayController::instance()->setOverlayRect(id, width, height, left, top);
 }
 JUI_METHOD(void, JUIsetAllTuneParamById)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
-    if(id == 1){
-        jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-        vrController::instance()->setRenderParam(values);
-        env->ReleaseFloatArrayElements(jvalues,values,0);
-    }
+    jfloat* values = env->GetFloatArrayElements(jvalues, 0);
+    if(id == 1)vrController::instance()->setRenderParam(values);
+    else if(id == 2)vrController::instance()->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
+
+    env->ReleaseFloatArrayElements(jvalues,values,0);
 }
 JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
         jint num, jobjectArray jkeys, jbooleanArray jvalues,

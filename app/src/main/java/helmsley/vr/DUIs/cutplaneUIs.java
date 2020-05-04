@@ -16,6 +16,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.common.primitives.Floats;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -33,7 +35,7 @@ public class cutplaneUIs extends BasePanel{
     private FloatingActionButton button_;
 
     private ctCheckboxListAdapter cbAdapter_;
-
+    private final static float[]default_cut_pose={0,0,0,0,0,-1};
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
 
@@ -125,8 +127,28 @@ public class cutplaneUIs extends BasePanel{
         Collections.addAll(names, check_names_);
         values.add(cut_status);
         values.add(freeze_volume);values.add(freeze_plane);
-    }
 
+
+        float[] cut_pose = default_cut_pose.clone();
+
+        float[] pos = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("ppoint", new ArrayList<Float>()));
+        if(pos.length == 3) System.arraycopy(pos, 0, cut_pose, 0, 3);
+        float[] norm = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("pnorm", new ArrayList<Float>()));
+        if(norm.length == 3) System.arraycopy(norm, 0, cut_pose, 3, 3);
+        JUIInterface.JUIsetAllTuneParamById(2, cut_pose);
+    }
+    public LinkedHashMap getCurrentStates(){
+        LinkedHashMap map = new LinkedHashMap();
+        String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
+        float[] cpv = JUIInterface.JUIgetCuttingPlaneStatus();
+        map.put("status", primary_checkbox.isChecked());
+        map.put("freeze volume", cbAdapter_.getValue(0));
+        map.put("freeze plane", cbAdapter_.getValue(1));
+        map.put("percentage", (float)seek_bar_.getProgress() / Integer.parseInt(params[1]));
+        map.put("ppoint", new float[]{cpv[0], cpv[1], cpv[2]});
+        map.put("pnorm", new float[]{cpv[3], cpv[4], cpv[5]});
+        return map;
+    }
     public void showHidePanel(boolean show_panel, boolean isRaycast){
         super.showHidePanel(show_panel);
 
@@ -163,6 +185,7 @@ public class cutplaneUIs extends BasePanel{
                 notifyDataSetChanged();
             }
         }
+        boolean getValue(int id){return (id<item_values.size())?item_values.get(id):false;}
         public View getDropDownView(int position, View convertView, ViewGroup parent){
             ViewContentHolder holder;
             if (convertView == null) {

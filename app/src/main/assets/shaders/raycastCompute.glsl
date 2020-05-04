@@ -1,7 +1,6 @@
 #version 310 es
 
 #pragma multi_compile SHOW_ORGANS
-#pragma multi_compile CONTRAST_ABSOLUTE
 #pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 #pragma multi_compile FLIPY
@@ -26,9 +25,6 @@ struct OpacityAdj{
 uniform vec2 u_opacity[60];
 uniform int u_widget_num;
 
-float CURRENT_INTENSITY;
-uint MASKS_;
-
 //last bit indicates body(which doesn't belong to organs)
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
@@ -37,9 +33,6 @@ uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
 uniform float u_contrast_level;
-
-//float contrastTop = 255.0;
-//float contrastBottom = .0;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -102,11 +95,9 @@ float TransferIntensityStepOne(uint intensity){
 
     if(intensity_01 > u_contrast_high||intensity_01 < u_contrast_low) intensity_01 = .0;
 
-//    #ifdef CONTRAST_ABSOLUTE
     intensity_01 = smoothstep(u_contrast_low, u_contrast_high, intensity_01);
 
 //    intensity_01 = (intensity_01 - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
-//    #endif
     intensity_01 = clamp(u_brightness+intensity_01 - 0.5, .0, 1.0);
     return intensity_01;
 }

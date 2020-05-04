@@ -4,6 +4,7 @@
 #include <vrController.h>
 #include <glm/gtx/rotate_vector.hpp>
 #include <Utils/mathUtils.h>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace glm;
 
@@ -35,7 +36,7 @@ void cuttingController::UpdateAndDraw(){
     Update();
     if(vrController::param_bool[dvr::CHECK_CUTTING]) draw_plane();
 }
-void cuttingController::setCuttingParams(GLuint sp,bool includePoints){
+void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
 //    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
 //    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
     Shader::Uniform(sp,"uPlane.p", p_point_);
@@ -124,7 +125,18 @@ bool cuttingController::keep_cutting_position(){
     return vrController::param_bool[dvr::CHECK_FREEZE_CPLANE];
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
-void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){}
+void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){
+    p_norm_ = normal; p_point_=startPoint;
+    cmove_value = .0f;
+    p_p2o_dirty = true;
+}
+float* cuttingController::getCutPlane(){
+    float* data = new float[6];
+    memcpy(data, glm::value_ptr(p_point_), 3* sizeof(float));
+    memcpy(data+3, glm::value_ptr(p_norm_), 3* sizeof(float));
+    return data;
+}
+
 void cuttingController::onRotate(float offx, float offy){
     update_plane_(glm::rotate(glm::mat4(1.0f), offx, glm::vec3(0,1,0))
                     * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))

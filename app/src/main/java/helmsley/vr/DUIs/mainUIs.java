@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import org.yaml.snakeyaml.Yaml;
 
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
@@ -77,7 +78,21 @@ public class mainUIs {
         }
     }
     private void saveTemplate(){
+        //todo:ui that choose a name sth..
+        String name = "test";
+        //construct a hash-table-type structure that contains all the information and write to yaml
+        Yaml ysaver = new Yaml();
+        try{
+            String fsys_root = actRef.get().getFilesDir().getAbsolutePath();
 
+            FileWriter writer = new FileWriter(fsys_root + "/config.yml");
+            ysaver.dump(mUIManagerRef.get().getCurrentStates(name), writer);
+        }catch (Exception e){
+            Log.e(TAG, "===fail to save yaml===");
+            e.printStackTrace();
+        }
+
+//        loadTemplate();
     }
 
     private class syscallListAdapter extends ListAdapter{

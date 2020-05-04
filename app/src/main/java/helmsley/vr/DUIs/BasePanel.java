@@ -42,6 +42,7 @@ public abstract class BasePanel {
     public void showHidePanel(boolean isPanelOn, boolean isRaycasting){
         showHidePanel(isPanelOn);
     }
+    public LinkedHashMap getCurrentStates(){return null;}
     public void onTexRayChange(boolean israycasting){}
     public void Reset(){}
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){}

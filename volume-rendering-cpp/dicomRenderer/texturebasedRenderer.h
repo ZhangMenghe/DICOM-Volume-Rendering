@@ -34,6 +34,7 @@ public:
     texvrRenderer(bool screen_baked = true);
     void setDimension(int dims, float thickness);
     void setCuttingPlane(float percent);
+    float getCuttingPlane(){}
     void Draw();
     void dirtyPrecompute(){baked_dirty_ = true;}
 };

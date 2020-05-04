@@ -14,7 +14,9 @@ public class JUIInterface {
 
     public static native void JUIsetChecks(String key, boolean value);
 
+    public static native float[] JUIgetVCStates();
     public static native void JUIsetCuttingPlane(int id, float value);
+    public static native float[] JUIgetCuttingPlaneStatus();
     public static native void JUIsetMaskBits(int num, int mbits);
     public static native void JuisetColorScheme(int id);
 

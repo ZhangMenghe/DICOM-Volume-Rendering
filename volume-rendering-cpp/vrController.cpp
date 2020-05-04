@@ -2,6 +2,7 @@
 #include "overlayController.h"
 #include <Utils/mathUtils.h>
 #include <dicomRenderer/screenQuad.h>
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
@@ -160,7 +161,6 @@ void vrController::precompute(){
     //todo!!!! add flip stuff
 //    if(tex_volume->Depth() == 144)
     bakeShader_->EnableKeyword("FLIPY");
-    bakeShader_->EnableKeyword("CONTRAST_ABSOLUTE");
     if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
 
@@ -229,10 +229,27 @@ void vrController::setCuttingPlane(float value){
     if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);
     else texvrRenderer_->setCuttingPlane(value);
 }
+void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
+    if(isRayCasting()) raycastRenderer_->setCuttingPlane(pp, pn);
+}
+float* vrController::getCuttingPlane(){
+    return raycastRenderer_->getCuttingPlane();
+}
+
 void vrController::setDualParameter(int id, float lv, float rv){
 //    if(id == CONTRAST_LIMIT){contrast_low=lv; contrast_high=rv;baked_dirty_=true;}
 }
 void vrController::setRenderParam(int id, float value){
     render_params_[id] = value;baked_dirty_ = true;
+}
+float* vrController::getCurrentReservedStates(){
+    float* data = new float[31];
+    memcpy(data, glm::value_ptr(PosVec3_), 3* sizeof(float));
+    memcpy(data+3, glm::value_ptr(ScaleVec3_), 3* sizeof(float));
+    memcpy(data+6, glm::value_ptr(RotateMat_), 16* sizeof(float));
+    memcpy(data+22, glm::value_ptr(camera->getCameraPosition()), 3* sizeof(float));
+    memcpy(data+25, glm::value_ptr(camera->getViewUpDirection()), 3* sizeof(float));
+    memcpy(data+28, glm::value_ptr(camera->getViewCenter()), 3* sizeof(float));
+    return data;
 }
 

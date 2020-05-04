@@ -64,6 +64,7 @@ public:
     void setCutPlane(float value);
     void setCutPlane(glm::vec3 normal);
     void setCutPlane(glm::vec3 startPoint, glm::vec3 normal);
+    float* getCutPlane();
 
     void onRotate(float offx, float offy);
     void onScale(float sx, float sy=-1.0f, float sz=-1.0f);

@@ -9,6 +9,7 @@ import com.google.common.primitives.Floats;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 
 import helmsley.vr.DUIs.BasePanel;
@@ -63,6 +64,31 @@ public class UIsManager {
     }
     public void onMaskPanelSwitch(boolean isPanelOn){
         sub_panels_.get(R.string.panel_mask_name).showHidePanel(isPanelOn);
+    }
+    public LinkedHashMap getCurrentStates(String name){
+        LinkedHashMap map = new LinkedHashMap();
+        map.put("name", name);
+        LinkedHashMap vol_map = new LinkedHashMap();
+        LinkedHashMap cam_map = new LinkedHashMap();
+        float[] v = JUIInterface.JUIgetVCStates();
+        vol_map.put("pos", new float[]{v[0], v[1], v[2]});
+        vol_map.put("scale", new float[]{v[3], v[4], v[5]});
+        vol_map.put("rotation", Arrays.copyOfRange(v, 6, 22));
+
+        cam_map.put("pos", new float[]{v[22], v[23], v[24]});
+        cam_map.put("up", new float[]{v[25], v[26], v[27]});
+        cam_map.put("center", new float[]{v[28], v[29], v[30]});
+
+        LinkedHashMap tf_map = sub_panels_.get(R.string.panel_rendering_name).getCurrentStates();
+        LinkedHashMap cut_map = sub_panels_.get(R.string.panel_cut_name).getCurrentStates();
+        LinkedHashMap mask_map = sub_panels_.get(R.string.panel_mask_name).getCurrentStates();
+        map.put("volume", vol_map);
+        map.put("camera", cam_map);
+        map.put("render mode", (current_texray_id == tex_id)? "Texture-based":"Raycasting");
+        map.put("transfer function", tf_map);
+        map.put("cutting plane", cut_map);
+        map.put("mask", mask_map);
+        return map;
     }
     public void RequestResetWithTemplate(LinkedHashMap map){
         if(map.isEmpty()) return;

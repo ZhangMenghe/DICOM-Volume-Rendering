@@ -43,6 +43,7 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
     void setCuttingPlane(float value);
+    void setCuttingPlane(glm::vec3 pp, glm::vec3 pn);
     void setDualParameter(int id, float lv, float rv);
     void setRenderParam(int id, float value);
     void setRenderParam(float* values){memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));baked_dirty_=true;}
@@ -51,6 +52,8 @@ public:
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(){return ModelMat_;}
     glm::mat4 getRotationMatrix(){return RotateMat_;}
+    float* getCurrentReservedStates();
+    float* getCuttingPlane();
 private:
     static vrController* myPtr_;
 
