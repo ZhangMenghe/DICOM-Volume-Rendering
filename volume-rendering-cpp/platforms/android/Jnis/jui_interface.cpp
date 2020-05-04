@@ -3,20 +3,19 @@
 #include "jui_interface.h"
 #include <vrController.h>
 #include <overlayController.h>
-
+#include <glm/gtc/type_ptr.hpp>
 using namespace dvr;
 
 namespace {
     std::vector<std::string> param_checks;
 }
-
+//current only opacity has multiple widgets
 JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jintArray jnums, jfloatArray jvalues){
-
     jint* nums = env->GetIntArrayElements(jnums, 0);
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
     overlayController::instance()->addWidget(std::vector<float>(values, values+nums[0]));
 
-    env->ReleaseFloatArrayElements(jvalues,values,0);
+    env->ReleaseFloatArrayElements(jvalues, values, 0);
     env->ReleaseIntArrayElements(jnums, nums, 0);
 }
 void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
@@ -30,6 +29,7 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
         vrController::param_bool.push_back(values[i]);
 //        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
+    env->ReleaseBooleanArrayElements(jvalues,values,0);
     vrController::baked_dirty_ = true;
 }
 
@@ -42,9 +42,9 @@ JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint wid){
 JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass){
     overlayController::instance()->removeAll();
 }
-JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint wid, jint pid, jfloat value){
-    if(wid == 0 && pid < dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
-    else if(wid == 1) vrController::instance()->setRenderParam(pid, value);
+JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint tid, jint pid, jfloat value){
+    if(tid == 0 && pid < dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
+    else if(tid == 1) vrController::instance()->setRenderParam(pid, value);
 }
 JUI_METHOD(void, JUIsetDualParamById)(JNIEnv *, jclass, jint pid, jfloat minv, jfloat maxv){
     if(pid < dvr::DUAL_END)vrController::instance()->setDualParameter(pid, minv, maxv);
@@ -86,17 +86,33 @@ JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
 JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint id, jint width, jint height, jint left, jint top){
     overlayController::instance()->setOverlayRect(id, width, height, left, top);
 }
-JUI_METHOD(void, JUIResetValues)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
+JUI_METHOD(void, JUIsetAllTuneParamById)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
     if(id == 1){
         jfloat* values = env->GetFloatArrayElements(jvalues, 0);
         vrController::instance()->setRenderParam(values);
-
         env->ReleaseFloatArrayElements(jvalues,values,0);
     }
 }
-JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
+JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
+        jint num, jobjectArray jkeys, jbooleanArray jvalues,
+        jfloatArray jvol_pose, jfloatArray jcam_pose){
     InitCheckParam(env, num, jkeys, jvalues);
-    nativeApp(nativeAddr)->onReset();
+
+    jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
+    jfloat* cam_arr = env->GetFloatArrayElements(jcam_pose, 0);
+    //unwrap pose information
+    vrController::instance()->onReset(
+            glm::vec3(vol_arr[0], vol_arr[1], vol_arr[2]),
+            glm::vec3(vol_arr[3], vol_arr[4], vol_arr[5]),
+            glm::make_mat4(vol_arr+6),
+            new Camera(
+                    glm::vec3(cam_arr[0], cam_arr[1], cam_arr[2]),
+                    glm::vec3(cam_arr[3], cam_arr[4], cam_arr[5]),
+                    glm::vec3(cam_arr[6], cam_arr[7], cam_arr[8])
+            ));
+
+    env->ReleaseFloatArrayElements(jvol_pose, vol_arr, 0);
+    env->ReleaseFloatArrayElements(jcam_pose, cam_arr, 0);
 }
 JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
     nativeApp(nativeAddr)->onSingleTouchDown(x, y);

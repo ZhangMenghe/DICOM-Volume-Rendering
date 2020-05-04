@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import helmsley.vr.R;
@@ -102,14 +104,29 @@ public class cutplaneUIs extends BasePanel{
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         int max_seek_value = Integer.valueOf(params[1]);
         seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
+        primary_checkbox.setChecked(default_primary_check);
     }
-    public boolean[] setCuttingStatus(int offset, boolean[]valuse){
-        //todo:set real valuses
-        valuse[offset] = false;
-        valuse[offset+1] = false;
-        valuse[offset+2] = false;
-        return valuse;
+    public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
+        LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
+        if(cutmap == null) return;
+
+        String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
+        int max_seek_value = Integer.valueOf(params[1]);
+        double percent = (Double)cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
+        seek_bar_.setProgress((int)(percent * max_seek_value));
+
+        //todo:jui send cutting plane status(pos/ori)
+        boolean cut_status = (Boolean) cutmap.getOrDefault("status", default_primary_check);
+        boolean freeze_volume = (Boolean) cutmap.getOrDefault("freeze volume", default_check_vales[1]);
+        boolean freeze_plane = (Boolean) cutmap.getOrDefault("freeze plane", default_check_vales[2]);
+        primary_checkbox.setChecked(cut_status);
+
+        cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);
+        Collections.addAll(names, check_names_);
+        values.add(cut_status);
+        values.add(freeze_volume);values.add(freeze_plane);
     }
+
     public void showHidePanel(boolean show_panel, boolean isRaycast){
         super.showHidePanel(show_panel);
 
@@ -126,7 +143,7 @@ public class cutplaneUIs extends BasePanel{
     public void onTexRayChange(boolean isRaycast){
         showHidePanel(panel_visible, isRaycast);
     }
-    private class ctCheckboxListAdapter extends ListAdapter {
+    private static class ctCheckboxListAdapter extends ListAdapter {
         List<Boolean> item_values;
         boolean is_cutting;
         ctCheckboxListAdapter(Context context) {
@@ -140,7 +157,12 @@ public class cutplaneUIs extends BasePanel{
             for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+1, false));
             check_values.recycle();
         }
-
+        void setValue(int id, boolean value){
+            if(id < item_values.size() && item_values.get(id)!=value) {
+                item_values.set(id, value);
+                notifyDataSetChanged();
+            }
+        }
         public View getDropDownView(int position, View convertView, ViewGroup parent){
             ViewContentHolder holder;
             if (convertView == null) {

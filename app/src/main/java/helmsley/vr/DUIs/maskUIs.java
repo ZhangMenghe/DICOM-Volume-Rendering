@@ -6,6 +6,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.common.primitives.Booleans;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+
 import helmsley.vr.R;
 
 public class maskUIs extends BasePanel{
@@ -36,6 +42,14 @@ public class maskUIs extends BasePanel{
     @Override
     public void Reset(){
         recyclerViewAdapter.Reset();
+        primary_checkbox.setChecked(default_primary_check);
+    }
+    public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
+        LinkedHashMap maskmap = (LinkedHashMap) map.getOrDefault("mask", null);
+        if(maskmap == null) return;
+        boolean status = (Boolean) maskmap.getOrDefault("status", default_primary_check);
+        primary_checkbox.setChecked(status);
+        recyclerViewAdapter.Reset(Booleans.toArray((ArrayList<Boolean>)maskmap.getOrDefault("value", null)));
     }
     @Override
     public void showHidePanel(boolean isPanelOn){

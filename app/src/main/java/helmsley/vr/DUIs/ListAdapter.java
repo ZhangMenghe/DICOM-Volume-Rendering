@@ -76,7 +76,10 @@ class textSimpleListAdapter extends ListAdapter {
         super(context, "");
         item_names = items;
     }
-    void setTitleByText(String title) {this.title = title;notifyDataSetChanged();}
+    void setTitleByText(String title) {
+        if(!item_names.contains(title)) setTitleById(0);
+        else this.title = title;notifyDataSetChanged();
+    }
     void setTitleById(int id){
         if(id<item_names.size()){
             this.title = item_names.get(id);

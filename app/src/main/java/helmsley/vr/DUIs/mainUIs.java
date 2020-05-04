@@ -15,9 +15,12 @@ import org.yaml.snakeyaml.Yaml;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
+import helmsley.vr.Utils.ConfigObject;
 
 public class mainUIs {
     final static String TAG = "mainUIs";
@@ -60,19 +63,18 @@ public class mainUIs {
     public void updateOnFrame(){dialogController.updateOnFrame();}
 
     private void loadTemplate(){
+        //todo:
         //show a dialog to select template
 
         //YAML Loader
-//        Yaml yloader = new Yaml();
-        //load config from yaml
-
-//        try{
-//            InputStream ins = actRef.get().getAssets().open("person.yml");
-//        }catch (Exception e){
-//            Log.e(TAG, "===fail to load yaml");
-//        }
-//        ConfigStatus status = yloader.loadAs(ins, ConfigStatus.class);
-        //Person person = yloader.loadAs(ins, Person.class);
+        Yaml yloader = new Yaml();
+        try{
+            InputStream ins = actRef.get().getAssets().open("config.yml");
+            mUIManagerRef.get().RequestResetWithTemplate((LinkedHashMap)yloader.load(ins));
+        }catch (Exception e){
+            Log.e(TAG, "===fail to load yaml===");
+            e.printStackTrace();
+        }
     }
     private void saveTemplate(){
 

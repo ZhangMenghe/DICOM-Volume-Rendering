@@ -39,6 +39,20 @@ void vrController::onReset() {
     cst_name="";
     setMVPStatus("default_status");
 }
+void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
+    rm = glm::mat4(1.0);
+    baked_dirty_ = true;
+    Mouse_old = glm::fvec2(.0f);
+    rStates_.clear();
+    cst_name="template";
+    glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
+                 * rm
+                 * glm::scale(glm::mat4(1.0), sv);
+    rStates_[cst_name] = reservedStatus(mm, rm, sv, pv, cam);
+    if(_screen_w != 0)rStates_[cst_name].vcam->setProjMat(_screen_w, _screen_h);
+    ModelMat_=mm; RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv; camera=rStates_[cst_name].vcam;
+    volume_model_dirty = false;
+}
 void vrController::assembleTexture(int w, int h, int d, float vol_thickness, GLubyte * data, int channel_num){
     texvrRenderer_->setDimension(d, vol_thickness);
     raycastRenderer_->setDimension(d, vol_thickness);

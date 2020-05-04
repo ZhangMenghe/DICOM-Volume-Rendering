@@ -25,6 +25,12 @@ public:
 
         updateCameraVector();
     }
+    Camera(glm::vec3 pos, glm::vec3 up, glm::vec3 center){
+        _up = up; _eyePos = pos;
+        _center = center;
+        _front = _center - _eyePos;
+        updateCameraVector();
+    }
     void setProjMat(int screen_width, int screen_height){
         float screen_ratio = ((float)screen_width) / screen_height;
         _projMat = glm::perspective(FOV, screen_ratio, NEAR_PLANE, FAR_PLANE);

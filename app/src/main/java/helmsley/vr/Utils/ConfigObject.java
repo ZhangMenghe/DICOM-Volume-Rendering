@@ -1,6 +1,8 @@
 package helmsley.vr.Utils;
 
 public class ConfigObject {
-    private String name;
-//    private
+    public String name;
+    public String color_scheme;
+//    public String getName(){return name;}
+
 }

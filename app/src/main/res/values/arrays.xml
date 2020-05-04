@@ -19,7 +19,7 @@
 
 <!--    rendering panel-->
     <string-array name="render_check_params">
-        <item>@string/texray_check_name</item>
+        <item>@string/raycast_render_mode_name</item>
         <item>Overlays</item>
     </string-array>
     <array name="render_check_values">
@@ -27,9 +27,10 @@
         <item>@bool/default_render_panel_on</item>
     </array>
 
+<!--    order matters!, consistent with uimanager static final values-->
     <string-array name="rendering_mode">
         <item>Slice by slice</item>
-        <item>Raycasting</item>
+        <item>@string/raycast_render_mode_name</item>
     </string-array>
     <string-array name="color_schemes">
         <item>Grayscale</item>
@@ -210,11 +211,5 @@
     <string-array name="bottomArr">
         <item>cut</item>
     </string-array>
-    <string-array name="checkParams">
-        <item>@string/texray_check_name</item>
-        <item>@string/mask_check_name</item>
-        <item>@string/cutting_check_name</item>
-        <item>@string/freezeVolume_check_name</item>
-        <item>@string/freezeplane_check_name</item>
-    </string-array>
+
 </resources>

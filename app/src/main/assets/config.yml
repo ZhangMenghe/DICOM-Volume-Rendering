@@ -1,27 +1,24 @@
-ConfigObjectGroup:
-	- name: Default
-	  volume:
-		- pos: [0,0,0]
-		- scale: [1,1,1]
-		- rotation: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
-	  camera:
-		- pos: [0,1,0]
-		- up: [0,1,0]
-		- center: [0,0,0]
-	  cutting-plane:
-		- status: Off
-		- freeze: null
-		- pos: [0,0,0]
-		- rotation: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
-	  mask:
-		- status: Off
-		- value: [1,1,1,1,1]
-	  transfer-function:
-		- contrast: [1.0, .0, 1.0, 0.5]
-		- opacity:
-			- number: 1
-			- value: [1.0, .0, 2.0, .0, 1.0]
-		- color-scheme: 0
-
-	  	
-	   
+name: Default
+volume:
+    pos: [0,0,0]
+    scale: [1,1,1]
+    rotation: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+camera:
+    pos: [0,0,3]
+    up: [0,1,0]
+    center: [0,0,2]
+render mode: Raycasting
+transfer function:
+    contrast: [1.0,.0,1.0,0.5]
+    opacity: [[1.0, .0, 2.0, .0, 1.0],[1.0, .0, 2.0, .0, 1.0]]
+    color scheme: Grayscale
+cutting plane:
+    status: Off
+    freeze volume: Off
+    freeze plane: Off
+    percentage: .5
+    pos: [0,0,0]
+    rotation: [1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]
+mask:
+    status: Off
+    value: [On,On,On,On,On]

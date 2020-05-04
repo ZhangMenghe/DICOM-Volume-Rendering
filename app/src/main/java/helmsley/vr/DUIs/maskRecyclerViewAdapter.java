@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -18,8 +19,8 @@ import helmsley.vr.R;
 public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerViewAdapter.MyView> {
     private final WeakReference<Activity> actRef;
     private final WeakReference<RecyclerView> recyRef;
-    private List<String> list;
-    private Boolean[] values;
+    private List<String> item_names;
+    private boolean[] values;
     private int card_num = 0;
 
     private int norm_bg_color, high_bg_color;
@@ -44,7 +45,9 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
         norm_bg_color = ContextCompat.getColor(activity, R.color.brightBlue);
         high_bg_color = ContextCompat.getColor(activity, R.color.yellowOrange);
 
-        set_initial_values();
+        item_names = Arrays.asList(actRef.get().getResources().getStringArray(R.array.masks_list));
+        values = new boolean[item_names.size()];
+        mask_num = item_names.size() - 1;
     }
 
     @Override
@@ -71,12 +74,12 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
 
     @Override
     public void onBindViewHolder(final MyView holder, final int position) {
-        holder.textView.setText(list.get(position));
+        holder.textView.setText(item_names.get(position));
     }
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return item_names.size();
     }
     private void setButtonStyle(View v, int pos){
         if(values[pos]){
@@ -86,19 +89,25 @@ public class maskRecyclerViewAdapter extends RecyclerView.Adapter<maskRecyclerVi
         }
     }
     private void set_initial_values(){
-        list = Arrays.asList(actRef.get().getResources().getStringArray(R.array.masks_list));
-        values = new Boolean[list.size()];
-        mask_num = list.size() - 1;
         mask_bits = 0;
-        TypedArray tvalues = actRef.get().getResources().obtainTypedArray(R.array.masks_status);
-        for(int i=0; i<list.size(); i++){
-            values[i] = tvalues.getBoolean(i, true);
+        for(int i=0; i<item_names.size(); i++)
             mask_bits+= values[i]? (int)Math.pow(2, i) : 0;
-        }
         JUIInterface.JUIsetMaskBits(mask_num, mask_bits);
-        tvalues.recycle();
     }
     void Reset(){
+        TypedArray tvalues = actRef.get().getResources().obtainTypedArray(R.array.masks_status);
+        for(int i=0; i<item_names.size(); i++)
+            values[i] = tvalues.getBoolean(i, true);
+        tvalues.recycle();
+        set_initial_values();
+        for(int i=0; i<recyRef.get().getChildCount(); i++){
+            setButtonStyle(recyRef.get().getChildAt(i), i);
+        }
+    }
+    void Reset(boolean[] vs){
+        if(vs==null || vs.length!=values.length){Reset(); return;}
+
+        values = vs.clone();
         set_initial_values();
         for(int i=0; i<recyRef.get().getChildCount(); i++){
             setButtonStyle(recyRef.get().getChildAt(i), i);

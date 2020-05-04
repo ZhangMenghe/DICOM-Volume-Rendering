@@ -18,6 +18,9 @@ import com.google.common.primitives.Floats;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
@@ -26,7 +29,7 @@ public class renderUIs extends BasePanel{
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private widgetListAdapter widAdapter;
     private tunerListAdapter rendertuneAdapter;
-    final private static int RAYCAST_ID = 1;
+
     private static String CHECK_TEXRAY_NAME, CHECK_OVERLAYS;
 
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
@@ -116,17 +119,48 @@ public class renderUIs extends BasePanel{
         CHECK_OVERLAYS = check_names_[1];//res.getStringArray(R.array.render_check_params)[1];
     }
     public void Reset(){
-        Resources res = actRef.get().getResources();
         widAdapter.Reset();
+        widAdapter.addItem();
         rendertuneAdapter.Reset();
         rendertuneAdapter.addInstance(0);
         //render mode should be the first to set!!
-        int rm_id = Integer.parseInt(res.getString(R.string.default_render_mode_id));
-        rendermodeAdapter.setTitleById(rm_id);
-        int color_id = Integer.parseInt(res.getString(R.string.default_color_mode_id));
-        colorAdapter.setTitleById(color_id);
-        JUIInterface.JUIResetValues(rendertuneAdapter.TID, rendertuneAdapter.getDefaultValues());
+        rendermodeAdapter.setTitleById(0);
+        colorAdapter.setTitleById(0);
+        JUIInterface.JUIsetAllTuneParamById(rendertuneAdapter.TID, rendertuneAdapter.getDefaultValues());
     }
+    public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
+        LinkedHashMap tfmap = (LinkedHashMap) map.getOrDefault("transfer function", null);
+        if(tfmap == null) return;
+
+        //transfer-func: contrast
+        rendertuneAdapter.Reset();
+        rendertuneAdapter.addInstanceWithValue(0, Floats.toArray((ArrayList<Float>)tfmap.getOrDefault("contrast", new ArrayList<Float>())));
+
+        //transfer-func: opacity widgets
+        widAdapter.Reset();
+        ArrayList<ArrayList<Float>> opa_values = (ArrayList) tfmap.getOrDefault("opacity", null);
+        if(opa_values == null || opa_values.isEmpty()) widAdapter.addItem();
+        for(ArrayList<Float> arrlst:opa_values)
+            widAdapter.addItemWithValues(Floats.toArray(arrlst));
+
+        //render mode
+        String render_mode = (String) map.getOrDefault("render mode", "");
+        if(render_mode.isEmpty()) rendermodeAdapter.setTitleById(0);
+        else rendermodeAdapter.setTitleByText(render_mode);
+
+        //transfer-func: color
+        colorAdapter.setTitleByText((String) tfmap.getOrDefault("color scheme", ""));
+
+        //JUIset
+        JUIInterface.JUIsetAllTuneParamById(rendertuneAdapter.TID, rendertuneAdapter.getCurrentValues());
+
+        //update check values
+        Collections.addAll(names, check_names_);
+
+        values.add((render_mode.equals("Raycasting")));
+        values.add(panel_visible);
+    }
+
     private void onTexRaySwitch(boolean isRaycast){
         JUIInterface.JUIsetChecks(CHECK_TEXRAY_NAME, isRaycast);
     }
@@ -141,7 +175,8 @@ public class renderUIs extends BasePanel{
         panel_visible = show_panel;
     }
     private static class tunerListAdapter extends ListAdapter{
-        public int TID;
+        //TID: 0 for opacity, 1 for contrast
+        int TID;
         private int dropview_width;
 
         private float[] item_value_max;
@@ -153,7 +188,7 @@ public class renderUIs extends BasePanel{
         tunerListAdapter(Context context, int tid, int title_resid, int content_resid) {
             super(context, context.getString(title_resid));
             TID = tid;
-            dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels *Float.parseFloat(context.getString(R.string.cf_drop_tune_w)) );
+            dropview_width = (int)(Resources.getSystem().getDisplayMetrics().widthPixels );
 
             //setup values
             Resources res = context.getResources();
@@ -186,6 +221,11 @@ public class renderUIs extends BasePanel{
             current_wid = nid;
             notifyDataSetChanged();
         }
+        void addInstanceWithValue(int nid, float[] values){
+            item_values.add((values.length == default_values.length)?values.clone():default_values.clone());
+            current_wid = nid;
+            notifyDataSetChanged();
+        }
         void removeInstance(int id, int nid){
             if(id>=item_values.size()) return;
             item_values.remove(id); current_wid = nid;
@@ -196,6 +236,7 @@ public class renderUIs extends BasePanel{
             notifyDataSetChanged();
         }
         float[] getDefaultValues(){return default_values.clone();}
+        float[] getCurrentValues(){return item_values.get(current_wid);}
 
         @Override
         public View getDropDownView(int position, View convertView, ViewGroup parent) {
@@ -262,34 +303,6 @@ public class renderUIs extends BasePanel{
                 mTunerRefs.add(new WeakReference<>(adp));
             widget_num = 0;
             name_prefix = context.getString(R.string.tune_widget_name_prefix) + " ";
-        }
-        public void Reset(){
-            if(widget_num > 0){
-                JUIInterface.JUIremoveAllTuneWidget();
-                for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().Reset();
-                widget_num = 0;
-            }
-            current_id = INIT_ID;
-            title = name_prefix + INIT_ID;
-            addItem();
-        }
-        void setTitleById(int id){
-            if(id >= widget_num) return;
-
-            current_id = id;
-            title = name_prefix + id;
-            for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().setCurrentId(id);
-
-            JUIInterface.JUIsetTuneWidgetById(id);
-            notifyDataSetChanged();
-        }
-        public int getCount(){return widget_num;}
-        public void addItem(){
-            if(widget_num >= 5) return;//todo:set maxmum of widget num
-
-            widget_num++;
-            current_id = widget_num-1;
-            title = name_prefix + current_id;
 
             //change relevant stuff
             if(jui_default_lengths == null){
@@ -303,10 +316,44 @@ public class renderUIs extends BasePanel{
                 }
                 jui_default_values = Floats.toArray(values);
             }
-            for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().addInstance(current_id);
-            JUIInterface.JUIAddTuneParams(jui_default_lengths, jui_default_values);
+        }
+        public void Reset(){
+            if(widget_num > 0){
+                JUIInterface.JUIremoveAllTuneWidget();
+                for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().Reset();
+                widget_num = 0;
+            }
+            current_id = INIT_ID;
+            title = name_prefix + INIT_ID;
+        }
+        void setTitleById(int id){
+            if(id >= widget_num) return;
 
-//            JUIInterface.JUIsetDualParamById(0, lvalues[0], rvalues[0]);
+            current_id = id;
+            title = name_prefix + id;
+            for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().setCurrentId(id);
+
+            JUIInterface.JUIsetTuneWidgetById(id);
+            notifyDataSetChanged();
+        }
+        public int getCount(){return widget_num;}
+        public void addItem(){
+            add_item(jui_default_values);
+        }
+        public void addItemWithValues(float[] values){
+            add_item((values.length == jui_default_values.length)?values:jui_default_values);
+        }
+        private void add_item(float[] values){
+            if(widget_num >= 5) return;//todo:set maxmum of widget num
+
+            widget_num++;
+            current_id = widget_num-1;
+            title = name_prefix + current_id;
+
+            for(int i=0; i<mTunerRefs.size();i++)
+                mTunerRefs.get(i).get().addInstance(current_id);
+
+            JUIInterface.JUIAddTuneParams(jui_default_lengths, values);
             JUIInterface.JUIsetTuneWidgetById(current_id);
 
             notifyDataSetChanged();
@@ -339,11 +386,11 @@ public class renderUIs extends BasePanel{
         }
     }
     private class renderListAdapter extends textSimpleListAdapter{
-        //TODO: SET THIS!
-
+        final private int RAYCAST_ID;
         int current_id = -1;
         renderListAdapter(Context context, int arrayId){
             super(context, arrayId);
+            RAYCAST_ID = UIsManager.raycast_id;
         }
         void onItemClick(int position){
 //            if(position == current_id) return;
@@ -351,7 +398,13 @@ public class renderUIs extends BasePanel{
             onTexRaySwitch(RAYCAST_ID == position);
             current_id = position;
         }
-
+        void setTitleByText(String tt){
+            super.setTitleByText(tt);
+            int id = item_names.indexOf(this.title);
+            mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == id);
+            onTexRaySwitch(RAYCAST_ID == id);
+            current_id = id;
+        }
         void setTitleById(int id){
 //            if(id == current_id) return;
             super.setTitleById(id);
@@ -359,7 +412,6 @@ public class renderUIs extends BasePanel{
             onTexRaySwitch(RAYCAST_ID == id);
             current_id = id;
         }
-        int getRenderingModeById(){return current_id;}
     }
     private class colorListAdapter extends textSimpleListAdapter{
         colorListAdapter(Context context, int arrayId){
@@ -368,6 +420,10 @@ public class renderUIs extends BasePanel{
         void setTitleById(int id){
             super.setTitleById(id);
             JUIInterface.JuisetColorScheme(id);
+        }
+        void setTitleByText(String title) {
+            super.setTitleByText(title);
+            JUIInterface.JuisetColorScheme(item_names.indexOf(this.title));
         }
         void onItemClick(int position){
             JUIInterface.JuisetColorScheme(position);

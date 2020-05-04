@@ -123,7 +123,7 @@ void texvrRenderer::draw_baked() {
 
 void texvrRenderer::setDimension(int dims, float thickness){
     dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
-    vol_thickness_factor = (thickness<0)?vol_thickness_factor:(thickness / 20.0f);
+    vol_thickness_factor = (thickness<0)?vol_thickness_factor:(thickness / 40.0f);
     update_instance_data();
 }
 void texvrRenderer::setCuttingPlane(float percent){
