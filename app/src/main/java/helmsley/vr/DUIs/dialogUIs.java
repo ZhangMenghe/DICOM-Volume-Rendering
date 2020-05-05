@@ -30,12 +30,14 @@ public class dialogUIs {
     private TextView errText;
     private Button sendButton;
     private boolean remote_connection_success = false;
-    private static AlertDialog loadlocal_dialog=null, loadremote_dialog=null, loadconfig_dialog=null, progress_dialog=null;
+    private static AlertDialog loadlocal_dialog=null, loadremote_dialog=null,
+            loadconfig_dialog=null, saveconfig_dialog=null,
+            progress_dialog=null;
     private static DSCardRecyclerViewAdapter loadlocal_adapter;
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
-    private boolean b_await_data = false, b_await_config=false;
+    private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
         activityReference = new WeakReference<>(activity_);
@@ -68,9 +70,43 @@ public class dialogUIs {
             if(setup)loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
         }
     }
+    void ExportConfigs(){
+        if(!remote_connection_success){b_await_config_export=true;setup_remote_connection();}
+        else{
+            if (saveconfig_dialog == null) setup_export_dialog();
+            else saveconfig_dialog.invalidateOptionsMenu();
+            //order matters
+            saveconfig_dialog.show();
+//            downloader.ExportConfig(content);
+        }
+    }
     void LoadConfig(String content){
         muiRef.get().LoadConfig(content);
         loadconfig_dialog.dismiss();
+    }
+    private void setup_export_dialog(){
+        Activity activity = activityReference.get();
+        final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
+        final View dialogView = LayoutInflater.from(activity).inflate(R.layout.export_dialog_layout, parentRef.get(), false);
+        //widgets
+        Button btn = (Button) dialogView.findViewById(R.id.req_button);
+        EditText nameEdit = (EditText) dialogView.findViewById(R.id.expname_edit_text);
+
+        layoutDialog_builder.setTitle(activity.getString(R.string.dialog_exp_config_title));
+        layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
+
+        layoutDialog_builder.setView(dialogView);
+        saveconfig_dialog = layoutDialog_builder.create();
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendButton.setEnabled(false);
+                String input_name = nameEdit.getText().toString();
+                downloader.ExportConfig(muiRef.get().getExportConfig(input_name.isEmpty()?nameEdit.getHint().toString():input_name));
+                saveconfig_dialog.dismiss();
+            }
+        });
+        saveconfig_dialog.show();
     }
     private void setup_remote_connection(){
         Activity activity = activityReference.get();
@@ -116,6 +152,10 @@ public class dialogUIs {
                         loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);
                         loadconfig_dialog.show();loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
                         b_await_config = false;
+                    }else if(b_await_config_export){
+                        setup_export_dialog();
+                        saveconfig_dialog.show();
+                        b_await_config_export = false;
                     }
                 } else {
                     errText.setText(res_msg);

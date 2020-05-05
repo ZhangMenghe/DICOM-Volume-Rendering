@@ -31,6 +31,7 @@ public class mainUIs {
 
     private Spinner spinner_check;
     private dialogUIs dialogController;
+    private String cached_yaml = null;
 
     //Spinner adapter
     private checkpanelAdapter cb_panel_adapter;
@@ -73,22 +74,24 @@ public class mainUIs {
             e.printStackTrace();
         }
     }
-    private void saveTemplate(){
+    String getExportConfig(String name){
+        if(cached_yaml == null)cached_yaml = cache_current_state_as_yaml(name);
+        return cached_yaml;
+    }
+    private String cache_current_state_as_yaml(String name){
         //todo:ui that choose a name sth..
-        String name = "test";
+        String content = null;
         //construct a hash-table-type structure that contains all the information and write to yaml
         Yaml ysaver = new Yaml();
         try{
-            String fsys_root = actRef.get().getFilesDir().getAbsolutePath();
-
-            FileWriter writer = new FileWriter(fsys_root + "/config.yml");
-            ysaver.dump(mUIManagerRef.get().getCurrentStates(name), writer);
+//            String fsys_root = actRef.get().getFilesDir().getAbsolutePath();
+//            FileWriter writer = new FileWriter(fsys_root + "/config.yml");
+            content = ysaver.dump(mUIManagerRef.get().getCurrentStates(name));
         }catch (Exception e){
             Log.e(TAG, "===fail to save yaml===");
             e.printStackTrace();
         }
-
-//        loadTemplate();
+        return content;
     }
 
     private class syscallListAdapter extends ListAdapter{
@@ -119,7 +122,7 @@ public class mainUIs {
                                 else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
                                 else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
                                 else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
-                                else if(text_title.equals(NAME_TEMPLATE_SAVE))saveTemplate();
+                                else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
                                 break;
                             case MotionEvent.ACTION_UP:
                                 holder.text_name.setTextAppearance(R.style.itemText);

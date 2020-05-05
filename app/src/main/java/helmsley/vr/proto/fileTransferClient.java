@@ -3,6 +3,7 @@ package helmsley.vr.proto;
 import android.app.Activity;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.JNIInterface;
@@ -44,6 +45,7 @@ public class fileTransferClient {
 
     final private String local_index_filename;
     private boolean local_initialized = false;
+    private boolean config_dirty = true;
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
         target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
@@ -57,6 +59,7 @@ public class fileTransferClient {
             dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
             available_remote_datasets =  blockingStub.getAvailableDatasets(req).getDatasetsList();
             available_config_files = blockingStub.getAvailableConfigs(req).getConfigsList();
+            config_dirty = false;
             return "";
         }catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -95,6 +98,16 @@ public class fileTransferClient {
         local_initialized = true;
     }
     public List<configResponse.configInfo> getAvailableConfigFiles(){
+        if(config_dirty){
+            try{
+                Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
+                dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+                available_config_files = blockingStub.getAvailableConfigs(req).getConfigsList();
+                config_dirty = false;
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
         return available_config_files;
     }
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
@@ -147,6 +160,14 @@ public class fileTransferClient {
         return false;
     }
 
+    public void ExportConfig(String content){
+        if(content == null) return;
+        Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(content).build();
+        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+        Response res = blockingStub.exportConfigs(req);
+        if(res.getSuccess()) Toast.makeText(activityReference.get(), "Config Exported", Toast.LENGTH_LONG).show();
+        config_dirty = true;
+    }
     public void Download(String ds_name, volumeInfo target_volume){
         target_vol = target_volume;
         if(!LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))

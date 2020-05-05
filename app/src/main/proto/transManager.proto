@@ -61,12 +61,12 @@ message RequestWholeVolume{
 }
 
 message Response{
-    int32 client_id = 1;
+    bool success = 1;
     string res_msg = 2;
 }
-
 service dataTransfer{
     rpc getAvailableConfigs(Request) returns(configResponse);
+    rpc exportConfigs(Request) returns(Response);
     rpc getAvailableDatasets(Request) returns(datasetResponse);
     rpc getVolumeFromDataset(Request) returns(volumeResponse);
     rpc Download(Request) returns (stream dcmImage);
