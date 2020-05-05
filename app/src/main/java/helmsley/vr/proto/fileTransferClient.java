@@ -39,6 +39,7 @@ public class fileTransferClient {
     private final String target_root_dir;
     private List<datasetInfo> available_remote_datasets,
             available_local_datasets = new ArrayList<>();
+    private List<configResponse.configInfo> available_config_files;
     private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
     final private String local_index_filename;
@@ -55,7 +56,7 @@ public class fileTransferClient {
             Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
             dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
             available_remote_datasets =  blockingStub.getAvailableDatasets(req).getDatasetsList();
-
+            available_config_files = blockingStub.getAvailableConfigs(req).getConfigsList();
             return "";
         }catch (Exception e) {
             StringWriter sw = new StringWriter();
@@ -93,7 +94,9 @@ public class fileTransferClient {
         }
         local_initialized = true;
     }
-
+    public List<configResponse.configInfo> getAvailableConfigFiles(){
+        return available_config_files;
+    }
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
         return isLocal? available_local_datasets: available_remote_datasets;
     }

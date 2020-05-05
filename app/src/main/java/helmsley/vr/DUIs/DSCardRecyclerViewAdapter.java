@@ -18,6 +18,7 @@ import java.util.List;
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.Utils.SwipeDetector;
+import helmsley.vr.proto.configResponse;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
@@ -27,8 +28,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private final WeakReference<Activity> activityReference;
     private final WeakReference<RecyclerView> recyclerView;
     private final WeakReference<fileTransferClient> downloaderReference;
-    private boolean isLocal;
+    private final WeakReference<dialogUIs> dUIRef;
+
     private ArrayAdapter<String> contentAdapter;
+    private dialogUIs.DownloadDialogType infotype_;
 
     //config of each card
     static class cardHolder extends RecyclerView.ViewHolder {
@@ -37,21 +40,24 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         TextView textViewPatient;
         TextView textViewDetail;
         ListView lstViewVol;
+        TextView textContent;
         cardHolder(View view) {
             super(view);
             this.textViewDate = (TextView) itemView.findViewById(R.id.textDate);
             this.textViewPatient = (TextView) itemView.findViewById(R.id.textPatientName);
             this.textViewDetail = (TextView) itemView.findViewById(R.id.textFolderName);
             this.lstViewVol = (ListView) itemView.findViewById(R.id.card_list);
+            this.textContent = (TextView) itemView.findViewById(R.id.card_detail);
         }
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, boolean local) {
+    DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, dialogUIs dui, dialogUIs.DownloadDialogType type) {
         downloaderReference = new WeakReference<>(downloader);
         activityReference = new WeakReference<>(activity);
         recyclerView = new WeakReference<>(recycle_view);
-        isLocal = local;
+        dUIRef = new WeakReference<>(dui);
+        infotype_ = type;
     }
 
     // Create new views (invoked by the layout manager)
@@ -61,7 +67,22 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         // create a new view
         View card_view = (View) LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.dataset_cards_layout, parent, false);
-
+        if(infotype_ == dialogUIs.DownloadDialogType.CONFIGS)
+            card_view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ViewGroup vp = (ViewGroup)v;
+                    for(int index=0; index<vp.getChildCount(); ++index) {
+                        View child = ((ViewGroup) v).getChildAt(index);
+                        if(child.getId() == R.id.card_detail){
+                            if(child.getVisibility() == View.VISIBLE)child.setVisibility(View.GONE);
+                            else child.setVisibility(View.VISIBLE);
+                            break;
+                        }
+                    }
+                }
+            });
+        else
         card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,8 +94,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                     View child = vp.getChildAt(index);
                     if(child.getId() == R.id.card_list){
                         lv = (ListView)child;
+                        boolean isLocal = (infotype_ == dialogUIs.DownloadDialogType.DATA_LOCAL);
                         if(!isLocal && lv.getCount() == 0)
-                            createListViewContent(lv, downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName());
+                            setup_single_card_content_list(lv, downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName(), false);
+
                         if(child.getVisibility() == View.VISIBLE)child.setVisibility(View.GONE);
                         else child.setVisibility(View.VISIBLE);
                         break;
@@ -85,16 +108,32 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         return new cardHolder(card_view);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    private void onBindViewHolderConfig(cardHolder holder, int position) {
+        configResponse.configInfo info = downloaderReference.get().getAvailableConfigFiles().get(position);
+        holder.textViewPatient.setText(info.getFileName());
+        holder.textContent.setText(info.getContent());
+//        holder.textContent.setVisibility(View.GONE);
+        holder.textContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dUIRef.get().LoadConfig(info.getContent());
+            }
+        });
+    }
+
+        // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(cardHolder holder, int position) {
+        if(infotype_ == dialogUIs.DownloadDialogType.CONFIGS){onBindViewHolderConfig(holder, position);return;}
+        boolean isLocal = (infotype_ == dialogUIs.DownloadDialogType.DATA_LOCAL);
+
         datasetInfo info = downloaderReference.get().getAvailableDataset(isLocal).get(position);
         holder.textViewDate.setText(info.getDate());
         holder.textViewPatient.setText(info.getPatientName());
         holder.textViewDetail.setText(info.getFolderName());
         holder.textViewDetail.setTextSize(9);
 
-        if(isLocal) createListViewContent(holder.lstViewVol, info.getFolderName());
+        if(isLocal)setup_single_card_content_list(holder.lstViewVol, info.getFolderName(), true);
 
         holder.lstViewVol.setVisibility(View.GONE);
 
@@ -136,12 +175,14 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
+        if(infotype_ == dialogUIs.DownloadDialogType.CONFIGS)return downloaderReference.get().getAvailableConfigFiles().size();
+        boolean isLocal = (infotype_ == dialogUIs.DownloadDialogType.DATA_LOCAL);
         return downloaderReference.get().getAvailableDataset(isLocal).size();
     }
 
     void onContentChange(){contentAdapter.notifyDataSetChanged();}
 
-    private void createListViewContent(ListView lv, String ds_name){
+    private void setup_single_card_content_list(ListView lv, String ds_name, boolean isLocal){
         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
         ArrayList<String> volcon_lst = new ArrayList<>();
         for (volumeResponse.volumeInfo vinfo : vol_lst)

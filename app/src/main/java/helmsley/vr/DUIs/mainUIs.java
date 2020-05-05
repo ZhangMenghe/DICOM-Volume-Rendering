@@ -46,7 +46,7 @@ public class mainUIs {
         syscallListAdapter fAdapter = new syscallListAdapter(activity, R.array.functions, R.string.sys_name);
         spinner_func.setAdapter(fAdapter);
 
-        dialogController = new dialogUIs(activity, parent_view);
+        dialogController = new dialogUIs(activity, this, parent_view);
 
         Resources res = activity.getResources();
         NAME_RESET = res.getString(R.string.sys_reset);
@@ -63,15 +63,11 @@ public class mainUIs {
 
     public void updateOnFrame(){dialogController.updateOnFrame();}
 
-    private void loadTemplate(){
-        //todo:
-        //show a dialog to select template
-
-        //YAML Loader
+    void LoadConfig(String content){
         Yaml yloader = new Yaml();
         try{
-            InputStream ins = actRef.get().getAssets().open("config.yml");
-            mUIManagerRef.get().RequestResetWithTemplate((LinkedHashMap)yloader.load(ins));
+//            InputStream ins = actRef.get().getAssets().open("config.yml");
+            mUIManagerRef.get().RequestResetWithTemplate((LinkedHashMap)yloader.load(content));
         }catch (Exception e){
             Log.e(TAG, "===fail to load yaml===");
             e.printStackTrace();
@@ -121,8 +117,8 @@ public class mainUIs {
                                 String text_title = ((TextView)view).getText().toString();
                                 if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
                                 else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
-                                else if(text_title.equals(NAME_DATA_REMOTE))dialogController.SetupConnectRemote();
-                                else if(text_title.equals(NAME_TEMPLATE_LOAD))loadTemplate();
+                                else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
+                                else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
                                 else if(text_title.equals(NAME_TEMPLATE_SAVE))saveTemplate();
                                 break;
                             case MotionEvent.ACTION_UP:
