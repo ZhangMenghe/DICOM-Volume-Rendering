@@ -90,7 +90,7 @@ public class dialogUIs {
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.export_dialog_layout, parentRef.get(), false);
         //widgets
         Button btn = (Button) dialogView.findViewById(R.id.req_button);
-        EditText nameEdit = (EditText) dialogView.findViewById(R.id.expname_edit_text);
+
 
         layoutDialog_builder.setTitle(activity.getString(R.string.dialog_exp_config_title));
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
@@ -101,8 +101,11 @@ public class dialogUIs {
             @Override
             public void onClick(View v) {
                 sendButton.setEnabled(false);
+                EditText nameEdit = (EditText) dialogView.findViewById(R.id.expname_edit_text);
+                EditText commnetEdit = (EditText) dialogView.findViewById(R.id.expcomment_edit_text);
                 String input_name = nameEdit.getText().toString();
-                downloader.ExportConfig(muiRef.get().getExportConfig(input_name.isEmpty()?nameEdit.getHint().toString():input_name));
+                downloader.ExportConfig(muiRef.get().getExportConfig(input_name.isEmpty()?nameEdit.getHint().toString():input_name,
+                        commnetEdit.getText().toString() ));
                 saveconfig_dialog.dismiss();
             }
         });

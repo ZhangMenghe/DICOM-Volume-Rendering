@@ -74,11 +74,10 @@ public class mainUIs {
             e.printStackTrace();
         }
     }
-    String getExportConfig(String name){
-        if(cached_yaml == null)cached_yaml = cache_current_state_as_yaml(name);
-        return cached_yaml;
+    String getExportConfig(String name, String comments){
+        return cache_current_state_as_yaml(name, comments);
     }
-    private String cache_current_state_as_yaml(String name){
+    private String cache_current_state_as_yaml(String name, String comments){
         //todo:ui that choose a name sth..
         String content = null;
         //construct a hash-table-type structure that contains all the information and write to yaml
@@ -86,7 +85,11 @@ public class mainUIs {
         try{
 //            String fsys_root = actRef.get().getFilesDir().getAbsolutePath();
 //            FileWriter writer = new FileWriter(fsys_root + "/config.yml");
-            content = ysaver.dump(mUIManagerRef.get().getCurrentStates(name));
+            LinkedHashMap map = new LinkedHashMap();
+            map.put("name", name);
+            if(!comments.isEmpty())map.put("comments", comments);
+            mUIManagerRef.get().getCurrentStates(map);
+            content = ysaver.dump(map);
         }catch (Exception e){
             Log.e(TAG, "===fail to save yaml===");
             e.printStackTrace();

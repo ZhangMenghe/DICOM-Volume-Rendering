@@ -65,9 +65,7 @@ public class UIsManager {
     public void onMaskPanelSwitch(boolean isPanelOn){
         sub_panels_.get(R.string.panel_mask_name).showHidePanel(isPanelOn);
     }
-    public LinkedHashMap getCurrentStates(String name){
-        LinkedHashMap map = new LinkedHashMap();
-        map.put("name", name);
+    public void getCurrentStates(LinkedHashMap map){
         LinkedHashMap vol_map = new LinkedHashMap();
         LinkedHashMap cam_map = new LinkedHashMap();
         float[] v = JUIInterface.JUIgetVCStates();
@@ -88,7 +86,6 @@ public class UIsManager {
         map.put("transfer function", tf_map);
         map.put("cutting plane", cut_map);
         map.put("mask", mask_map);
-        return map;
     }
     public void RequestResetWithTemplate(LinkedHashMap map){
         if(map.isEmpty()) return;
