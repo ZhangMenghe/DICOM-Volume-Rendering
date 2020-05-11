@@ -57,7 +57,7 @@ void overlayController::onDraw(){
     || !vrController::instance()->isDrawing()) return;
     if(dirty_wid >= 0){
         renderers_[dvr::OVERLAY_GRAPH]->setData(widget_points_[widget_id], widget_id);
-        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_widget_num", widget_points_.size());
+        renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_widget_num", (int)widget_points_.size());
         renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6*widget_points_.size(), u_opacity_data_);
         dirty_wid = -1;
     }
@@ -123,7 +123,9 @@ void overlayController::setOverlayRect(int id, int width, int height, int left, 
     }
     overlay_rect_set = true;
 }
-void overlayController::updateUniforms(){
+void overlayController::updateUniforms(const float* params){
     renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", vrController::color_scheme_id);
+    renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_contrast_low", params[dvr::RENDER_CONTRAST_LOW]);
+    renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_contrast_high", params[dvr::RENDER_CONTRAST_HIGH]);
 }
 

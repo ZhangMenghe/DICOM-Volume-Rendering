@@ -26,6 +26,11 @@ public:
         Shader::Uniform(sp, key, id);
         shader_.UnUse();
     }
+    virtual void setUniform(const char* key, float v){
+        GLuint sp = shader_.Use();
+        Shader::Uniform(sp, key, v);
+        shader_.UnUse();
+    }
     virtual void setData(std::vector<float*> data){}
     virtual void setData(float* data, int wid){}
     virtual void Clear(){}

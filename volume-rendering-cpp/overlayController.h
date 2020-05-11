@@ -23,7 +23,7 @@ public:
 
     void setTuneParameter(int tid, float value);
     void setOverlayRect(int id, int width, int height, int left, int top);
-    void updateUniforms();
+    void updateUniforms(const float* params);
 
     //getter
     const float* getCurrentWidgetPoints(){return widget_points_[widget_id];}

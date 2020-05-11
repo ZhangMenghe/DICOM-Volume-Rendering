@@ -103,6 +103,12 @@ float TransferIntensityStepOne(uint intensity){
 }
 
 vec3 TransferColor(float intensity, int ORGAN_BIT){
+    intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);
+    intensity= max(.0, min(1.0, intensity));
+
+//    if(uScheme == 0) gl_FragColor = vec4(vec3(intensity), 1.0);
+//    else gl_FragColor = vec4(hsv2rgb(transfer_scheme_hsv((vTexcoord.x > u_contrast_high)? 1.0:intensity)), 1.0);
+
     vec3 color = vec3(intensity);
 
     #ifdef COLOR_HSV

@@ -86,7 +86,7 @@
     </string-array>
     <string-array name="brightness">
         <item>Brightness</item>
-        <item>.8</item>
+        <item>.5</item>
         <item>1.0</item>
         <item>255</item>
     </string-array>
@@ -98,7 +98,7 @@
     </string-array>
     <string-array name="contrast_high">
         <item>High Range</item>
-        <item>0.5</item>
+        <item>0.4</item>
         <item>1.0</item>
         <item>255</item>
     </string-array>

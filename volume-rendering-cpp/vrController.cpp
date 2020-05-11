@@ -155,7 +155,7 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
     }
-    overlayController::instance()->updateUniforms();
+    overlayController::instance()->updateUniforms(render_params_);
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
     //todo!!!! add flip stuff
