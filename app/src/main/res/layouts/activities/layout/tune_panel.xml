@@ -28,37 +28,67 @@
         app:layout_constraintTop_toTopOf="parent"
         style="@style/Spinner"/>
 </android.support.constraint.ConstraintLayout>
-<LinearLayout
+
+<android.support.constraint.ConstraintLayout
+    android:id="@+id/panel_widget"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
+
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toBottomOf="@+id/panel1">
     <Spinner
         android:id="@+id/tune_widget_id_spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        app:layout_constraintWidth_percent="0.25"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         style="@style/Spinner"/>
     <Spinner
         android:id="@+id/tune_seekbar_spinner"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintStart_toEndOf="@+id/tune_widget_id_spinner"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         style="@style/Spinner"/>
     <Button
-        android:id="@+id/tune_widget_add_button"
+        android:id="@+id/tune_widget_hide_button"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Add"
-        android:layout_weight="0.5"
+        android:layout_height="0dp"
+        android:background="@drawable/visible"
+        app:layout_constraintEnd_toStartOf="@+id/tune_widget_delete_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_percent="0.1"
+        app:layout_constraintDimensionRatio="1:1"
         style="@style/CommonButton"/>
     <Button
         android:id="@+id/tune_widget_delete_button"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Del"
-        android:layout_weight="0.5"
+        android:layout_height="0dp"
+        android:background="@drawable/delete"
+        android:backgroundTint="@color/redOrange"
+
+        app:layout_constraintEnd_toStartOf="@+id/tune_widget_add_button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
         style="@style/CommonButton"/>
-</LinearLayout>
+    <ImageButton
+        android:id="@+id/tune_widget_add_button"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/greenadd"
+        android:background="@drawable/greenadd"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1:1"
+        style="@style/CommonButton"
+        android:contentDescription="add" />
+
+</android.support.constraint.ConstraintLayout>
 </android.support.constraint.ConstraintLayout>

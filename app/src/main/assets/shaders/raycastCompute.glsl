@@ -32,6 +32,7 @@ uniform vec3 u_tex_size;
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
+uniform int u_visible_bits;
 //uniform float u_contrast_level;
 
 // All components are in the range [0…1], including hue.
@@ -136,7 +137,9 @@ void main(){
     //intensity in 0-1
     float intensity = TransferIntensityStepOne(sampled_value.x);
     float alpha = .0;
-    for(int i=0; i<u_widget_num; i++) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity));
+    for(int i=0; i<u_widget_num; i++)
+    if(((u_visible_bits >> i) & 1) == 1) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity));
+
     imageStore(destTex, storePos, vec4(TransferColor(intensity, ORGAN_BIT), alpha));
 }
 

@@ -4,16 +4,19 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.media.Image;
 import android.support.constraint.ConstraintLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.common.primitives.Booleans;
 import com.google.common.primitives.Floats;
 
 import java.lang.ref.WeakReference;
@@ -29,6 +32,7 @@ public class renderUIs extends BasePanel{
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private widgetListAdapter widAdapter;
     private tunerListAdapter rendertuneAdapter;
+    private Button btn_hide;
 
     private static String CHECK_TEXRAY_NAME, CHECK_OVERLAYS;
 
@@ -53,10 +57,10 @@ public class renderUIs extends BasePanel{
         contrast_seekbar_spinner.setAdapter(rendertuneAdapter);
 
         Spinner widget_spinner = (Spinner)tune_panel_.findViewById(R.id.tune_widget_id_spinner);
-        widAdapter = new widgetListAdapter(activity, new tunerListAdapter[]{tunerAdapter});
+        widAdapter = new widgetListAdapter(activity, this, new tunerListAdapter[]{tunerAdapter});
         widget_spinner.setAdapter(widAdapter);
 
-        Button btn_add = (Button)tune_panel_.findViewById(R.id.tune_widget_add_button);
+        ImageButton btn_add = tune_panel_.findViewById(R.id.tune_widget_add_button);
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +72,13 @@ public class renderUIs extends BasePanel{
             @Override
             public void onClick(View v) {
                 widAdapter.deleteItem();
+            }
+        });
+        btn_hide = (Button)tune_panel_.findViewById(R.id.tune_widget_hide_button);
+        btn_hide.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+               widAdapter.hideItem();
             }
         });
 
@@ -181,6 +192,10 @@ public class renderUIs extends BasePanel{
             JUIInterface.JUIsetChecks(CHECK_OVERLAYS, true);
         }
         panel_visible = show_panel;
+    }
+    private void onWidgetChange(boolean visible){
+        if(visible) btn_hide.setBackground(actRef.get().getResources().getDrawable(R.drawable.visible, null));
+        else btn_hide.setBackground(actRef.get().getResources().getDrawable(R.drawable.invisible, null));
     }
     private static class tunerListAdapter extends ListAdapter{
         //TID: 0 for opacity, 1 for contrast
@@ -296,20 +311,26 @@ public class renderUIs extends BasePanel{
     }
     private static class widgetListAdapter extends textSimpleListAdapter {
         private final ArrayList<WeakReference<tunerListAdapter>> mTunerRefs;
+        private final WeakReference<renderUIs> mParentRef;
 
+        private final static int MAX_WIDGET = 7;
         private final static int INIT_ID = 0;
         int current_id;
         int widget_num;
         String name_prefix;
         private float[] jui_default_values = null;
         private int[] jui_default_lengths = null;
+        //currently only one mTunerRef. Item_visibility keeps consistents with its item_values
+        private ArrayList<Boolean> item_visibility;
 
-        widgetListAdapter(Context context, tunerListAdapter[] tuner_adapters) {
+        widgetListAdapter(Context context, renderUIs parent_act, tunerListAdapter[] tuner_adapters) {
             super(context, new ArrayList<>());
+            mParentRef = new WeakReference<>(parent_act);
             mTunerRefs = new ArrayList<>();
             for(tunerListAdapter adp:tuner_adapters)
                 mTunerRefs.add(new WeakReference<>(adp));
             widget_num = 0;
+            item_visibility = new ArrayList<>();
             name_prefix = context.getString(R.string.tune_widget_name_prefix) + " ";
 
             //change relevant stuff
@@ -331,6 +352,7 @@ public class renderUIs extends BasePanel{
                 for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().Reset();
                 widget_num = 0;
             }
+            item_visibility.clear();
             current_id = INIT_ID;
             title = name_prefix + INIT_ID;
         }
@@ -341,7 +363,7 @@ public class renderUIs extends BasePanel{
             current_id = id;
             title = name_prefix + id;
             for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().setCurrentId(id);
-
+            mParentRef.get().onWidgetChange(item_visibility.get(current_id));
             JUIInterface.JUIsetTuneWidgetById(id);
             notifyDataSetChanged();
         }
@@ -353,15 +375,14 @@ public class renderUIs extends BasePanel{
             add_item((values.length == jui_default_values.length)?values:jui_default_values);
         }
         private void add_item(float[] values){
-            if(widget_num >= 5) return;//todo:set maxmum of widget num
+            if(widget_num >= MAX_WIDGET) return;
 
             widget_num++;
             current_id = widget_num-1;
             title = name_prefix + current_id;
-
             for(int i=0; i<mTunerRefs.size();i++)
                 mTunerRefs.get(i).get().addInstance(current_id);
-
+            item_visibility.add(true);
             JUIInterface.JUIAddTuneParams(jui_default_lengths, values);
             JUIInterface.JUIsetTuneWidgetById(current_id);
 
@@ -369,6 +390,14 @@ public class renderUIs extends BasePanel{
         }
         void deleteItem(){
             deleteItem(current_id);
+        }
+        void hideItem(){
+            hideItem(current_id);
+        }
+        void hideItem(int id){
+            item_visibility.set(id, !item_visibility.get(id));
+            mParentRef.get().onWidgetChange(item_visibility.get(id));
+            JUIInterface.JUIsetTuneWidgetVisibility(id, item_visibility.get(id));
         }
         public void deleteItem(int id){
             if(widget_num<2 || id >= widget_num) return;
@@ -379,6 +408,7 @@ public class renderUIs extends BasePanel{
 
             //change relevant stuff
             for(int i=0; i<mTunerRefs.size();i++) mTunerRefs.get(i).get().removeInstance(id,current_id);
+            item_visibility.remove(id);
             JUIInterface.JUIremoveTuneWidgetById(id);
             JUIInterface.JUIsetTuneWidgetById(current_id);
 

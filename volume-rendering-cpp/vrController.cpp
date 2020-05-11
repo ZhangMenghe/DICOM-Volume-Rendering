@@ -174,6 +174,10 @@ void vrController::precompute(){
     float* widget_data_pointer;
     int widget_num;
     overlayController::instance()->getWidgetFlatPoints(widget_data_pointer, widget_num);
+    auto visibles = overlayController::instance()->getWidgetVisibilities();
+    int visible=0;
+    for(int i=0;i<widget_num;i++){visible |= int(visibles[i]) << i;}
+    Shader::Uniform(sp, "u_visible_bits", visible);
     Shader::Uniform(sp, "u_opacity", 6*widget_num, widget_data_pointer);
     Shader::Uniform(sp, "u_widget_num", widget_num);
 

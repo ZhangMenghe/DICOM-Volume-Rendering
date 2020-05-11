@@ -33,7 +33,7 @@
     <string name="contrast_group_name">Contrast</string>
     <string name="opacity_group_name">Opacity</string>
     <string name="raycast_render_mode_name">Raycasting</string>
-    <string name="tune_widget_name_prefix">WID</string>
+    <string name="tune_widget_name_prefix">Id</string>
 
 <!--    mask panel subs-->
     <string name="mask_check_name">ShowMask</string>

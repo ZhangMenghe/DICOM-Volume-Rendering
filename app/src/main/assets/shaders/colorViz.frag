@@ -3,13 +3,13 @@
 precision mediump float;
 uniform int uScheme;
 uniform int u_widget_num;
+uniform int u_visible_bits;
 uniform vec2 u_opacity[60];
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 
 out vec4 gl_FragColor;
 in vec2 vTexcoord;
-
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
     vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
@@ -53,8 +53,9 @@ void main(){
 //        intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);
 
         float gray = .0;
-        for(int i=0; i<u_widget_num; i++)
-        gray = max(gray, get_intensity(6*i, intensity));
+        for(int i=0; i<u_widget_num; i++){
+            if(((u_visible_bits >> i) & 1) == 1) gray = max(gray, get_intensity(6*i, intensity));
+        }
         if(vTexcoord.y<0.33) gl_FragColor = vec4(vec3(gray), 1.0);
         else{
             intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);

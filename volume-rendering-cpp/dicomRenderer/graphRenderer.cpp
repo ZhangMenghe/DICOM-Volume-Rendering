@@ -1,5 +1,6 @@
 #include <GLPipeline/Primitive.h>
 #include <GLPipeline/Mesh.h>
+#include <overlayController.h>
 #include "graphRenderer.h"
 #include "Constants.h"
 
@@ -87,8 +88,10 @@ void GraphRenderer::Draw(){
     GLuint sp = shader_.Use();
     Shader::Uniform(sp, "uScale", r_scale_);
     Shader::Uniform(sp, "uOffset", r_offset_);
-    for(auto vao:vaos_){
-        glBindVertexArray(vao);
+    auto visibles = overlayController::instance()->getWidgetVisibilities();
+    for(int i=0; i<visibles.size(); i++){
+        if(!visibles[i])continue;
+        glBindVertexArray(vaos_[i]);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);
     }

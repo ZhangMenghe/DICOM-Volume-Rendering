@@ -8,6 +8,7 @@ public class JUIInterface {
     public static native void JUIsetTuneWidgetById(int wid);
     public static native void JUIremoveTuneWidgetById(int wid);
     public static native void JUIremoveAllTuneWidget();
+    public static native void JUIsetTuneWidgetVisibility(int wid, boolean visible);
     public static native void JUIsetAllTuneParamById(int tid, float[] values);
     public static native void JUIsetTuneParamById(int tid, int pid, float value);
     public static native void JUIsetDualParamById(int pid, float minValue, float maxValue);
