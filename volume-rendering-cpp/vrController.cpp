@@ -179,7 +179,7 @@ void vrController::precompute(){
 
     Shader::Uniform(sp, "u_contrast_low", render_params_[RENDER_CONTRAST_LOW]);
     Shader::Uniform(sp, "u_contrast_high", render_params_[RENDER_CONTRAST_HIGH]);
-    Shader::Uniform(sp, "u_contrast_level", render_params_[RENDER_CONTRAST_LEVEL]);
+//    Shader::Uniform(sp, "u_contrast_level", render_params_[RENDER_CONTRAST_LEVEL]);
     Shader::Uniform(sp, "u_brightness", render_params_[RENDER_BRIGHTNESS]);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);

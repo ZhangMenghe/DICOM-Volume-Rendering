@@ -72,18 +72,18 @@
     </string-array>
 
     <string-array name="contrastParams">
-        <item>@array/contrast_level</item>
+<!--        <item>@array/contrast_level</item>-->
         <item>@array/contrast_low</item>
         <item>@array/contrast_high</item>
         <item>@array/brightness</item>
 
     </string-array>
-    <string-array name="contrast_level">
-        <item>Level</item>
-        <item>1.0</item>
-        <item>1.0</item>
-        <item>255</item>
-    </string-array>
+<!--    <string-array name="contrast_level">-->
+<!--        <item>Level</item>-->
+<!--        <item>1.0</item>-->
+<!--        <item>1.0</item>-->
+<!--        <item>255</item>-->
+<!--    </string-array>-->
     <string-array name="brightness">
         <item>Brightness</item>
         <item>.5</item>

@@ -23,8 +23,8 @@ namespace dvr{
         DUAL_END
     };
     enum PARAM_RENDER_TUNE{
-        RENDER_CONTRAST_LEVEL=0,
-        RENDER_CONTRAST_LOW,
+//        RENDER_CONTRAST_LEVEL=0,
+        RENDER_CONTRAST_LOW=0,
         RENDER_CONTRAST_HIGH,
         RENDER_BRIGHTNESS,
         PARAM_RENDER_TUNE_END

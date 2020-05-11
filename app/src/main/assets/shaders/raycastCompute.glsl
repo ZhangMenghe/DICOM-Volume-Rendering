@@ -32,7 +32,7 @@ uniform vec3 u_tex_size;
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
-uniform float u_contrast_level;
+//uniform float u_contrast_level;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
