@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import com.google.common.primitives.Ints;
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
@@ -72,28 +73,43 @@ public class fileTransferClient {
     public void SetupLocal(){
         if(local_initialized) return;
         List<String> lpc = fileUtils.readLines(local_index_filename);
-
+        int record_num = lpc.size() / 2;
         if(lpc.isEmpty()){
             Log.i(TAG, "=== SetupLocal: No existing index file exist====");
             return;
         }
-        for(String line:lpc){
-            Log.e(TAG, "===SetupLocal: read " + line);
-            String[] info = line.split(",");
-            if(info.length < 7) continue;
-            //eg: "Larry Smarr" ,"2016-10-26" ,"Larry-2016-10-26-MRI"
-            datasetInfo tinfo = datasetInfo.newBuilder().setPatientName(info[0]).setFolderName(info[2]).setDate(info[1]).build();
-            // eg. "series_214_DYN_COR_VIBE_3_RUNS" 512, 512, 48, 243.10002131, 2, 2
-            volumeInfo vol_info = volumeInfo.newBuilder()
-                    .setFolderName(info[3])
-                    .setFileNums(Integer.parseInt(info[6]))
-                    .setImgHeight(Integer.parseInt(info[4]))
-                    .setImgWidth(Integer.parseInt(info[5]))
-                    .setVolThickness(Float.parseFloat(info[7]))
-                    .setMaskAvailable(Integer.parseInt(info[9]) != 0)
-                    .build();
+        for(int i=0; i<record_num; i++){
+//            Log.e(TAG, "===SetupLocal: read " + line);
+            String[] info = lpc.get(i*2).split("/");
+            //Larry Smarr/2016-10-26/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/512, 512, 144/1.0, -0.0, 0.0, -0.0, -0.0, -1.0/0.8984, 0.8984/243.10002131
+            datasetInfo tinfo = datasetInfo.newBuilder().setPatientName(info[0]).setDate(info[1]).setFolderName(info[2]).build();
 
-            update_local_info(tinfo, vol_info);
+            volumeInfo.Builder vinfo_builder = volumeInfo.newBuilder()
+                    .setFolderName(info[3])
+                    .setVolumeLocRange(Float.parseFloat(info[7]));
+            //set dimensions
+            String[] dims_tx = info[4].split(",");
+            for(String dt:dims_tx)
+                vinfo_builder.addDims(Integer.parseInt(dt));
+            //set orientation
+            String[] ori_tx = info[5].split(",");
+            for(String t:ori_tx)
+                vinfo_builder.addOrientation(Float.parseFloat(t));
+            //set resolution
+            String[] res_tx = info[6].split(",");
+            for(String t:res_tx)
+                vinfo_builder.addResolution(Float.parseFloat(t));
+            //build score
+//            2/0.9994351267814636/0.9599999785423279/0.75/1.0
+            String[] score_tx = lpc.get(i*2+1).split("/");
+            volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
+                    .setRgroupId(Integer.parseInt(score_tx[0]))
+                    .setRankScore(Float.parseFloat(score_tx[1]))
+                    .setNumScore(Float.parseFloat(score_tx[2]))
+                    .setTagsScore(Float.parseFloat(score_tx[3]))
+                    .setMaskScore(Float.parseFloat(score_tx[4]));
+            vinfo_builder.setScores(s_builder.build());
+            update_local_info(tinfo, vinfo_builder.build());
         }
         local_initialized = true;
     }
@@ -122,7 +138,13 @@ public class fileTransferClient {
         }
         Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(dataset_name).build();
         dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-        return blockingStub.getVolumeFromDataset(req).getVolumesList();
+        Iterator<volumeResponse> data_itor;
+
+        List<volumeInfo> res_lst = new ArrayList<>();
+        data_itor = blockingStub.getVolumeFromDataset(req);
+        while(data_itor.hasNext())
+            res_lst.addAll(data_itor.next().getVolumesList());
+        return res_lst;
     }
     public boolean deleteLocalData(String dsname, int pos){
         //delete from local list
@@ -174,7 +196,7 @@ public class fileTransferClient {
             new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
     }
     private void DownloadMasks(String target_path){
-        if(!target_vol.getMaskAvailable()) return;
+        if(target_vol.getScores().getMaskScore() <= 0) return;
         Log.e(TAG, "====Start to DownloadMasks: " + target_path );
         new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(target_path);
     }
@@ -321,7 +343,7 @@ public class fileTransferClient {
 
     private void saveData(Activity activity, String fname) throws IOException{
         //save data
-        String file_name = target_vol.getMaskAvailable()? activity.getString(R.string.cf_dcmwmask_name):fname;
+        String file_name = (target_vol.getScores().getMaskScore() > 0)? activity.getString(R.string.cf_dcmwmask_name):fname;
         File tar_ds_dir = Paths.get(target_root_dir, target_ds.getFolderName()).toFile();
         if(!tar_ds_dir.exists()) tar_ds_dir.mkdir();
 
@@ -363,21 +385,25 @@ public class fileTransferClient {
         //save to local file
         if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
             try{
-                String content = target_ds.getPatientName()+","
-                        +target_ds.getDate()+","
-                        +target_ds.getFolderName()+","
-                        +target_vol.getFolderName()+","
-                        +target_vol.getImgHeight()+","
-                        +target_vol.getImgWidth()+","
-                        +target_vol.getFileNums() + ","
-                        +target_vol.getVolThickness()+","
-                        +(target_vol.getMaskAvailable()?"2,2":"2,0")
-                        +"\n";
+                String[] title_info = {target_ds.getPatientName(), target_ds.getDate(), target_ds.getFolderName(),target_vol.getFolderName()};
+                List<String>vol_info_lst = new ArrayList<>();
+                vol_info_lst.add(String.join("/", title_info));
+                //dims
+                vol_info_lst.add(String.join(",",  String.valueOf(target_vol.getDimsList())));
+                //set orientation
+                vol_info_lst.add(String.join(",",  String.valueOf(target_vol.getOrientationList())));
+                //set resolution
+                vol_info_lst.add(String.join(",",  String.valueOf(target_vol.getResolutionList())));
+                //set loc range
+                vol_info_lst.add(String.valueOf(target_vol.getVolumeLocRange()));
+                //set score
+                volumeResponse.scoreInfo sinfo = target_vol.getScores();
+                String[] score_info = {String.valueOf(sinfo.getRgroupId()), String.valueOf(sinfo.getRankScore()), String.valueOf(sinfo.getNumScore()), String.valueOf(sinfo.getTagsScore()), String.valueOf(sinfo.getMaskScore())};
+                String content = String.join("/", vol_info_lst) + '\n' + String.join("/", score_info) + '\n';
                 fileUtils.addToFile(local_index_filename, content);
                 saveData(activity, activity.getString(R.string.cf_dcm_name));
             }catch (Exception e){
                 e.printStackTrace();
-
                 Log.e(TAG, "====Failed to Save Results to file");
             }
         }

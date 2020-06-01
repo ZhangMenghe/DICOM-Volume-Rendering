@@ -147,7 +147,8 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 
                 fileTransferClient loader = downloaderReference.get();
                 volumeResponse.volumeInfo vol_info = loader.getAvailableVolumes(dsname, isLocal).get(position);
-                JNIInterface.JNIsendDataPrepare(vol_info.getImgWidth(), vol_info.getImgHeight(), vol_info.getFileNums(), vol_info.getVolThickness(), vol_info.getMaskAvailable());
+                List<Integer> dims = vol_info.getDimsList();
+                JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), vol_info.getVolumeLocRange(), vol_info.getScores().getMaskScore()>0);
                 loader.Download(dsname, vol_info);
             }
         });
@@ -185,10 +186,14 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private void setup_single_card_content_list(ListView lv, String ds_name, boolean isLocal){
         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
         ArrayList<String> volcon_lst = new ArrayList<>();
-        for (volumeResponse.volumeInfo vinfo : vol_lst)
+        for (volumeResponse.volumeInfo vinfo : vol_lst){
+            List<Integer> dims = vinfo.getDimsList();
             volcon_lst.add(activityReference.get().getString(
-                    R.string.volume_lst_item, vinfo.getFolderName(), vinfo.getImgWidth(), vinfo.getImgHeight(), vinfo.getFileNums())
-                    +(vinfo.getMaskAvailable()?"\n===>>With Mask<<===":""));
+                    R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
+                    +(vinfo.getScores().getMaskScore()>0?"\n===>>With Mask<<===":""));
+        }
+
+
 
         contentAdapter = new ArrayAdapter<>(activityReference.get(), android.R.layout.simple_list_item_1, volcon_lst);
 
