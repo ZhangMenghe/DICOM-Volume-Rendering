@@ -20,17 +20,17 @@ Google Drive or other internet source).
 public class PushToImebraPipe implements Runnable {
 
     private PipeStream mImebraPipe;    // The Pipe into which we push the data
-    private List<InputStream> mStreamLst; // The InputStream from which we read the data
+    private InputStream mStream; // The InputStream from which we read the data
 
-    public PushToImebraPipe(com.imebra.PipeStream pipe, List<InputStream> stream) {
+    public PushToImebraPipe(com.imebra.PipeStream pipe, InputStream stream) {
         mImebraPipe = pipe;
-        mStreamLst = stream;
+        mStream = stream;
     }
 
     @Override
     public void run() {
         StreamWriter pipeWriter = new StreamWriter(mImebraPipe.getStreamOutput());
-        for(InputStream mStream:mStreamLst) {
+//        for(InputStream mStream:mStreamLst) {
             try {
                 // Buffer used to read from the stream
                 byte[] buffer = new byte[128000];
@@ -51,6 +51,6 @@ public class PushToImebraPipe implements Runnable {
                 pipeWriter.delete();
                 mImebraPipe.close(50000);
             }
-        }
+//        }
     }
 }

@@ -23,6 +23,7 @@ public class MainActivity extends GLActivity {
     @Override
     protected void updateOnFrame(){
         ui_manager.updateOnFrame();
+        dcm_manager.updateOnFrame();
         super.updateOnFrame();
     }
 
