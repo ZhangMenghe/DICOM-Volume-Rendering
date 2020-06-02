@@ -12,22 +12,18 @@ import android.widget.TextView;
 
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.FileWriter;
-import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
-import helmsley.vr.Utils.ConfigObject;
 
 public class mainUIs {
     final static String TAG = "mainUIs";
     private final WeakReference<Activity> actRef;
     private final WeakReference<UIsManager> mUIManagerRef;
-    private final String NAME_RESET, NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD, NAME_DATA_REMOTE, NAME_DATA_LOCAL;
+    private final String NAME_RESET, NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD, NAME_DATA_REMOTE, NAME_DATA_DEVICE, NAME_DATA_LOCAL;
 
     private Spinner spinner_check;
     private dialogUIs dialogController;
@@ -52,7 +48,7 @@ public class mainUIs {
         Resources res = activity.getResources();
         NAME_RESET = res.getString(R.string.sys_reset);
         NAME_TEMPLATE_SAVE = res.getString(R.string.sys_template_save);NAME_TEMPLATE_LOAD = res.getString(R.string.sys_template_load);
-        NAME_DATA_REMOTE = res.getString(R.string.sys_data_remote); NAME_DATA_LOCAL = res.getString(R.string.sys_data_local);
+        NAME_DATA_REMOTE = res.getString(R.string.sys_data_remote); NAME_DATA_LOCAL = res.getString(R.string.sys_data_local);NAME_DATA_DEVICE=res.getString(R.string.sys_data_device);
     }
 
     public void Reset(){
@@ -123,6 +119,7 @@ public class mainUIs {
                                 String text_title = ((TextView)view).getText().toString();
                                 if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
                                 else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
+                                else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
                                 else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
                                 else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
                                 else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();

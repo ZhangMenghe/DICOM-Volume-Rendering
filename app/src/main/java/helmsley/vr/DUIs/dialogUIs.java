@@ -2,6 +2,8 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -38,6 +40,7 @@ public class dialogUIs {
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
     private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
+    private boolean b_init_pick_alert = false;
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
         activityReference = new WeakReference<>(activity_);
@@ -304,7 +307,7 @@ public class dialogUIs {
 
             }});
     }
-    public void updateOnFrame(){
+    void updateOnFrame(){
         if(downloader == null) return;
         if(downloader.isDownloadingProcessFinished()){
             downloader.Reset();
@@ -320,5 +323,32 @@ public class dialogUIs {
             JNIInterface.JNIsendDataDone();
         }
     }
+    void ShowDICOMPicker(){
+        if(!b_init_pick_alert){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activityReference.get());
+            alertDialogBuilder.setMessage("Choose a DICOM file. To view a folder, choose ONE file inside");
+            alertDialogBuilder.setPositiveButton("yes",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            show_file_picker();
+                        }
+                    });
 
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+            b_init_pick_alert = true;
+        }else{
+            show_file_picker();
+        }
+    }
+    private void show_file_picker(){
+        // Let's use the Android File dialog. It will return an answer in the future, which we
+        // get via onActivityResult()
+        Intent intent = new Intent()
+                .setType("*/*")
+                .setAction(Intent.ACTION_OPEN_DOCUMENT);
+
+        activityReference.get().startActivityForResult(Intent.createChooser(intent, "Select a DICOM file"), 123);
+    }
 }

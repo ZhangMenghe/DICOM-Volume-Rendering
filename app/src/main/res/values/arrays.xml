@@ -156,6 +156,7 @@
         <item>@string/sys_template_save</item>
         <item>@string/sys_template_load</item>
         <item>@string/sys_data_remote</item>
+        <item>@string/sys_data_device</item>
         <item>@string/sys_data_local</item>
     </string-array>
 
