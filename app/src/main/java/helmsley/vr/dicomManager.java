@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -46,6 +47,7 @@ class dicomManager {
     private AlertDialog preview_dialog = null;
     private ImageView preview_img_view;
     private TextView title_tex_view, content_tex_view;
+    private static Image single_image;
     dicomManager(Activity activity) {
         actRef = new WeakReference<>(activity);
     }
@@ -135,11 +137,11 @@ class dicomManager {
         DataSet loadDataSet = CodecFactory.load(new StreamReader(imebraPipe.getStreamInput()));
         // Get the first frame from the dataset (after the proper modality transforms
         // have been applied).
-        Image dicomImage = loadDataSet.getImageApplyModalityTransform(0);
-        byte[] byte_data = get_image_byte_array(dicomImage);
+        single_image = loadDataSet.getImageApplyModalityTransform(0);
+        byte[] byte_data = get_image_byte_array(single_image);
 
         // Build the Android Bitmap from the raw bytes returned by DrawBitmap.
-        Bitmap renderBitmap = Bitmap.createBitmap((int) dicomImage.getWidth(), (int) dicomImage.getHeight(), Bitmap.Config.ARGB_8888);
+        Bitmap renderBitmap = Bitmap.createBitmap((int) single_image.getWidth(), (int) single_image.getHeight(), Bitmap.Config.ARGB_8888);
 
         ByteBuffer byteBuffer = ByteBuffer.wrap(byte_data);
         renderBitmap.copyPixelsFromBuffer(byteBuffer);
@@ -168,25 +170,47 @@ class dicomManager {
         layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
         layoutDialog_builder.setView(dialogView);
         preview_dialog = layoutDialog_builder.create();
+        preview_dialog.setCanceledOnTouchOutside(false);
         preview_dialog.getWindow().setLayout((int)(displayMetrics.widthPixels * 0.8), (int)(displayMetrics.heightPixels * 0.8));
         preview_img_view = dialogView.findViewById(R.id.pre_img);
         preview_img_view.setScaleType(ImageView.ScaleType.FIT_CENTER);
         title_tex_view = dialogView.findViewById(R.id.pre_name);
         content_tex_view = dialogView.findViewById(R.id.pre_content);
+        Button dismiss_btn = dialogView.findViewById(R.id.pre_dismiss_btn);
+        dismiss_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                preview_dialog.dismiss();
+            }
+        });
+        Button import_btn = dialogView.findViewById(R.id.pre_import_btn);
+        import_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                long width, height; int ssize;
+                width = single_image.getWidth(); height = single_image.getHeight();
+                ssize = (int)(width * height) * 2;
+                byte[] data = get_image_pure_bytes(single_image, ssize, width, height);
+                JNIInterface.JNIsendDataPrepare((int)width, (int)height, 1, -1, false);
+                JNIInterface.JNIsendData(0, 0, ssize, 2, data);
+                is_finished = true;
+                preview_dialog.dismiss();
+            }
+        });
     }
     private void build_volume(List<String> file_names) {
-        int id = 0;
         long width=0, height=0; int ssize=0;
         byte[][] datas = new byte[file_names.size()][];
-
+        boolean is_first = true;
         DataSet loadDataSet;
         for(String name:file_names){
             loadDataSet = CodecFactory.load(name);
             Image dicomImage = loadDataSet.getImageApplyModalityTransform(0);
-            if(id == 0){
+            if(is_first){
                 width = dicomImage.getWidth(); height = dicomImage.getHeight();
                 JNIInterface.JNIsendDataPrepare((int)width, (int)height, file_names.size(), -1, false);
                 ssize = (int)(width * height) * 2;
+                is_first = false;
             }
             int ins_id = Integer.parseInt(loadDataSet.getString(new TagId(0x0020,0x0013),0)) - 1;
             datas[ins_id] = get_image_pure_bytes(dicomImage, ssize, width, height);

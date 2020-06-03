@@ -38,5 +38,27 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/pre_img"
         style="@style/itemText"/>
+    <Button
+        android:id="@+id/pre_import_btn"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/brightBlue"
+        android:text="Import"
+        android:textColor="@color/paneColor"
+        android:layout_marginEnd="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/pre_content"
+        app:layout_constraintEnd_toStartOf="@id/pre_dismiss_btn"
+        style="@style/CommonButton"/>
+    <Button
+        android:id="@+id/pre_dismiss_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/brightBlue"
+        android:text="Dismiss"
+        android:textColor="@color/paneColor"
+        app:layout_constraintTop_toBottomOf="@+id/pre_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/CommonButton"/>
 
 </android.support.constraint.ConstraintLayout>
