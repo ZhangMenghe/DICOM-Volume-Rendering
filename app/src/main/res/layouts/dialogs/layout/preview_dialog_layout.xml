@@ -1,0 +1,42 @@
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/near_white_blue">
+    <TextView
+        android:id="@+id/pre_name"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:textColor="@color/paneColor"
+        android:text="@string/preview_text"
+        android:gravity="center"
+        app:layout_constraintHeight_percent="0.2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/titleText"/>
+    <ImageView
+        android:id="@+id/pre_img"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pre_name"
+        app:srcCompat="@color/colorPrimary"
+        android:contentDescription="Preview of File"/>
+    <TextView
+        android:id="@+id/pre_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:textColor="@color/paneColor"
+        android:text="@string/preview_text"
+        android:gravity="left"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        app:layout_constraintHeight_percent="0.3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pre_img"
+        style="@style/itemText"/>
+
+</android.support.constraint.ConstraintLayout>

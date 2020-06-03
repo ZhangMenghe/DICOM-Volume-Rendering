@@ -5,9 +5,14 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.support.v7.widget.LinearLayoutManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imebra.CodecFactory;
@@ -38,7 +43,9 @@ class dicomManager {
     private AlertDialog file_dir_dialog = null;
     private Uri sel_uri;
     private static boolean is_finished = false;
-
+    private AlertDialog preview_dialog = null;
+    private ImageView preview_img_view;
+    private TextView title_tex_view, content_tex_view;
     dicomManager(Activity activity) {
         actRef = new WeakReference<>(activity);
     }
@@ -63,7 +70,8 @@ class dicomManager {
                 dlgAlert.create().show();
                 return;
             }
-            build_single_slice_strem(mstream);
+            String[] name_split = rpath.split("/");
+            build_single_slice_strem(mstream, name_split[name_split.length - 1]);
             if (isVolume)
                 Toast.makeText(actRef.get(), "remote side only supports single file", Toast.LENGTH_LONG);
             return;
@@ -102,7 +110,6 @@ class dicomManager {
             file_dir_dialog = alertDialogBuilder.create();
         }
         file_dir_dialog.show();
-
     }
 
     void Run(Uri selectedfile) {
@@ -110,7 +117,7 @@ class dicomManager {
         show_file_dir_dialog();
     }
 
-    private void build_single_slice_strem(InputStream stream) {
+    private void build_single_slice_strem(InputStream stream, String name) {
         CodecFactory.setMaximumImageSize(8000, 8000);
 
         // The usage of the Pipe allows to use also files on Google Drive or other providers
@@ -137,11 +144,36 @@ class dicomManager {
         ByteBuffer byteBuffer = ByteBuffer.wrap(byte_data);
         renderBitmap.copyPixelsFromBuffer(byteBuffer);
 
-        // Update the image
-//        mImageView.setImageBitmap(renderBitmap);
-//        mImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        //update image
+        if(preview_dialog == null) setup_dialog();
+        preview_img_view.setImageBitmap(renderBitmap);
+        title_tex_view.setText(actRef.get().getString(R.string.preview_text,name));
+        //name
+        String content = "Patient Name: " + loadDataSet.getString(new TagId(0x0010, 0x0010), 0) + '\n';
+        content += "Date: " + loadDataSet.getString(new TagId(0x0008, 0x0023), 0) ;
+        content_tex_view.setText(content);
+        preview_dialog.show();
     }
+    private void setup_dialog(){
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        actRef.get().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
 
+        //setup dialog
+        final ViewGroup parent_view = (ViewGroup)actRef.get().findViewById(R.id.parentPanel);
+        final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(actRef.get());
+        final View dialogView = LayoutInflater.from(actRef.get())
+                                .inflate(R.layout.preview_dialog_layout, parent_view, false);
+
+        layoutDialog_builder.setTitle(actRef.get().getString(R.string.preview_title));
+        layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
+        layoutDialog_builder.setView(dialogView);
+        preview_dialog = layoutDialog_builder.create();
+        preview_dialog.getWindow().setLayout((int)(displayMetrics.widthPixels * 0.8), (int)(displayMetrics.heightPixels * 0.8));
+        preview_img_view = dialogView.findViewById(R.id.pre_img);
+        preview_img_view.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        title_tex_view = dialogView.findViewById(R.id.pre_name);
+        content_tex_view = dialogView.findViewById(R.id.pre_content);
+    }
     private void build_volume(List<String> file_names) {
         int id = 0;
         long width=0, height=0; int ssize=0;

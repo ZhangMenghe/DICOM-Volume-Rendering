@@ -18,6 +18,8 @@
     <string name="dialog_config_title">Select a Config File</string>
     <string name="dialog_exp_config_title">Export to Config File</string>
     <string name="dialog_progress_title">Loading...</string>
+    <string name="preview_title">Preview DICOM File</string>
+    <string name="preview_text">File: %1$s</string>
 
 <!--    format values-->
     <string name="tune_value">%1$.2f </string>
