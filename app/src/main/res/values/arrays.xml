@@ -98,7 +98,7 @@
     </string-array>
     <string-array name="contrast_high">
         <item>High Range</item>
-        <item>0.4</item>
+        <item>0.2</item>
         <item>1.0</item>
         <item>255</item>
     </string-array>

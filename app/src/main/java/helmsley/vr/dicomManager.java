@@ -41,10 +41,9 @@ import helmsley.vr.Utils.PushToImebraPipe;
 class dicomManager {
     private static final String TAG = "dicomManager";
     private final WeakReference<Activity> actRef;
-    private AlertDialog file_dir_dialog = null;
+    private AlertDialog file_dir_dialog = null, preview_dialog = null;
     private Uri sel_uri;
     private static boolean is_finished = false;
-    private AlertDialog preview_dialog = null;
     private ImageView preview_img_view;
     private TextView title_tex_view, content_tex_view;
     private static Image single_image;
