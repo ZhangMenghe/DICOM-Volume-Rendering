@@ -170,7 +170,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 dialogUIs.onDownloadingUI(sel_ds_name, sel_is_local);
                 //get the information ready here
                 List<Integer> dims = sel_vol_info.getDimsList();
-                JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getScores().getMaskScore()>0);
+                JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getScores().getVolScore(2)>0);
                 downloaderReference.get().Download(sel_ds_name, sel_vol_info);
                 preview_dialog.dismiss();
             }
@@ -220,9 +220,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 preview_img_view.setImageBitmap(renderBitmap);
                 title_tex_view.setText(actRef.get().getString(R.string.preview_text, sel_vol_info.getFolderName()));
                 //name
-                String content = "Score: \n";
+                String content = "Rank: " + sel_vol_info.getScores().getRankId() + "\n";
                 content +="Ranking score: "+ sel_vol_info.getScores().getRankScore() + "\n"
-                        + "Tags Score: " + sel_vol_info.getScores().getTagsScore() + "\n";
+                        + "Tags Score: " + sel_vol_info.getScores().getVolScore(1) + "\n";
                 content_tex_view.setText(content);
                 preview_dialog.show();
             }
@@ -266,7 +266,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             List<Integer> dims = vinfo.getDimsList();
             volcon_lst.add(actRef.get().getString(
                     R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
-                    +(vinfo.getScores().getMaskScore()>0?"\n===>>With Mask<<===":""));
+                    +(vinfo.getScores().getVolScore(2)>0?"\n===>>With Mask<<===":""));
         }
 
         contentAdapter = new ArrayAdapter<>(actRef.get(), android.R.layout.simple_list_item_1, volcon_lst);

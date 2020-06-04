@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import com.google.common.primitives.Ints;
+import com.google.protobuf.ByteString;
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
@@ -99,15 +100,29 @@ public class fileTransferClient {
             String[] res_tx = info[6].split(",");
             for(String t:res_tx)
                 vinfo_builder.addResolution(Float.parseFloat(t));
-            //build score
-//            2/0.9994351267814636/0.9599999785423279/0.75/1.0
+
+            try{
+                File data = new File(target_root_dir, info[2] + '/' + info[3] + "/sample");
+                InputStream inputStream = new FileInputStream(data);
+                byte[] buffer = new byte[inputStream.available()];
+                inputStream.read(buffer);
+                ByteString simg = ByteString.copyFrom(buffer);
+                vinfo_builder.setSampleImg(simg);
+            }catch (Exception e) {
+                Log.e(TAG, "===Failed to open sample image "+ e);
+            }
+//           group/rank/rscore/...../volscore*3
             String[] score_tx = lpc.get(i*2+1).split("/");
             volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
                     .setRgroupId(Integer.parseInt(score_tx[0]))
-                    .setRankScore(Float.parseFloat(score_tx[1]))
-                    .setNumScore(Float.parseFloat(score_tx[2]))
-                    .setTagsScore(Float.parseFloat(score_tx[3]))
-                    .setMaskScore(Float.parseFloat(score_tx[4]));
+                    .setRankId(Integer.parseInt(score_tx[1]))
+                    .setRankScore(Float.parseFloat(score_tx[2]));
+            int param_end_id = score_tx.length - 3;
+            for(int ri=3; ri<param_end_id; ri++)
+                s_builder.addRawScore(Float.parseFloat(score_tx[ri]));
+            for(int ni=param_end_id; ni<score_tx.length; ni++)
+                s_builder.addVolScore(Float.parseFloat(score_tx[ni]));
+
             vinfo_builder.setScores(s_builder.build());
             update_local_info(tinfo, vinfo_builder.build());
         }
@@ -196,7 +211,7 @@ public class fileTransferClient {
             new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
     }
     private void DownloadMasks(String target_path){
-        if(target_vol.getScores().getMaskScore() <= 0) return;
+        if(target_vol.getScores().getVolScore(2) <= 0) return;
         Log.e(TAG, "====Start to DownloadMasks: " + target_path );
         new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(target_path);
     }
@@ -341,9 +356,7 @@ public class fileTransferClient {
         }
     }
 
-    private void saveData(Activity activity, String fname) throws IOException{
-        //save data
-        String file_name = (target_vol.getScores().getMaskScore() > 0)? activity.getString(R.string.cf_dcmwmask_name):fname;
+    private File get_tar_vol_dir(){
         File tar_ds_dir = Paths.get(target_root_dir, target_ds.getFolderName()).toFile();
         if(!tar_ds_dir.exists()) tar_ds_dir.mkdir();
 
@@ -355,11 +368,13 @@ public class fileTransferClient {
             File tar_vol_dir = new File(tar_ds_dir, vol_dir_prefix);
             if(!tar_vol_dir.exists()) tar_vol_dir.mkdir();
         }
-
         File tar_vol_dir = new File(tar_ds_dir, target_vol.getFolderName());
         if(!tar_vol_dir.exists()) tar_vol_dir.mkdir();
-        File datafile = new File(tar_vol_dir, file_name);
-
+        return tar_vol_dir;
+    }
+    private void saveData(Activity activity, String fname) throws IOException{
+        String file_name = (target_vol.getScores().getVolScore(2) > 0)? activity.getString(R.string.cf_dcmwmask_name):fname;
+        File datafile = new File(get_tar_vol_dir(), file_name);
         saveLargeImageToFile(new FileOutputStream(datafile), JNIInterface.JNIgetVolumeData());
     }
 
@@ -389,18 +404,35 @@ public class fileTransferClient {
                 List<String>vol_info_lst = new ArrayList<>();
                 vol_info_lst.add(String.join("/", title_info));
                 //dims
-                vol_info_lst.add(String.join(",",  String.valueOf(target_vol.getDimsList())));
+                String listString = target_vol.getDimsList().toString().replaceAll("\\s+","");
+                vol_info_lst.add(listString.substring(1, listString.length()-1));
                 //set orientation
-                vol_info_lst.add(String.join(",",  String.valueOf(target_vol.getOrientationList())));
+                listString = target_vol.getOrientationList().toString().replaceAll("\\s+","");
+                vol_info_lst.add(listString.substring(1, listString.length()-1));
                 //set resolution
-                vol_info_lst.add(String.join(",",  String.valueOf(target_vol.getResolutionList())));
+                listString = target_vol.getResolutionList().toString().replaceAll("\\s+","");
+                vol_info_lst.add(listString.substring(1, listString.length()-1));
                 //set loc range
                 vol_info_lst.add(String.valueOf(target_vol.getVolumeLocRange()));
                 //set score
                 volumeResponse.scoreInfo sinfo = target_vol.getScores();
-                String[] score_info = {String.valueOf(sinfo.getRgroupId()), String.valueOf(sinfo.getRankScore()), String.valueOf(sinfo.getNumScore()), String.valueOf(sinfo.getTagsScore()), String.valueOf(sinfo.getMaskScore())};
-                String content = String.join("/", vol_info_lst) + '\n' + String.join("/", score_info) + '\n';
+//                String[] score_info = {String.valueOf(sinfo.getRgroupId()), String.valueOf(sinfo.getRankScore()), String.valueOf(sinfo.getVolScore(0)), String.valueOf(sinfo.getVolScore(1)), String.valueOf(sinfo.getVolScore(2))};
+                List<String> score_info_lst = new ArrayList<>();
+                score_info_lst.add(String.valueOf(sinfo.getRgroupId()));
+                score_info_lst.add(String.valueOf(sinfo.getRankId()));
+                score_info_lst.add(String.valueOf(sinfo.getRankScore()));
+                for(Float s:sinfo.getRawScoreList())
+                    score_info_lst.add(String.valueOf(s));
+                for(Float s:sinfo.getVolScoreList())
+                    score_info_lst.add(String.valueOf(s));
+
+                String content = String.join("/", vol_info_lst) + '\n' + String.join("/", score_info_lst) + '\n';
                 fileUtils.addToFile(local_index_filename, content);
+                //save sample file
+                byte[]buffer = target_vol.getSampleImg().toByteArray();
+                File datafile = new File(get_tar_vol_dir(), "sample");
+                FileOutputStream os = new FileOutputStream(datafile);
+                os.write(buffer);
                 saveData(activity, activity.getString(R.string.cf_dcm_name));
             }catch (Exception e){
                 e.printStackTrace();
