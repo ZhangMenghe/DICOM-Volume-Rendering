@@ -2,6 +2,7 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -14,11 +15,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -47,6 +52,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private static volumeResponse.volumeInfo sel_vol_info;
     private static String sel_ds_name;
     private static boolean sel_is_local;
+    private final static List<String> sort_keys = new ArrayList<>(Arrays.asList("HELM Grade", "Mean", "Range", "SNR"));
+    private final static int[] sort_keys_ids = {-1, 0,1,6};
+
 
     //config of each card
     static class cardHolder extends RecyclerView.ViewHolder {
@@ -56,6 +64,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         TextView textViewDetail;
         ListView lstViewVol;
         TextView textContent;
+        Spinner sortSpinner;
         cardHolder(View view) {
             super(view);
             this.textViewDate = (TextView) itemView.findViewById(R.id.textDate);
@@ -63,6 +72,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             this.textViewDetail = (TextView) itemView.findViewById(R.id.textFolderName);
             this.lstViewVol = (ListView) itemView.findViewById(R.id.card_list);
             this.textContent = (TextView) itemView.findViewById(R.id.card_detail);
+            this.sortSpinner = (Spinner) itemView.findViewById(R.id.sort_key_spinner);
         }
     }
 
@@ -102,23 +112,22 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //show/hide volume details
+                //show/hide list view: volume details
                 int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
-                ViewGroup vp = (ViewGroup)v;
-                ListView lv = null;
-                for(int index=0; index<vp.getChildCount(); ++index) {
-                    View child = vp.getChildAt(index);
-                    if(child.getId() == R.id.card_list){
-                        lv = (ListView)child;
-                        boolean isLocal = (infotype_ == dialogUIs.DownloadDialogType.DATA_LOCAL);
-                        if(!isLocal && lv.getCount() == 0)
-                            setup_single_card_content_list(lv, downloaderReference.get().getAvailableDataset(isLocal).get(selectedItemPosition).getFolderName(), false);
+                ListView lst_view = (ListView)v.findViewById(R.id.card_list);
+                sel_is_local = (infotype_ == dialogUIs.DownloadDialogType.DATA_LOCAL);
+                sel_ds_name = downloaderReference.get().getAvailableDataset(sel_is_local).get(selectedItemPosition).getFolderName();
 
-                        if(child.getVisibility() == View.VISIBLE)child.setVisibility(View.GONE);
-                        else child.setVisibility(View.VISIBLE);
-                        break;
-                    }
-                }
+                if(!sel_is_local && lst_view.getCount() == 0)
+                    setup_single_card_content_list(lst_view, sel_ds_name, false);
+
+                if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
+                else lst_view.setVisibility(View.VISIBLE);
+
+                //show/hide sort view
+                View sort_view = v.findViewById(R.id.card_sort_layout);
+                if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
+                else sort_view.setVisibility(View.VISIBLE);
             }
         });
         return new cardHolder(card_view);
@@ -199,7 +208,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 //load data from local / remote
                 sel_ds_name = info.getFolderName();
                 sel_is_local = isLocal;
-                fileTransferClient loader = downloaderReference.get();
+//                fileTransferClient loader = downloaderReference.get();
 //                sel_vol_info = loader.getAvailableVolumes(sel_ds_name, isLocal).get(position);
                 sel_vol_info = cached_volumeinfo.get(sel_ds_name).get(position);
 
@@ -246,6 +255,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             }
         }
         holder.lstViewVol.setOnTouchListener(new lstSwipeDetector());
+
+        //order matter!
+        sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys);
+        holder.sortSpinner.setAdapter(adp);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -284,5 +297,62 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                     + 40 * vol_lst.get(pos).getFolderName().length() / 24;
         }
         lv.setLayoutParams(params);
+    }
+    private void ReorderVolumeList(String key){
+//        List<volumeResponse.volumeInfo> info_lst = downloaderReference.get().getAvailableVolumes(sel_ds_name, sel_is_local);
+//                //reorder
+//        int kid = sort_keys_ids[sort_keys.indexOf(key)];
+//        if(kid > 0)
+//        Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+//            @Override
+//            public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+//                return (u1.getScores().getRawScore(kid)-u2.getScores().getRawScore(kid) > 0)?1:0;
+//            }
+//        });
+//        else
+//            Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+//                @Override
+//                public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+//                    return (u1.getScores().getRankScore()-u2.getScores().getRankScore() > 0)?1:0;
+//                }
+//            });
+//
+//        ArrayList<String> volcon_lst = new ArrayList<>();
+//        for (volumeResponse.volumeInfo vinfo : info_lst){
+//            List<Integer> dims = vinfo.getDimsList();
+//            volcon_lst.add(actRef.get().getString(
+//                    R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
+//                    +(vinfo.getScores().getVolScore(2)>0?"\n===>>With Mask<<===":""));
+//        }
+//        contentAdapter.clear();
+//        contentAdapter.addAll(volcon_lst);
+//        dialogUIs.NotifyChanges();
+    }
+    private static class sortListAdapter extends textSimpleListAdapter{
+        int current_id = 0;
+        private final WeakReference<DSCardRecyclerViewAdapter> parentRef;
+        sortListAdapter(Context context, DSCardRecyclerViewAdapter parent, List<String> arrs){
+            super(context, arrs);
+            parentRef = new WeakReference<>(parent);
+            setTitleById(current_id);
+        }
+        void setTitleById(int id){
+            super.setTitleById(id);
+            if(current_id == id) return;
+            current_id = id;
+            parentRef.get().ReorderVolumeList(item_names.get(id));
+        }
+        void setTitleByText(String title) {
+            super.setTitleByText(title);
+            int nid = item_names.indexOf(title);
+            if(nid == current_id) return;
+            current_id = nid;
+            parentRef.get().ReorderVolumeList(title);
+        }
+        void onItemClick(int position){
+            if(current_id == position) return;
+            current_id = position;
+            parentRef.get().ReorderVolumeList(item_names.get(position));
+        }
     }
 }

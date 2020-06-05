@@ -114,8 +114,8 @@ class textSimpleListAdapter extends ListAdapter {
                         notifyDataSetChanged();
                     }
                 } );
-            else
-                holder.text_title.setTypeface(null, Typeface.BOLD);
+//            else
+//                holder.text_title.setTypeface(null, Typeface.BOLD);
             convertView.setTag(R.layout.thin_spinner_item, holder);
         } else {
             holder = (ViewTitleHolder) convertView.getTag(R.layout.thin_spinner_item);
