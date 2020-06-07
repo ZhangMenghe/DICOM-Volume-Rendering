@@ -175,6 +175,8 @@ class dicomManager {
         preview_img_view.setScaleType(ImageView.ScaleType.FIT_CENTER);
         title_tex_view = dialogView.findViewById(R.id.pre_name);
         content_tex_view = dialogView.findViewById(R.id.pre_content);
+        Button delete_btn = dialogView.findViewById(R.id.pre_delete_btn);
+        delete_btn.setVisibility(View.GONE);
         Button dismiss_btn = dialogView.findViewById(R.id.pre_dismiss_btn);
         dismiss_btn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -39,20 +39,24 @@ public class fileTransferClient {
     private volumeInfo target_vol;
     private boolean vol_with_mask = true;
     private final WeakReference<Activity> activityReference;
-    private final String target_root_dir;
+
     private List<datasetInfo> available_remote_datasets,
             available_local_datasets = new ArrayList<>();
     private List<configResponse.configInfo> available_config_files;
     private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
-    final private String local_index_filename;
     private boolean local_initialized = false;
     private boolean config_dirty = true;
+    private static String DCM_FILE_NAME, DCM_MASK_FILE_NAME, DCM_WMASK_FILE_NAME;
+    private static String TARGET_ROOT_DIR, LOCAL_INDEX_FILE_PATH;
     public fileTransferClient(Activity activity){
         activityReference = new WeakReference<Activity>(activity);
-        target_root_dir = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
+        TARGET_ROOT_DIR = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
         selfReference = new WeakReference<>(this);
-        local_index_filename = target_root_dir + "/" + activityReference.get().getString(R.string.cf_config_name);
+        LOCAL_INDEX_FILE_PATH = TARGET_ROOT_DIR + "/" + activityReference.get().getString(R.string.cf_config_name);
+        DCM_FILE_NAME = activity.getString(R.string.cf_dcm_name);
+        DCM_MASK_FILE_NAME = activity.getString(R.string.cf_dcmmask_name);
+        DCM_WMASK_FILE_NAME = activity.getString(R.string.cf_dcmwmask_name);
     }
     public String Setup(String host, String portStr){
         try{
@@ -73,7 +77,7 @@ public class fileTransferClient {
     }
     public void SetupLocal(){
         if(local_initialized) return;
-        List<String> lpc = fileUtils.readLines(local_index_filename);
+        List<String> lpc = fileUtils.readLines(LOCAL_INDEX_FILE_PATH);
         int record_num = lpc.size() / 2;
         if(lpc.isEmpty()){
             Log.i(TAG, "=== SetupLocal: No existing index file exist====");
@@ -102,7 +106,7 @@ public class fileTransferClient {
                 vinfo_builder.addResolution(Float.parseFloat(t));
 
             try{
-                File data = new File(target_root_dir, info[2] + '/' + info[3] + "/sample");
+                File data = new File(TARGET_ROOT_DIR, info[2] + '/' + info[3] + "/sample");
                 InputStream inputStream = new FileInputStream(data);
                 byte[] buffer = new byte[inputStream.available()];
                 inputStream.read(buffer);
@@ -161,30 +165,32 @@ public class fileTransferClient {
             res_lst.addAll(data_itor.next().getVolumesList());
         return res_lst;
     }
-    public boolean deleteLocalData(String dsname, int pos){
+    //todo!!!!need modify
+    public boolean deleteLocalData(String dsname, volumeInfo rinfo){
         //delete from local list
-        if(!local_dv_map.containsKey(dsname)) return false;
+//        if(!local_dv_map.containsKey(dsname)) return false;
         List<volumeInfo> infolist = local_dv_map.get(dsname);
-        volumeInfo rinfo = infolist.get(pos);
+//        volumeInfo rinfo = infolist.get(pos);
         if(rinfo == null) return false;
 
         //remove data directory
-        File tar_ds_dir = Paths.get(target_root_dir, dsname).toFile();
+        File tar_ds_dir = Paths.get(TARGET_ROOT_DIR, dsname).toFile();
         if(!tar_ds_dir.exists()) return false;
         if(!fileUtils.deleteDirectory(new File(tar_ds_dir, rinfo.getFolderName()))) return false;
 
         //remove from local index file
         //todo: flush if many changes, avoid write line by line
-        List<String> lines = fileUtils.readLines(local_index_filename);
-        for(String line : lines){
-            String[] info = line.split(",");
+        List<String> lines = fileUtils.readLines(LOCAL_INDEX_FILE_PATH);
+        int rnum = (int)lines.size() / 2;
+        for(int i=0; i<rnum; i++){
+            String[] info = lines.get(2*i).split("/");
             if(info[2].equals(dsname)
                     && info[3].equals(rinfo.getFolderName())){
-                lines.remove(line);
-                fileUtils.writeToFile(local_index_filename, lines);
+                lines.remove(lines.get(2*i+1));
+                lines.remove(lines.get(2*i));
+                fileUtils.writeToFile(LOCAL_INDEX_FILE_PATH, lines);
+                infolist.remove(rinfo);
 
-                //update local data
-                infolist.remove(pos);
                 if(infolist.isEmpty()){
                     local_dv_map.remove(dsname);
                     for(datasetInfo dsinfo:available_local_datasets){
@@ -268,7 +274,7 @@ public class fileTransferClient {
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
-            activity.saveDCMI();
+            fileTransferClient.saveDCMI(activity.target_ds, activity.target_vol);
             activity.DownloadMasks(target_path);
         }
         private void loadTextureOnly(dataTransferGrpc.dataTransferBlockingStub blockingStub){
@@ -356,26 +362,21 @@ public class fileTransferClient {
         }
     }
 
-    private File get_tar_vol_dir(){
-        File tar_ds_dir = Paths.get(target_root_dir, target_ds.getFolderName()).toFile();
+    private static File get_tar_vol_dir(String root_dir, String ds_name, String vol_name){
+        File tar_ds_dir = Paths.get(root_dir, ds_name).toFile();
         if(!tar_ds_dir.exists()) tar_ds_dir.mkdir();
 
         //check relevant sub dirs
-        String[] vol_dir_tree = target_vol.getFolderName().split("/");
+        String[] vol_dir_tree = vol_name.split("/");
         String vol_dir_prefix="";
         for(String vol_dir:vol_dir_tree){
             vol_dir_prefix = vol_dir_prefix+vol_dir;
             File tar_vol_dir = new File(tar_ds_dir, vol_dir_prefix);
             if(!tar_vol_dir.exists()) tar_vol_dir.mkdir();
         }
-        File tar_vol_dir = new File(tar_ds_dir, target_vol.getFolderName());
+        File tar_vol_dir = new File(tar_ds_dir, vol_name);
         if(!tar_vol_dir.exists()) tar_vol_dir.mkdir();
         return tar_vol_dir;
-    }
-    private void saveData(Activity activity, String fname) throws IOException{
-        String file_name = (target_vol.getScores().getVolScore(2) > 0)? activity.getString(R.string.cf_dcmwmask_name):fname;
-        File datafile = new File(get_tar_vol_dir(), file_name);
-        saveLargeImageToFile(new FileOutputStream(datafile), JNIInterface.JNIgetVolumeData());
     }
 
     //save after download complete
@@ -385,37 +386,38 @@ public class fileTransferClient {
         if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))) return;
 
         try {
-            saveData(activity, activity.getString(R.string.cf_dcmmask_name));
+            File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, target_ds.getFolderName(), target_vol.getFolderName()), DCM_MASK_FILE_NAME);
+            fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
         } catch (Exception e) {
             Log.e(TAG, "====Failed to Save Masks to file");
         }
     }
     //save after download complete
-    private void saveDCMI(){
-        Activity activity = activityReference.get();
+    private static void saveDCMI(datasetInfo tds, volumeInfo tvol){
+//        Activity activity = activityReference.get();
         //update local data
-        update_local_info(target_ds, target_vol);
+        selfReference.get().update_local_info(tds, tvol);
         dialogUIs.local_dirty = true;
 
         //save to local file
-        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
+//        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
             try{
-                String[] title_info = {target_ds.getPatientName(), target_ds.getDate(), target_ds.getFolderName(),target_vol.getFolderName()};
+                String[] title_info = {tds.getPatientName(), tds.getDate(), tds.getFolderName(),tvol.getFolderName()};
                 List<String>vol_info_lst = new ArrayList<>();
                 vol_info_lst.add(String.join("/", title_info));
                 //dims
-                String listString = target_vol.getDimsList().toString().replaceAll("\\s+","");
+                String listString = tvol.getDimsList().toString().replaceAll("\\s+","");
                 vol_info_lst.add(listString.substring(1, listString.length()-1));
                 //set orientation
-                listString = target_vol.getOrientationList().toString().replaceAll("\\s+","");
+                listString = tvol.getOrientationList().toString().replaceAll("\\s+","");
                 vol_info_lst.add(listString.substring(1, listString.length()-1));
                 //set resolution
-                listString = target_vol.getResolutionList().toString().replaceAll("\\s+","");
+                listString = tvol.getResolutionList().toString().replaceAll("\\s+","");
                 vol_info_lst.add(listString.substring(1, listString.length()-1));
                 //set loc range
-                vol_info_lst.add(String.valueOf(target_vol.getVolumeLocRange()));
+                vol_info_lst.add(String.valueOf(tvol.getVolumeLocRange()));
                 //set score
-                volumeResponse.scoreInfo sinfo = target_vol.getScores();
+                volumeResponse.scoreInfo sinfo = tvol.getScores();
 //                String[] score_info = {String.valueOf(sinfo.getRgroupId()), String.valueOf(sinfo.getRankScore()), String.valueOf(sinfo.getVolScore(0)), String.valueOf(sinfo.getVolScore(1)), String.valueOf(sinfo.getVolScore(2))};
                 List<String> score_info_lst = new ArrayList<>();
                 score_info_lst.add(String.valueOf(sinfo.getRgroupId()));
@@ -427,18 +429,20 @@ public class fileTransferClient {
                     score_info_lst.add(String.valueOf(s));
 
                 String content = String.join("/", vol_info_lst) + '\n' + String.join("/", score_info_lst) + '\n';
-                fileUtils.addToFile(local_index_filename, content);
+                fileUtils.addToFile(LOCAL_INDEX_FILE_PATH, content);
                 //save sample file
-                byte[]buffer = target_vol.getSampleImg().toByteArray();
-                File datafile = new File(get_tar_vol_dir(), "sample");
-                FileOutputStream os = new FileOutputStream(datafile);
+                byte[]buffer = tvol.getSampleImg().toByteArray();
+                File simgf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName() ), "sample");
+                FileOutputStream os = new FileOutputStream(simgf);
                 os.write(buffer);
-                saveData(activity, activity.getString(R.string.cf_dcm_name));
+                boolean b_wmask = tvol.getScores().getVolScore(2) > 0;
+                File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), b_wmask?DCM_WMASK_FILE_NAME:DCM_FILE_NAME);
+                fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
             }catch (Exception e){
                 e.printStackTrace();
                 Log.e(TAG, "====Failed to Save Results to file");
             }
-        }
+//        }
         finished = true;
     }
     private void update_local_info(datasetInfo tds, volumeInfo tvol){
@@ -458,7 +462,7 @@ public class fileTransferClient {
     private boolean LoadDataFromLocal(String vpath){
         Activity activity = activityReference.get();
         //target folder exist
-        Path destDir_path = Paths.get(target_root_dir, vpath);
+        Path destDir_path = Paths.get(TARGET_ROOT_DIR, vpath);
         File destDir = destDir_path.toFile();
 
         if(!destDir.exists()) return false;
@@ -507,16 +511,6 @@ public class fileTransferClient {
             }
     }
 
-    private void saveLargeImageToFile(OutputStream ostream, byte[] data){
-        try{
-            ostream.write(data);
-            ostream.flush();
-            ostream.close();
-        }catch (IOException e){
-            e.printStackTrace();
-            Log.e(TAG, "====Failed to Save Large Image to file");
-        }
-    }
     public void Shutdown() throws InterruptedException {
         mChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }

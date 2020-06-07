@@ -48,6 +48,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 
     private AlertDialog preview_dialog = null;
     private ImageView preview_img_view;
+    private Button preview_delete_btn;
     private TextView title_tex_view, content_tex_view;
     private static volumeResponse.volumeInfo sel_vol_info;
     private static String sel_ds_name;
@@ -165,6 +166,15 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         preview_img_view.setScaleType(ImageView.ScaleType.FIT_CENTER);
         title_tex_view = dialogView.findViewById(R.id.pre_name);
         content_tex_view = dialogView.findViewById(R.id.pre_content);
+        preview_delete_btn = dialogView.findViewById(R.id.pre_delete_btn);
+        preview_delete_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(downloaderReference.get().deleteLocalData(sel_ds_name, sel_vol_info))
+                    onContentChange();
+                preview_dialog.dismiss();
+            }
+        });
         Button dismiss_btn = dialogView.findViewById(R.id.pre_dismiss_btn);
         dismiss_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -228,6 +238,8 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 
                 preview_img_view.setImageBitmap(renderBitmap);
                 title_tex_view.setText(actRef.get().getString(R.string.preview_text, sel_vol_info.getFolderName()));
+                if(isLocal)preview_delete_btn.setVisibility(View.VISIBLE);
+                else preview_delete_btn.setVisibility(View.GONE);
                 //name
                 String content = "Rank: " + sel_vol_info.getScores().getRankId() + "\n";
                 content +="Ranking score: "+ sel_vol_info.getScores().getRankScore() + "\n"
@@ -238,29 +250,32 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         });
 
         //Perform "more" options with a fling gesture
-        final class lstSwipeDetector extends SwipeDetector{
-            private int current_id = -1;
-            protected void onSwipeRightToLeft(View v, int x, int y){
-                //todo: some notification about the operation
-                //perform local deletion
-                int pos = holder.lstViewVol.pointToPosition(x,y);
-                if(pos == current_id) return;
-                current_id = pos;
-                if(downloaderReference.get().deleteLocalData(info.getFolderName(), pos))
-                    dialogUIs.NotifyChanges();
-                current_id = -1;
-            }
-            protected void onSwipeLeftToRight(View v){
-                Log.i(TAG, "Swipe Left to Right");
-            }
-        }
-        holder.lstViewVol.setOnTouchListener(new lstSwipeDetector());
+//        final class lstSwipeDetector extends SwipeDetector{
+//            private int current_id = -1;
+//            protected void onSwipeRightToLeft(View v, int x, int y){
+//                //todo: some notification about the operation
+//                //perform local deletion
+//                int pos = holder.lstViewVol.pointToPosition(x,y);
+//                if(pos == current_id) return;
+//                current_id = pos;
+//                if(downloaderReference.get().deleteLocalData(info.getFolderName(), pos))
+//                    onContentChange();
+//                current_id = -1;
+//            }
+//            protected void onSwipeLeftToRight(View v){
+//                Log.i(TAG, "Swipe Left to Right");
+//            }
+//        }
+//        holder.lstViewVol.setOnTouchListener(new lstSwipeDetector());
 
         //order matter!
         sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys);
         holder.sortSpinner.setAdapter(adp);
     }
-
+    void onContentChange(){
+        contentAdapter.notifyDataSetChanged();
+//        notifyDataSetChanged();
+    }
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
@@ -269,13 +284,11 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         return downloaderReference.get().getAvailableDataset(isLocal).size();
     }
 
-    void onContentChange(){contentAdapter.notifyDataSetChanged();}
-
     private void setup_single_card_content_list(ListView lv, String ds_name, boolean isLocal){
         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
         cached_volumeinfo.put(ds_name, vol_lst);
         ArrayList<String> volcon_lst = new ArrayList<>();
-        for (volumeResponse.volumeInfo vinfo : vol_lst){
+        for (volumeResponse.volumeInfo vinfo : cached_volumeinfo.get(ds_name)){
             List<Integer> dims = vinfo.getDimsList();
             volcon_lst.add(actRef.get().getString(
                     R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
@@ -299,34 +312,40 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         lv.setLayoutParams(params);
     }
     private void ReorderVolumeList(String key){
-//        List<volumeResponse.volumeInfo> info_lst = downloaderReference.get().getAvailableVolumes(sel_ds_name, sel_is_local);
-//                //reorder
-//        int kid = sort_keys_ids[sort_keys.indexOf(key)];
-//        if(kid > 0)
-//        Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
-//            @Override
-//            public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
-//                return (u1.getScores().getRawScore(kid)-u2.getScores().getRawScore(kid) > 0)?1:0;
-//            }
-//        });
-//        else
-//            Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
-//                @Override
-//                public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
-//                    return (u1.getScores().getRankScore()-u2.getScores().getRankScore() > 0)?1:0;
-//                }
-//            });
-//
-//        ArrayList<String> volcon_lst = new ArrayList<>();
-//        for (volumeResponse.volumeInfo vinfo : info_lst){
-//            List<Integer> dims = vinfo.getDimsList();
-//            volcon_lst.add(actRef.get().getString(
-//                    R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
-//                    +(vinfo.getScores().getVolScore(2)>0?"\n===>>With Mask<<===":""));
-//        }
-//        contentAdapter.clear();
-//        contentAdapter.addAll(volcon_lst);
-//        dialogUIs.NotifyChanges();
+        List<volumeResponse.volumeInfo> info_lst = cached_volumeinfo.get(sel_ds_name);//downloaderReference.get().getAvailableVolumes(sel_ds_name, sel_is_local);
+                //reorder
+        int kid = sort_keys_ids[sort_keys.indexOf(key)];
+        if(kid > 0)
+        Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+            @Override
+            public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+                float r1 = u1.getScores().getRawScore(kid);
+                float r2 = u2.getScores().getRawScore(kid);
+                return Float.compare(r2, r1);
+            }
+        });
+        else
+            Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+                @Override
+                public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+                    float r1 = u1.getScores().getRankScore();
+                    float r2 = u2.getScores().getRankScore();
+                    return Float.compare(r2,r1);
+                }
+            });
+        for(volumeResponse.volumeInfo info : info_lst)
+            Log.e(TAG, "===ReorderVolumeList: " +info.getFolderName() );
+        cached_volumeinfo.put(sel_ds_name, info_lst);
+        ArrayList<String> volcon_lst = new ArrayList<>();
+        for (volumeResponse.volumeInfo vinfo : info_lst){
+            List<Integer> dims = vinfo.getDimsList();
+            volcon_lst.add(actRef.get().getString(
+                    R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
+                    +(vinfo.getScores().getVolScore(2)>0?"\n===>>With Mask<<===":""));
+        }
+        contentAdapter.clear();
+        contentAdapter.addAll(volcon_lst);
+        onContentChange();
     }
     private static class sortListAdapter extends textSimpleListAdapter{
         int current_id = 0;

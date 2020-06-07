@@ -183,5 +183,15 @@ public class fileUtils {
             e.printStackTrace();
         }
     }
+    public static void saveLargeImageToFile(OutputStream ostream, byte[] data){
+        try{
+            ostream.write(data);
+            ostream.flush();
+            ostream.close();
+        }catch (IOException e){
+            e.printStackTrace();
+            Log.e(TAG, "====Failed to Save Large Image to file");
+        }
+    }
 }
 

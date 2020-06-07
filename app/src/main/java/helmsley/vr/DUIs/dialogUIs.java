@@ -35,7 +35,7 @@ public class dialogUIs {
     private static AlertDialog loadlocal_dialog=null, loadremote_dialog=null,
             loadconfig_dialog=null, saveconfig_dialog=null,
             progress_dialog=null;
-    private static DSCardRecyclerViewAdapter loadlocal_adapter;
+    private DSCardRecyclerViewAdapter loadlocal_adapter;
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
@@ -236,12 +236,10 @@ public class dialogUIs {
         downloader.SetupLocal();
 
         if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
-        if(local_dirty){ NotifyChanges(); local_dirty=false;}
+        if(local_dirty){ loadlocal_adapter.onContentChange(); local_dirty=false;}
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
-
-    static void NotifyChanges(){loadlocal_adapter.onContentChange();loadlocal_adapter.notifyDataSetChanged();}
 
     private AlertDialog setup_download_dialog(DownloadDialogType type){
         final Activity activity = activityReference.get();
