@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 
 import helmsley.vr.JNIInterface;
+import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
 
@@ -46,6 +49,7 @@ public class dialogUIs {
         activityReference = new WeakReference<>(activity_);
         muiRef = new WeakReference<>(mui);
         parentRef = new WeakReference<>(parent_view);
+        downloader = new fileTransferClient(activity_);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity_.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         DIALOG_HEIGHT_LIMIT = (int)(displayMetrics.heightPixels * 0.85);
@@ -341,6 +345,12 @@ public class dialogUIs {
         }
     }
     private void show_file_picker(){
+        if(!MainActivity.permission_granted)
+            Toast.makeText(
+                    activityReference.get(),
+                    "Permission denied to read your External storage, try to enable it via system setting",
+                    Toast.LENGTH_SHORT
+            ).show();
         // Let's use the Android File dialog. It will return an answer in the future, which we
         // get via onActivityResult()
         Intent intent = new Intent()
@@ -348,5 +358,6 @@ public class dialogUIs {
                 .setAction(Intent.ACTION_OPEN_DOCUMENT);
 
         activityReference.get().startActivityForResult(Intent.createChooser(intent, "Select a DICOM file"), 123);
+
     }
 }

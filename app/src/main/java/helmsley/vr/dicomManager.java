@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.protobuf.ByteString;
 import com.imebra.CodecFactory;
 import com.imebra.ColorTransformsFactory;
 import com.imebra.DataSet;
@@ -35,8 +36,12 @@ import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import helmsley.vr.Utils.PushToImebraPipe;
+import helmsley.vr.proto.datasetResponse;
+import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.proto.volumeResponse;
 
 class dicomManager {
     private static final String TAG = "dicomManager";
@@ -89,7 +94,7 @@ class dicomManager {
                 Log.e(TAG, "=====setup_volume_data: ");
             }
         }
-        build_volume(streams);
+        build_volume(pd.getName(), streams);
     }
 
     private void show_file_dir_dialog() {
@@ -199,19 +204,54 @@ class dicomManager {
             }
         });
     }
-    private void build_volume(List<String> file_names) {
+    private void build_volume(String vol_name, List<String> file_names) {
         long width=0, height=0; int ssize=0;
         byte[][] datas = new byte[file_names.size()][];
         boolean is_first = true;
         DataSet loadDataSet;
+        datasetResponse.datasetInfo.Builder ds_builder = datasetResponse.datasetInfo.newBuilder();
+        volumeResponse.volumeInfo.Builder vinfo_builder = volumeResponse.volumeInfo.newBuilder()
+                .setFolderName(vol_name)
+                .setVolumeLocRange(-1);
+
         for(String name:file_names){
             loadDataSet = CodecFactory.load(name);
             Image dicomImage = loadDataSet.getImageApplyModalityTransform(0);
             if(is_first){
+                //build dataset info
+
                 width = dicomImage.getWidth(); height = dicomImage.getHeight();
                 JNIInterface.JNIsendDataPrepare((int)width, (int)height, file_names.size(), -1, false);
                 ssize = (int)(width * height) * 2;
+
                 is_first = false;
+
+                String patient_name = loadDataSet.getString(new TagId(0x0010, 0x0010), 0);
+                String date_str = loadDataSet.getString(new TagId(0x0008, 0x0023), 0);
+                String physicanName = loadDataSet.getString(new TagId(0x0008,0x0090), 0);
+                String folder_name = patient_name+'_'+date_str+'_'+ Calendar.getInstance().getTime();
+                ds_builder = datasetResponse.datasetInfo.newBuilder().setFolderName(folder_name).setPatientName(patient_name)
+                        .setDate(date_str).setPhysicanName(physicanName);
+                TagId po_tag = new TagId(0x0020, 0x0020);
+                float o1 = loadDataSet.getFloat(po_tag,0,-100);
+                if(o1  != -100){
+                    vinfo_builder.addOrientation(o1);
+                    for(int i=1; i<6; i++) vinfo_builder.addOrientation(loadDataSet.getFloat(po_tag, i));
+                }else{
+                    for(int i=0; i<6; i++) vinfo_builder.addOrientation(-1);
+                }
+                vinfo_builder.addDims((int)height);vinfo_builder.addDims((int)width);vinfo_builder.addDims((int)file_names.size());
+                vinfo_builder.addResolution(-1);vinfo_builder.addResolution(-1);
+
+                volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
+                        .setRgroupId(-1)
+                        .setRankId(-1)
+                        .setRankScore(-1);
+                for(int ri=3; ri<21; ri++)
+                    s_builder.addRawScore(-1);
+                for(int ni=21; ni<24; ni++)
+                    s_builder.addVolScore(-1);
+                vinfo_builder.setScores(s_builder.build());
             }
             int ins_id = Integer.parseInt(loadDataSet.getString(new TagId(0x0020,0x0013),0)) - 1;
             datas[ins_id] = get_image_pure_bytes(dicomImage, ssize, width, height);
@@ -219,6 +259,14 @@ class dicomManager {
         for(int i=0; i<datas.length;i++)
             JNIInterface.JNIsendData(0, i, ssize, 2, datas[i]);
         is_finished = true;
+        int sam_size = ssize / 2;
+        byte[] sample_data = datas[(int)(datas.length / 2)];
+        byte[] simg_bytes = new byte[sam_size];
+        for(int i=0; i<sam_size; i++)
+            simg_bytes[i] = sample_data[2*i];
+        vinfo_builder.setSampleImg(ByteString.copyFrom(simg_bytes));
+
+        fileTransferClient.saveDCMI(ds_builder.build(),vinfo_builder.build());
     }
     private byte[] get_image_byte_array(Image dicomImage){
         TransformsChain chain = new TransformsChain();
@@ -245,7 +293,7 @@ class dicomManager {
                 // For monochrome images
                 long idx = idy + scanX;
                 int value = dataHandler.getSignedLong( idx);
-                data[2*(int)idx+1] = (byte)(0);
+                data[2*(int)idx+1] = (byte)(value>>>8);
                 data[2*(int)idx] = (byte)value;
             }
         }

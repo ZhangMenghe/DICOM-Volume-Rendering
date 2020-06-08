@@ -393,56 +393,52 @@ public class fileTransferClient {
         }
     }
     //save after download complete
-    private static void saveDCMI(datasetInfo tds, volumeInfo tvol){
-//        Activity activity = activityReference.get();
+    public static void saveDCMI(datasetInfo tds, volumeInfo tvol){
         //update local data
         selfReference.get().update_local_info(tds, tvol);
         dialogUIs.local_dirty = true;
 
-        //save to local file
-//        if(Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))){
-            try{
-                String[] title_info = {tds.getPatientName(), tds.getDate(), tds.getFolderName(),tvol.getFolderName()};
-                List<String>vol_info_lst = new ArrayList<>();
-                vol_info_lst.add(String.join("/", title_info));
-                //dims
-                String listString = tvol.getDimsList().toString().replaceAll("\\s+","");
-                vol_info_lst.add(listString.substring(1, listString.length()-1));
-                //set orientation
-                listString = tvol.getOrientationList().toString().replaceAll("\\s+","");
-                vol_info_lst.add(listString.substring(1, listString.length()-1));
-                //set resolution
-                listString = tvol.getResolutionList().toString().replaceAll("\\s+","");
-                vol_info_lst.add(listString.substring(1, listString.length()-1));
-                //set loc range
-                vol_info_lst.add(String.valueOf(tvol.getVolumeLocRange()));
-                //set score
-                volumeResponse.scoreInfo sinfo = tvol.getScores();
+        try{
+            String[] title_info = {tds.getPatientName(), tds.getDate(), tds.getFolderName(),tvol.getFolderName()};
+            List<String>vol_info_lst = new ArrayList<>();
+            vol_info_lst.add(String.join("/", title_info));
+            //dims
+            String listString = tvol.getDimsList().toString().replaceAll("\\s+","");
+            vol_info_lst.add(listString.substring(1, listString.length()-1));
+            //set orientation
+            listString = tvol.getOrientationList().toString().replaceAll("\\s+","");
+            vol_info_lst.add(listString.substring(1, listString.length()-1));
+            //set resolution
+            listString = tvol.getResolutionList().toString().replaceAll("\\s+","");
+            vol_info_lst.add(listString.substring(1, listString.length()-1));
+            //set loc range
+            vol_info_lst.add(String.valueOf(tvol.getVolumeLocRange()));
+            //set score
+            volumeResponse.scoreInfo sinfo = tvol.getScores();
 //                String[] score_info = {String.valueOf(sinfo.getRgroupId()), String.valueOf(sinfo.getRankScore()), String.valueOf(sinfo.getVolScore(0)), String.valueOf(sinfo.getVolScore(1)), String.valueOf(sinfo.getVolScore(2))};
-                List<String> score_info_lst = new ArrayList<>();
-                score_info_lst.add(String.valueOf(sinfo.getRgroupId()));
-                score_info_lst.add(String.valueOf(sinfo.getRankId()));
-                score_info_lst.add(String.valueOf(sinfo.getRankScore()));
-                for(Float s:sinfo.getRawScoreList())
-                    score_info_lst.add(String.valueOf(s));
-                for(Float s:sinfo.getVolScoreList())
-                    score_info_lst.add(String.valueOf(s));
+            List<String> score_info_lst = new ArrayList<>();
+            score_info_lst.add(String.valueOf(sinfo.getRgroupId()));
+            score_info_lst.add(String.valueOf(sinfo.getRankId()));
+            score_info_lst.add(String.valueOf(sinfo.getRankScore()));
+            for(Float s:sinfo.getRawScoreList())
+                score_info_lst.add(String.valueOf(s));
+            for(Float s:sinfo.getVolScoreList())
+                score_info_lst.add(String.valueOf(s));
 
-                String content = String.join("/", vol_info_lst) + '\n' + String.join("/", score_info_lst) + '\n';
-                fileUtils.addToFile(LOCAL_INDEX_FILE_PATH, content);
-                //save sample file
-                byte[]buffer = tvol.getSampleImg().toByteArray();
-                File simgf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName() ), "sample");
-                FileOutputStream os = new FileOutputStream(simgf);
-                os.write(buffer);
-                boolean b_wmask = tvol.getScores().getVolScore(2) > 0;
-                File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), b_wmask?DCM_WMASK_FILE_NAME:DCM_FILE_NAME);
-                fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
-            }catch (Exception e){
-                e.printStackTrace();
-                Log.e(TAG, "====Failed to Save Results to file");
-            }
-//        }
+            String content = String.join("/", vol_info_lst) + '\n' + String.join("/", score_info_lst) + '\n';
+            fileUtils.addToFile(LOCAL_INDEX_FILE_PATH, content);
+            //save sample file
+            byte[]buffer = tvol.getSampleImg().toByteArray();
+            File simgf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName() ), "sample");
+            FileOutputStream os = new FileOutputStream(simgf);
+            os.write(buffer);
+            boolean b_wmask = tvol.getScores().getVolScore(2) > 0;
+            File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), b_wmask?DCM_WMASK_FILE_NAME:DCM_FILE_NAME);
+            fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.e(TAG, "====Failed to Save Results to file");
+        }
         finished = true;
     }
     private void update_local_info(datasetInfo tds, volumeInfo tvol){

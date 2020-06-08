@@ -54,4 +54,5 @@
     <string name="sys_data_remote">Load from Remote..</string>
     <string name="sys_data_device">Load from Device..</string>
     <string name="sys_data_local">Load from Local..</string>
+    <string name="sys_req_code">123</string>
 </resources>
