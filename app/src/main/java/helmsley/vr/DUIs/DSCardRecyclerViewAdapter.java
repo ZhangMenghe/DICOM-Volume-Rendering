@@ -186,11 +186,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         import_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                dialogUIs.onDownloadingUI(sel_ds_name, sel_is_local);
                 //get the information ready here
                 List<Integer> dims = sel_vol_info.getDimsList();
                 JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getScores().getVolScore(2)>0);
-                downloaderReference.get().Download(sel_ds_name, sel_vol_info);
+                if(downloaderReference.get().Download(sel_ds_name, sel_vol_info))dialogUIs.onDownloadingUI(sel_ds_name, sel_is_local);
                 preview_dialog.dismiss();
             }
         });

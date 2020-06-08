@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -43,7 +42,9 @@ import helmsley.vr.proto.datasetResponse;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
 
-class dicomManager {
+import static helmsley.vr.DUIs.dialogUIs.progress_dialog;
+
+public class dicomManager {
     private static final String TAG = "dicomManager";
     private final WeakReference<Activity> actRef;
     private AlertDialog file_dir_dialog = null, preview_dialog = null;
@@ -52,8 +53,10 @@ class dicomManager {
     private ImageView preview_img_view;
     private TextView title_tex_view, content_tex_view;
     private static Image single_image;
+    public static String DEFAULT_DS_NAME;
     dicomManager(Activity activity) {
         actRef = new WeakReference<>(activity);
+        DEFAULT_DS_NAME = activity.getString(R.string.data_device_dir_name);
     }
 
     private void setup_volume_data(boolean isVolume) {
@@ -87,14 +90,8 @@ class dicomManager {
         //build stream list
         File pd = sel_file.getParentFile();
         String[] flst = pd.list();
-        for (String f : flst) {
-            try {
-                streams.add(pd.getAbsolutePath()+'/'+f);
-            } catch (Exception e) {
-                Log.e(TAG, "=====setup_volume_data: ");
-            }
-        }
-        build_volume(pd.getName(), streams);
+        for (String f : flst) streams.add(pd.getAbsolutePath()+'/'+f);
+        build_volume(pd.getAbsolutePath(), pd.getName(), streams);
     }
 
     private void show_file_dir_dialog() {
@@ -204,7 +201,7 @@ class dicomManager {
             }
         });
     }
-    private void build_volume(String vol_name, List<String> file_names) {
+    private void build_volume(String folder_path, String vol_name, List<String> file_names) {
         long width=0, height=0; int ssize=0;
         byte[][] datas = new byte[file_names.size()][];
         boolean is_first = true;
@@ -212,6 +209,7 @@ class dicomManager {
         datasetResponse.datasetInfo.Builder ds_builder = datasetResponse.datasetInfo.newBuilder();
         volumeResponse.volumeInfo.Builder vinfo_builder = volumeResponse.volumeInfo.newBuilder()
                 .setFolderName(vol_name)
+                .setFolderPath(folder_path)
                 .setVolumeLocRange(-1);
 
         for(String name:file_names){
@@ -226,12 +224,11 @@ class dicomManager {
 
                 is_first = false;
 
-                String patient_name = loadDataSet.getString(new TagId(0x0010, 0x0010), 0);
-                String date_str = loadDataSet.getString(new TagId(0x0008, 0x0023), 0);
-                String physicanName = loadDataSet.getString(new TagId(0x0008,0x0090), 0);
-                String folder_name = patient_name+'_'+date_str+'_'+ Calendar.getInstance().getTime();
-                ds_builder = datasetResponse.datasetInfo.newBuilder().setFolderName(folder_name).setPatientName(patient_name)
-                        .setDate(date_str).setPhysicanName(physicanName);
+//                String patient_name = loadDataSet.getString(new TagId(0x0010, 0x0010), 0);
+//                String date_str = loadDataSet.getString(new TagId(0x0008, 0x0023), 0);
+//                String physicanName = loadDataSet.getString(new TagId(0x0008,0x0090), 0);
+                ds_builder = datasetResponse.datasetInfo.newBuilder().setFolderName(DEFAULT_DS_NAME).setPatientName("UNKNOWN")
+                        .setDate("UNKNOWN").setPhysicanName("UNKNOWN");
                 TagId po_tag = new TagId(0x0020, 0x0020);
                 float o1 = loadDataSet.getFloat(po_tag,0,-100);
                 if(o1  != -100){
@@ -266,7 +263,7 @@ class dicomManager {
             simg_bytes[i] = sample_data[2*i];
         vinfo_builder.setSampleImg(ByteString.copyFrom(simg_bytes));
 
-        fileTransferClient.saveDCMI(ds_builder.build(),vinfo_builder.build());
+        fileTransferClient.saveDCMI(ds_builder.build(),vinfo_builder.build(), false);
     }
     private byte[] get_image_byte_array(Image dicomImage){
         TransformsChain chain = new TransformsChain();
@@ -283,7 +280,7 @@ class dicomManager {
         memory.data(memoryByte);
         return  memoryByte;
     }
-    private byte[] get_image_pure_bytes(Image dicomImage, int bsize, long width, long height){
+    private static byte[] get_image_pure_bytes(Image dicomImage, int bsize, long width, long height){
         byte[] data = new byte[bsize];
         // Retrieve the data handler
         com.imebra.ReadingDataHandlerNumeric dataHandler = dicomImage.getReadingDataHandler();
@@ -299,10 +296,50 @@ class dicomManager {
         }
         return data;
     }
+    public static boolean LoadDataFromDevice(volumeResponse.volumeInfo vinfo){
+        int height = vinfo.getDims(0);int width = vinfo.getDims(1);int nums = vinfo.getDims(2);
+        int ssize = width * height * 2;
+        byte[][] datas = new byte[nums][];
+        boolean is_first = true;
+        DataSet loadDataSet;
+        try{
+            File pd = new File(vinfo.getFolderPath());
+
+            String[] flst = pd.list();
+            for (String f : flst) {
+                try {
+                    String fname = pd.getAbsolutePath()+'/'+f;
+                    loadDataSet = CodecFactory.load(fname);
+                    Image dicomImage = loadDataSet.getImageApplyModalityTransform(0);
+                    if(is_first) {
+                        is_first = false;
+                        JNIInterface.JNIsendDataPrepare(width, height, nums, -1, false);
+                    }
+                    int ins_id = Integer.parseInt(loadDataSet.getString(new TagId(0x0020,0x0013),0)) - 1;
+                    datas[ins_id] = get_image_pure_bytes(dicomImage, ssize, width, height);
+                } catch (Exception e) {
+                    Log.e(TAG, "=====setup_volume_data: ");
+                    return false;
+                }
+            }
+        }catch (Exception e){
+            return false;
+        }
+        for(int i=0; i<datas.length;i++)
+            JNIInterface.JNIsendData(0, i, ssize, 2, datas[i]);
+        is_finished = true;
+        return true;
+
+    }
     void updateOnFrame(){
         if(is_finished){
             is_finished = false;
             JNIInterface.JNIsendDataDone();
+            actRef.get().runOnUiThread(new Runnable()  {
+                @Override
+                public void run()  {
+                    if(progress_dialog!=null) progress_dialog.dismiss();
+                }});
         }
     }
 }

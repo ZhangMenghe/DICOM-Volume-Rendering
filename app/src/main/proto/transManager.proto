@@ -36,12 +36,13 @@ message volumeResponse{
     }
     message volumeInfo{
         string folder_name = 1;
-        repeated int32 dims = 2;/*height,width,depth*/
-        repeated float orientation = 3;
-        repeated float resolution = 4;/*pix_spacing y, x, slice thickness*/
-        float volume_loc_range = 5;
-        bytes sample_img = 6;
-        scoreInfo scores = 7;
+        string folder_path = 2;
+        repeated int32 dims = 3;/*height,width,depth*/
+        repeated float orientation = 4;
+        repeated float resolution = 5;/*pix_spacing y, x, slice thickness*/
+        float volume_loc_range = 6;
+        bytes sample_img = 7;
+        scoreInfo scores = 8;
     }
     repeated volumeInfo volumes = 1;
 }

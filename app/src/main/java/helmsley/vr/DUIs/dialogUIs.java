@@ -36,8 +36,8 @@ public class dialogUIs {
     private Button sendButton;
     private boolean remote_connection_success = false;
     private static AlertDialog loadlocal_dialog=null, loadremote_dialog=null,
-            loadconfig_dialog=null, saveconfig_dialog=null,
-            progress_dialog=null;
+            loadconfig_dialog=null, saveconfig_dialog=null;
+    public static AlertDialog progress_dialog=null;
     private DSCardRecyclerViewAdapter loadlocal_adapter;
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;

@@ -9,6 +9,7 @@ import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.Utils.fileUtils;
+import helmsley.vr.dicomManager;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -85,23 +86,25 @@ public class fileTransferClient {
         }
         for(int i=0; i<record_num; i++){
 //            Log.e(TAG, "===SetupLocal: read " + line);
-            String[] info = lpc.get(i*2).split("/");
-            //Larry Smarr/2016-10-26/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/512, 512, 144/1.0, -0.0, 0.0, -0.0, -0.0, -1.0/0.8984, 0.8984/243.10002131
+            String[] info = lpc.get(i*2).split("#");
+            //Larry Smarr/2016-10-26/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/series_23_Cor_LAVA_PRE-Amira/512, 512, 144/1.0, -0.0, 0.0, -0.0, -0.0, -1.0/0.8984, 0.8984/243.10002131
+
             datasetInfo tinfo = datasetInfo.newBuilder().setPatientName(info[0]).setDate(info[1]).setFolderName(info[2]).build();
 
             volumeInfo.Builder vinfo_builder = volumeInfo.newBuilder()
                     .setFolderName(info[3])
-                    .setVolumeLocRange(Float.parseFloat(info[7]));
+                    .setFolderPath(info[4])
+                    .setVolumeLocRange(Float.parseFloat(info[8]));
             //set dimensions
-            String[] dims_tx = info[4].split(",");
+            String[] dims_tx = info[5].split(",");
             for(String dt:dims_tx)
                 vinfo_builder.addDims(Integer.parseInt(dt));
             //set orientation
-            String[] ori_tx = info[5].split(",");
+            String[] ori_tx = info[6].split(",");
             for(String t:ori_tx)
                 vinfo_builder.addOrientation(Float.parseFloat(t));
             //set resolution
-            String[] res_tx = info[6].split(",");
+            String[] res_tx = info[7].split(",");
             for(String t:res_tx)
                 vinfo_builder.addResolution(Float.parseFloat(t));
 
@@ -116,7 +119,7 @@ public class fileTransferClient {
                 Log.e(TAG, "===Failed to open sample image "+ e);
             }
 //           group/rank/rscore/...../volscore*3
-            String[] score_tx = lpc.get(i*2+1).split("/");
+            String[] score_tx = lpc.get(i*2+1).split("#");
             volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
                     .setRgroupId(Integer.parseInt(score_tx[0]))
                     .setRankId(Integer.parseInt(score_tx[1]))
@@ -211,10 +214,18 @@ public class fileTransferClient {
         if(res.getSuccess()) Toast.makeText(activityReference.get(), "Config Exported", Toast.LENGTH_LONG).show();
         config_dirty = true;
     }
-    public void Download(String ds_name, volumeInfo target_volume){
+    public boolean Download(String ds_name, volumeInfo target_volume){
         target_vol = target_volume;
-        if(!LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))
-            new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
+        if(ds_name.equals(dicomManager.DEFAULT_DS_NAME)){
+            if(dicomManager.LoadDataFromDevice(target_volume)) return true;
+            Toast.makeText(activityReference.get(),  "File not exist, please check device", Toast.LENGTH_LONG).show();
+            return false;
+        }else{
+            //todo: check and timeout for loading failure
+            if(!LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))
+                new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
+        }
+        return true;
     }
     private void DownloadMasks(String target_path){
         if(target_vol.getScores().getVolScore(2) <= 0) return;
@@ -274,7 +285,7 @@ public class fileTransferClient {
         }
         @Override
         public void onPostExecute(fileTransferClient activity){
-            fileTransferClient.saveDCMI(activity.target_ds, activity.target_vol);
+            fileTransferClient.saveDCMI(activity.target_ds, activity.target_vol, true);
             activity.DownloadMasks(target_path);
         }
         private void loadTextureOnly(dataTransferGrpc.dataTransferBlockingStub blockingStub){
@@ -393,15 +404,15 @@ public class fileTransferClient {
         }
     }
     //save after download complete
-    public static void saveDCMI(datasetInfo tds, volumeInfo tvol){
+    public static void saveDCMI(datasetInfo tds, volumeInfo tvol, boolean save_complete){
         //update local data
         selfReference.get().update_local_info(tds, tvol);
         dialogUIs.local_dirty = true;
 
         try{
-            String[] title_info = {tds.getPatientName(), tds.getDate(), tds.getFolderName(),tvol.getFolderName()};
+            String[] title_info = {tds.getPatientName(), tds.getDate(), tds.getFolderName(),tvol.getFolderName(), tvol.getFolderPath()};
             List<String>vol_info_lst = new ArrayList<>();
-            vol_info_lst.add(String.join("/", title_info));
+            vol_info_lst.add(String.join("#", title_info));
             //dims
             String listString = tvol.getDimsList().toString().replaceAll("\\s+","");
             vol_info_lst.add(listString.substring(1, listString.length()-1));
@@ -425,7 +436,7 @@ public class fileTransferClient {
             for(Float s:sinfo.getVolScoreList())
                 score_info_lst.add(String.valueOf(s));
 
-            String content = String.join("/", vol_info_lst) + '\n' + String.join("/", score_info_lst) + '\n';
+            String content = String.join("#", vol_info_lst) + '\n' + String.join("#", score_info_lst) + '\n';
             fileUtils.addToFile(LOCAL_INDEX_FILE_PATH, content);
             //save sample file
             byte[]buffer = tvol.getSampleImg().toByteArray();
@@ -433,8 +444,11 @@ public class fileTransferClient {
             FileOutputStream os = new FileOutputStream(simgf);
             os.write(buffer);
             boolean b_wmask = tvol.getScores().getVolScore(2) > 0;
-            File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), b_wmask?DCM_WMASK_FILE_NAME:DCM_FILE_NAME);
-            fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
+            if(save_complete){
+                File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), b_wmask?DCM_WMASK_FILE_NAME:DCM_FILE_NAME);
+                fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
+            }
+
         }catch (Exception e){
             e.printStackTrace();
             Log.e(TAG, "====Failed to Save Results to file");
