@@ -37,6 +37,9 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
+
+import helmsley.vr.DUIs.DSCardRecyclerViewAdapter;
 import helmsley.vr.Utils.PushToImebraPipe;
 import helmsley.vr.proto.datasetResponse;
 import helmsley.vr.proto.fileTransferClient;
@@ -210,7 +213,9 @@ public class dicomManager {
         volumeResponse.volumeInfo.Builder vinfo_builder = volumeResponse.volumeInfo.newBuilder()
                 .setFolderName(vol_name)
                 .setFolderPath(folder_path)
-                .setVolumeLocRange(-1);
+                .setVolumeLocRange(-1)
+                .setWithMask(false)
+                .setDataSource(volumeResponse.volumeInfo.DataSource.DEVICE);
 
         for(String name:file_names){
             loadDataSet = CodecFactory.load(name);
@@ -239,13 +244,13 @@ public class dicomManager {
                 }
                 vinfo_builder.addDims((int)height);vinfo_builder.addDims((int)width);vinfo_builder.addDims((int)file_names.size());
                 vinfo_builder.addResolution(-1);vinfo_builder.addResolution(-1);
-
+                Random random = new Random();
                 volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
                         .setRgroupId(-1)
                         .setRankId(-1)
-                        .setRankScore(-1);
+                        .setRankScore(random.nextFloat());
                 for(int ri=3; ri<21; ri++)
-                    s_builder.addRawScore(-1);
+                    s_builder.addRawScore(random.nextFloat());
                 for(int ni=21; ni<24; ni++)
                     s_builder.addVolScore(-1);
                 vinfo_builder.setScores(s_builder.build());
@@ -263,7 +268,7 @@ public class dicomManager {
             simg_bytes[i] = sample_data[2*i];
         vinfo_builder.setSampleImg(ByteString.copyFrom(simg_bytes));
 
-        fileTransferClient.saveDCMI(ds_builder.build(),vinfo_builder.build(), false);
+        fileTransferClient.saveDCMI(ds_builder.build(), vinfo_builder.build(), false);
     }
     private byte[] get_image_byte_array(Image dicomImage){
         TransformsChain chain = new TransformsChain();

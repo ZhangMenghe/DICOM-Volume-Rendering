@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.ArraySet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
@@ -38,11 +41,12 @@ import helmsley.vr.proto.volumeResponse;
 public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecyclerViewAdapter.cardHolder> {
     final static String TAG = "DSCardRecyclerViewAdapter";
     private final WeakReference<Activity> actRef;
+    private static WeakReference<DSCardRecyclerViewAdapter> selfReference;
     private final WeakReference<RecyclerView> recyclerView;
     private final WeakReference<fileTransferClient> downloaderReference;
     private final WeakReference<dialogUIs> dUIRef;
 
-    private ArrayAdapter<String> contentAdapter;
+    private static Map<String, ArrayAdapter<String>> contentAdapters;
     private LinkedHashMap<String, List<volumeResponse.volumeInfo>> cached_volumeinfo;
     private dialogUIs.DownloadDialogType infotype_;
 
@@ -55,7 +59,8 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private static boolean sel_is_local;
     private final static List<String> sort_keys = new ArrayList<>(Arrays.asList("HELM Grade", "Mean", "Range", "SNR"));
     private final static int[] sort_keys_ids = {-1, 0,1,6};
-
+    private static Set<String> dirty_dsname= new ArraySet<>();
+    private Map<String, View> sort_view_map = new LinkedHashMap<>();
 
     //config of each card
     static class cardHolder extends RecyclerView.ViewHolder {
@@ -80,11 +85,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     // Provide a suitable constructor (depends on the kind of dataset)
     DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, dialogUIs dui, dialogUIs.DownloadDialogType type) {
         downloaderReference = new WeakReference<>(downloader);
+        selfReference = new WeakReference<>(this);
         actRef = new WeakReference<>(activity);
         recyclerView = new WeakReference<>(recycle_view);
         dUIRef = new WeakReference<>(dui);
         infotype_ = type;
         cached_volumeinfo = new LinkedHashMap<>();
+        contentAdapters = new LinkedHashMap<>();
     }
 
     // Create new views (invoked by the layout manager)
@@ -129,6 +136,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 View sort_view = v.findViewById(R.id.card_sort_layout);
                 if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
                 else sort_view.setVisibility(View.VISIBLE);
+                sort_view_map.put(sel_ds_name, sort_view);
             }
         });
         return new cardHolder(card_view);
@@ -170,8 +178,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         preview_delete_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(downloaderReference.get().deleteLocalData(sel_ds_name, sel_vol_info))
-                    onContentChange();
+                if(downloaderReference.get().deleteLocalData(sel_ds_name, sel_vol_info)){
+                    DirtyCache(sel_ds_name);
+//                    onContentChange();
+                }
                 preview_dialog.dismiss();
             }
         });
@@ -188,7 +198,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             public void onClick(View v) {
                 //get the information ready here
                 List<Integer> dims = sel_vol_info.getDimsList();
-                JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getScores().getVolScore(2)>0);
+                JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getWithMask());
                 if(downloaderReference.get().Download(sel_ds_name, sel_vol_info))dialogUIs.onDownloadingUI(sel_ds_name, sel_is_local);
                 preview_dialog.dismiss();
             }
@@ -219,6 +229,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 sel_is_local = isLocal;
 //                fileTransferClient loader = downloaderReference.get();
 //                sel_vol_info = loader.getAvailableVolumes(sel_ds_name, isLocal).get(position);
+                if(!dirty_dsname.isEmpty()){
+                    for(String name:dirty_dsname){
+                        List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(name, true);
+                        if(vol_lst!=null && !vol_lst.isEmpty()) cached_volumeinfo.put(name, vol_lst);
+                    }
+                    dirty_dsname.clear();
+                }
                 sel_vol_info = cached_volumeinfo.get(sel_ds_name).get(position);
 
                 if(preview_dialog == null) setup_preview_dialog();
@@ -248,32 +265,20 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             }
         });
 
-        //Perform "more" options with a fling gesture
-//        final class lstSwipeDetector extends SwipeDetector{
-//            private int current_id = -1;
-//            protected void onSwipeRightToLeft(View v, int x, int y){
-//                //todo: some notification about the operation
-//                //perform local deletion
-//                int pos = holder.lstViewVol.pointToPosition(x,y);
-//                if(pos == current_id) return;
-//                current_id = pos;
-//                if(downloaderReference.get().deleteLocalData(info.getFolderName(), pos))
-//                    onContentChange();
-//                current_id = -1;
-//            }
-//            protected void onSwipeLeftToRight(View v){
-//                Log.i(TAG, "Swipe Left to Right");
-//            }
-//        }
-//        holder.lstViewVol.setOnTouchListener(new lstSwipeDetector());
-
         //order matter!
         sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys);
         holder.sortSpinner.setAdapter(adp);
     }
-    void onContentChange(){
-        contentAdapter.notifyDataSetChanged();
-//        notifyDataSetChanged();
+    public static void DirtyCache(String dsname){
+        dirty_dsname.add(dsname);
+        try{
+            contentAdapters.get(dsname).notifyDataSetChanged();
+            selfReference.get().notifyDataSetChanged();
+            for(View sort_view: selfReference.get().sort_view_map.values())
+                sort_view.setVisibility(View.GONE);
+        }catch (NullPointerException e){
+        }
+
     }
     // Return the size of your dataset (invoked by the layout manager)
     @Override
@@ -285,16 +290,19 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 
     private void setup_single_card_content_list(ListView lv, String ds_name, boolean isLocal){
         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
+        if(vol_lst.isEmpty()) return;
         cached_volumeinfo.put(ds_name, vol_lst);
+
+        //setup card info
         ArrayList<String> volcon_lst = new ArrayList<>();
         for (volumeResponse.volumeInfo vinfo : cached_volumeinfo.get(ds_name)){
             List<Integer> dims = vinfo.getDimsList();
             volcon_lst.add(actRef.get().getString(
                     R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
-                    +(vinfo.getScores().getVolScore(2)>0?"\n===>>With Mask<<===":""));
+                    +(vinfo.getWithMask()?"\n===>>With Mask<<===":""));
         }
 
-        contentAdapter = new ArrayAdapter<>(actRef.get(), android.R.layout.simple_list_item_1, volcon_lst);
+        ArrayAdapter<String> contentAdapter = new ArrayAdapter<>(actRef.get(), android.R.layout.simple_list_item_1, volcon_lst);
 
         //init listview
         lv.setAdapter(contentAdapter);
@@ -309,10 +317,14 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                     + 40 * vol_lst.get(pos).getFolderName().length() / 24;
         }
         lv.setLayoutParams(params);
+        contentAdapters.put(ds_name, contentAdapter);
     }
     private void ReorderVolumeList(String key){
         List<volumeResponse.volumeInfo> info_lst = cached_volumeinfo.get(sel_ds_name);//downloaderReference.get().getAvailableVolumes(sel_ds_name, sel_is_local);
                 //reorder
+        for(volumeResponse.volumeInfo v: info_lst)
+            Log.e(TAG, "====before: " + v.getFolderName() );
+
         int kid = sort_keys_ids[sort_keys.indexOf(key)];
         if(kid > 0)
         Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
@@ -332,19 +344,20 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                     return Float.compare(r2,r1);
                 }
             });
-        for(volumeResponse.volumeInfo info : info_lst)
-            Log.e(TAG, "===ReorderVolumeList: " +info.getFolderName() );
         cached_volumeinfo.put(sel_ds_name, info_lst);
+
+        //setup card info
         ArrayList<String> volcon_lst = new ArrayList<>();
-        for (volumeResponse.volumeInfo vinfo : info_lst){
+        for (volumeResponse.volumeInfo vinfo : cached_volumeinfo.get(sel_ds_name)){
             List<Integer> dims = vinfo.getDimsList();
             volcon_lst.add(actRef.get().getString(
                     R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
-                    +(vinfo.getScores().getVolScore(2)>0?"\n===>>With Mask<<===":""));
+                    +(vinfo.getWithMask()?"\n===>>With Mask<<===":""));
         }
-        contentAdapter.clear();
-        contentAdapter.addAll(volcon_lst);
-        onContentChange();
+        contentAdapters.get(sel_ds_name).clear();
+        contentAdapters.get(sel_ds_name).addAll(volcon_lst);
+        contentAdapters.get(sel_ds_name).notifyDataSetChanged();
+
     }
     private static class sortListAdapter extends textSimpleListAdapter{
         int current_id = 0;

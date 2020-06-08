@@ -27,7 +27,6 @@ public class mainUIs {
 
     private Spinner spinner_check;
     private dialogUIs dialogController;
-    private String cached_yaml = null;
 
     //Spinner adapter
     private checkpanelAdapter cb_panel_adapter;

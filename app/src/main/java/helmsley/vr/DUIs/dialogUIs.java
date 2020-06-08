@@ -240,7 +240,7 @@ public class dialogUIs {
         downloader.SetupLocal();
 
         if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
-        if(local_dirty){ loadlocal_adapter.onContentChange(); local_dirty=false;}
+//        if(local_dirty){ loadlocal_adapter.onContentChange(); local_dirty=false;}
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }

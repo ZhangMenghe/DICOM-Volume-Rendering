@@ -41,8 +41,15 @@ message volumeResponse{
         repeated float orientation = 4;
         repeated float resolution = 5;/*pix_spacing y, x, slice thickness*/
         float volume_loc_range = 6;
-        bytes sample_img = 7;
-        scoreInfo scores = 8;
+        bool with_mask = 7;
+        enum DataSource{
+            LOCAL = 0;
+            SERVER = 1;
+            DEVICE = 2;
+        }
+        DataSource data_source = 8;
+        bytes sample_img = 9;
+        scoreInfo scores = 10;
     }
     repeated volumeInfo volumes = 1;
 }
