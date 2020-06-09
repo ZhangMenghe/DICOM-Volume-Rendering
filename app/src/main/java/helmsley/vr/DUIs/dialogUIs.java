@@ -4,8 +4,6 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -257,7 +255,7 @@ public class dialogUIs {
         //adapter
         switch (type){
             case CONFIGS:
-                content_view.setAdapter(new DSCardRecyclerViewAdapter(activity, content_view,downloader, this, DownloadDialogType.CONFIGS));
+                content_view.setAdapter(new ConfigCardRecyclerViewAdapter(downloader, this));
                 break;
             case DATA_LOCAL:
                 loadlocal_adapter = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_LOCAL);

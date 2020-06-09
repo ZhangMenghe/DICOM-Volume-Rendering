@@ -51,9 +51,9 @@
     <string name="sys_reset">Reset</string>
     <string name="sys_template_save">Save Workspace As..</string>
     <string name="sys_template_load">Open Workspace..</string>
-    <string name="sys_data_remote">Load from Remote..</string>
-    <string name="sys_data_device">Load from Device..</string>
-    <string name="sys_data_local">Load from Local..</string>
+    <string name="sys_data_remote">Data from Remote..</string>
+    <string name="sys_data_device">Data from Device..</string>
+    <string name="sys_data_local">Data from Local..</string>
     <string name="sys_req_code">123</string>
     <string name="data_device_dir_name">Device</string>
 </resources>

@@ -32,7 +32,6 @@
                     android:layout_height="wrap_content"
                     android:textAlignment="center"
                     android:layout_gravity="center"
-                    android:text="asdasdff"
                     android:layout_weight="1"/>
 
                 <LinearLayout
@@ -56,7 +55,6 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal"
                         android:layout_marginTop="10dp"
-                        android:text="asdfasd"
                         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                 </LinearLayout>
