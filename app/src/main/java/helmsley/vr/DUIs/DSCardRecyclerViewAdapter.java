@@ -57,8 +57,8 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private static volumeResponse.volumeInfo sel_vol_info;
     private static String sel_ds_name;
     private static boolean sel_is_local;
-    private final static List<String> sort_keys = new ArrayList<>(Arrays.asList("HELM Grade", "Mean", "Range", "SNR"));
-    private final static int[] sort_keys_ids = {-1, 0,1,6};
+    private final static List<String> sort_keys = new ArrayList<>(Arrays.asList("HELM Grade", "Name", "Mean", "Range", "SNR"));
+    private final static int[] sort_keys_ids = {-1, -1, 0,1,6};
     private static Set<String> dirty_dsname= new ArraySet<>();
     private Map<String, View> sort_view_map = new LinkedHashMap<>();
 
@@ -228,11 +228,12 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 //                sel_vol_info = loader.getAvailableVolumes(sel_ds_name, isLocal).get(position);
                 if(!dirty_dsname.isEmpty()){
                     for(String name:dirty_dsname){
-                        List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(name, true);
+                        List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(name, sel_is_local);
                         if(vol_lst!=null && !vol_lst.isEmpty()) cached_volumeinfo.put(name, vol_lst);
                     }
                     dirty_dsname.clear();
                 }
+                //todo:debug, select from remote, the second time after reordering
                 sel_vol_info = cached_volumeinfo.get(sel_ds_name).get(position);
 
                 if(preview_dialog == null) setup_preview_dialog();
@@ -269,10 +270,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     public static void DirtyCache(String dsname){
         dirty_dsname.add(dsname);
         try{
-            contentAdapters.get(dsname).notifyDataSetChanged();
             selfReference.get().notifyDataSetChanged();
             for(View sort_view: selfReference.get().sort_view_map.values())
                 sort_view.setVisibility(View.GONE);
+            contentAdapters.get(dsname).notifyDataSetChanged();
         }catch (NullPointerException e){
         }
 
@@ -318,9 +319,6 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     }
     private void ReorderVolumeList(String key){
         List<volumeResponse.volumeInfo> info_lst = cached_volumeinfo.get(sel_ds_name);//downloaderReference.get().getAvailableVolumes(sel_ds_name, sel_is_local);
-                //reorder
-        for(volumeResponse.volumeInfo v: info_lst)
-            Log.e(TAG, "====before: " + v.getFolderName() );
 
         int kid = sort_keys_ids[sort_keys.indexOf(key)];
         if(kid > 0)
@@ -332,15 +330,37 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 return Float.compare(r2, r1);
             }
         });
-        else
-            Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
-                @Override
-                public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
-                    float r1 = u1.getScores().getRankScore();
-                    float r2 = u2.getScores().getRankScore();
-                    return Float.compare(r2,r1);
-                }
-            });
+        else{
+            if(key.equals("Name")){
+                Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+                    @Override
+                    public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+                        try{
+                            float f1 = Float.parseFloat(u1.getFolderName().split("_")[0]);
+                            return Float.compare(f1, Float.parseFloat(u2.getFolderName().split("_")[0]));
+                        }catch (NumberFormatException e1){
+                            try{
+                                float f12 = Float.parseFloat(u1.getFolderName().split("_")[1]);
+                                return Float.compare(f12,Float.parseFloat(u2.getFolderName().split("_")[1]));
+                            }catch (NumberFormatException e2){
+                                return Character.compare(u1.getFolderName().charAt(0), u2.getFolderName().charAt(0));
+                            }
+                        }
+                    }
+                });
+            }else{
+                Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+                    @Override
+                    public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+                        float r1 = u1.getScores().getRankScore();
+                        float r2 = u2.getScores().getRankScore();
+                        return Float.compare(r2,r1);
+                    }
+                });
+            }
+
+        }
+
         cached_volumeinfo.put(sel_ds_name, info_lst);
 
         //setup card info
@@ -351,10 +371,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                     R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
                     +(vinfo.getWithMask()?"\n===>>With Mask<<===":""));
         }
-        contentAdapters.get(sel_ds_name).clear();
-        contentAdapters.get(sel_ds_name).addAll(volcon_lst);
-        contentAdapters.get(sel_ds_name).notifyDataSetChanged();
-
+        if(!contentAdapters.containsKey(sel_ds_name))
+            contentAdapters.put(sel_ds_name, new ArrayAdapter<>(actRef.get(), android.R.layout.simple_list_item_1, volcon_lst));
+        else{
+            contentAdapters.get(sel_ds_name).clear();
+            contentAdapters.get(sel_ds_name).addAll(volcon_lst);
+            contentAdapters.get(sel_ds_name).notifyDataSetChanged();
+        }
     }
     private static class sortListAdapter extends textSimpleListAdapter{
         int current_id = 0;

@@ -109,10 +109,10 @@ public class dialogUIs {
             public void onClick(View v) {
                 sendButton.setEnabled(false);
                 EditText nameEdit = (EditText) dialogView.findViewById(R.id.expname_edit_text);
-                EditText commnetEdit = (EditText) dialogView.findViewById(R.id.expcomment_edit_text);
+                EditText commentEdit = (EditText) dialogView.findViewById(R.id.expcomment_edit_text);
                 String input_name = nameEdit.getText().toString();
                 downloader.ExportConfig(muiRef.get().getExportConfig(input_name.isEmpty()?nameEdit.getHint().toString():input_name,
-                        commnetEdit.getText().toString() ));
+                        commentEdit.getText().toString() ));
                 saveconfig_dialog.dismiss();
             }
         });
