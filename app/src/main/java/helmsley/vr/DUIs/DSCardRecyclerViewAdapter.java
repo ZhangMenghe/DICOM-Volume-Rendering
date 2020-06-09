@@ -229,8 +229,6 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 //load data from local / remote
                 sel_ds_name = info.getFolderName();
                 sel_is_local = isLocal;
-//                fileTransferClient loader = downloaderReference.get();
-//                sel_vol_info = loader.getAvailableVolumes(sel_ds_name, isLocal).get(position);
                 if(!dirty_dsname.isEmpty()){
                     for(String name:dirty_dsname){
                         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(name, sel_is_local);
@@ -238,7 +236,6 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                     }
                     dirty_dsname.clear();
                 }
-                //todo:debug, select from remote, the second time after reordering
                 sel_vol_info = cached_volumeinfo.get(sel_ds_name).get(position);
 
                 if(preview_dialog == null) setup_preview_dialog();
@@ -266,9 +263,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 if(isLocal)preview_delete_btn.setVisibility(View.VISIBLE);
                 else preview_delete_btn.setVisibility(View.GONE);
                 //name
-                String content = "Rank: " + sel_vol_info.getScores().getRankId() + "\n";
-                content +="Ranking score: "+ sel_vol_info.getScores().getRankScore() + "\n"
-                        + "Tags Score: " + sel_vol_info.getScores().getVolScore(1) + "\n";
+                String content = "HELM Rank: " + sel_vol_info.getScores().getRankId() + "\n";
+                content +="HELM Rank score: "+ sel_vol_info.getScores().getRankScore() + "\n"
+                        + "Dimensions: " + height + "x"+width+"x"+sel_vol_info.getDims(2) + '\n';
                 content_tex_view.setText(content);
                 preview_dialog.show();
             }
@@ -298,6 +295,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     }
 
     private void setup_single_card_content_list(ListView lv, String ds_name, boolean isLocal){
+        //todo:on processing ui?
         List<volumeResponse.volumeInfo> vol_lst = downloaderReference.get().getAvailableVolumes(ds_name, isLocal);
         if(vol_lst.isEmpty()) return;
         cached_volumeinfo.put(ds_name, vol_lst);
@@ -387,8 +385,8 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         else{
             contentAdapters.get(sel_ds_name).clear();
             contentAdapters.get(sel_ds_name).addAll(volcon_lst);
-            contentAdapters.get(sel_ds_name).notifyDataSetChanged();
         }
+        contentAdapters.get(sel_ds_name).notifyDataSetChanged();
     }
     private static class sortListAdapter extends textSimpleListAdapter{
         int current_id = 0;
