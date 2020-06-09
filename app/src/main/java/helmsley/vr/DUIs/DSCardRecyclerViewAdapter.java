@@ -178,10 +178,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         preview_delete_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(downloaderReference.get().deleteLocalData(sel_ds_name, sel_vol_info)){
-                    DirtyCache(sel_ds_name);
-//                    onContentChange();
-                }
+                if(downloaderReference.get().deleteLocalData(sel_ds_name, sel_vol_info)) DirtyCache(sel_ds_name);
                 preview_dialog.dismiss();
             }
         });

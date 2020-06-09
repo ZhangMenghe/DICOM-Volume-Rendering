@@ -244,13 +244,13 @@ public class dicomManager {
                 }
                 vinfo_builder.addDims((int)height);vinfo_builder.addDims((int)width);vinfo_builder.addDims((int)file_names.size());
                 vinfo_builder.addResolution(-1);vinfo_builder.addResolution(-1);
-                Random random = new Random();
+//                Random random = new Random();
                 volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
                         .setRgroupId(-1)
                         .setRankId(-1)
-                        .setRankScore(random.nextFloat());
+                        .setRankScore(-1);//random.nextFloat());
                 for(int ri=3; ri<21; ri++)
-                    s_builder.addRawScore(random.nextFloat());
+                    s_builder.addRawScore(-1);//random.nextFloat());
                 for(int ni=21; ni<24; ni++)
                     s_builder.addVolScore(-1);
                 vinfo_builder.setScores(s_builder.build());
