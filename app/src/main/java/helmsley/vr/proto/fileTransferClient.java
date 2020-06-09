@@ -460,7 +460,7 @@ public class fileTransferClient {
             Log.e(TAG, "====Failed to Save Results to file");
         }
         finished = true;
-        DSCardRecyclerViewAdapter.DirtyCache(tds.getFolderName());
+        if(!save_complete)DSCardRecyclerViewAdapter.DirtyCache(tds.getFolderName());
     }
     private void update_local_info(datasetInfo tds, volumeInfo tvol){
         String dsname = tds.getFolderName();

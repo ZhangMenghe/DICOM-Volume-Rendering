@@ -264,7 +264,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         });
 
         //order matter!
-        sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys);
+        sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys, info.getFolderName());
         holder.sortSpinner.setAdapter(adp);
     }
     public static void DirtyCache(String dsname){
@@ -381,9 +381,11 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     }
     private static class sortListAdapter extends textSimpleListAdapter{
         int current_id = 0;
+        String ds_name_;
         private final WeakReference<DSCardRecyclerViewAdapter> parentRef;
-        sortListAdapter(Context context, DSCardRecyclerViewAdapter parent, List<String> arrs){
+        sortListAdapter(Context context, DSCardRecyclerViewAdapter parent, List<String> arrs, String ds_name){
             super(context, arrs);
+            ds_name_ = ds_name;
             parentRef = new WeakReference<>(parent);
             setTitleById(current_id);
         }
@@ -391,6 +393,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             super.setTitleById(id);
             if(current_id == id) return;
             current_id = id;
+            sel_ds_name = ds_name_;
             parentRef.get().ReorderVolumeList(item_names.get(id));
         }
         void setTitleByText(String title) {
@@ -398,11 +401,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             int nid = item_names.indexOf(title);
             if(nid == current_id) return;
             current_id = nid;
+            sel_ds_name = ds_name_;
             parentRef.get().ReorderVolumeList(title);
         }
         void onItemClick(int position){
             if(current_id == position) return;
             current_id = position;
+            sel_ds_name = ds_name_;
             parentRef.get().ReorderVolumeList(item_names.get(position));
         }
     }
