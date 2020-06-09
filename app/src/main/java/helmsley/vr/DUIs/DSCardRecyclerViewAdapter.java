@@ -8,6 +8,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.ArraySet;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,6 +62,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private final static int[] sort_keys_ids = {-1, -1, 0,1,6};
     private static Set<String> dirty_dsname= new ArraySet<>();
     private Map<String, View> sort_view_map = new LinkedHashMap<>();
+    private static int PREVIEW_IMG_HEIGHT;
 
     //config of each card
     static class cardHolder extends RecyclerView.ViewHolder {
@@ -92,6 +94,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         infotype_ = type;
         cached_volumeinfo = new LinkedHashMap<>();
         contentAdapters = new LinkedHashMap<>();
+        TypedValue typedValue = new TypedValue();
+        activity.getResources().getValue(R.dimen.preview_img_height, typedValue, true);
+        PREVIEW_IMG_HEIGHT = (int)typedValue.getFloat();
     }
 
     // Create new views (invoked by the layout manager)
@@ -250,7 +255,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 ByteBuffer byteBuffer = ByteBuffer.wrap(data);
                 renderBitmap.copyPixelsFromBuffer(byteBuffer);
 
-                preview_img_view.setImageBitmap(renderBitmap);
+                if(height == PREVIEW_IMG_HEIGHT){
+                    preview_img_view.setImageBitmap(renderBitmap);
+                }else{
+                    Bitmap bMapScaled = Bitmap.createScaledBitmap(renderBitmap, (int)(width/height * PREVIEW_IMG_HEIGHT), PREVIEW_IMG_HEIGHT, true);
+                    preview_img_view.setImageBitmap(bMapScaled);
+                }
+
                 title_tex_view.setText(actRef.get().getString(R.string.preview_text, sel_vol_info.getFolderName()));
                 if(isLocal)preview_delete_btn.setVisibility(View.VISIBLE);
                 else preview_delete_btn.setVisibility(View.GONE);

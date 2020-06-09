@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,10 +57,14 @@ public class dicomManager {
     private ImageView preview_img_view;
     private TextView title_tex_view, content_tex_view;
     private static Image single_image;
-    public static String DEFAULT_DS_NAME;
+    private static String DEFAULT_DS_NAME;
+    private static int PREVIEW_IMG_HEIGHT;
     dicomManager(Activity activity) {
         actRef = new WeakReference<>(activity);
         DEFAULT_DS_NAME = activity.getString(R.string.data_device_dir_name);
+        TypedValue typedValue = new TypedValue();
+        activity.getResources().getValue(R.dimen.preview_img_height, typedValue, true);
+        PREVIEW_IMG_HEIGHT = (int)typedValue.getFloat();
     }
 
     private void setup_volume_data(boolean isVolume) {
@@ -150,9 +155,15 @@ public class dicomManager {
         ByteBuffer byteBuffer = ByteBuffer.wrap(byte_data);
         renderBitmap.copyPixelsFromBuffer(byteBuffer);
 
+        if(single_image.getHeight() == PREVIEW_IMG_HEIGHT){
+            preview_img_view.setImageBitmap(renderBitmap);
+        }else{
+            Bitmap bMapScaled = Bitmap.createScaledBitmap(renderBitmap, (int)(single_image.getWidth()/single_image.getHeight() * PREVIEW_IMG_HEIGHT), PREVIEW_IMG_HEIGHT, true);
+            preview_img_view.setImageBitmap(bMapScaled);
+        }
+
         //update image
         if(preview_dialog == null) setup_dialog();
-        preview_img_view.setImageBitmap(renderBitmap);
         title_tex_view.setText(actRef.get().getString(R.string.preview_text,name));
         //name
         String content = "Patient Name: " + loadDataSet.getString(new TagId(0x0010, 0x0010), 0) + '\n';

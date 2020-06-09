@@ -6,4 +6,5 @@
 
     <dimen name="activity_top_panel_percent">0.20</dimen>
     <dimen name="activity_trans_bottom_panel_percent">0.15</dimen>
+    <dimen name="preview_img_height">512</dimen>
 </resources>
