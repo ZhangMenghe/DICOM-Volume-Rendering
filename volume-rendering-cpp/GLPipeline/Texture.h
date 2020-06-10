@@ -14,6 +14,7 @@ public:
 	unsigned int Width() const { return mWidth; }
 	unsigned int Height() const { return mHeight; }
 	unsigned int Depth() const { return mDepth; }
+
 	GLuint GLTexture() const { return mTexture; }
 	void Update(void* data);
 

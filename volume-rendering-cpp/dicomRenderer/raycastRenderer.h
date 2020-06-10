@@ -20,10 +20,11 @@ private:
 public:
     raycastRenderer(bool screen_baked = true);
 
-    void onCuttingChange(float percent);
+    void setCuttingPlane(float percent);
+    void setCuttingPlane(glm::vec3 pp, glm::vec3 pn);
+    float* getCuttingPlane();
     void Draw();
-    void updatePrecomputation(GLuint sp);
     void dirtyPrecompute(){baked_dirty_ = true;}
-    void setDimension(int dims);
+    void setDimension(int dims, float thickness);
 };
 #endif

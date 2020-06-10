@@ -6,6 +6,7 @@
 
 #include <android/bitmap.h>
 #include <vector>
+#include <overlayController.h>
 
 using namespace dvr;
 namespace {
@@ -14,8 +15,9 @@ namespace {
     //globally
     GLubyte* g_VolumeTexData = nullptr;
     int g_img_h=0, g_img_w=0, g_img_d=0;
+    float g_vol_thickness = 0;
     size_t g_ssize = 0, g_vol_len;
-    size_t n_data_offset[2] = {0};
+    size_t n_data_offset[3] = {0};
     AAssetManager * _asset_manager;
     std::string LoadTextFile(const char* file_name) {
         std::string* out_file_text_string = new std::string();
@@ -69,14 +71,17 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
     nativeApp(nativeAddr)->onViewCreated();
+    overlayController::instance()->onViewCreated();
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
     nativeApp(nativeAddr)->onViewChange(w, h);
+    overlayController::instance()->onViewChange(w, h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     nativeApp(nativeAddr)->onDraw();
+    overlayController::instance()->onDraw();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){
@@ -93,7 +98,7 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
                 buffer[CHANEL_NUM* idx] = GLubyte(data[2*idx]);
                 buffer[CHANEL_NUM* idx + 1] = GLubyte(data[2*idx+1]);
             }
-        }else{
+        }else if(target == LOAD_MASK_ID){
             for(auto idx = 0; idx<num; idx++){
                 buffer[CHANEL_NUM* idx + 2] = GLubyte(data[2*idx]);
                 buffer[CHANEL_NUM* idx + 3] = GLubyte(data[2*idx+1]);
@@ -104,22 +109,20 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
     env->ReleaseByteArrayElements(jdata, data, 0);
 }
 
-JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint width, jint height, jint dims, jboolean b_wmask){
+JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint width, jint height, jint dims, jfloat thickness, jboolean b_wmask){
     CHANEL_NUM = b_wmask? 4:2;
     g_img_h = height; g_img_w = width; g_img_d = dims;
     g_ssize = CHANEL_NUM * width * height;
     g_vol_len = g_ssize* dims;
-
+    g_vol_thickness = thickness;
     if(g_VolumeTexData!= nullptr){delete[]g_VolumeTexData; g_VolumeTexData = nullptr;}
     g_VolumeTexData = new GLubyte[ g_vol_len];
     memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
 }
 
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
-    if(n_data_offset[LOAD_DCMI_ID] == 0 && n_data_offset[LOAD_MASK_ID] == 0) return;
-    vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_VolumeTexData, CHANEL_NUM);
-    //todo:!!attention, is the data change or not? delete here to save memory
-    n_data_offset[LOAD_DCMI_ID] = 0; n_data_offset[LOAD_MASK_ID] = 0;
+    for(auto &id:n_data_offset)
+        if(id!=0) {vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_vol_thickness, g_VolumeTexData, CHANEL_NUM); id=0;break;}
 }
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){

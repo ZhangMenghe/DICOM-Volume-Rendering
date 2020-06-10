@@ -13,7 +13,6 @@ layout(binding = 1, rgba8)writeonly uniform mediump image2D destTex;
 
 uniform vec2 u_con_size;
 uniform float u_fov;
-
 uniform mat4 u_WorldToModel;
 uniform mat4 u_CamToWorld;
 
@@ -27,6 +26,7 @@ struct Plane{
 };
 uniform Plane uPlane;
 const float constantNCP = 1.0;
+const float alpha_tolerance = 0.01;
 vec3 VolumeSize;
 
 vec2 RayCube(vec3 ro, vec3 rd, vec3 extents) {
@@ -52,9 +52,8 @@ bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
 }
 
 vec4 Sample(vec3 p){
-    vec3 coord = clamp(p, vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
-    return imageLoad(srcTex, ivec3(VolumeSize *coord));
-//    return vec4(ucolor)/ 256.0;
+    vec3 coord = clamp(p, vec3(.0), vec3(1.0));//vec3(usample_step_inverse), vec3(1.0-usample_step_inverse));
+    return clamp(imageLoad(srcTex, ivec3(VolumeSize *coord)), vec4(.0), vec4(1.0));
 }
 vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
     float t0 = t - StepSize * 4.0;
@@ -71,25 +70,69 @@ vec4 subDivide(vec3 p, vec3 ro, vec3 rd, float t, float StepSize){
     return Sample(p);
 }
 vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
+    //todo:better way???
+    if(VolumeSize.z <2.0) return clamp(Sample(ro+rd*head), vec4(.0), vec4(1.0));
+
     vec4 sum = vec4(.0);
-    int steps = 0; float pd = .0;
+    int steps = 0;
+    float pd = .0;
 
     float vmax = .0;
+    bool last_succeeded = true;
+    float high_bound = 0.01;
+
+    float step_size = usample_step_inverse;
+    vec3 p;
+    vec4 val_color;
     for(float t = head; t<tail; ){
-        if(sum.a >= 0.95) break;
-        vec3 p = ro + rd * t;
-        vec4 val_color = Sample(p);
+        if(sum.a >= 0.95 ||steps>800) break;
+        p = ro + rd * t;
+        val_color = Sample(p);
+
         if(val_color.a > 0.01){
-            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
-            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
-            sum.a += (1.0 - sum.a) * val_color.a;
+            pd = (1.0 - sum.a) * val_color.a;
+
+            if (pd > high_bound){
+                step_size/=2.0; high_bound= min(high_bound*2.0, 1.0);last_succeeded = false;
+            }else{
+                sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
+                sum.a += pd;
+                t += step_size;
+
+                if (last_succeeded){ step_size*=2.0; high_bound/=2.0; }
+                else last_succeeded = true;
+            }
+        }else{
+            t+=4.0*usample_step_inverse;
         }
-        t += val_color.a > 0.01? usample_step_inverse: usample_step_inverse * 4.0;
         steps++;
-        pd = sum.a;
     }
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
+
+//vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
+//    //todo:better way???
+//    if(VolumeSize.z <2.0) return clamp(Sample(ro+rd*head), vec4(.0), vec4(1.0));
+//
+//    vec4 sum = vec4(.0);
+//    int steps = 0; float pd = .0;
+//
+//    float vmax = .0;
+//    for(float t = head; t<tail; ){
+//        if(sum.a >= 0.95) break;
+//        vec3 p = ro + rd * t;
+//        vec4 val_color = Sample(p);
+//        if(val_color.a > 0.01){
+//            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
+//            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
+//            sum.a += (1.0 - sum.a) * val_color.a;
+//        }
+//        t += val_color.a > 0.01? usample_step_inverse: usample_step_inverse * 4.0;
+//        steps++;
+//        pd = sum.a;
+//    }
+//    return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
+//}
 
 vec4 tracing(float u, float v){
     float tangent = tan(u_fov / 2.0); // angle in radians

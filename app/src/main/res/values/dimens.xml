@@ -2,4 +2,9 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin_half">8dp</dimen>
+
+    <dimen name="activity_top_panel_percent">0.20</dimen>
+    <dimen name="activity_trans_bottom_panel_percent">0.15</dimen>
+    <dimen name="preview_img_height">512</dimen>
 </resources>

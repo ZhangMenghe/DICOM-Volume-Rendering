@@ -28,10 +28,11 @@ SET(GL_PIPELINE_FILES
 #        Utils/perfMonitor.cpp
 #        )
 SET(DICOM_RENDERERS
-        dicomRenderer/funcsRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp
         dicomRenderer/cuttingController.cpp
+        dicomRenderer/colorbarRenderer.cpp
+        dicomRenderer/graphRenderer.cpp
         dicomRenderer/screenQuad.cpp)
 
 include_directories(${GLM_DIRECTORY})
@@ -40,6 +41,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(vrNative
         SHARED
         vrController.cpp
+        overlayController.cpp
         ${DICOM_RENDERERS}
         ${GL_PIPELINE_FILES}
 #        ${UTILS_FILES}

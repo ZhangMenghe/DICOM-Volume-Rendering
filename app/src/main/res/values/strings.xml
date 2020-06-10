@@ -2,7 +2,7 @@
     <string name="app_name">DICOM Viewer</string>
     <string name="fps">0.0 FPS</string>
 
-    <string name="DEFAULT_HOST">10.68.2.130</string>
+    <string name="DEFAULT_HOST">10.68.2.105</string>
     <!--    <string name="DEFAULT_HOST">137.110.118.222</string>-->
     <string name="DEFAULT_PORT">23333</string>
 
@@ -15,19 +15,45 @@
 
     <string name="dialog_connect_title">Connect to Server</string>
     <string name="dialog_select_title">Select a Dataset</string>
+    <string name="dialog_config_title">Select a Config File</string>
+    <string name="dialog_exp_config_title">Export to Config File</string>
     <string name="dialog_progress_title">Loading...</string>
+    <string name="preview_title">Preview DICOM File</string>
+    <string name="preview_text">File: %1$s</string>
 
-    <string name="tune_group_name">Tune</string>
-    <string name="check_group_name">Check</string>
-    <string name="fund_group_name">Setting</string>
+<!--    format values-->
+    <string name="tune_value">%1$.2f </string>
+    <string name="volume_lst_item">%1$s:\n%2$d x %3$d x %4$d</string>
 
+<!--    panel on/off names-->
+    <string name="check_panel_group_name">Panels</string>
+    <string name="panel_rendering_name">Rendering</string>
+    <string name="panel_mask_name">Organs</string>
+    <string name="panel_cut_name">Cut Planes</string>
+
+<!--    render panel subs-->
+    <string name="contrast_group_name">Contrast</string>
+    <string name="opacity_group_name">Opacity</string>
+    <string name="raycast_render_mode_name">Raycasting</string>
+    <string name="tune_widget_name_prefix">Id</string>
+
+<!--    mask panel subs-->
     <string name="mask_check_name">ShowMask</string>
-    <string name="texray_check_name">Raycasting</string>
+
+<!--    cut panel subs-->
     <string name="cutting_check_name">Cutting</string>
+    <string name="check_freeze_name">Freeze</string>
     <string name="freezeplane_check_name">Freeze Plane</string>
     <string name="freezeVolume_check_name">Freeze Volume</string>
 
-    <string name="tune_value">%1$.2f </string>
-    <string name="cf_drop_tune_w">1.0</string>
-    <string name="volume_lst_item">%1$s:\n%2$d x %3$d x %4$d</string>
+    <!--    sys operation names-->
+    <string name="sys_name">System</string>
+    <string name="sys_reset">Reset</string>
+    <string name="sys_template_save">Save Workspace As..</string>
+    <string name="sys_template_load">Open Workspace..</string>
+    <string name="sys_data_remote">Data from Remote..</string>
+    <string name="sys_data_device">Data from Device..</string>
+    <string name="sys_data_local">Data from Local..</string>
+    <string name="sys_req_code">123</string>
+    <string name="data_device_dir_name">Device</string>
 </resources>

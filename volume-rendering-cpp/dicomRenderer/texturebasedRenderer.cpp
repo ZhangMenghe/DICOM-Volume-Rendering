@@ -13,7 +13,7 @@ texvrRenderer::texvrRenderer(bool screen_baked)
         LOGE("TextureBas===Failed to create texture based shader program===");
     vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
 
-    onCuttingChange(.0f);
+    setCuttingPlane(.0f);
 }
 
 void texvrRenderer::init_vertices(){
@@ -55,7 +55,7 @@ void texvrRenderer::update_instance_data(){
     float zTex = .0f;
     float mappedZVal = -scale_inv + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
     for (int i = 0; i < dimensions; i++){
-        zInfos[i].x = mappedZVal; zInfos[i].y = zTex;
+        zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
         mappedZVal+=MAX_DIMENSIONS_INV; zTex+=dimension_inv;
     }
 
@@ -81,6 +81,10 @@ void texvrRenderer::draw_scene(){
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
     Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * modelmat);
+    if(vrController::param_bool[dvr::CHECK_CUTTING])
+        Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
+    else
+        Shader::Uniform(sp, "u_cut_texz", 1.0f);
 
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
@@ -103,19 +107,6 @@ void texvrRenderer::Draw(){
     draw_scene();
 }
 
-void texvrRenderer::onCuttingChange(float percent){
-    int cut_id = int(dimensions * percent);
-    GLuint sp = shader_->Use();
-    Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
-    shader_->UnUse();
-}
-
-void texvrRenderer::updatePrecomputation(GLuint sp) {
-    Shader::Uniform(sp,"uOpacitys.overall", vrController::param_tex[dvr::TT_OVERALL]);
-    Shader::Uniform(sp,"uOpacitys.lowbound", vrController::param_tex[dvr::TT_LOWEST]);
-    Shader::Uniform(sp,"uOpacitys.cutoff", vrController::param_tex[dvr::TT_CUTOFF]);
-}
-
 void texvrRenderer::draw_baked() {
     if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
@@ -130,7 +121,12 @@ void texvrRenderer::draw_baked() {
     baked_dirty_ = false;
 }
 
-void texvrRenderer::setDimension(int dims){
+void texvrRenderer::setDimension(int dims, float thickness){
     dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
+    vol_thickness_factor = (thickness<0)?vol_thickness_factor:(thickness / 40.0f);
     update_instance_data();
+}
+void texvrRenderer::setCuttingPlane(float percent){
+    cut_id = int(dimensions * percent);
+    baked_dirty_ = true;
 }

@@ -2,33 +2,23 @@
 #include <android/asset_manager_jni.h>
 #include "jui_interface.h"
 #include <vrController.h>
+#include <overlayController.h>
+#include <glm/gtc/type_ptr.hpp>
 using namespace dvr;
 
 namespace {
-    std::vector<std::string> param_tex_names, param_ray_names, param_checks;
-    const int TEX_ID = 0, RAY_ID = 1;
-    //todo:currently should manully keep consistence with R.string....
-    const std::string cutting_keyword = "Cutting", freeze_keyworkd="Freeze Plane";
+    std::vector<std::string> param_checks;
 }
-
-JUI_METHOD(void, JUIInitTuneParam)(JNIEnv *env, jclass, jint id, jint num, jobjectArray jkeys, jfloatArray jvalues){
-    auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
-    auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
-    vec->clear();tvec->clear();
+//current only opacity has multiple widgets
+JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jintArray jnums, jfloatArray jvalues){
+    jint* nums = env->GetIntArrayElements(jnums, 0);
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    for(int i=0; i<num; i++){
-        jstring jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
-        std::string key = dvr::jstring2string(env,jkey);
-        vec->push_back(key);
-        tvec->push_back(values[i]);
-//        LOGE("======SET INIT %s, %f", key.c_str(), values[i]);
-    }
-    vec->push_back(cutting_keyword);
-    tvec->push_back(-1.0f);
+    overlayController::instance()->addWidget(std::vector<float>(values, values+nums[0]));
 
-    vrController::baked_dirty_ = true;
+    env->ReleaseFloatArrayElements(jvalues, values, 0);
+    env->ReleaseIntArrayElements(jnums, nums, 0);
 }
-JUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray jkeys, jbooleanArray jvalues){
+void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     param_checks.clear();
     vrController::param_bool.clear();
     jboolean* values = env->GetBooleanArrayElements(jvalues, 0);
@@ -39,25 +29,25 @@ JUI_METHOD(void, JUIInitCheckParam)(JNIEnv * env, jclass, jint num, jobjectArray
         vrController::param_bool.push_back(values[i]);
 //        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
-
-    param_checks.push_back(freeze_keyworkd);
-    vrController::param_bool.push_back(false);
-
-    //!!debug only,
-//    vrController::instance()->setStatus(vrController::param_bool[0]?"Raycasting":"texturebased");
-
+    env->ReleaseBooleanArrayElements(jvalues,values,0);
     vrController::baked_dirty_ = true;
 }
 
-JUI_METHOD(void, JUIsetTuneParam)(JNIEnv *env, jclass, jint id, jstring jkey, jfloat value){
-    auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
-    std::string key = dvr::jstring2string(env,jkey);
-    auto it = std::find (vec->begin(), vec->end(), key);
-    if (it != vec->end()){
-        (id == TEX_ID)? vrController::param_tex[it - vec->begin()] = value : vrController::param_ray[it-vec->begin()] = value;
-//        LOGE("======SET %d, %s, %f", id, key.c_str(), value);
-        vrController::baked_dirty_ = true;
-    }
+JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint wid){
+    overlayController::instance()->setWidgetId(wid);
+}
+JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint wid){
+    overlayController::instance()->removeWidget(wid);
+}
+JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass){
+    overlayController::instance()->removeAll();
+}
+JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint tid, jint pid, jfloat value){
+    if(tid == 0 && pid < dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
+    else if(tid == 1) vrController::instance()->setRenderParam(pid, value);
+}
+JUI_METHOD(void, JUIsetDualParamById)(JNIEnv *, jclass, jint pid, jfloat minv, jfloat maxv){
+    if(pid < dvr::DUAL_END)vrController::instance()->setDualParameter(pid, minv, maxv);
 }
 JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean value){
     std::string key = dvr::jstring2string(env,jkey);
@@ -66,37 +56,77 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
 //        LOGE("======SET  %s, %d", key.c_str(), value);
-        if(key==freeze_keyworkd) vrController::cutDirty = true;
-            //!!debug only,
-//        else if(key == "Raycasting") vrController::instance()->setStatus(value?"Raycasting":"texturebased");
+//        if(key=="Raycasting") vrController::widget_id = value?1:0;
+//        if(key==freeze_keyworkd) vrController::cutDirty = true;
+//            //!!debug only,
+////        else if(key == "Raycasting") vrController::instance()->setMVPStatus(value?"Raycasting":"texturebased");
         vrController::baked_dirty_ = true;
     }
-
 }
-JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value, jboolean freeze_plane){
-    auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
-    auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
-//    LOGE("======CUTTING %d, %f, %d", id, value, freeze_plane?1:0);
-    auto it = std::find (vec->begin(), vec->end(), cutting_keyword);
-    (*tvec)[it - vec->begin()] = value;
-    if(id == RAY_ID){
-        auto it_freeze = std::find (param_checks.begin(), param_checks.end(), freeze_keyworkd);
-        vrController::param_bool[it_freeze-param_checks.begin()] = freeze_plane;
-    }
-    vrController::cutDirty = true;
-    vrController::baked_dirty_ = true;
+JUI_METHOD(jfloatArray, JUIgetVCStates)(JNIEnv * env, jclass){
+    jfloatArray res = env->NewFloatArray(31);
+    env->SetFloatArrayRegion(res,0,31, reinterpret_cast<jfloat *>(vrController::instance()->getCurrentReservedStates()));
+    return res;
+}
+JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatus)(JNIEnv * env, jclass){
+    jfloatArray res= env->NewFloatArray(7);
+    env->SetFloatArrayRegion(res,0,7, reinterpret_cast<jfloat *>(vrController::instance()->getCuttingPlane()));
+    return res;
+}
+JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value){
+//    auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
+//    auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
+////    LOGE("======CUTTING %d, %f, %d", id, value, freeze_plane?1:0);
+//    auto it = std::find (vec->begin(), vec->end(), cutting_keyword);
+//    (*tvec)[it - vec->begin()] = value;
+//    vrController::cutDirty = true;
+//    vrController::baked_dirty_ = true;
+    vrController::instance()->setCuttingPlane(value);
 }
 JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint num, jint mbits){
     vrController::instance()->mask_num_ = (unsigned int)num;
     vrController::instance()->mask_bits_ = (unsigned int)mbits;
     vrController::baked_dirty_ = true;
 }
-
-
-JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass){
-    nativeApp(nativeAddr)->onReset();
+JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
+    vrController::color_scheme_id = id;
+    vrController::baked_dirty_ = true;
 }
+JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint id, jint width, jint height, jint left, jint top){
+    overlayController::instance()->setOverlayRect(id, width, height, left, top);
+}
+JUI_METHOD(void, JUIsetAllTuneParamById)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
+    jfloat* values = env->GetFloatArrayElements(jvalues, 0);
+    if(id == 1)vrController::instance()->setRenderParam(values);
+    else if(id == 2)vrController::instance()->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
 
+    env->ReleaseFloatArrayElements(jvalues,values,0);
+}
+JUI_METHOD(void, JUIsetTuneWidgetVisibility)(JNIEnv*, jclass, jint wid, jboolean value){
+    overlayController::instance()->setWidgetsVisibility(wid, value);
+    vrController::baked_dirty_ = true;
+}
+JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
+        jint num, jobjectArray jkeys, jbooleanArray jvalues,
+        jfloatArray jvol_pose, jfloatArray jcam_pose){
+    InitCheckParam(env, num, jkeys, jvalues);
+
+    jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
+    jfloat* cam_arr = env->GetFloatArrayElements(jcam_pose, 0);
+    //unwrap pose information
+    vrController::instance()->onReset(
+            glm::vec3(vol_arr[0], vol_arr[1], vol_arr[2]),
+            glm::vec3(vol_arr[3], vol_arr[4], vol_arr[5]),
+            glm::make_mat4(vol_arr+6),
+            new Camera(
+                    glm::vec3(cam_arr[0], cam_arr[1], cam_arr[2]),
+                    glm::vec3(cam_arr[3], cam_arr[4], cam_arr[5]),
+                    glm::vec3(cam_arr[6], cam_arr[7], cam_arr[8])
+            ));
+
+    env->ReleaseFloatArrayElements(jvol_pose, vol_arr, 0);
+    env->ReleaseFloatArrayElements(jcam_pose, cam_arr, 0);
+}
 JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
     nativeApp(nativeAddr)->onSingleTouchDown(x, y);
 }

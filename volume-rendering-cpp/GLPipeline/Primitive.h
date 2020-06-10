@@ -3,12 +3,7 @@
 
 const unsigned int quad_indices[6]= {0,1,2,
                                      0,2,3};
-const float quad_vertices[12]={
-        0.5f, 1.0f, .0f,//top-right
-        -0.5f,1.0f, .0f,//top-left
-        -0.5f, .0f, .0f,//bottom-left
-        0.5f, .0f,  .0f//bottom-right
-};
+
 const float quad_vertices_2d[8]={
         0.5f, .5f,//top-right
         -0.5f, .5f,//top-left

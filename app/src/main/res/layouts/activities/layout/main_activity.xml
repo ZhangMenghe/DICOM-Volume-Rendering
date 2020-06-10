@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
 
+    android:id="@+id/parentPanel"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
@@ -29,21 +30,6 @@
             app:layout_constraintTop_toTopOf="parent"
             android:orientation="horizontal">
             <Spinner
-                android:id="@+id/tuneSpinner"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                style="@style/Spinner"/>
-            <Spinner
-                android:id="@+id/checkSpinner"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:spinnerMode="dropdown"
-                style="@style/Spinner"/>
-            <Spinner
                 android:id="@+id/funcSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -51,110 +37,15 @@
                 android:gravity="center"
                 android:spinnerMode="dropdown"
                 style="@style/Spinner"/>
-
+            <Spinner
+                android:id="@+id/checkPanelSpinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:spinnerMode="dropdown"
+                style="@style/Spinner"/>
         </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
-
-    <!--bottom panel:cutting-->
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/bottomPanel"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:background="@color/paneColor"
-        app:layout_constraintHeight_percent="0.08"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <SeekBar
-            android:id="@+id/cuttingSeekBar"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_marginStart="20dp"
-            android:theme="@style/Seekbar"
-            android:visibility="invisible"
-            app:layout_constraintWidth_percent="0.9"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="parent"/>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/cutting_button"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintHeight_percent="0.8"
-
-            android:layout_centerInParent="true"
-            app:backgroundTint="@color/brightBlue"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintDimensionRatio="1:1"/>
-
-    </android.support.constraint.ConstraintLayout>
-
-<!--    bottom panel: organ masks-->
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/maskPanel"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:background="@color/paneColor"
-        android:fillAfter="true"
-        android:fillEnabled="true"
-        app:layout_constraintHeight_percent="0.1"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <Button
-            android:id="@+id/mask_hide_button"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/down_icon"
-            app:layout_constraintHeight_percent="0.3"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintDimensionRatio="1:1"/>
-
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/mask_recycle"
-            android:scrollbars="horizontal"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_centerInParent="true"
-            app:layout_constraintWidth_percent="0.9"
-            app:layout_constraintHeight_percent="0.8"
-
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"/>
-
-    </android.support.constraint.ConstraintLayout>
-
-    <!--    bottom panel: organ masks-->
-    <android.support.constraint.ConstraintLayout
-        android:id="@+id/hiddenBottomPanel"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:background="@color/paneTransColor"
-        app:layout_constraintHeight_percent="0.03"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <Button
-            android:id="@+id/show_button"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/up_icon"
-            app:layout_constraintHeight_percent="0.99"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintDimensionRatio="1:1"/>
-    </android.support.constraint.ConstraintLayout>
-
 </android.support.constraint.ConstraintLayout>

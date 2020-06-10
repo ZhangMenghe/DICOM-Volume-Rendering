@@ -3,60 +3,62 @@ package helmsley.vr.DUIs;
 import android.app.Activity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
+import android.view.ViewGroup;
+
+import com.google.common.primitives.Booleans;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import helmsley.vr.R;
 
-public class maskUIs {
-    private View panel;
-    private Button hide_btn, show_btn;
+public class maskUIs extends BasePanel{
+    private RecyclerView recyclerView;
+    private maskRecyclerViewAdapter recyclerViewAdapter;
 
-    private boolean is_panel_on;
-    View hideBottomPanel;
+    public maskUIs(final Activity activity, ViewGroup parent_view) {
+        super(activity, parent_view);
+        final LayoutInflater mInflater = LayoutInflater.from(activity);
 
-    RecyclerView recyclerView;
-    maskRecyclerViewAdapter recyclerViewAdapter;
-
-    public maskUIs(final Activity activity) {
-        panel = (View)activity.findViewById(R.id.maskPanel);
-        hideBottomPanel = (View)activity.findViewById(R.id.hiddenBottomPanel);
-
-        hide_btn = (Button)activity.findViewById(R.id.mask_hide_button);
-        show_btn = (Button)activity.findViewById(R.id.show_button);
-        View.OnClickListener show_hide_listener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onStateChange(!is_panel_on, true);
-//                if(!is_panel_on) hideBottomPanel.setVisibility(View.VISIBLE);
-            }
-        };
-        hide_btn.setOnClickListener(show_hide_listener);
-        show_btn.setOnClickListener(show_hide_listener);
-
-        recyclerView = (RecyclerView)activity.findViewById(R.id.mask_recycle);
+        View panel_ = mInflater.inflate(R.layout.mask_panel, parent_view, false);
+        sub_panels_.add(panel_);
+        recyclerView = (RecyclerView)panel_.findViewById(R.id.mask_recycle);
         recyclerView.setHasFixedSize(true);
         LinearLayoutManager HorizontalLayout = new LinearLayoutManager(activity, LinearLayoutManager.HORIZONTAL, false);
         RecyclerView.LayoutManager layout_manager = new LinearLayoutManager(activity);
         recyclerView.setLayoutManager(layout_manager);
         recyclerView.setLayoutManager(HorizontalLayout);
 
-
         recyclerViewAdapter = new maskRecyclerViewAdapter(activity, recyclerView);
         recyclerView.setAdapter(recyclerViewAdapter);
 
+        setup_checks(
+                panel_,
+                R.array.mask_check_params, R.array.mask_check_values,
+                R.id.check_mask_show, 0);
     }
-    public void onStateChange(boolean isPanelOn, boolean keepHideIcon){
-        is_panel_on = isPanelOn;
-        if(hideBottomPanel.getVisibility() == View.VISIBLE && !isPanelOn){
-            panel.setVisibility(View.INVISIBLE);
-        }else{
-            DUIHelpers.ToggleShowView_animate(panel, isPanelOn);
-        }
-        if(keepHideIcon && !is_panel_on) hideBottomPanel.setVisibility(View.VISIBLE);
-        else hideBottomPanel.setVisibility(View.INVISIBLE);
-    }
+    @Override
     public void Reset(){
         recyclerViewAdapter.Reset();
+        primary_checkbox.setChecked(default_primary_check);
+    }
+    public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
+        LinkedHashMap maskmap = (LinkedHashMap) map.getOrDefault("mask", null);
+        if(maskmap == null) return;
+        boolean status = (Boolean) maskmap.getOrDefault("status", default_primary_check);
+        primary_checkbox.setChecked(status);
+        recyclerViewAdapter.Reset(Booleans.toArray((ArrayList<Boolean>)maskmap.getOrDefault("value", null)));
+    }
+    public LinkedHashMap getCurrentStates(){
+        LinkedHashMap map = new LinkedHashMap();
+        map.put("status", primary_checkbox.isChecked());
+        map.put("value", recyclerViewAdapter.getValues());
+        return map;
+    }
+    @Override
+    public void showHidePanel(boolean isPanelOn){
+        super.showHidePanel(isPanelOn);
     }
 }

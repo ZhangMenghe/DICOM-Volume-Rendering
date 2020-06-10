@@ -1,8 +1,9 @@
 #version 310 es
 
 #pragma multi_compile SHOW_ORGANS
-#pragma multi_compile TRANSFER_COLOR
+#pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
+#pragma multi_compile FLIPY
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -20,14 +21,19 @@ struct OpacityAdj{
     float cutoff;//0,1
 };
 //shaderd by tex and ray, but mutually exclusive
-uniform OpacityAdj uOpacitys;
-
-float CURRENT_INTENSITY;
-uint MASKS_;
+//uniform OpacityAdj uOpacitys;
+uniform vec2 u_opacity[60];
+uniform int u_widget_num;
 
 //last bit indicates body(which doesn't belong to organs)
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
+uniform vec3 u_tex_size;
+uniform float u_contrast_low;
+uniform float u_contrast_high;
+uniform float u_brightness;
+uniform int u_visible_bits;
+//uniform float u_contrast_level;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -35,64 +41,105 @@ vec3 hsv2rgb(vec3 c){
     vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
-uvec3 transfer_scheme(float gray){
-    return uvec3(hsv2rgb(vec3(gray * 0.8, 1.0, 1.0)) * 255.0);
+vec3 transfer_scheme(float gray){
+    return hsv2rgb(vec3(gray, 1.0, 1.0));
 }
-uvec3 transfer_scheme(float cat, float gray){
-    return uvec3(hsv2rgb(vec3(cat, 1.0, gray)) * 255.0);
+vec3 transfer_scheme(float cat, float gray){
+    return hsv2rgb(vec3(cat, 1.0, gray));
 }
-uint UpdateOpacityAlpha(uint sampled_alpha){
-    float falpha = float(sampled_alpha) * 0.003921;
-    float alpha = CURRENT_INTENSITY * (1.0 - uOpacitys.lowbound) + uOpacitys.lowbound;
-    alpha = (CURRENT_INTENSITY < uOpacitys.cutoff)?.0:alpha*falpha;
-    return uint(alpha*uOpacitys.overall * 255.0);
+//hot to color. H(0~180)
+vec3 bright_scheme(float gray){
+    return hsv2rgb(vec3((1.0 -gray) * 180.0 / 255.0, 1.0, 1.0));
 }
 
-uvec4 show_organs(uvec4 color){
-    uint alpha = uint(0);
-    //organs
+float UpdateOpacityAlpha(int woffset, float alpha){
+    vec2 lb = u_opacity[woffset], rb = u_opacity[woffset+3];
+    if(alpha < lb.x || alpha > rb.x) return .0;
+    vec2 lm = u_opacity[woffset+1], lt =u_opacity[woffset+2];
+    vec2 rm = u_opacity[woffset+4], rt =u_opacity[woffset+5];
+    float k = (lt.y - lm.y)/(lt.x - lm.x);
+    if(alpha < lt.x) alpha*= k*(alpha - lm.x)+lm.y;
+    else if(alpha < rt.x) alpha*=rt.y;
+    else alpha*= -k *(alpha - rm.x)+rm.y;
+    return alpha;
+}
+int getMaskBit(uint mask_value){
+    //check body
+    if(mask_value == uint(0)) return ((u_maskbits & uint(1)) == uint(1))? 0:-1;
+
+    int CHECK_BIT = int(-1);
+    //check if organ
     for(uint i=uint(0); i<u_organ_num; i++){
-        if( ((u_maskbits>> uint(i + uint(1))) & uint(1)) == uint(0)) continue;
-        uint cbit = (MASKS_>> uint(i)) & uint(1);
-        alpha = alpha | cbit;
+        if(((u_maskbits>> uint(i + uint(1))) & uint(1)) == uint(0)) continue;
+        uint cbit = (mask_value>> i) & uint(1);
         if(cbit == uint(1)){
-            color.rgb = transfer_scheme(float(i) / float(u_organ_num), CURRENT_INTENSITY);
+            CHECK_BIT = int(i) + 1;
             break;
         }
     }
-    // body
-    if(alpha == uint(0)){
-        if( ( u_maskbits & uint(1) ) == uint(1)) 
-        {alpha = uint(1); color.rgb = uvec3(color.r);}
-    }
-    color.a*= alpha;
-    return color;
+    return CHECK_BIT;
 }
-uvec4 Sample(ivec3 pos){
+
+uvec2 Sample(ivec3 pos){
+    #ifdef FLIPY
+        pos = ivec3(pos.x, uint(u_tex_size.y-float(pos.y)),pos.z);
+    #endif
     uint value = imageLoad(srcTex, pos).r;
-    //lower part as color
-    uvec4 color = uvec4(uvec3(value&uint(0xffff)), 255);
-    CURRENT_INTENSITY = float(color.r) * 0.003921;
-    MASKS_ = value>>uint(16);
-    return color;
+    //lower part as color, higher part as mask
+    return uvec2(value&uint(0xffff), value>>uint(16));
 }
-uvec4 post_process(uvec4 color){
-    #ifdef TRANSFER_COLOR
-        color.rgb = transfer_scheme(CURRENT_INTENSITY);
+
+//applied contrast, brightness, 12bit->8bit, return value 0-1
+float TransferIntensityStepOne(uint intensity){
+    //max value 4095
+    float intensity_01 = float(intensity) * 0.0002442002442002442;
+
+    if(intensity_01 > u_contrast_high||intensity_01 < u_contrast_low) intensity_01 = .0;
+
+    intensity_01 = smoothstep(u_contrast_low, u_contrast_high, intensity_01);
+
+//    intensity_01 = (intensity_01 - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
+    intensity_01 = clamp(u_brightness+intensity_01 - 0.5, .0, 1.0);
+    return intensity_01;
+}
+
+vec3 TransferColor(float intensity, int ORGAN_BIT){
+    intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);
+    intensity= max(.0, min(1.0, intensity));
+
+//    if(uScheme == 0) gl_FragColor = vec4(vec3(intensity), 1.0);
+//    else gl_FragColor = vec4(hsv2rgb(transfer_scheme_hsv((vTexcoord.x > u_contrast_high)? 1.0:intensity)), 1.0);
+
+    vec3 color = vec3(intensity);
+
+    #ifdef COLOR_HSV
+        color = transfer_scheme(intensity);
+    #elif defined(COLOR_BRIGHT)
+        color = bright_scheme(intensity);
     #endif
 
     #ifdef SHOW_ORGANS
-        //upper part as mask
-        color = show_organs(color);
+        if(ORGAN_BIT > int(0))
+        color = transfer_scheme(float(ORGAN_BIT) / float(u_organ_num), intensity);
     #endif
     return color;
 }
 
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
-    uvec4 sample_color = Sample(storePos);
-    uint alpha = UpdateOpacityAlpha(sample_color.a);
-    uvec4 ufc = post_process(uvec4(sample_color.rgb, alpha));
-    imageStore(destTex, storePos, vec4(ufc) * 0.003921);
+    uvec2 sampled_value = Sample(storePos);
+    int ORGAN_BIT = -1;
+    #ifdef SHOW_ORGANS
+        ORGAN_BIT = getMaskBit(sampled_value.y);
+        if(ORGAN_BIT< 0) {imageStore(destTex, storePos, vec4(.0)); return;}
+    #endif
+
+    //intensity in 0-1
+    float intensity = TransferIntensityStepOne(sampled_value.x);
+    float alpha = .0;
+    for(int i=0; i<u_widget_num; i++)
+    if(((u_visible_bits >> i) & 1) == 1) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity));
+
+    imageStore(destTex, storePos, vec4(TransferColor(intensity, ORGAN_BIT), alpha));
 }
 

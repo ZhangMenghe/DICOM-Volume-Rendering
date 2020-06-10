@@ -197,7 +197,10 @@ void Shader::EnableKeyword(std::string keyword){
     int line_level = 0;
     for (auto& it : available_keywords_) {
         for (const auto& k : it){
-            if(k == keyword){active_keywords_[line_level].emplace (keyword); return;}
+            if(k == keyword){
+                active_keywords_[line_level].emplace (keyword);
+                return;
+            }
         }
         line_level++;
     }
@@ -206,6 +209,13 @@ void Shader::DisableKeyword(std::string keyword){
     for(auto& it: active_keywords_){
         for (auto k = it.begin();k!=it.end();k++){
             if(*k == keyword){it.erase(k); return;}
+        }
+    }
+}
+void Shader::DisableAllKeyword(){
+    for(auto& it: active_keywords_){
+        for (auto k = it.begin();k!=it.end();k++) {
+            it.erase(k);
         }
     }
 }
