@@ -52,27 +52,38 @@ public class dialogUIs {
         activity_.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         DIALOG_HEIGHT_LIMIT = (int)(displayMetrics.heightPixels * 0.85);
         DIALOG_WIDTH_LIMIT = (int)(displayMetrics.widthPixels * 0.9);
+
+        loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);
+        loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+
+        loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);
+        loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+
+        loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL);
     }
     void ShowDatasetRemote(){
         if(!remote_connection_success){b_await_data=true;setup_remote_connection();}
         else{
-            boolean setup = false;
-            if (loadremote_dialog == null) {loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);setup=true;}
-            else loadremote_dialog.invalidateOptionsMenu();
+//            boolean setup = false;
+//            if (loadremote_dialog == null) {loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);setup=true;}
+//            else
+                loadremote_dialog.invalidateOptionsMenu();
             //order matters
             loadremote_dialog.show();
-            if(setup)loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+//            if(setup)
+//                loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
         }
     }
     void ShowConfigsRemote(){
         if(!remote_connection_success){b_await_config=true;setup_remote_connection();}
         else{
-            boolean setup = false;
-            if (loadconfig_dialog == null) {loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);setup=true;}
-            else loadconfig_dialog.invalidateOptionsMenu();
+//            boolean setup = false;
+//            if (loadconfig_dialog == null) {loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);setup=true;}
+//            else
+                loadconfig_dialog.invalidateOptionsMenu();
             //order matters
             loadconfig_dialog.show();
-            if(setup)loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+//            if(setup)loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
         }
     }
     void ExportConfigs(){
@@ -181,7 +192,7 @@ public class dialogUIs {
     void SetupConnectLocal(){
         downloader.SetupLocal();
 
-        if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
+//        if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
 //        if(local_dirty){ local_card_adp.onContentChange(); local_dirty=false;}
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);

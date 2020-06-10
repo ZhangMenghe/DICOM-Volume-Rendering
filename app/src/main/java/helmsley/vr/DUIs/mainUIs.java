@@ -110,32 +110,26 @@ public class mainUIs {
                 }
                 holder.text_name.setText(item_names.get(position));
 
-                holder.text_name.setOnTouchListener(new View.OnTouchListener(){
-                    public boolean onTouch(View view, MotionEvent event) {
-                        switch (event.getActionMasked()) {
-                            case MotionEvent.ACTION_DOWN:
-                                holder.text_name.setTextAppearance(R.style.itemHighlightText);
-                                String text_title = ((TextView)view).getText().toString();
-                                if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
-                                else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
-                                else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
-                                else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
-                                else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
-                                else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
-                                break;
-                            case MotionEvent.ACTION_UP:
-                                holder.text_name.setTextAppearance(R.style.itemText);
-                                break;
-
-                            default:
-                                break;
-                        }
-                        return true;
+                holder.text_name.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        holder.text_name.setTextAppearance(R.style.itemHighlightText);
+                        String text_title = ((TextView)v).getText().toString();
+                        if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
+                        else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
+                        else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
+                        else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
+                        else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
+                        else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
+                        new android.os.Handler().postDelayed(
+                                new Runnable() {
+                                    public void run() {
+                                        holder.text_name.setTextAppearance(R.style.itemText);
+                                    }
+                                },
+                                300);
                     }
-
                 });
-
-
             return convertView;
         }
         private class ViewContentHolder{
