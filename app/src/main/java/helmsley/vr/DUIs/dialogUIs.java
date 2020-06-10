@@ -36,18 +36,18 @@ public class dialogUIs {
     private static AlertDialog loadlocal_dialog=null, loadremote_dialog=null,
             loadconfig_dialog=null, saveconfig_dialog=null;
     public static AlertDialog progress_dialog=null;
-    private DSCardRecyclerViewAdapter loadlocal_adapter;
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
     private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
     private boolean b_init_pick_alert = false;
+    private DSCardRecyclerViewAdapter local_card_adp, remote_card_adp;
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
         activityReference = new WeakReference<>(activity_);
         muiRef = new WeakReference<>(mui);
         parentRef = new WeakReference<>(parent_view);
-        downloader = new fileTransferClient(activity_);
+        downloader = new fileTransferClient(activity_, this);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity_.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         DIALOG_HEIGHT_LIMIT = (int)(displayMetrics.heightPixels * 0.85);
@@ -88,6 +88,10 @@ public class dialogUIs {
     void LoadConfig(String content){
         muiRef.get().LoadConfig(content);
         loadconfig_dialog.dismiss();
+    }
+    public void NotifyLocalCardUpdate(String ds_name){
+        local_card_adp.updateLstContent(ds_name, downloader.getAvailableVolumes(ds_name, true));
+        local_card_adp.updateCardContent();
     }
     private void setup_export_dialog(){
         Activity activity = activityReference.get();
@@ -145,7 +149,6 @@ public class dialogUIs {
                 host_addr = host_addr.isEmpty() ? hostEdit.getHint().toString() : host_addr;
                 String port_addr = portEdit.getText().toString();
                 port_addr = port_addr.isEmpty() ? portEdit.getHint().toString() : port_addr;
-                if (downloader == null) downloader = new fileTransferClient(activity);
                 String res_msg = downloader.Setup(host_addr, port_addr);
                 if (res_msg.equals("")) {
                     Log.i(TAG, "=====Connect to server successfully=====");
@@ -175,70 +178,11 @@ public class dialogUIs {
         });
         connect_dialog.show();
     }
-    void SetupConnectRemote(){
-        if(remote_connection_success) {
-            loadremote_dialog.invalidateOptionsMenu();
-            loadremote_dialog.show();
-        }else{
-            Activity activity = activityReference.get();
-            final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
-            final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, parentRef.get(), false);
-            //widgets
-            sendButton = (Button) dialogView.findViewById(R.id.connect_req_button);
-            EditText hostEdit = (EditText) dialogView.findViewById(R.id.host_edit_text);
-            hostEdit.setHint(activity.getString(R.string.DEFAULT_HOST));
-            EditText portEdit = (EditText) dialogView.findViewById(R.id.port_edit_text);
-            portEdit.setHint(activity.getString(R.string.DEFAULT_PORT));
-
-            errText = (TextView) dialogView.findViewById(R.id.grpc_err_msg);
-            errText.setMovementMethod(new ScrollingMovementMethod());
-
-            layoutDialog_builder.setTitle(activity.getString(R.string.dialog_connect_title));
-            layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
-
-            layoutDialog_builder.setView(dialogView);
-            AlertDialog connect_dialog = layoutDialog_builder.create();
-
-
-    //        dialog.setCanceledOnTouchOutside(false);
-
-            sendButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    sendButton.setEnabled(false);
-                    errText.setText("");
-                    String host_addr = hostEdit.getText().toString();
-                    host_addr = host_addr.isEmpty() ? hostEdit.getHint().toString() : host_addr;
-                    String port_addr = portEdit.getText().toString();
-                    port_addr = port_addr.isEmpty() ? portEdit.getHint().toString() : port_addr;
-                    if (downloader == null) downloader = new fileTransferClient(activity);
-                    String res_msg = downloader.Setup(host_addr, port_addr);
-                    if (res_msg.equals("")) {
-                        Log.i(TAG, "=====Connect to server successfully=====");
-                        connect_dialog.dismiss();
-                        remote_connection_success = true;
-//                        if (loadremote_dialog == null)
-//                            SetupDownloadDialog(false);
-//                        //order matters
-//                        loadremote_dialog.show();
-//                        loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
-                    } else {
-                        errText.setText(res_msg);
-                        errText.setVisibility(View.VISIBLE);
-                        sendButton.setEnabled(true);
-                        connect_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
-                    }
-                }
-            });
-            connect_dialog.show();
-        }
-    }
     void SetupConnectLocal(){
-        if(downloader == null)downloader = new fileTransferClient(activityReference.get());
         downloader.SetupLocal();
 
         if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
-//        if(local_dirty){ loadlocal_adapter.onContentChange(); local_dirty=false;}
+//        if(local_dirty){ local_card_adp.onContentChange(); local_dirty=false;}
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
@@ -258,11 +202,12 @@ public class dialogUIs {
                 content_view.setAdapter(new ConfigCardRecyclerViewAdapter(downloader, this));
                 break;
             case DATA_LOCAL:
-                loadlocal_adapter = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_LOCAL);
-                content_view.setAdapter(loadlocal_adapter);
+                local_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_LOCAL);
+                content_view.setAdapter(local_card_adp);
                 break;
             case DATA_REMOTE:
-                content_view.setAdapter(new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE));
+                remote_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE);
+                content_view.setAdapter(remote_card_adp);
                 break;
             default:
                 return null;

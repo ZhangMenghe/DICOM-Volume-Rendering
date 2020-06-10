@@ -42,6 +42,8 @@ public class fileTransferClient {
     private datasetInfo target_ds;
     private volumeInfo target_vol;
     private final WeakReference<Activity> activityReference;
+    private final WeakReference<dialogUIs> duiRef;
+
 
     private List<datasetInfo> available_remote_datasets,
             available_local_datasets = new ArrayList<>();
@@ -52,8 +54,9 @@ public class fileTransferClient {
     private boolean config_dirty = true;
     private static String DCM_FILE_NAME, DCM_MASK_FILE_NAME, DCM_WMASK_FILE_NAME;
     private static String TARGET_ROOT_DIR, LOCAL_INDEX_FILE_PATH;
-    public fileTransferClient(Activity activity){
+    public fileTransferClient(Activity activity, dialogUIs dui){
         activityReference = new WeakReference<Activity>(activity);
+        duiRef = new WeakReference<>(dui);
         TARGET_ROOT_DIR = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
         selfReference = new WeakReference<>(this);
         LOCAL_INDEX_FILE_PATH = TARGET_ROOT_DIR + "/" + activityReference.get().getString(R.string.cf_config_name);
@@ -171,6 +174,12 @@ public class fileTransferClient {
         while(data_itor.hasNext())
             res_lst.addAll(data_itor.next().getVolumesList());
         return res_lst;
+    }
+    public void setLocalVolumes(String ds_name, List<volumeInfo>info_lst){
+        local_dv_map.put(ds_name, info_lst);
+    }
+    public volumeInfo getLocalVolumeFromDSAt(String ds_name, int pos){
+        return local_dv_map.get(ds_name).get(pos);
     }
     public boolean deleteLocalData(String dsname, volumeInfo rinfo){
         //delete from local list
@@ -460,7 +469,7 @@ public class fileTransferClient {
             Log.e(TAG, "====Failed to Save Results to file");
         }
         finished = true;
-        if(!save_complete)DSCardRecyclerViewAdapter.DirtyCache(tds.getFolderName());
+        selfReference.get().duiRef.get().NotifyLocalCardUpdate(tds.getFolderName());
     }
     private void update_local_info(datasetInfo tds, volumeInfo tvol){
         String dsname = tds.getFolderName();
