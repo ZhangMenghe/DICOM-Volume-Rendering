@@ -155,7 +155,7 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
         shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
     }
-    overlayController::instance()->updateUniforms();
+    overlayController::instance()->updateUniforms(render_params_);
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
     //todo!!!! add flip stuff
@@ -174,12 +174,16 @@ void vrController::precompute(){
     float* widget_data_pointer;
     int widget_num;
     overlayController::instance()->getWidgetFlatPoints(widget_data_pointer, widget_num);
+    auto visibles = overlayController::instance()->getWidgetVisibilities();
+    int visible=0;
+    for(int i=0;i<widget_num;i++){visible |= int(visibles[i]) << i;}
+    Shader::Uniform(sp, "u_visible_bits", visible);
     Shader::Uniform(sp, "u_opacity", 6*widget_num, widget_data_pointer);
     Shader::Uniform(sp, "u_widget_num", widget_num);
 
     Shader::Uniform(sp, "u_contrast_low", render_params_[RENDER_CONTRAST_LOW]);
     Shader::Uniform(sp, "u_contrast_high", render_params_[RENDER_CONTRAST_HIGH]);
-    Shader::Uniform(sp, "u_contrast_level", render_params_[RENDER_CONTRAST_LEVEL]);
+//    Shader::Uniform(sp, "u_contrast_level", render_params_[RENDER_CONTRAST_LEVEL]);
     Shader::Uniform(sp, "u_brightness", render_params_[RENDER_BRIGHTNESS]);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);

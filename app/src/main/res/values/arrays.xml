@@ -72,21 +72,21 @@
     </string-array>
 
     <string-array name="contrastParams">
-        <item>@array/contrast_level</item>
+<!--        <item>@array/contrast_level</item>-->
         <item>@array/contrast_low</item>
         <item>@array/contrast_high</item>
         <item>@array/brightness</item>
 
     </string-array>
-    <string-array name="contrast_level">
-        <item>Level</item>
-        <item>1.0</item>
-        <item>1.0</item>
-        <item>255</item>
-    </string-array>
+<!--    <string-array name="contrast_level">-->
+<!--        <item>Level</item>-->
+<!--        <item>1.0</item>-->
+<!--        <item>1.0</item>-->
+<!--        <item>255</item>-->
+<!--    </string-array>-->
     <string-array name="brightness">
         <item>Brightness</item>
-        <item>.8</item>
+        <item>.5</item>
         <item>1.0</item>
         <item>255</item>
     </string-array>
@@ -98,7 +98,7 @@
     </string-array>
     <string-array name="contrast_high">
         <item>High Range</item>
-        <item>0.5</item>
+        <item>0.2</item>
         <item>1.0</item>
         <item>255</item>
     </string-array>
@@ -153,10 +153,11 @@
 <!--other functions-->
     <string-array name="functions">
         <item>@string/sys_reset</item>
+        <item>@string/sys_data_local</item>
+        <item>@string/sys_data_device</item>
+        <item>@string/sys_data_remote</item>
         <item>@string/sys_template_save</item>
         <item>@string/sys_template_load</item>
-        <item>@string/sys_data_remote</item>
-        <item>@string/sys_data_local</item>
     </string-array>
 
     <string-array name="cutting_plane">
@@ -171,6 +172,8 @@
         <item>Kidneys</item>
         <item>Colon</item>
         <item>Spleen</item>
+        <item>Ileum</item>
+        <item>Aorta</item>
     </string-array>
     <string-array name="masks_status">
         <item>true</item>
@@ -211,5 +214,4 @@
     <string-array name="bottomArr">
         <item>cut</item>
     </string-array>
-
 </resources>

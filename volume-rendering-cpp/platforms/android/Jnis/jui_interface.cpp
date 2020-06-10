@@ -102,6 +102,10 @@ JUI_METHOD(void, JUIsetAllTuneParamById)(JNIEnv* env, jclass, jint id, jfloatArr
 
     env->ReleaseFloatArrayElements(jvalues,values,0);
 }
+JUI_METHOD(void, JUIsetTuneWidgetVisibility)(JNIEnv*, jclass, jint wid, jboolean value){
+    overlayController::instance()->setWidgetsVisibility(wid, value);
+    vrController::baked_dirty_ = true;
+}
 JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
         jint num, jobjectArray jkeys, jbooleanArray jvalues,
         jfloatArray jvol_pose, jfloatArray jcam_pose){

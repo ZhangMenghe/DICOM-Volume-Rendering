@@ -14,6 +14,7 @@ extern "C"{
     JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint);
     JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint);
     JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass);
+    JUI_METHOD(void, JUIsetTuneWidgetVisibility)(JNIEnv *, jclass, jint, jboolean);
 
     JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint, jint, jfloat);
     JUI_METHOD(void, JUIsetDualParamById)(JNIEnv *, jclass, jint, jfloat, jfloat);

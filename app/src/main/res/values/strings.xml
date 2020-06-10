@@ -18,6 +18,8 @@
     <string name="dialog_config_title">Select a Config File</string>
     <string name="dialog_exp_config_title">Export to Config File</string>
     <string name="dialog_progress_title">Loading...</string>
+    <string name="preview_title">Preview DICOM File</string>
+    <string name="preview_text">File: %1$s</string>
 
 <!--    format values-->
     <string name="tune_value">%1$.2f </string>
@@ -33,7 +35,7 @@
     <string name="contrast_group_name">Contrast</string>
     <string name="opacity_group_name">Opacity</string>
     <string name="raycast_render_mode_name">Raycasting</string>
-    <string name="tune_widget_name_prefix">WID</string>
+    <string name="tune_widget_name_prefix">Id</string>
 
 <!--    mask panel subs-->
     <string name="mask_check_name">ShowMask</string>
@@ -49,6 +51,9 @@
     <string name="sys_reset">Reset</string>
     <string name="sys_template_save">Save Workspace As..</string>
     <string name="sys_template_load">Open Workspace..</string>
-    <string name="sys_data_remote">Remote Data</string>
-    <string name="sys_data_local">Local Data</string>
+    <string name="sys_data_remote">Data from Remote..</string>
+    <string name="sys_data_device">Data from Device..</string>
+    <string name="sys_data_local">Data from Local..</string>
+    <string name="sys_req_code">123</string>
+    <string name="data_device_dir_name">Device</string>
 </resources>

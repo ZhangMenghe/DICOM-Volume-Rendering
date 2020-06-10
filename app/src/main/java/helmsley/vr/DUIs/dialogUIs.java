@@ -2,6 +2,8 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 import java.lang.ref.WeakReference;
 
 import helmsley.vr.JNIInterface;
+import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
 
@@ -31,43 +34,56 @@ public class dialogUIs {
     private Button sendButton;
     private boolean remote_connection_success = false;
     private static AlertDialog loadlocal_dialog=null, loadremote_dialog=null,
-            loadconfig_dialog=null, saveconfig_dialog=null,
-            progress_dialog=null;
-    private static DSCardRecyclerViewAdapter loadlocal_adapter;
+            loadconfig_dialog=null, saveconfig_dialog=null;
+    public static AlertDialog progress_dialog=null;
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
     private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
+    private boolean b_init_pick_alert = false;
+    private DSCardRecyclerViewAdapter local_card_adp, remote_card_adp;
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
         activityReference = new WeakReference<>(activity_);
         muiRef = new WeakReference<>(mui);
         parentRef = new WeakReference<>(parent_view);
+        downloader = new fileTransferClient(activity_, this);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity_.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         DIALOG_HEIGHT_LIMIT = (int)(displayMetrics.heightPixels * 0.85);
         DIALOG_WIDTH_LIMIT = (int)(displayMetrics.widthPixels * 0.9);
+
+        loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);
+        loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+
+        loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);
+        loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+
+        loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL);
     }
     void ShowDatasetRemote(){
         if(!remote_connection_success){b_await_data=true;setup_remote_connection();}
         else{
-            boolean setup = false;
-            if (loadremote_dialog == null) {loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);setup=true;}
-            else loadremote_dialog.invalidateOptionsMenu();
+//            boolean setup = false;
+//            if (loadremote_dialog == null) {loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);setup=true;}
+//            else
+                loadremote_dialog.invalidateOptionsMenu();
             //order matters
             loadremote_dialog.show();
-            if(setup)loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+//            if(setup)
+//                loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
         }
     }
     void ShowConfigsRemote(){
         if(!remote_connection_success){b_await_config=true;setup_remote_connection();}
         else{
-            boolean setup = false;
-            if (loadconfig_dialog == null) {loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);setup=true;}
-            else loadconfig_dialog.invalidateOptionsMenu();
+//            boolean setup = false;
+//            if (loadconfig_dialog == null) {loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);setup=true;}
+//            else
+                loadconfig_dialog.invalidateOptionsMenu();
             //order matters
             loadconfig_dialog.show();
-            if(setup)loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+//            if(setup)loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
         }
     }
     void ExportConfigs(){
@@ -83,6 +99,10 @@ public class dialogUIs {
     void LoadConfig(String content){
         muiRef.get().LoadConfig(content);
         loadconfig_dialog.dismiss();
+    }
+    public void NotifyLocalCardUpdate(String ds_name){
+        local_card_adp.updateLstContent(ds_name, downloader.getAvailableVolumes(ds_name, true));
+        local_card_adp.updateCardContent();
     }
     private void setup_export_dialog(){
         Activity activity = activityReference.get();
@@ -102,10 +122,10 @@ public class dialogUIs {
             public void onClick(View v) {
                 sendButton.setEnabled(false);
                 EditText nameEdit = (EditText) dialogView.findViewById(R.id.expname_edit_text);
-                EditText commnetEdit = (EditText) dialogView.findViewById(R.id.expcomment_edit_text);
+                EditText commentEdit = (EditText) dialogView.findViewById(R.id.expcomment_edit_text);
                 String input_name = nameEdit.getText().toString();
                 downloader.ExportConfig(muiRef.get().getExportConfig(input_name.isEmpty()?nameEdit.getHint().toString():input_name,
-                        commnetEdit.getText().toString() ));
+                        commentEdit.getText().toString() ));
                 saveconfig_dialog.dismiss();
             }
         });
@@ -140,7 +160,6 @@ public class dialogUIs {
                 host_addr = host_addr.isEmpty() ? hostEdit.getHint().toString() : host_addr;
                 String port_addr = portEdit.getText().toString();
                 port_addr = port_addr.isEmpty() ? portEdit.getHint().toString() : port_addr;
-                if (downloader == null) downloader = new fileTransferClient(activity);
                 String res_msg = downloader.Setup(host_addr, port_addr);
                 if (res_msg.equals("")) {
                     Log.i(TAG, "=====Connect to server successfully=====");
@@ -170,75 +189,14 @@ public class dialogUIs {
         });
         connect_dialog.show();
     }
-    void SetupConnectRemote(){
-        if(remote_connection_success) {
-            loadremote_dialog.invalidateOptionsMenu();
-            loadremote_dialog.show();
-        }else{
-            Activity activity = activityReference.get();
-            final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
-            final View dialogView = LayoutInflater.from(activity).inflate(R.layout.connect_dialog_layout, parentRef.get(), false);
-            //widgets
-            sendButton = (Button) dialogView.findViewById(R.id.connect_req_button);
-            EditText hostEdit = (EditText) dialogView.findViewById(R.id.host_edit_text);
-            hostEdit.setHint(activity.getString(R.string.DEFAULT_HOST));
-            EditText portEdit = (EditText) dialogView.findViewById(R.id.port_edit_text);
-            portEdit.setHint(activity.getString(R.string.DEFAULT_PORT));
-
-            errText = (TextView) dialogView.findViewById(R.id.grpc_err_msg);
-            errText.setMovementMethod(new ScrollingMovementMethod());
-
-            layoutDialog_builder.setTitle(activity.getString(R.string.dialog_connect_title));
-            layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
-
-            layoutDialog_builder.setView(dialogView);
-            AlertDialog connect_dialog = layoutDialog_builder.create();
-
-
-    //        dialog.setCanceledOnTouchOutside(false);
-
-            sendButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    sendButton.setEnabled(false);
-                    errText.setText("");
-                    String host_addr = hostEdit.getText().toString();
-                    host_addr = host_addr.isEmpty() ? hostEdit.getHint().toString() : host_addr;
-                    String port_addr = portEdit.getText().toString();
-                    port_addr = port_addr.isEmpty() ? portEdit.getHint().toString() : port_addr;
-                    if (downloader == null) downloader = new fileTransferClient(activity);
-                    String res_msg = downloader.Setup(host_addr, port_addr);
-                    if (res_msg.equals("")) {
-                        Log.i(TAG, "=====Connect to server successfully=====");
-                        connect_dialog.dismiss();
-                        remote_connection_success = true;
-//                        if (loadremote_dialog == null)
-//                            SetupDownloadDialog(false);
-//                        //order matters
-//                        loadremote_dialog.show();
-//                        loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
-                    } else {
-                        errText.setText(res_msg);
-                        errText.setVisibility(View.VISIBLE);
-                        sendButton.setEnabled(true);
-                        connect_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
-                    }
-                }
-            });
-            connect_dialog.show();
-        }
-    }
     void SetupConnectLocal(){
-        if(downloader == null)downloader = new fileTransferClient(activityReference.get());
         downloader.SetupLocal();
 
-        if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
-        if(local_dirty){ NotifyChanges(); local_dirty=false;}
+//        if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
+//        if(local_dirty){ local_card_adp.onContentChange(); local_dirty=false;}
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
-
-    static void NotifyChanges(){loadlocal_adapter.onContentChange();loadlocal_adapter.notifyDataSetChanged();}
 
     private AlertDialog setup_download_dialog(DownloadDialogType type){
         final Activity activity = activityReference.get();
@@ -252,14 +210,15 @@ public class dialogUIs {
         //adapter
         switch (type){
             case CONFIGS:
-                content_view.setAdapter(new DSCardRecyclerViewAdapter(activity, content_view,downloader, this, DownloadDialogType.CONFIGS));
+                content_view.setAdapter(new ConfigCardRecyclerViewAdapter(downloader, this));
                 break;
             case DATA_LOCAL:
-                loadlocal_adapter = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_LOCAL);
-                content_view.setAdapter(loadlocal_adapter);
+                local_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_LOCAL);
+                content_view.setAdapter(local_card_adp);
                 break;
             case DATA_REMOTE:
-                content_view.setAdapter(new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE));
+                remote_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE);
+                content_view.setAdapter(remote_card_adp);
                 break;
             default:
                 return null;
@@ -304,7 +263,7 @@ public class dialogUIs {
 
             }});
     }
-    public void updateOnFrame(){
+    void updateOnFrame(){
         if(downloader == null) return;
         if(downloader.isDownloadingProcessFinished()){
             downloader.Reset();
@@ -320,5 +279,39 @@ public class dialogUIs {
             JNIInterface.JNIsendDataDone();
         }
     }
+    void ShowDICOMPicker(){
+        if(!b_init_pick_alert){
+            AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activityReference.get());
+            alertDialogBuilder.setMessage("Choose a DICOM file. To view a folder, choose ONE file inside");
+            alertDialogBuilder.setPositiveButton("yes",
+                    new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface arg0, int arg1) {
+                            show_file_picker();
+                        }
+                    });
 
+            AlertDialog alertDialog = alertDialogBuilder.create();
+            alertDialog.show();
+            b_init_pick_alert = true;
+        }else{
+            show_file_picker();
+        }
+    }
+    private void show_file_picker(){
+        if(!MainActivity.permission_granted)
+            Toast.makeText(
+                    activityReference.get(),
+                    "Permission denied to read your External storage, try to enable it via system setting",
+                    Toast.LENGTH_SHORT
+            ).show();
+        // Let's use the Android File dialog. It will return an answer in the future, which we
+        // get via onActivityResult()
+        Intent intent = new Intent()
+                .setType("*/*")
+                .setAction(Intent.ACTION_OPEN_DOCUMENT);
+
+        activityReference.get().startActivityForResult(Intent.createChooser(intent, "Select a DICOM file"), 123);
+
+    }
 }

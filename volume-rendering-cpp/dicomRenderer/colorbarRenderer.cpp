@@ -1,6 +1,7 @@
 #include <GLPipeline/Mesh.h>
 #include <GLPipeline/Primitive.h>
 #include <dicomRenderer/colorbarRenderer.h>
+#include <vrController.h>
 
 ColorbarRenderer::ColorbarRenderer(std::string vertex_shader, std::string frag_shader)
         :baseQuad(vertex_shader, frag_shader){

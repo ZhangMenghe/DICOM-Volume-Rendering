@@ -20,16 +20,17 @@ public:
     void addWidget(std::vector<float> values);
     void removeWidget(int wid);
     void removeAll();
+    void setWidgetsVisibility(int wid, bool value);
 
     void setTuneParameter(int tid, float value);
     void setOverlayRect(int id, int width, int height, int left, int top);
-    void updateUniforms();
-
+    void updateUniforms(const float* params);
     //getter
     const float* getCurrentWidgetPoints(){return widget_points_[widget_id];}
     void getWidgetFlatPoints(float*& data, int& num){
         data = u_opacity_data_; num = widget_points_.size();
     }
+    std::vector<bool> getWidgetVisibilities(){return widget_visibilities_;}
 
 private:
     static overlayController* myPtr_;
@@ -43,6 +44,7 @@ private:
     //widgets num should be the same
     int widget_id;
     std::vector<std::vector<float>> widget_params_;
+    std::vector<bool> widget_visibilities_;
     std::vector<float*> widget_points_;
     float* default_widget_points_;
     float* u_opacity_data_;

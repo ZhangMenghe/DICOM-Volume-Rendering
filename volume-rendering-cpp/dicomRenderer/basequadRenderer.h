@@ -26,7 +26,11 @@ public:
         Shader::Uniform(sp, key, id);
         shader_.UnUse();
     }
-    virtual void setData(std::vector<float*> data){}
+    virtual void setUniform(const char* key, float v){
+        GLuint sp = shader_.Use();
+        Shader::Uniform(sp, key, v);
+        shader_.UnUse();
+    }
     virtual void setData(float* data, int wid){}
     virtual void Clear(){}
     virtual void Draw()=0;
@@ -35,5 +39,6 @@ protected:
     Shader shader_;
     glm::vec2 r_scale_, r_offset_;
     const static int MAX_INSTANCES = 5;
+
 };
 #endif

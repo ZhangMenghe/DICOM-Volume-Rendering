@@ -32,7 +32,8 @@ uniform vec3 u_tex_size;
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
-uniform float u_contrast_level;
+uniform int u_visible_bits;
+//uniform float u_contrast_level;
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -103,6 +104,12 @@ float TransferIntensityStepOne(uint intensity){
 }
 
 vec3 TransferColor(float intensity, int ORGAN_BIT){
+    intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);
+    intensity= max(.0, min(1.0, intensity));
+
+//    if(uScheme == 0) gl_FragColor = vec4(vec3(intensity), 1.0);
+//    else gl_FragColor = vec4(hsv2rgb(transfer_scheme_hsv((vTexcoord.x > u_contrast_high)? 1.0:intensity)), 1.0);
+
     vec3 color = vec3(intensity);
 
     #ifdef COLOR_HSV
@@ -130,7 +137,9 @@ void main(){
     //intensity in 0-1
     float intensity = TransferIntensityStepOne(sampled_value.x);
     float alpha = .0;
-    for(int i=0; i<u_widget_num; i++) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity));
+    for(int i=0; i<u_widget_num; i++)
+    if(((u_visible_bits >> i) & 1) == 1) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity));
+
     imageStore(destTex, storePos, vec4(TransferColor(intensity, ORGAN_BIT), alpha));
 }
 
