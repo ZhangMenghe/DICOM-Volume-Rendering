@@ -4,10 +4,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.ArraySet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,12 +28,9 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
-import helmsley.vr.Utils.SwipeDetector;
-import helmsley.vr.proto.configResponse;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
@@ -69,6 +65,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private final WeakReference<RecyclerView> recyclerView;
     private final WeakReference<fileTransferClient> downloaderRef;
     private final WeakReference<dialogUIs> duiRef;
+    private final WeakReference<DSCardRecyclerViewAdapter> selfRef;
     private final boolean islocal_;
 
     //adapter of listView content
@@ -93,7 +90,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 //    private static Set<String> dirty_dsname= new ArraySet<>();
     private Map<String, View> sort_view_map = new LinkedHashMap<>();
 //    private Map<String, View> lst_view_map = new LinkedHashMap<>();
-
+    private ProgressTask p_tsk;
 
     DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, dialogUIs dui, dialogUIs.DownloadDialogType type) {
         downloaderRef = new WeakReference<>(downloader);
@@ -101,12 +98,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         recyclerView = new WeakReference<>(recycle_view);
         duiRef = new WeakReference<>(dui);
         islocal_ = (type == DATA_LOCAL);
-        if(!islocal_)cached_volumeinfo = new LinkedHashMap<>();
+        if(!islocal_) cached_volumeinfo = new LinkedHashMap<>();
 
         contentAdapters = new LinkedHashMap<>();
         TypedValue typedValue = new TypedValue();
         activity.getResources().getValue(R.dimen.preview_img_height, typedValue, true);
         PREVIEW_IMG_HEIGHT = (int)typedValue.getFloat();
+        selfRef = new WeakReference<>(this);
     }
     @Override
     public DSCardRecyclerViewAdapter.cardHolder onCreateViewHolder(ViewGroup parent,
@@ -118,28 +116,28 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
-                sel_ds_name = downloaderRef.get().getAvailableDataset(islocal_).get(selectedItemPosition).getFolderName();
-
-                ListView lst_view = (ListView)v.findViewById(R.id.card_list);
-                //setup remote card content
-                if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
-
-                //show/hide list view: volume details
-                if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
-                else lst_view.setVisibility(View.VISIBLE);
-                //show/hide sort view
-                View sort_view;
-                try{
-                    sort_view = sort_view_map.get(sel_ds_name);
-                }catch (NullPointerException e){
-                    sort_view = v.findViewById(R.id.card_sort_layout);
-                    sort_view_map.put(sel_ds_name, sort_view);
-                }
-                if(sort_view!=null){
-                    if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
-                    else sort_view.setVisibility(View.VISIBLE);
-                }
+//                int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
+//                sel_ds_name = downloaderRef.get().getAvailableDataset(islocal_).get(selectedItemPosition).getFolderName();
+                new ProgressTask(selfRef.get(),v).execute(recyclerView.get().getChildAdapterPosition(v));
+//                ListView lst_view = (ListView)v.findViewById(R.id.card_list);
+//                //setup remote card content
+//                if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
+//
+//                //show/hide list view: volume details
+//                if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
+//                else lst_view.setVisibility(View.VISIBLE);
+//                //show/hide sort view
+//                View sort_view;
+//                try{
+//                    sort_view = sort_view_map.get(sel_ds_name);
+//                }catch (NullPointerException e){
+//                    sort_view = v.findViewById(R.id.card_sort_layout);
+//                    sort_view_map.put(sel_ds_name, sort_view);
+//                }
+//                if(sort_view!=null){
+//                    if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
+//                    else sort_view.setVisibility(View.VISIBLE);
+//                }
             }
         });
         return new cardHolder(card_view);
@@ -424,6 +422,75 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             if(current_id == position) return;
             current_id = position;
             parentRef.get().ReorderVolumeList(ds_name_,item_names.get(position));
+        }
+    }
+    private void post_task_run(View v, String sel_name){
+        sel_ds_name = sel_name;
+        ListView lst_view = (ListView)v.findViewById(R.id.card_list);
+        //setup remote card content
+        if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
+
+        //show/hide list view: volume details
+        if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
+        else lst_view.setVisibility(View.VISIBLE);
+        //show/hide sort view
+        View sort_view;
+        try{
+            sort_view = sort_view_map.get(sel_ds_name);
+        }catch (NullPointerException e){
+            sort_view = v.findViewById(R.id.card_sort_layout);
+            sort_view_map.put(sel_ds_name, sort_view);
+        }
+        if(sort_view!=null){
+            if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
+            else sort_view.setVisibility(View.VISIBLE);
+        }
+    }
+    private static class ProgressTask extends AsyncTask<Integer, Void, String> {
+        private final WeakReference<DSCardRecyclerViewAdapter> parentRef;
+        private final WeakReference<View> vRef;
+        ProgressTask(DSCardRecyclerViewAdapter adp, View v_){
+            parentRef = new WeakReference<>(adp);
+            vRef = new WeakReference<>(v_);
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialogUIs.showProgress();
+        }
+
+        @Override
+        protected void onPostExecute(String res) {
+            super.onPostExecute(res);
+
+//            parentRef.get().sel_ds_name = res;
+            parentRef.get().post_task_run(vRef.get(),res);
+
+//            ListView lst_view = (ListView)v.findViewById(R.id.card_list);
+//            //setup remote card content
+//            if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
+//
+//            //show/hide list view: volume details
+//            if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
+//            else lst_view.setVisibility(View.VISIBLE);
+//            //show/hide sort view
+//            View sort_view;
+//            try{
+//                sort_view = sort_view_map.get(sel_ds_name);
+//            }catch (NullPointerException e){
+//                sort_view = v.findViewById(R.id.card_sort_layout);
+//                sort_view_map.put(sel_ds_name, sort_view);
+//            }
+//            if(sort_view!=null){
+//                if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
+//                else sort_view.setVisibility(View.VISIBLE);
+//            }
+            dialogUIs.hideProgress();
+        }
+
+        @Override
+        protected String doInBackground(Integer... params) {
+            return parentRef.get().downloaderRef.get().getAvailableDataset(false).get(params[0]).getFolderName();
         }
     }
 }

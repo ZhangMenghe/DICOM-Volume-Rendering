@@ -41,7 +41,9 @@ public class dialogUIs {
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
     private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
     private boolean b_init_pick_alert = false;
-    private DSCardRecyclerViewAdapter local_card_adp, remote_card_adp;
+    private DSCardRecyclerViewAdapter local_card_adp;
+    private static View progressOverlay;
+
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
         activityReference = new WeakReference<>(activity_);
@@ -197,11 +199,31 @@ public class dialogUIs {
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
+    static void showProgress(){
+        progressOverlay.setVisibility(View.VISIBLE);
+
+//            button.setEnabled(false);
+//            inAnimation = new AlphaAnimation(0f, 1f);
+//            inAnimation.setDuration(200);
+//            progressBarHolder.setAnimation(inAnimation);
+//            progressBarHolder.setVisibility(View.VISIBLE);
+    }
+    static void hideProgress(){
+        progressOverlay.setVisibility(View.GONE);
+
+//            outAnimation = new AlphaAnimation(1f, 0f);
+//            outAnimation.setDuration(200);
+//            progressBarHolder.setAnimation(outAnimation);
+//            progressBarHolder.setVisibility(View.GONE);
+//            button.setEnabled(true);
+    }
 
     private AlertDialog setup_download_dialog(DownloadDialogType type){
         final Activity activity = activityReference.get();
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, parentRef.get(), false);
+        progressOverlay = dialogView.findViewById(R.id.loading_layout);
+
         //recycle view
         RecyclerView content_view = dialogView.findViewById(R.id.contentRecView);
         //layout manager
@@ -217,7 +239,7 @@ public class dialogUIs {
                 content_view.setAdapter(local_card_adp);
                 break;
             case DATA_REMOTE:
-                remote_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE);
+                DSCardRecyclerViewAdapter remote_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE);
                 content_view.setAdapter(remote_card_adp);
                 break;
             default:

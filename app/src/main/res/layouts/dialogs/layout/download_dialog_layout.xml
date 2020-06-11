@@ -7,11 +7,11 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainActivity">
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/contentRecView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
-
+        android:layout_height="match_parent"/>
+    <include
+        android:id="@+id/loading_layout"
+        layout="@layout/progress_layout"/>
 </RelativeLayout>

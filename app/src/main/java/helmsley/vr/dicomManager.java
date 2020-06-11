@@ -155,6 +155,8 @@ public class dicomManager {
         ByteBuffer byteBuffer = ByteBuffer.wrap(byte_data);
         renderBitmap.copyPixelsFromBuffer(byteBuffer);
 
+        //update image
+        if(preview_dialog == null) setup_dialog();
         if(single_image.getHeight() == PREVIEW_IMG_HEIGHT){
             preview_img_view.setImageBitmap(renderBitmap);
         }else{
@@ -162,12 +164,10 @@ public class dicomManager {
             preview_img_view.setImageBitmap(bMapScaled);
         }
 
-        //update image
-        if(preview_dialog == null) setup_dialog();
         title_tex_view.setText(actRef.get().getString(R.string.preview_text,name));
         //name
-        String content = "Patient Name: " + loadDataSet.getString(new TagId(0x0010, 0x0010), 0) + '\n';
-        content += "Date: " + loadDataSet.getString(new TagId(0x0008, 0x0023), 0) ;
+        String content = "Patient Name: " + loadDataSet.getString(new TagId(0x0010, 0x0010), 0, "Anonymous") + '\n';
+        content += "Date: " + loadDataSet.getString(new TagId(0x0008, 0x0023), 0, "UNKNOWN") ;
         content_tex_view.setText(content);
         preview_dialog.show();
     }
