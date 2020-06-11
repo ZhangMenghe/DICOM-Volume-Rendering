@@ -116,28 +116,12 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         card_view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
-//                sel_ds_name = downloaderRef.get().getAvailableDataset(islocal_).get(selectedItemPosition).getFolderName();
-                new ProgressTask(selfRef.get(),v).execute(recyclerView.get().getChildAdapterPosition(v));
-//                ListView lst_view = (ListView)v.findViewById(R.id.card_list);
-//                //setup remote card content
-//                if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
-//
-//                //show/hide list view: volume details
-//                if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
-//                else lst_view.setVisibility(View.VISIBLE);
-//                //show/hide sort view
-//                View sort_view;
-//                try{
-//                    sort_view = sort_view_map.get(sel_ds_name);
-//                }catch (NullPointerException e){
-//                    sort_view = v.findViewById(R.id.card_sort_layout);
-//                    sort_view_map.put(sel_ds_name, sort_view);
-//                }
-//                if(sort_view!=null){
-//                    if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
-//                    else sort_view.setVisibility(View.VISIBLE);
-//                }
+                int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
+                sel_ds_name = downloaderRef.get().getAvailableDataset(islocal_).get(selectedItemPosition).getFolderName();
+                if(islocal_ || ((ListView)v.findViewById(R.id.card_list)).getCount() != 0) {
+                    on_click_ds_card(v);
+                }else
+                    new ProgressTask(selfRef.get(),v).execute();
             }
         });
         return new cardHolder(card_view);
@@ -198,18 +182,6 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys, info.getFolderName());
         holder.sortSpinner.setAdapter(adp);
         adp.setTitleById(0);
-    }
-    public static void DirtyCache(String dsname){
-
-//        dirty_dsname.add(dsname);
-//        try{
-//            selfReference.get().notifyDataSetChanged();
-//            for(View sort_view: selfReference.get().sort_view_map.values())
-//                sort_view.setVisibility(View.GONE);
-//            contentAdapters.get(dsname).notifyDataSetChanged();
-//        }catch (NullPointerException e){
-//        }
-
     }
     @Override
     public int getItemCount() {
@@ -396,6 +368,28 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         contentAdapters.get(ds_name).notifyDataSetChanged();
         return true;
     }
+    private void on_click_ds_card(View v){
+        ListView lst_view = (ListView)v.findViewById(R.id.card_list);
+        //setup remote card content
+        if(!islocal_ && lst_view.getCount() == 0)
+            setup_single_card_content_list(lst_view, sel_ds_name, false);
+
+        //show/hide list view: volume details
+        if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
+        else lst_view.setVisibility(View.VISIBLE);
+        //show/hide sort view
+        View sort_view;
+        try{
+            sort_view = sort_view_map.get(sel_ds_name);
+        }catch (NullPointerException e){
+            sort_view = v.findViewById(R.id.card_sort_layout);
+            sort_view_map.put(sel_ds_name, sort_view);
+        }
+        if(sort_view!=null){
+            if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
+            else sort_view.setVisibility(View.VISIBLE);
+        }
+    }
     private static class sortListAdapter extends textSimpleListAdapter{
         int current_id = -1;
         String ds_name_;
@@ -424,29 +418,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             parentRef.get().ReorderVolumeList(ds_name_,item_names.get(position));
         }
     }
-    private void post_task_run(View v, String sel_name){
-        sel_ds_name = sel_name;
-        ListView lst_view = (ListView)v.findViewById(R.id.card_list);
-        //setup remote card content
-        if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
 
-        //show/hide list view: volume details
-        if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
-        else lst_view.setVisibility(View.VISIBLE);
-        //show/hide sort view
-        View sort_view;
-        try{
-            sort_view = sort_view_map.get(sel_ds_name);
-        }catch (NullPointerException e){
-            sort_view = v.findViewById(R.id.card_sort_layout);
-            sort_view_map.put(sel_ds_name, sort_view);
-        }
-        if(sort_view!=null){
-            if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
-            else sort_view.setVisibility(View.VISIBLE);
-        }
-    }
-    private static class ProgressTask extends AsyncTask<Integer, Void, String> {
+
+    private static class ProgressTask extends AsyncTask<Void, Void, Void> {
         private final WeakReference<DSCardRecyclerViewAdapter> parentRef;
         private final WeakReference<View> vRef;
         ProgressTask(DSCardRecyclerViewAdapter adp, View v_){
@@ -460,37 +434,15 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         }
 
         @Override
-        protected void onPostExecute(String res) {
-            super.onPostExecute(res);
-
-//            parentRef.get().sel_ds_name = res;
-            parentRef.get().post_task_run(vRef.get(),res);
-
-//            ListView lst_view = (ListView)v.findViewById(R.id.card_list);
-//            //setup remote card content
-//            if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
-//
-//            //show/hide list view: volume details
-//            if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
-//            else lst_view.setVisibility(View.VISIBLE);
-//            //show/hide sort view
-//            View sort_view;
-//            try{
-//                sort_view = sort_view_map.get(sel_ds_name);
-//            }catch (NullPointerException e){
-//                sort_view = v.findViewById(R.id.card_sort_layout);
-//                sort_view_map.put(sel_ds_name, sort_view);
-//            }
-//            if(sort_view!=null){
-//                if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
-//                else sort_view.setVisibility(View.VISIBLE);
-//            }
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            parentRef.get().on_click_ds_card(vRef.get());
             dialogUIs.hideProgress();
         }
 
         @Override
-        protected String doInBackground(Integer... params) {
-            return parentRef.get().downloaderRef.get().getAvailableDataset(false).get(params[0]).getFolderName();
+        protected Void doInBackground(Void... params) {
+            return null;
         }
     }
 }
