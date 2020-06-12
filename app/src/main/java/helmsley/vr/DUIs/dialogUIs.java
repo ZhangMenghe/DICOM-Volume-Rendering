@@ -42,6 +42,7 @@ public class dialogUIs {
     private boolean b_init_pick_alert = false;
     private DSCardRecyclerViewAdapter local_card_adp;
     private View download_progress, main_progress;
+    private boolean remote_layout_set = false, config_layout_set = false;
 
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
@@ -55,10 +56,7 @@ public class dialogUIs {
         DIALOG_WIDTH_LIMIT = (int)(displayMetrics.widthPixels * 0.9);
 
         loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);
-        loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
-
         loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);
-        loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
 
         loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL);
         main_progress = activity_.findViewById(R.id.loading_layout);
@@ -69,6 +67,7 @@ public class dialogUIs {
             loadremote_dialog.invalidateOptionsMenu();
             //order matters
             loadremote_dialog.show();
+            if(!remote_layout_set){loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);remote_layout_set=true;}
         }
     }
     void ShowConfigsRemote(){
@@ -76,6 +75,7 @@ public class dialogUIs {
         else{
             loadconfig_dialog.invalidateOptionsMenu();
             loadconfig_dialog.show();
+            if(!config_layout_set){loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);remote_layout_set=true;}
         }
     }
     void ExportConfigs(){
@@ -160,11 +160,13 @@ public class dialogUIs {
                         loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);
                         //order matters
                         loadremote_dialog.show();loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
+                        remote_layout_set=true;
                         b_await_data = false;
                     }else if(b_await_config){
                         loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);
                         loadconfig_dialog.show();loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
                         b_await_config = false;
+                        config_layout_set = true;
                     }else if(b_await_config_export){
                         setup_export_dialog();
                         saveconfig_dialog.show();
