@@ -250,16 +250,19 @@ public class dialogUIs {
         if(downloader.isDownloadingProcessFinished()){
             downloader.Reset();
             JNIInterface.JNIsendDataDone();
-            activityReference.get().runOnUiThread(new Runnable()  {
-                @Override
-                public void run()  {
-                    main_progress.setVisibility(View.GONE);
-                }});
+            onProgressFinish();
         }
         if(downloader.isDownloadingMaskProcessFinished()){
             downloader.ResetMast();
             JNIInterface.JNIsendDataDone();
         }
+    }
+    public void onProgressFinish(){
+        activityReference.get().runOnUiThread(new Runnable()  {
+            @Override
+            public void run()  {
+                main_progress.setVisibility(View.GONE);
+            }});
     }
     void ShowDICOMPicker(){
         if(!b_init_pick_alert){

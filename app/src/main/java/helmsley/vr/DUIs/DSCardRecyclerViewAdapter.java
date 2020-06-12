@@ -7,6 +7,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -267,7 +268,12 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             public void onClick(View v) {
                 //get the information ready here
                 List<Integer> dims = sel_vol_info.getDimsList();
-                JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getWithMask());
+                List<Float> spacing = sel_vol_info.getResolutionList();
+//                Log.e(TAG, "====onClick: "+ spacing.get(0)*dims.get(0) + " ====" +spacing.get(1)*dims.get(1) + "==="+sel_vol_info.getVolumeLocRange() );
+                JNIInterface.JNIsendDataPrepare(dims.get(0), dims.get(1), dims.get(2),
+                        spacing.get(0)*dims.get(0), spacing.get(1)*dims.get(1), sel_vol_info.getVolumeLocRange(),
+                        sel_vol_info.getWithMask());
+                
                 if(downloaderRef.get().Download(sel_ds_name, sel_vol_info))duiRef.get().onDownloadingUI(islocal_);
                 preview_dialog.dismiss();
             }

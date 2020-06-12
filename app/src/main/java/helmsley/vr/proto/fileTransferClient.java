@@ -33,6 +33,8 @@ import com.google.protobuf.ByteString;
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
+    private final WeakReference<Activity> activityReference;
+    private final WeakReference<dialogUIs> duiRef;
     private static WeakReference<fileTransferClient> selfReference;
     private static boolean finished = false, finished_mask=false;
 
@@ -41,9 +43,6 @@ public class fileTransferClient {
     private final int CLIENT_ID = 1;
     private datasetInfo target_ds;
     private volumeInfo target_vol;
-    private final WeakReference<Activity> activityReference;
-    private final WeakReference<dialogUIs> duiRef;
-
 
     private List<datasetInfo> available_remote_datasets,
             available_local_datasets = new ArrayList<>();
@@ -551,5 +550,7 @@ public class fileTransferClient {
     public void ResetMast(){
         finished_mask = false;
     }
-
+    public static void onProgressFinish(){
+        selfReference.get().duiRef.get().onProgressFinish();
+    }
 }
