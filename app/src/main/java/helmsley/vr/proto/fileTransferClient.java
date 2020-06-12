@@ -233,8 +233,8 @@ public class fileTransferClient {
             return false;
         }else{
             //todo: check and timeout for loading failure
-            if(is_local && !LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))
-                return false;
+            if(is_local)
+                return LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName());
             new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
         }
         return true;

@@ -261,6 +261,7 @@ public class dialogUIs {
         activityReference.get().runOnUiThread(new Runnable()  {
             @Override
             public void run()  {
+
                 main_progress.setVisibility(View.GONE);
             }});
     }
