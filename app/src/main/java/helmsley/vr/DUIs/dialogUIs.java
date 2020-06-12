@@ -193,29 +193,14 @@ public class dialogUIs {
     }
     void SetupConnectLocal(){
         downloader.SetupLocal();
-
-//        if(loadlocal_dialog == null) {loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL); local_dirty = false;}
-//        if(local_dirty){ local_card_adp.onContentChange(); local_dirty=false;}
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
     void showProgress(){
         progressOverlay.setVisibility(View.VISIBLE);
-
-//            button.setEnabled(false);
-//            inAnimation = new AlphaAnimation(0f, 1f);
-//            inAnimation.setDuration(200);
-//            progressBarHolder.setAnimation(inAnimation);
-//            progressBarHolder.setVisibility(View.VISIBLE);
     }
     void hideProgress(){
         progressOverlay.setVisibility(View.GONE);
-
-//            outAnimation = new AlphaAnimation(1f, 0f);
-//            outAnimation.setDuration(200);
-//            progressBarHolder.setAnimation(outAnimation);
-//            progressBarHolder.setVisibility(View.GONE);
-//            button.setEnabled(true);
     }
 
     private AlertDialog setup_download_dialog(DownloadDialogType type){
