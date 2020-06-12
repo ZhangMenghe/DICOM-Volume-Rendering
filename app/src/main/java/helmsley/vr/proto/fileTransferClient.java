@@ -495,7 +495,6 @@ public class fileTransferClient {
         //load data
         File DwM = new File(destDir, activity.getString(R.string.cf_dcmwmask_name));
         try{
-
             if(DwM.exists()){
                 loadVolumeData(new FileInputStream(DwM), 2, 4);
                 finished = true; finished_mask = true;
