@@ -430,14 +430,14 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            dialogUIs.showProgress();
+            parentRef.get().duiRef.get().showProgress();
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
             parentRef.get().on_click_ds_card(vRef.get());
-            dialogUIs.hideProgress();
+            parentRef.get().duiRef.get().hideProgress();
         }
 
         @Override

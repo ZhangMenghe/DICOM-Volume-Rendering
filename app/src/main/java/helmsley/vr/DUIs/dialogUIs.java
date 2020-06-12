@@ -42,7 +42,7 @@ public class dialogUIs {
     private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
     private boolean b_init_pick_alert = false;
     private DSCardRecyclerViewAdapter local_card_adp;
-    private static View progressOverlay;
+    private View progressOverlay;
 
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
@@ -199,7 +199,7 @@ public class dialogUIs {
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
-    static void showProgress(){
+    void showProgress(){
         progressOverlay.setVisibility(View.VISIBLE);
 
 //            button.setEnabled(false);
@@ -208,7 +208,7 @@ public class dialogUIs {
 //            progressBarHolder.setAnimation(inAnimation);
 //            progressBarHolder.setVisibility(View.VISIBLE);
     }
-    static void hideProgress(){
+    void hideProgress(){
         progressOverlay.setVisibility(View.GONE);
 
 //            outAnimation = new AlphaAnimation(1f, 0f);
