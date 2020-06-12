@@ -268,7 +268,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 //get the information ready here
                 List<Integer> dims = sel_vol_info.getDimsList();
                 JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getWithMask());
-                if(downloaderRef.get().Download(sel_ds_name, sel_vol_info))dialogUIs.onDownloadingUI(sel_ds_name, islocal_);
+                if(downloaderRef.get().Download(sel_ds_name, sel_vol_info))duiRef.get().onDownloadingUI(islocal_);
                 preview_dialog.dismiss();
             }
         });

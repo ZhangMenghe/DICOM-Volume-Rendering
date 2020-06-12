@@ -46,6 +46,8 @@
                 android:spinnerMode="dropdown"
                 style="@style/Spinner"/>
         </LinearLayout>
-
     </android.support.constraint.ConstraintLayout>
+    <include
+        android:id="@+id/loading_layout"
+        layout="@layout/progress_layout"/>
 </android.support.constraint.ConstraintLayout>

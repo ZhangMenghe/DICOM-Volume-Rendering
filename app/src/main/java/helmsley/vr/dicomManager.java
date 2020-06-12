@@ -46,7 +46,7 @@ import helmsley.vr.proto.datasetResponse;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
 
-import static helmsley.vr.DUIs.dialogUIs.progress_dialog;
+//import static helmsley.vr.DUIs.dialogUIs.progress_dialog;
 
 public class dicomManager {
     private static final String TAG = "dicomManager";
@@ -351,11 +351,11 @@ public class dicomManager {
         if(is_finished){
             is_finished = false;
             JNIInterface.JNIsendDataDone();
-            actRef.get().runOnUiThread(new Runnable()  {
-                @Override
-                public void run()  {
-                    if(progress_dialog!=null) progress_dialog.dismiss();
-                }});
+//            actRef.get().runOnUiThread(new Runnable()  {
+//                @Override
+//                public void run()  {
+//                    if(progress_dialog!=null) progress_dialog.dismiss();
+//                }});
         }
     }
 }

@@ -28,21 +28,20 @@ public class dialogUIs {
     private static WeakReference<Activity> activityReference;
     private static WeakReference<mainUIs> muiRef;
 
-    final static String TAG = "dialogUIs";
+    private final static String TAG = "dialogUIs";
     private static fileTransferClient downloader;
     private TextView errText;
     private Button sendButton;
     private boolean remote_connection_success = false;
     private static AlertDialog loadlocal_dialog=null, loadremote_dialog=null,
             loadconfig_dialog=null, saveconfig_dialog=null;
-    public static AlertDialog progress_dialog=null;
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
     private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
     private boolean b_init_pick_alert = false;
     private DSCardRecyclerViewAdapter local_card_adp;
-    private View progressOverlay;
+    private View download_progress, main_progress;
 
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
@@ -62,30 +61,21 @@ public class dialogUIs {
         loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
 
         loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL);
+        main_progress = activity_.findViewById(R.id.loading_layout);
     }
     void ShowDatasetRemote(){
         if(!remote_connection_success){b_await_data=true;setup_remote_connection();}
         else{
-//            boolean setup = false;
-//            if (loadremote_dialog == null) {loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);setup=true;}
-//            else
-                loadremote_dialog.invalidateOptionsMenu();
+            loadremote_dialog.invalidateOptionsMenu();
             //order matters
             loadremote_dialog.show();
-//            if(setup)
-//                loadremote_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
         }
     }
     void ShowConfigsRemote(){
         if(!remote_connection_success){b_await_config=true;setup_remote_connection();}
         else{
-//            boolean setup = false;
-//            if (loadconfig_dialog == null) {loadconfig_dialog = setup_download_dialog(DownloadDialogType.CONFIGS);setup=true;}
-//            else
-                loadconfig_dialog.invalidateOptionsMenu();
-            //order matters
+            loadconfig_dialog.invalidateOptionsMenu();
             loadconfig_dialog.show();
-//            if(setup)loadconfig_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
         }
     }
     void ExportConfigs(){
@@ -95,7 +85,6 @@ public class dialogUIs {
             else saveconfig_dialog.invalidateOptionsMenu();
             //order matters
             saveconfig_dialog.show();
-//            downloader.ExportConfig(content);
         }
     }
     void LoadConfig(String content){
@@ -197,17 +186,17 @@ public class dialogUIs {
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
     void showProgress(){
-        progressOverlay.setVisibility(View.VISIBLE);
+        download_progress.setVisibility(View.VISIBLE);
     }
     void hideProgress(){
-        progressOverlay.setVisibility(View.GONE);
+        download_progress.setVisibility(View.GONE);
     }
 
     private AlertDialog setup_download_dialog(DownloadDialogType type){
         final Activity activity = activityReference.get();
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, parentRef.get(), false);
-        progressOverlay = dialogView.findViewById(R.id.loading_layout);
+        download_progress = dialogView.findViewById(R.id.loading_layout);
 
         //recycle view
         RecyclerView content_view = dialogView.findViewById(R.id.contentRecView);
@@ -230,35 +219,19 @@ public class dialogUIs {
             default:
                 return null;
         }
-        layoutDialog_builder.setTitle(activity.getString((type == DownloadDialogType.CONFIGS)?R.string.dialog_config_title:R.string.dialog_select_title));
-        layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
+        final TextView tv = dialogView.findViewById(R.id.title_name);
+        tv.setText((type == DownloadDialogType.CONFIGS)?R.string.dialog_config_title:R.string.dialog_select_title);
         layoutDialog_builder.setView(dialogView);
         return layoutDialog_builder.create();
     }
 
-    private static void SetupProgressDialog(String info){
-        Activity activity = activityReference.get();
-        final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
-        final View dialogView = LayoutInflater.from(activity).inflate(R.layout.progress_dialog, null);
-        layoutDialog_builder.setTitle(activity.getString(R.string.dialog_progress_title));
-        layoutDialog_builder.setIcon(R.mipmap.ic_launcher_round);
-        layoutDialog_builder.setView(dialogView);
-
-        //todo: if the info is needed, use adapter
-//        TextView tv = dialogView.findViewById(R.id.textProgressInfo);
-//        tv.setText(info);
-
-        progress_dialog = layoutDialog_builder.create();
-        progress_dialog.setCanceledOnTouchOutside(false);
-    }
-    static void onDownloadingUI(String dataset_name, boolean isLocal){
+    void onDownloadingUI(boolean isLocal){
         activityReference.get().runOnUiThread(new Runnable()  {
             @Override
             public void run()  {
                 if(isLocal)loadlocal_dialog.dismiss();
                 else loadremote_dialog.dismiss();
-                if(progress_dialog == null) SetupProgressDialog(dataset_name);
-                progress_dialog.show();
+                main_progress.setVisibility(View.VISIBLE);
             }});
     }
 
@@ -278,7 +251,7 @@ public class dialogUIs {
             activityReference.get().runOnUiThread(new Runnable()  {
                 @Override
                 public void run()  {
-                    if(progress_dialog!=null) progress_dialog.dismiss();
+                    main_progress.setVisibility(View.GONE);
                 }});
         }
         if(downloader.isDownloadingMaskProcessFinished()){
