@@ -42,6 +42,11 @@ public class mainUIs {
         syscallListAdapter fAdapter = new syscallListAdapter(activity, R.array.functions, R.string.sys_name);
         spinner_func.setAdapter(fAdapter);
 
+
+        Spinner spinner_data = (Spinner) activity.findViewById(R.id.dataSpinner);
+        dataListAdapter dAdapter = new dataListAdapter(activity, R.array.data_loading, R.string.data_name);
+        spinner_data.setAdapter(dAdapter);
+
         dialogController = new dialogUIs(activity, this, parent_view);
 
         Resources res = activity.getResources();
@@ -116,9 +121,9 @@ public class mainUIs {
                         holder.text_name.setTextAppearance(R.style.itemHighlightText);
                         String text_title = ((TextView)v).getText().toString();
                         if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
-                        else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
-                        else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
-                        else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
+//                        else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
+//                        else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
+//                        else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
                         else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
                         else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
                         new android.os.Handler().postDelayed(
@@ -130,6 +135,49 @@ public class mainUIs {
                                 300);
                     }
                 });
+            return convertView;
+        }
+        private class ViewContentHolder{
+            TextView text_name;
+        }
+    }
+    private class dataListAdapter extends ListAdapter{
+        dataListAdapter(Context context, int arrayId, int titleId){
+            super(context, context.getResources().getString(titleId));
+            item_names = Arrays.asList(context.getResources().getStringArray(arrayId));
+        }
+        public View getDropDownView(int position, View convertView, ViewGroup parent){
+            ViewContentHolder holder;
+            if (convertView == null) {
+                holder = new ViewContentHolder();
+                convertView = mInflater.inflate(R.layout.spinner_item, null);
+                holder.text_name = (TextView) convertView.findViewById(R.id.funcName);
+                convertView.setTag(R.layout.spinner_check_layout, holder);
+            } else {
+                holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
+            }
+            holder.text_name.setText(item_names.get(position));
+
+            holder.text_name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    holder.text_name.setTextAppearance(R.style.itemHighlightText);
+                    String text_title = ((TextView)v).getText().toString();
+//                    if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
+                    if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
+                    else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
+                    else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
+//                    else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
+//                    else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    holder.text_name.setTextAppearance(R.style.itemText);
+                                }
+                            },
+                            300);
+                }
+            });
             return convertView;
         }
         private class ViewContentHolder{

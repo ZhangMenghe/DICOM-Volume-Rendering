@@ -153,11 +153,13 @@
 <!--other functions-->
     <string-array name="functions">
         <item>@string/sys_reset</item>
+        <item>@string/sys_template_save</item>
+        <item>@string/sys_template_load</item>
+    </string-array>
+    <string-array name="data_loading">
         <item>@string/sys_data_local</item>
         <item>@string/sys_data_device</item>
         <item>@string/sys_data_remote</item>
-        <item>@string/sys_template_save</item>
-        <item>@string/sys_template_load</item>
     </string-array>
 
     <string-array name="cutting_plane">

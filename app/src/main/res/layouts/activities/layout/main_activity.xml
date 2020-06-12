@@ -38,6 +38,14 @@
                 android:spinnerMode="dropdown"
                 style="@style/Spinner"/>
             <Spinner
+                android:id="@+id/dataSpinner"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:spinnerMode="dropdown"
+                style="@style/Spinner"/>
+            <Spinner
                 android:id="@+id/checkPanelSpinner"
                 android:layout_width="0dp"
                 android:layout_weight="1"
