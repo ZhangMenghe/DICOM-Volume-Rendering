@@ -46,7 +46,7 @@ import helmsley.vr.proto.datasetResponse;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
 
-import static helmsley.vr.DUIs.dialogUIs.progress_dialog;
+//import static helmsley.vr.DUIs.dialogUIs.progress_dialog;
 
 public class dicomManager {
     private static final String TAG = "dicomManager";
@@ -155,6 +155,8 @@ public class dicomManager {
         ByteBuffer byteBuffer = ByteBuffer.wrap(byte_data);
         renderBitmap.copyPixelsFromBuffer(byteBuffer);
 
+        //update image
+        if(preview_dialog == null) setup_dialog();
         if(single_image.getHeight() == PREVIEW_IMG_HEIGHT){
             preview_img_view.setImageBitmap(renderBitmap);
         }else{
@@ -162,12 +164,10 @@ public class dicomManager {
             preview_img_view.setImageBitmap(bMapScaled);
         }
 
-        //update image
-        if(preview_dialog == null) setup_dialog();
         title_tex_view.setText(actRef.get().getString(R.string.preview_text,name));
         //name
-        String content = "Patient Name: " + loadDataSet.getString(new TagId(0x0010, 0x0010), 0) + '\n';
-        content += "Date: " + loadDataSet.getString(new TagId(0x0008, 0x0023), 0) ;
+        String content = "Patient Name: " + loadDataSet.getString(new TagId(0x0010, 0x0010), 0, "Anonymous") + '\n';
+        content += "Date: " + loadDataSet.getString(new TagId(0x0008, 0x0023), 0, "UNKNOWN") ;
         content_tex_view.setText(content);
         preview_dialog.show();
     }
@@ -208,7 +208,7 @@ public class dicomManager {
                 width = single_image.getWidth(); height = single_image.getHeight();
                 ssize = (int)(width * height) * 2;
                 byte[] data = get_image_pure_bytes(single_image, ssize, width, height);
-                JNIInterface.JNIsendDataPrepare((int)width, (int)height, 1, -1, false);
+                JNIInterface.JNIsendDataPrepare((int)height,(int)width, 1, -1, -1,-1,false);
                 JNIInterface.JNIsendData(0, 0, ssize, 2, data);
                 is_finished = true;
                 preview_dialog.dismiss();
@@ -235,7 +235,7 @@ public class dicomManager {
                 //build dataset info
 
                 width = dicomImage.getWidth(); height = dicomImage.getHeight();
-                JNIInterface.JNIsendDataPrepare((int)width, (int)height, file_names.size(), -1, false);
+                JNIInterface.JNIsendDataPrepare( (int)height, (int)width, file_names.size(), -1,-1, -1, false);
                 ssize = (int)(width * height) * 2;
 
                 is_first = false;
@@ -329,7 +329,7 @@ public class dicomManager {
                     Image dicomImage = loadDataSet.getImageApplyModalityTransform(0);
                     if(is_first) {
                         is_first = false;
-                        JNIInterface.JNIsendDataPrepare(width, height, nums, -1, false);
+                        JNIInterface.JNIsendDataPrepare(height, width, nums,-1,-1, -1, false);
                     }
                     int ins_id = Integer.parseInt(loadDataSet.getString(new TagId(0x0020,0x0013),0)) - 1;
                     datas[ins_id] = get_image_pure_bytes(dicomImage, ssize, width, height);
@@ -351,11 +351,12 @@ public class dicomManager {
         if(is_finished){
             is_finished = false;
             JNIInterface.JNIsendDataDone();
-            actRef.get().runOnUiThread(new Runnable()  {
-                @Override
-                public void run()  {
-                    if(progress_dialog!=null) progress_dialog.dismiss();
-                }});
+            fileTransferClient.onProgressFinish();
+//            actRef.get().runOnUiThread(new Runnable()  {
+//                @Override
+//                public void run()  {
+////                    if(progress_dialog!=null) progress_dialog.dismiss();
+//                }});
         }
     }
 }

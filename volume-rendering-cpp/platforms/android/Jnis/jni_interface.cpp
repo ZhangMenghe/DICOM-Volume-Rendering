@@ -15,7 +15,7 @@ namespace {
     //globally
     GLubyte* g_VolumeTexData = nullptr;
     int g_img_h=0, g_img_w=0, g_img_d=0;
-    float g_vol_thickness = 0;
+    float g_vol_h, g_vol_w, g_vol_depth = 0;
     size_t g_ssize = 0, g_vol_len;
     size_t n_data_offset[3] = {0};
     AAssetManager * _asset_manager;
@@ -109,20 +109,25 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
     env->ReleaseByteArrayElements(jdata, data, 0);
 }
 
-JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint width, jint height, jint dims, jfloat thickness, jboolean b_wmask){
-    CHANEL_NUM = b_wmask? 4:2;
+JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint height, jint width, jint dims,jfloat sh,jfloat sw, jfloat sd, jboolean b_mask){
+    CHANEL_NUM = b_mask? 4:2;
     g_img_h = height; g_img_w = width; g_img_d = dims;
     g_ssize = CHANEL_NUM * width * height;
     g_vol_len = g_ssize* dims;
-    g_vol_thickness = thickness;
+    g_vol_h=sh; g_vol_w=sw; g_vol_depth=sd;
     if(g_VolumeTexData!= nullptr){delete[]g_VolumeTexData; g_VolumeTexData = nullptr;}
     g_VolumeTexData = new GLubyte[ g_vol_len];
     memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
 }
 
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
-    for(auto &id:n_data_offset)
-        if(id!=0) {vrController::instance()->assembleTexture(g_img_w, g_img_h, g_img_d, g_vol_thickness, g_VolumeTexData, CHANEL_NUM); id=0;break;}
+    for(int i=0; i<3; i++){
+        if(n_data_offset[i] != 0){
+            vrController::instance()->assembleTexture(i, g_img_h, g_img_w, g_img_d, g_vol_h, g_vol_w, g_vol_depth, g_VolumeTexData, CHANEL_NUM);
+            n_data_offset[i] = 0;
+            break;
+        }
+    }
 }
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){

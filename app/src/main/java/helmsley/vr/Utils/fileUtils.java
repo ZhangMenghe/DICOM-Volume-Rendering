@@ -184,6 +184,10 @@ public class fileUtils {
         }
     }
     public static void saveLargeImageToFile(OutputStream ostream, byte[] data){
+//        for(int i=0; i< 25000000; i++){
+//            if(data[4*i+2] !=0 || data[4*i+3]!=0)
+//                Log.e(TAG, "=====save not 0: " );
+//        }
         try{
             ostream.write(data);
             ostream.flush();

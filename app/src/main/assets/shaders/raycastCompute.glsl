@@ -34,6 +34,8 @@ uniform float u_contrast_high;
 uniform float u_brightness;
 uniform int u_visible_bits;
 //uniform float u_contrast_level;
+const vec3 ORGAN_COLORS[6]= vec3[6](vec3(0.24, 0.004, 0.64), vec3(0.008, 0.278, 0.99), vec3(0.75, 0.634, 0.996),
+                            vec3(1, 0.87, 0.14),vec3(0.98, 0.88, 1.0),vec3(0.99, 0.106, 0.365));
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -44,8 +46,10 @@ vec3 hsv2rgb(vec3 c){
 vec3 transfer_scheme(float gray){
     return hsv2rgb(vec3(gray, 1.0, 1.0));
 }
-vec3 transfer_scheme(float cat, float gray){
-    return hsv2rgb(vec3(cat, 1.0, gray));
+vec3 transfer_scheme(int cat, float gray){
+//    return hsv2rgb(vec3(cat, 1.0, gray));
+    vec3 gcolor = ORGAN_COLORS[cat - 1];
+    return gcolor * gray;
 }
 //hot to color. H(0~180)
 vec3 bright_scheme(float gray){
@@ -120,7 +124,7 @@ vec3 TransferColor(float intensity, int ORGAN_BIT){
 
     #ifdef SHOW_ORGANS
         if(ORGAN_BIT > int(0))
-        color = transfer_scheme(float(ORGAN_BIT) / float(u_organ_num), intensity);
+        color = transfer_scheme(ORGAN_BIT, intensity);
     #endif
     return color;
 }

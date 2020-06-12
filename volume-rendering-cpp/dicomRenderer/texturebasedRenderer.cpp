@@ -53,10 +53,11 @@ void texvrRenderer::update_instance_data(){
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
     float zTex = .0f;
-    float mappedZVal = -scale_inv + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
+    float step = 1.0f / dimensions;
+    float mappedZVal = - (dimensions - 1) / 2.0f * step; //-scale_inv;// + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
     for (int i = 0; i < dimensions; i++){
         zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
-        mappedZVal+=MAX_DIMENSIONS_INV; zTex+=dimension_inv;
+        mappedZVal+=step; zTex+=dimension_inv;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
@@ -123,7 +124,13 @@ void texvrRenderer::draw_baked() {
 
 void texvrRenderer::setDimension(int dims, float thickness){
     dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
-    vol_thickness_factor = (thickness<0)?vol_thickness_factor:(thickness / 40.0f);
+    if(thickness > 0){
+        vol_thickness_factor = thickness;
+    }else{
+        if(dims > 200) vol_thickness_factor = 0.5;
+        else if(dims > 100) vol_thickness_factor = dims / 300.f;
+        else vol_thickness_factor = dims / 200.f;
+    }
     update_instance_data();
 }
 void texvrRenderer::setCuttingPlane(float percent){

@@ -33,6 +33,8 @@ import com.google.protobuf.ByteString;
 
 public class fileTransferClient {
     final static String TAG = "fileTransferClient";
+    private final WeakReference<Activity> activityReference;
+    private final WeakReference<dialogUIs> duiRef;
     private static WeakReference<fileTransferClient> selfReference;
     private static boolean finished = false, finished_mask=false;
 
@@ -41,9 +43,6 @@ public class fileTransferClient {
     private final int CLIENT_ID = 1;
     private datasetInfo target_ds;
     private volumeInfo target_vol;
-    private final WeakReference<Activity> activityReference;
-    private final WeakReference<dialogUIs> duiRef;
-
 
     private List<datasetInfo> available_remote_datasets,
             available_local_datasets = new ArrayList<>();
@@ -226,7 +225,7 @@ public class fileTransferClient {
         if(res.getSuccess()) Toast.makeText(activityReference.get(), "Config Exported", Toast.LENGTH_LONG).show();
         config_dirty = true;
     }
-    public boolean Download(String ds_name, volumeInfo target_volume){
+    public boolean Download(String ds_name, volumeInfo target_volume, boolean is_local){
         target_vol = target_volume;
         if(target_volume.getDataSource() == volumeInfo.DataSource.DEVICE){
             if(dicomManager.LoadDataFromDevice(target_volume)) return true;
@@ -234,8 +233,9 @@ public class fileTransferClient {
             return false;
         }else{
             //todo: check and timeout for loading failure
-            if(!LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName()))
-                new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
+            if(is_local)
+                return LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName());
+            new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
         }
         return true;
     }
@@ -409,7 +409,8 @@ public class fileTransferClient {
         if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))) return;
 
         try {
-            File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, target_ds.getFolderName(), target_vol.getFolderName()), DCM_MASK_FILE_NAME);
+//            tvol.getWithMask()?DCM_WMASK_FILE_NAME:
+            File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, target_ds.getFolderName(), target_vol.getFolderName()), DCM_WMASK_FILE_NAME);
             fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
         } catch (Exception e) {
             Log.e(TAG, "====Failed to Save Masks to file");
@@ -459,8 +460,8 @@ public class fileTransferClient {
             File simgf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName() ), "sample");
             FileOutputStream os = new FileOutputStream(simgf);
             os.write(buffer);
-            if(save_complete){
-                File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), tvol.getWithMask()?DCM_WMASK_FILE_NAME:DCM_FILE_NAME);
+            if(save_complete && !tvol.getWithMask()){
+                File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), DCM_FILE_NAME);
                 fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
             }
 
@@ -496,7 +497,6 @@ public class fileTransferClient {
         //load data
         File DwM = new File(destDir, activity.getString(R.string.cf_dcmwmask_name));
         try{
-
             if(DwM.exists()){
                 loadVolumeData(new FileInputStream(DwM), 2, 4);
                 finished = true; finished_mask = true;
@@ -551,5 +551,7 @@ public class fileTransferClient {
     public void ResetMast(){
         finished_mask = false;
     }
-
+    public static void onProgressFinish(){
+        selfReference.get().duiRef.get().onProgressFinish();
+    }
 }

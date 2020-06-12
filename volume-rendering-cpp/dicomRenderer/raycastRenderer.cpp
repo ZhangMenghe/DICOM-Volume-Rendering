@@ -120,5 +120,11 @@ void raycastRenderer::draw_baked(){
     screenQuad::instance()->Draw();
 }
 void raycastRenderer::setDimension(int dims, float thickness){
-    dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(.75f, 0.75f, (thickness<0)?(dims/100.0f):(thickness / 400.0f)));
+    if(thickness > 0 ){
+        dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, thickness));
+    }else{
+        if(dims > 200) dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 0.5f));
+        else if(dims > 100) dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, dims / 300.f));
+        else dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, dims / 200.f));
+    }
 }
