@@ -142,6 +142,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         if(islocal_) setup_single_card_content_list(holder.lstViewVol, info.getFolderName(), true);
 
         holder.lstViewVol.setVisibility(View.GONE);
+        holder.sortView.setVisibility(View.GONE);
 
         //Perform selection of a volume
         holder.lstViewVol.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -396,8 +397,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             sort_view_map.put(sel_ds_name, sort_view);
         }
         if(sort_view!=null){
-            if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
-            else sort_view.setVisibility(View.VISIBLE);
+            sort_view.setVisibility(lst_view.getVisibility());
+//            if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
+//            else sort_view.setVisibility(View.VISIBLE);
         }
     }
     private static class sortListAdapter extends textSimpleListAdapter{
