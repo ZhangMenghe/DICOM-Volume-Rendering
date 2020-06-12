@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -274,7 +275,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                         spacing.get(0)*dims.get(0), spacing.get(1)*dims.get(1), sel_vol_info.getVolumeLocRange(),
                         sel_vol_info.getWithMask());
                 
-                if(downloaderRef.get().Download(sel_ds_name, sel_vol_info))duiRef.get().onDownloadingUI(islocal_);
+                if(downloaderRef.get().Download(sel_ds_name, sel_vol_info, islocal_))
+                    duiRef.get().onDownloadingUI(islocal_);
+                else
+                    Toast.makeText(actRef.get(), "Fail to load Data", Toast.LENGTH_LONG);
                 preview_dialog.dismiss();
             }
         });

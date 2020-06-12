@@ -54,25 +54,25 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
     ModelMat_=mm; RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv; camera=rStates_[cst_name].vcam;
     volume_model_dirty = false;
 }
-void vrController::assembleTexture(int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
-    //
-    if(sh<=0 || sw<=0 || sd<=0){
-        texvrRenderer_->setDimension(pd, -1);
-        raycastRenderer_->setDimension(pd, -1);
-    }else if(abs(sh - sw) < 1){
-        texvrRenderer_->setDimension(pd, sd / sh);
-        raycastRenderer_->setDimension(pd, sd / sh);
-    }else{
-        float ls = fmax(sw,sh);
-        texvrRenderer_->setDimension(pd, sd / ls);
-        raycastRenderer_->setDimension(pd, sd / ls);
-        if(sw > sh){
-            ScaleVec3_ = ScaleVec3_* glm::vec3(1.0, sh / sw, 1.0);
+void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
+    if(update_target==0 || update_target==2){
+        if(sh<=0 || sw<=0 || sd<=0){
+            texvrRenderer_->setDimension(pd, -1);
+            raycastRenderer_->setDimension(pd, -1);
+        }else if(abs(sh - sw) < 1){
+            texvrRenderer_->setDimension(pd, sd / sh);
+            raycastRenderer_->setDimension(pd, sd / sh);
         }else{
-            ScaleVec3_ = ScaleVec3_* glm::vec3(sw/sh, 1.0, 1.0);
+            float ls = fmax(sw,sh);
+            texvrRenderer_->setDimension(pd, sd / ls);
+            raycastRenderer_->setDimension(pd, sd / ls);
+            if(sw > sh){
+                ScaleVec3_ = ScaleVec3_* glm::vec3(1.0, sh / sw, 1.0);
+            }else{
+                ScaleVec3_ = ScaleVec3_* glm::vec3(sw/sh, 1.0, 1.0);
+            }
+            volume_model_dirty = true;
         }
-        volume_model_dirty = true;
-
     }
 
     auto vsize= ph*pw*pd;
