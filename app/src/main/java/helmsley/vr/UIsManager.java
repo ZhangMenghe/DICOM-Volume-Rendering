@@ -56,14 +56,8 @@ public class UIsManager {
         current_texray_id = isRaycast?raycast_id:tex_id;
         sub_panels_.get(R.string.panel_cut_name).onTexRayChange(isRaycast);
     }
-    public void onCuttingPlaneSwitch(boolean isPanelOn){
-        sub_panels_.get(R.string.panel_cut_name).showHidePanel(isPanelOn, current_texray_id==raycast_id);
-    }
-    public void onRenderingSwitch(boolean isPanelOn){
-        sub_panels_.get(R.string.panel_rendering_name).showHidePanel(isPanelOn);
-    }
-    public void onMaskPanelSwitch(boolean isPanelOn){
-        sub_panels_.get(R.string.panel_mask_name).showHidePanel(isPanelOn);
+    public void onPanelCheckSwitch(int pos, boolean isPanelOn){
+        sub_panels_.get(sub_panel_name_ids_[pos]).showHidePanel(isPanelOn, current_texray_id==raycast_id);
     }
     public void getCurrentStates(LinkedHashMap map){
         LinkedHashMap vol_map = new LinkedHashMap();

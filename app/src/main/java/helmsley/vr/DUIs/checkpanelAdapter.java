@@ -15,7 +15,7 @@ import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
 public class checkpanelAdapter extends ListAdapter {
-    final WeakReference<Context> contexRef;
+    private final WeakReference<Context> contexRef;
     private final WeakReference<UIsManager> mUIManagerRef;
     private boolean[] item_values;
 
@@ -32,7 +32,7 @@ public class checkpanelAdapter extends ListAdapter {
             item_values[i] = check_values_type.getBoolean(i, false);
         check_values_type.recycle();
     }
-    public boolean[] getAllValues(){return item_values;}
+    boolean[] getAllValues(){return item_values;}
 
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
         ViewContentHolder holder;
@@ -54,20 +54,7 @@ public class checkpanelAdapter extends ListAdapter {
                                          boolean isChecked) {
                 if (item_values[position] == isChecked) return;
                 item_values[position]= isChecked;
-                switch (position){
-                    case 0:
-                        onRenderingSwitch(isChecked);
-                        break;
-                    case 1:
-                        onCuttingPlaneSwitch(isChecked);
-                        break;
-                    case 2:
-                        onMaskPanelSwitch(isChecked);
-                        break;
-                    default:
-                        break;
-                }
-
+                mUIManagerRef.get().onPanelCheckSwitch(position, isChecked);
             }
         });
         holder.checkBox.setTag(position);
@@ -75,20 +62,8 @@ public class checkpanelAdapter extends ListAdapter {
         return convertView;
     }
 
-    class ViewContentHolder {
+    static class ViewContentHolder {
         TextView text_name;
         CheckBox checkBox;
-    }
-
-    private void onCuttingPlaneSwitch(boolean isChecked) {
-        mUIManagerRef.get().onCuttingPlaneSwitch(isChecked);
-    }
-
-    private void onRenderingSwitch(boolean isChecked){
-        mUIManagerRef.get().onRenderingSwitch(isChecked);
-    }
-
-    private void onMaskPanelSwitch(boolean isChecked){
-        mUIManagerRef.get().onMaskPanelSwitch(isChecked);
     }
 }
