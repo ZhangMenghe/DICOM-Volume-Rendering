@@ -9,12 +9,10 @@
 
 class texvrRenderer{
 private:
-    const float scale_inv = 0.5f;
-    const float DENSE_FACTOR = 2.0f;
+    const float DENSE_FACTOR = 1.0f;
     int dimensions; float dimension_inv;
-    float vol_thickness_factor = 10.0f;
-    const int MAX_DIMENSIONS = 2000;
-    const float MAX_DIMENSIONS_INV = 1.0f/MAX_DIMENSIONS;
+    float vol_thickness_factor = 1.0f;
+    const int MAX_DIMENSIONS = 1000;
 
     Shader* shader_;
     GLuint frame_buff_ = 0;

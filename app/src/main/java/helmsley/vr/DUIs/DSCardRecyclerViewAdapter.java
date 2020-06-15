@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.ArraySet;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -19,6 +19,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -29,12 +30,9 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
-import helmsley.vr.Utils.SwipeDetector;
-import helmsley.vr.proto.configResponse;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
@@ -69,6 +67,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private final WeakReference<RecyclerView> recyclerView;
     private final WeakReference<fileTransferClient> downloaderRef;
     private final WeakReference<dialogUIs> duiRef;
+    private final WeakReference<DSCardRecyclerViewAdapter> selfRef;
     private final boolean islocal_;
 
     //adapter of listView content
@@ -93,7 +92,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 //    private static Set<String> dirty_dsname= new ArraySet<>();
     private Map<String, View> sort_view_map = new LinkedHashMap<>();
 //    private Map<String, View> lst_view_map = new LinkedHashMap<>();
-
+    private ProgressTask p_tsk;
 
     DSCardRecyclerViewAdapter(Activity activity, RecyclerView recycle_view, fileTransferClient downloader, dialogUIs dui, dialogUIs.DownloadDialogType type) {
         downloaderRef = new WeakReference<>(downloader);
@@ -101,12 +100,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         recyclerView = new WeakReference<>(recycle_view);
         duiRef = new WeakReference<>(dui);
         islocal_ = (type == DATA_LOCAL);
-        if(!islocal_)cached_volumeinfo = new LinkedHashMap<>();
+        if(!islocal_) cached_volumeinfo = new LinkedHashMap<>();
 
         contentAdapters = new LinkedHashMap<>();
         TypedValue typedValue = new TypedValue();
         activity.getResources().getValue(R.dimen.preview_img_height, typedValue, true);
         PREVIEW_IMG_HEIGHT = (int)typedValue.getFloat();
+        selfRef = new WeakReference<>(this);
     }
     @Override
     public DSCardRecyclerViewAdapter.cardHolder onCreateViewHolder(ViewGroup parent,
@@ -120,26 +120,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             public void onClick(View v) {
                 int selectedItemPosition = recyclerView.get().getChildAdapterPosition(v);
                 sel_ds_name = downloaderRef.get().getAvailableDataset(islocal_).get(selectedItemPosition).getFolderName();
-
-                ListView lst_view = (ListView)v.findViewById(R.id.card_list);
-                //setup remote card content
-                if(!islocal_ && lst_view.getCount() == 0) setup_single_card_content_list(lst_view, sel_ds_name, false);
-
-                //show/hide list view: volume details
-                if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
-                else lst_view.setVisibility(View.VISIBLE);
-                //show/hide sort view
-                View sort_view;
-                try{
-                    sort_view = sort_view_map.get(sel_ds_name);
-                }catch (NullPointerException e){
-                    sort_view = v.findViewById(R.id.card_sort_layout);
-                    sort_view_map.put(sel_ds_name, sort_view);
-                }
-                if(sort_view!=null){
-                    if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
-                    else sort_view.setVisibility(View.VISIBLE);
-                }
+                if(islocal_ || ((ListView)v.findViewById(R.id.card_list)).getCount() != 0) {
+                    on_click_ds_card(v);
+                }else
+                    new ProgressTask(selfRef.get(),v).execute();
             }
         });
         return new cardHolder(card_view);
@@ -158,6 +142,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         if(islocal_) setup_single_card_content_list(holder.lstViewVol, info.getFolderName(), true);
 
         holder.lstViewVol.setVisibility(View.GONE);
+        holder.sortView.setVisibility(View.GONE);
 
         //Perform selection of a volume
         holder.lstViewVol.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -200,18 +185,6 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys, info.getFolderName());
         holder.sortSpinner.setAdapter(adp);
         adp.setTitleById(0);
-    }
-    public static void DirtyCache(String dsname){
-
-//        dirty_dsname.add(dsname);
-//        try{
-//            selfReference.get().notifyDataSetChanged();
-//            for(View sort_view: selfReference.get().sort_view_map.values())
-//                sort_view.setVisibility(View.GONE);
-//            contentAdapters.get(dsname).notifyDataSetChanged();
-//        }catch (NullPointerException e){
-//        }
-
     }
     @Override
     public int getItemCount() {
@@ -297,8 +270,16 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             public void onClick(View v) {
                 //get the information ready here
                 List<Integer> dims = sel_vol_info.getDimsList();
-                JNIInterface.JNIsendDataPrepare(dims.get(1), dims.get(0), dims.get(2), sel_vol_info.getVolumeLocRange(), sel_vol_info.getWithMask());
-                if(downloaderRef.get().Download(sel_ds_name, sel_vol_info))dialogUIs.onDownloadingUI(sel_ds_name, islocal_);
+                List<Float> spacing = sel_vol_info.getResolutionList();
+//                Log.e(TAG, "====onClick: "+ spacing.get(0)*dims.get(0) + " ====" +spacing.get(1)*dims.get(1) + "==="+sel_vol_info.getVolumeLocRange() );
+                JNIInterface.JNIsendDataPrepare(dims.get(0), dims.get(1), dims.get(2),
+                        spacing.get(0)*dims.get(0), spacing.get(1)*dims.get(1), sel_vol_info.getVolumeLocRange(),
+                        sel_vol_info.getWithMask());
+                
+                if(downloaderRef.get().Download(sel_ds_name, sel_vol_info, islocal_))
+                    duiRef.get().onDownloadingUI(islocal_);
+                else
+                    Toast.makeText(actRef.get(), "Fail to load Data", Toast.LENGTH_LONG);
                 preview_dialog.dismiss();
             }
         });
@@ -398,6 +379,29 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         contentAdapters.get(ds_name).notifyDataSetChanged();
         return true;
     }
+    private void on_click_ds_card(View v){
+        ListView lst_view = (ListView)v.findViewById(R.id.card_list);
+        //setup remote card content
+        if(!islocal_ && lst_view.getCount() == 0)
+            setup_single_card_content_list(lst_view, sel_ds_name, false);
+
+        //show/hide list view: volume details
+        if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
+        else lst_view.setVisibility(View.VISIBLE);
+        //show/hide sort view
+        View sort_view;
+        try{
+            sort_view = sort_view_map.get(sel_ds_name);
+        }catch (NullPointerException e){
+            sort_view = v.findViewById(R.id.card_sort_layout);
+            sort_view_map.put(sel_ds_name, sort_view);
+        }
+        if(sort_view!=null){
+            sort_view.setVisibility(lst_view.getVisibility());
+//            if(sort_view.getVisibility() == View.VISIBLE) sort_view.setVisibility(View.GONE);
+//            else sort_view.setVisibility(View.VISIBLE);
+        }
+    }
     private static class sortListAdapter extends textSimpleListAdapter{
         int current_id = -1;
         String ds_name_;
@@ -424,6 +428,33 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             if(current_id == position) return;
             current_id = position;
             parentRef.get().ReorderVolumeList(ds_name_,item_names.get(position));
+        }
+    }
+
+
+    private static class ProgressTask extends AsyncTask<Void, Void, Void> {
+        private final WeakReference<DSCardRecyclerViewAdapter> parentRef;
+        private final WeakReference<View> vRef;
+        ProgressTask(DSCardRecyclerViewAdapter adp, View v_){
+            parentRef = new WeakReference<>(adp);
+            vRef = new WeakReference<>(v_);
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            parentRef.get().duiRef.get().showProgress();
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            parentRef.get().on_click_ds_card(vRef.get());
+            parentRef.get().duiRef.get().hideProgress();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            return null;
         }
     }
 }

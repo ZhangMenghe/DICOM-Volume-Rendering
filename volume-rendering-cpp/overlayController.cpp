@@ -64,7 +64,6 @@ void overlayController::onDraw(){
         int visible=0;
         int wnum = widget_visibilities_.size();
         for(int i=0;i<wnum;i++)visible |= int(widget_visibilities_[i]) << i;
-        LOGE("====== %d", visible);
         renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_visible_bits", visible);
         dirty_wid = -1;
     }

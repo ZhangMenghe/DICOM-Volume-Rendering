@@ -54,10 +54,28 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
     ModelMat_=mm; RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv; camera=rStates_[cst_name].vcam;
     volume_model_dirty = false;
 }
-void vrController::assembleTexture(int w, int h, int d, float vol_thickness, GLubyte * data, int channel_num){
-    texvrRenderer_->setDimension(d, vol_thickness);
-    raycastRenderer_->setDimension(d, vol_thickness);
-    auto vsize= w*h*d;
+void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
+    if(update_target==0 || update_target==2){
+        if(sh<=0 || sw<=0 || sd<=0){
+            texvrRenderer_->setDimension(pd, -1);
+            raycastRenderer_->setDimension(pd, -1);
+        }else if(abs(sh - sw) < 1){
+            texvrRenderer_->setDimension(pd, sd / sh);
+            raycastRenderer_->setDimension(pd, sd / sh);
+        }else{
+            float ls = fmax(sw,sh);
+            texvrRenderer_->setDimension(pd, sd / ls);
+            raycastRenderer_->setDimension(pd, sd / ls);
+            if(sw > sh){
+                ScaleVec3_ = ScaleVec3_* glm::vec3(1.0, sh / sw, 1.0);
+            }else{
+                ScaleVec3_ = ScaleVec3_* glm::vec3(sw/sh, 1.0, 1.0);
+            }
+            volume_model_dirty = true;
+        }
+    }
+
+    auto vsize= ph*pw*pd;
     uint32_t* vol_data  = new uint32_t[vsize];
     uint16_t tm;
     //fuse volume data
@@ -68,11 +86,11 @@ void vrController::assembleTexture(int w, int h, int d, float vol_thickness, GLu
         // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
     }
     if(tex_volume!= nullptr){delete tex_volume; tex_volume= nullptr;}
-    tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, w, h, d, vol_data);
+    tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, vol_data);
 
     auto* tb_data = new GLubyte[vsize * 4];
     if(tex_baked!= nullptr){delete tex_baked; tex_baked= nullptr;}
-    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, w, h, d, tb_data);
+    tex_baked = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, pw, ph, pd, tb_data);
     delete[]tb_data;
     delete[]vol_data;
     baked_dirty_ = true;
@@ -123,7 +141,6 @@ void vrController::onTouchMove(float x, float y) {
 }
 void vrController::onScale(float sx, float sy){
     if(!tex_volume) return;
-    LOGE("====SCALE");
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     //unified scaling
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
@@ -138,7 +155,6 @@ void vrController::onScale(float sx, float sy){
 }
 void vrController::onPan(float x, float y){
     if(!tex_volume|| vrController::param_bool[dvr::CHECK_FREEZE_VOLUME]) return;
-    LOGE("====PAN");
     if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
     float offx = x / _screen_w * MOUSE_PAN_SENSITIVITY, offy = -y /_screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;
@@ -159,7 +175,6 @@ void vrController::precompute(){
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[color_scheme_id]);
     //todo!!!! add flip stuff
-//    if(tex_volume->Depth() == 144)
     bakeShader_->EnableKeyword("FLIPY");
     if(param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");

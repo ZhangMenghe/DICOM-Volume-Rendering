@@ -38,7 +38,10 @@ public:
     glm::mat4 getProjMat(){return _projMat;}
     glm::mat4 getViewMat(){return _viewMat;}
     glm::mat4 getVPMat(){return _projMat * _viewMat;}
-    glm::vec3 getCameraPosition(){return _eyePos;}
+    glm::vec3 getCameraPosition(){
+        //todo:DON'T KNOW WHY BUT WORKS FOR RAYCASTING MODE TO STAY THE SAME SIZE
+        return _eyePos + glm::vec3(.0,.0,1.0);
+    }
     glm::vec3 getViewCenter(){return _center;}
     glm::vec3 getViewDirection(){return _front;}
     glm::vec3 getViewUpDirection(){return _up;}
