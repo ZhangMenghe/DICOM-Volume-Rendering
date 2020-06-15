@@ -17,6 +17,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
         GLESv3
         EGL
         log)
+    include_directories(${ARCORE_INCLUDE})
 endif()
 set(GLM_DIRECTORY /usr/local/include/glm)
 
