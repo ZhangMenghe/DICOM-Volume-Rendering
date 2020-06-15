@@ -5,9 +5,11 @@
         <item>@string/panel_rendering_name</item>
         <item>@string/panel_cut_name</item>
         <item>@string/panel_mask_name</item>
+        <item>@string/panel_ar_name</item>
     </string-array>
     <string-array name="checkShowPanelValues">
         <item>@bool/default_render_panel_on</item>
+        <item>false</item>
         <item>false</item>
         <item>false</item>
     </string-array>
@@ -15,6 +17,7 @@
         <item>@array/render_check_params</item>
         <item>@array/mask_check_params</item>
         <item>@array/cut_check_params</item>
+        <item>@array/ar_check_params</item>
     </string-array>
 
 <!--    rendering panel-->
@@ -63,6 +66,13 @@
         <item>false</item>
         <item>false</item>
     </string-array>
+<!--    ar_check_params-->
+    <string-array name="ar_check_params">
+        <item>@string/ar_check_name</item>
+    </string-array>
+    <array name="ar_check_values">
+        <item>false</item>
+    </array>
 
     <string-array name="raycast_density">
         <item>Density</item>

@@ -30,6 +30,7 @@
     <string name="panel_rendering_name">Rendering</string>
     <string name="panel_mask_name">Organs</string>
     <string name="panel_cut_name">Cut Planes</string>
+    <string name="panel_ar_name">AR</string>
 
 <!--    render panel subs-->
     <string name="contrast_group_name">Contrast</string>
@@ -39,12 +40,13 @@
 
 <!--    mask panel subs-->
     <string name="mask_check_name">ShowMask</string>
-
 <!--    cut panel subs-->
     <string name="cutting_check_name">Cutting</string>
     <string name="check_freeze_name">Freeze</string>
     <string name="freezeplane_check_name">Freeze Plane</string>
     <string name="freezeVolume_check_name">Freeze Volume</string>
+<!--ar sub panel-->
+    <string name="ar_check_name">AR Enabled</string>
 
     <!--    sys operation names-->
     <string name="sys_name">System</string>
