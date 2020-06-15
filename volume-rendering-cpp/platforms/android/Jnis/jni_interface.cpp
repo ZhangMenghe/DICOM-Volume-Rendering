@@ -79,7 +79,7 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
     overlayController::instance()->onViewCreated();
 }
 
-JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h, jint rot){
+JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
     nativeApp(nativeAddr)->onViewChange(w, h);
     overlayController::instance()->onViewChange(w, h);
 }

@@ -16,7 +16,7 @@ class Camera{
     const float NEAR_PLANE = 1.8f;//as close as possible
     const float FAR_PLANE = 1000.0f;
     const float FOV = 45.0f;
-    const glm::vec3 ORI_CAM_POS = glm::vec3(0.0f, .0f, 2.8f);
+    const glm::vec3 ORI_CAM_POS = glm::vec3(0.0f, .0f, 4.f);
     const glm::vec3 ORI_UP = glm::vec3(0.0f, 1.0f, 0.0f);
     const glm::vec3 ORI_FRONT = glm::vec3(0.0f, 0.0f, -1.0f);
 
@@ -69,7 +69,7 @@ public:
     glm::mat4 getVPMat(){return _projMat * _viewMat;}
     glm::vec3 getCameraPosition(){
         //todo:DON'T KNOW WHY BUT WORKS FOR RAYCASTING MODE TO STAY THE SAME SIZE
-        return _eyePos + glm::vec3(.0,.0,1.0);
+        return _eyePos;// + glm::vec3(.0,.0,1.0);
     }
     glm::vec3 getViewCenter(){return _center;}
     glm::vec3 getViewDirection(){return _front;}

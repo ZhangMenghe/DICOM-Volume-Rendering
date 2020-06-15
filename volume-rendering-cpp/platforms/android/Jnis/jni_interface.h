@@ -32,8 +32,6 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv * env, jclass);
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint, jint, jint);
 
-JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint, jint, jint);
-
 JNIEnv *GetJniEnv();
 
 jclass FindClass(const char *classname);
