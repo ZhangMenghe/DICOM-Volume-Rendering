@@ -68,13 +68,18 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     setupShaderContents();
     return nativeAddr;
 }
+JNI_METHOD(void, JNIonPause)(JNIEnv* env, jclass){}
+
+JNI_METHOD(void, JNIonDestroy)(JNIEnv* env, jclass){}
+
+JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject, jobject){}
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
     nativeApp(nativeAddr)->onViewCreated();
     overlayController::instance()->onViewCreated();
 }
 
-JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
+JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h, jint rot){
     nativeApp(nativeAddr)->onViewChange(w, h);
     overlayController::instance()->onViewChange(w, h);
 }

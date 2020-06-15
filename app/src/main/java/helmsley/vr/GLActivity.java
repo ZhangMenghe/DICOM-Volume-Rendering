@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+
 import java.io.File;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -24,6 +26,11 @@ public class GLActivity extends AppCompatActivity {
 
     final static boolean skipLoadingResource = true;
 
+    protected boolean viewportChanged = false;
+    protected int viewportWidth;
+    protected int viewportHeight;
+    // Opaque native pointer to the native application instance.
+
     //Surface view
     protected GLSurfaceView surfaceView;
     protected long nativeAddr;
@@ -37,7 +44,8 @@ public class GLActivity extends AppCompatActivity {
         setContentView(R.layout.main_activity);
         checkPermissions();
         setupSurfaceView();
-        nativeAddr = JNIInterface.JNIonCreate(getAssets());
+        JNIInterface.assetManager = getAssets();
+        nativeAddr = JNIInterface.JNIonCreate(JNIInterface.assetManager);
         setupTouchDetector();
     }
     protected void checkPermissions(){}
@@ -50,6 +58,27 @@ public class GLActivity extends AppCompatActivity {
     protected void onPause(){
         super.onPause();
         surfaceView.onPause();
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+    }
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus) {
+            // Standard Android full-screen functionality.
+            getWindow()
+                    .getDecorView()
+                    .setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
     private void setupTouchDetector() {
         gestureDetector = new GestureDetectorCalVR(this);
@@ -104,13 +133,26 @@ public class GLActivity extends AppCompatActivity {
 
         @Override
         public void onSurfaceChanged(GL10 gl, int width, int height) {
-            JNIInterface.JNIonSurfaceChanged(width, height);
+            viewportWidth = width;
+            viewportHeight = height;
+            viewportChanged = true;
         }
 
         @Override
         public void onDrawFrame(GL10 gl) {
-            JNIInterface.JNIdrawFrame();
-            updateOnFrame();
+            // Synchronized to avoid racing onDestroy.
+            updateOnFrame();	            synchronized (this) {
+                if (nativeAddr == 0) {
+                    return;
+                }
+                if (viewportChanged) {
+                    int displayRotation = getWindowManager().getDefaultDisplay().getRotation();
+                    JNIInterface.JNIonSurfaceChanged(displayRotation, viewportWidth, viewportHeight);
+                    viewportChanged = false;
+                }
+                JNIInterface.JNIdrawFrame();
+                updateOnFrame();
+            }
         }
     }
 }

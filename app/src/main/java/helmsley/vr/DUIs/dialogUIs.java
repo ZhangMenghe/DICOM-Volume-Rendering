@@ -297,7 +297,7 @@ public class dialogUIs {
                 .setType("*/*")
                 .setAction(Intent.ACTION_OPEN_DOCUMENT);
 
-        activityReference.get().startActivityForResult(Intent.createChooser(intent, "Select a DICOM file"), 123);
+        activityReference.get().startActivityForResult(Intent.createChooser(intent, "Select a DICOM file"), MainActivity.FILE_PERMISSION_CODE);
 
     }
 }

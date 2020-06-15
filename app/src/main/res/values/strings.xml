@@ -57,4 +57,7 @@
     <string name="sys_data_local">From Local..</string>
     <string name="sys_req_code">123</string>
     <string name="data_device_dir_name">Device</string>
+
+<!--    ar-->
+    <string name="ar_enable">true</string>
 </resources>
