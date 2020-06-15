@@ -14,6 +14,7 @@ import java.util.LinkedHashMap;
 
 import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
+import helmsley.vr.DUIs.arUIs;
 import helmsley.vr.DUIs.cutplaneUIs;
 import helmsley.vr.DUIs.mainUIs;
 import helmsley.vr.DUIs.maskUIs;
@@ -30,10 +31,11 @@ public class UIsManager {
     //Panels
     private mainUIs main_panel_;
     private LinkedHashMap<Integer, BasePanel> sub_panels_;
-    private final static Integer[] sub_panel_name_ids_ ={
+    private final static Integer[] sub_panel_name_ids_={
             R.string.panel_rendering_name,
             R.string.panel_cut_name,
-            R.string.panel_mask_name
+            R.string.panel_mask_name,
+            R.string.panel_ar_name
     };
     private final static float[]default_vol_pose={0,0,0,1,1,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
     private final static float[]default_cam_pose={0,0,4.0f,0,1,0,0,0,2.0f};
@@ -49,6 +51,8 @@ public class UIsManager {
         sub_panels_.put(sub_panel_name_ids_[0], new renderUIs(activity_, this, parent_view));
         sub_panels_.put(sub_panel_name_ids_[1], new cutplaneUIs(activity_, parent_view));
         sub_panels_.put(sub_panel_name_ids_[2], new maskUIs(activity_, parent_view));
+        sub_panels_.put(sub_panel_name_ids_[3], new arUIs(activity_, parent_view));
+
         RequestReset();
     }
 
@@ -74,12 +78,15 @@ public class UIsManager {
         LinkedHashMap tf_map = sub_panels_.get(R.string.panel_rendering_name).getCurrentStates();
         LinkedHashMap cut_map = sub_panels_.get(R.string.panel_cut_name).getCurrentStates();
         LinkedHashMap mask_map = sub_panels_.get(R.string.panel_mask_name).getCurrentStates();
+        LinkedHashMap ar_map = sub_panels_.get(R.string.panel_ar_name).getCurrentStates();
+
         map.put("volume", vol_map);
         map.put("camera", cam_map);
         map.put("render mode", (current_texray_id == tex_id)? "Texture-based":"Raycasting");
         map.put("transfer function", tf_map);
         map.put("cutting plane", cut_map);
         map.put("mask", mask_map);
+        map.put("ar", ar_map);
     }
     public void RequestResetWithTemplate(LinkedHashMap map){
         if(map.isEmpty()) return;

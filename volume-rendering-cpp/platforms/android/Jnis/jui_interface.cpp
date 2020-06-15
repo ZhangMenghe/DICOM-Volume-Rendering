@@ -56,10 +56,6 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
     if (it != param_checks.end()){
         vrController::param_bool[it -param_checks.begin()] = value;
 //        LOGE("======SET  %s, %d", key.c_str(), value);
-//        if(key=="Raycasting") vrController::widget_id = value?1:0;
-//        if(key==freeze_keyworkd) vrController::cutDirty = true;
-//            //!!debug only,
-////        else if(key == "Raycasting") vrController::instance()->setMVPStatus(value?"Raycasting":"texturebased");
         vrController::baked_dirty_ = true;
     }
 }

@@ -9,6 +9,7 @@ namespace dvr{
         CHECK_FREEZE_VOLUME,
         CHECK_FREEZE_CPLANE,
         CHECK_MASKON,
+        CHECK_ARENABLE,
     };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
