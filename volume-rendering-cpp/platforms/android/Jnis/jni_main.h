@@ -15,6 +15,8 @@
         Java_helmsley_vr_DUIs_JUIInterface_##funcName
 
 namespace dvr{
+    inline static JavaVM *g_vm = nullptr;
+
     inline jlong nativeAddr;
 
     inline jlong getNativeClassAddr(nEntrance * native_controller){

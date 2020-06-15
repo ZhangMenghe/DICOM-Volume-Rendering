@@ -1,4 +1,4 @@
-#include <assetLoader.h>
+#include <Utils/assetLoader.h>
 #include <android/asset_manager_jni.h>
 #include <GLES3/gl32.h>
 #include "jni_interface.h"
@@ -62,6 +62,11 @@ namespace {
             vrc->setShaderContents(SHADER_FILES (i), LoadTextFile(shader_file_names[i]));
     }
 }
+jint JNI_OnLoad(JavaVM *vm, void *) {
+    g_vm = vm;
+    return JNI_VERSION_1_6;
+}
+
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     _asset_manager = AAssetManager_fromJava(env, asset_manager);
     nativeAddr =  getNativeClassAddr(new vrController());
@@ -142,4 +147,14 @@ JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
 }
 JNI_METHOD(void, JNIreleaseBuffer)(JNIEnv*, jclass){
     delete[]g_VolumeTexData; g_VolumeTexData = nullptr;
+}
+JNIEnv *GetJniEnv() {
+    JNIEnv *env;
+    jint result = g_vm->AttachCurrentThread(&env, nullptr);
+    return result == JNI_OK ? env : nullptr;
+}
+
+jclass FindClass(const char *classname) {
+    JNIEnv *env = GetJniEnv();
+    return env->FindClass(classname);
 }
