@@ -34,8 +34,8 @@ uniform float u_contrast_high;
 uniform float u_brightness;
 uniform int u_visible_bits;
 //uniform float u_contrast_level;
-const vec3 ORGAN_COLORS[6]= vec3[6](vec3(0.24, 0.004, 0.64), vec3(0.008, 0.278, 0.99), vec3(0.75, 0.634, 0.996),
-                            vec3(1, 0.87, 0.14),vec3(0.98, 0.88, 1.0),vec3(0.99, 0.106, 0.365));
+const vec3 ORGAN_COLORS[7]= vec3[7](vec3(0.24, 0.004, 0.64), vec3(0.008, 0.278, 0.99), vec3(0.75, 0.634, 0.996),
+                            vec3(1, 0.87, 0.14),vec3(0.98, 0.88, 1.0),vec3(0.99, 0.106, 0.365), vec3(.0, 0.314,0.75));
 
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
