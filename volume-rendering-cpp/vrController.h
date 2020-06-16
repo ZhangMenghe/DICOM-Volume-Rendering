@@ -48,6 +48,9 @@ public:
     void setRenderParam(int id, float value);
     void setRenderParam(float* values){memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));baked_dirty_=true;}
 
+    bool addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam);
+    bool addStatus(std::string name);
+
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(){return ModelMat_;}

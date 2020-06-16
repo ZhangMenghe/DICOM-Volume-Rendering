@@ -38,20 +38,19 @@ void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
     rStates_.clear();
     cst_name="";
+    addStatus("default_status");
     setMVPStatus("default_status");
 }
 void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
-    rm = glm::mat4(1.0);
     baked_dirty_ = true;
     Mouse_old = glm::fvec2(.0f);
     rStates_.clear();
-    cst_name="template";
     glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
                  * rm
                  * glm::scale(glm::mat4(1.0), sv);
-    rStates_[cst_name] = reservedStatus(mm, rm, sv, pv, cam);
-    if(_screen_w != 0)rStates_[cst_name].vcam->setProjMat(_screen_w, _screen_h);
-    ModelMat_=mm; RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv; camera=rStates_[cst_name].vcam;
+    addStatus("template", mm, rm, sv, pv, cam);
+    setMVPStatus("template");
+
     volume_model_dirty = false;
 }
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
@@ -221,28 +220,52 @@ void vrController::updateVolumeModelMat(){
                  * RotateMat_
                  * glm::scale(glm::mat4(1.0), ScaleVec3_);
 }
-void vrController::setMVPStatus(std::string status_name){
-    //save changes to current status
-    if(status_name == cst_name) return;
-    if(!cst_name.empty()) rStates_[cst_name] = reservedStatus(ModelMat_, RotateMat_, ScaleVec3_, PosVec3_, camera);
+bool vrController::addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){
+    auto it = rStates_.find(name);
+    if(it != rStates_.end()) return false;
 
-    //restore / create status
-    auto it = rStates_.find(status_name);
-    if (it == rStates_.end()) {
-        rStates_[status_name] = reservedStatus();
-        //LOGE("===create status for %s\n", status_name.c_str());
-        // for debug camera only
-        //if(status_name == "Raycasting") rStates_[status_name].vcam->setPosition();
-        if(_screen_w != 0)rStates_[status_name].vcam->setProjMat(_screen_w, _screen_h);
-    }
+    rStates_[name] = reservedStatus(mm, rm, sv, pv, cam);
+    if(_screen_w != 0)rStates_[name].vcam->setProjMat(_screen_w, _screen_h);
+    return true;
+}
 
-    auto rstate_ = rStates_[status_name];
+bool vrController::addStatus(std::string name){
+    auto it = rStates_.find(name);
+    if(it != rStates_.end()) return false;
+
+    rStates_[name] = reservedStatus();
+    if(_screen_w != 0)rStates_[name].vcam->setProjMat(_screen_w, _screen_h);
+    return true;
+}
+
+void vrController::setMVPStatus(std::string name){
+    if(name == cst_name) return;
+    auto rstate_ = rStates_[name];
     ModelMat_=rstate_.model_mat; RotateMat_=rstate_.rot_mat; ScaleVec3_=rstate_.scale_vec; PosVec3_=rstate_.pos_vec; camera=rstate_.vcam;
 
     volume_model_dirty = false;
-    cst_name = status_name;
-//    auto cpos= camera->getCameraPosition();
-//    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
+    cst_name = name;
+//    //save changes to current status
+//    if(status_name == cst_name) return;
+//    if(!cst_name.empty()) rStates_[cst_name] = reservedStatus(ModelMat_, RotateMat_, ScaleVec3_, PosVec3_, camera);
+//
+//    //restore / create status
+//    auto it = rStates_.find(status_name);
+//    if (it == rStates_.end()) {
+//        rStates_[status_name] = reservedStatus();
+//        //LOGE("===create status for %s\n", status_name.c_str());
+//        // for debug camera only
+//        //if(status_name == "Raycasting") rStates_[status_name].vcam->setPosition();
+//        if(_screen_w != 0)rStates_[status_name].vcam->setProjMat(_screen_w, _screen_h);
+//    }
+//
+//    auto rstate_ = rStates_[status_name];
+//    ModelMat_=rstate_.model_mat; RotateMat_=rstate_.rot_mat; ScaleVec3_=rstate_.scale_vec; PosVec3_=rstate_.pos_vec; camera=rstate_.vcam;
+//
+//    volume_model_dirty = false;
+//    cst_name = status_name;
+////    auto cpos= camera->getCameraPosition();
+////    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
 void vrController::setCuttingPlane(float value){
     if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);
