@@ -176,6 +176,7 @@
         <item>Spleen</item>
         <item>Ileum</item>
         <item>Aorta</item>
+        <item>Vein</item>
     </string-array>
     <string-array name="masks_status">
         <item>true</item>
