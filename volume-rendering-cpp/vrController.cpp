@@ -13,6 +13,7 @@ bool vrController::baked_dirty_;
 int vrController::color_scheme_id;
 
 vrController* vrController::instance(){
+    if(!myPtr_) myPtr_ = new vrController;
     return myPtr_;
 }
 vrController::~vrController(){
