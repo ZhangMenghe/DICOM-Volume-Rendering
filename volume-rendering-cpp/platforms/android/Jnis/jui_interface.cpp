@@ -113,7 +113,7 @@ JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
     vrController::instance()->onReset(
             glm::vec3(vol_arr[0], vol_arr[1], vol_arr[2]),
             glm::vec3(vol_arr[3], vol_arr[4], vol_arr[5]),
-            glm::make_mat4(vol_arr+16),
+            glm::make_mat4(vol_arr+6),
             new Camera(
                     glm::vec3(cam_arr[0], cam_arr[1], cam_arr[2]),
                     glm::vec3(cam_arr[3], cam_arr[4], cam_arr[5]),

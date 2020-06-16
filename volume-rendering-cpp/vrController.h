@@ -30,8 +30,12 @@ public:
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
+    void onViewChange(int rot, int width, int height){onViewChange(width, height);}
     void onDraw();
     void onReset();
+    void onPause(){}
+    void onDestroy(){}
+    void onResume(void* env, void* context, void* activity){}
     void onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam);
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}

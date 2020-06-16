@@ -7,6 +7,7 @@
 #include <android/bitmap.h>
 #include <vector>
 #include <overlayController.h>
+#include <platforms/android/ARHelpers/arController.h>
 
 using namespace dvr;
 namespace {
@@ -69,20 +70,35 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     setupShaderContents();
     return nativeAddr;
 }
-JNI_METHOD(void, JNIonPause)(JNIEnv* env, jclass){}
+JNI_METHOD(void, JNIonPause)(JNIEnv*, jclass){
+    vrController::instance()->onPause();
+    arController::instance()->onPause();
+}
 
-JNI_METHOD(void, JNIonDestroy)(JNIEnv* env, jclass){}
+JNI_METHOD(void, JNIonDestroy)(JNIEnv*, jclass){
+    vrController::instance()->onDestroy();
+    arController::instance()->onDestroy();
+    delete nativeApp(nativeAddr);
+    delete arController::instance();
 
-JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject, jobject){}
+    nativeAddr = 0;
+}
+
+JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject context, jobject activity){
+    vrController::instance()->onResume(env, context, activity);
+    arController::instance()->onResume(env, context, activity);
+}
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
     nativeApp(nativeAddr)->onViewCreated();
     overlayController::instance()->onViewCreated();
+    arController::instance()->onViewCreated();
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
     nativeApp(nativeAddr)->onViewChange(w, h);
     overlayController::instance()->onViewChange(w, h);
+    arController::instance()->onViewChange(rot,w,h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
