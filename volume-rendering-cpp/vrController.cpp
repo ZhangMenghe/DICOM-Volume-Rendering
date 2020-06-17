@@ -110,7 +110,10 @@ void vrController::onViewChange(int width, int height){
 }
 
 bool vrController::isDirty() {
-    return tex_volume && (volume_model_dirty||baked_dirty_);
+    if(!tex_volume) return false;
+    if(volume_model_dirty||baked_dirty_) return true;
+    if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
+    return texvrRenderer_->isPrecomputeDirty();
 }
 void vrController::onDraw() {
     if(!tex_volume) return;

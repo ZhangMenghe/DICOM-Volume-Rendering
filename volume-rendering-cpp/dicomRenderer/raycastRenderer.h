@@ -27,5 +27,6 @@ public:
     void Draw();
     void dirtyPrecompute(){baked_dirty_ = true;}
     void setDimension(int dims, float thickness);
+    bool isPrecomputeDirty(){return baked_dirty_;}
 };
 #endif

@@ -9,7 +9,8 @@ precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 layout(binding = 0, rgba8)readonly uniform mediump image3D srcTex;
-layout(binding = 1, rgba8)writeonly uniform mediump image2D destTex;
+layout(binding = 1, rgba8)readonly uniform mediump image2D bgTex;
+layout(binding = 2, rgba8)writeonly uniform mediump image2D destTex;
 
 uniform vec2 u_con_size;
 uniform float u_fov;
@@ -109,32 +110,10 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     }
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
-
-//vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
-//    //todo:better way???
-//    if(VolumeSize.z <2.0) return clamp(Sample(ro+rd*head), vec4(.0), vec4(1.0));
-//
-//    vec4 sum = vec4(.0);
-//    int steps = 0; float pd = .0;
-//
-//    float vmax = .0;
-//    for(float t = head; t<tail; ){
-//        if(sum.a >= 0.95) break;
-//        vec3 p = ro + rd * t;
-//        vec4 val_color = Sample(p);
-//        if(val_color.a > 0.01){
-//            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
-//            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
-//            sum.a += (1.0 - sum.a) * val_color.a;
-//        }
-//        t += val_color.a > 0.01? usample_step_inverse: usample_step_inverse * 4.0;
-//        steps++;
-//        pd = sum.a;
-//    }
-//    return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
-//}
-
-vec4 tracing(float u, float v){
+vec4 getBackground(ivec2 pos){
+    return imageLoad(bgTex, pos);
+}
+vec4 tracing(float u, float v, ivec2 spos){
     float tangent = tan(u_fov / 2.0); // angle in radians
     float ar = (float(u_con_size.x) / u_con_size.y);
 
@@ -160,9 +139,11 @@ vec4 tracing(float u, float v){
 
     if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
     #endif
-    if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);
+    vec4 bg_color = getBackground(spos);
+    if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, bg_color, u_plane_color.a):bg_color;
 
-    return Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    vec4 tcolor = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    return mix(tcolor, bg_color, 1.0-tcolor.a);
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);
@@ -170,5 +151,5 @@ void main() {
     if ( cx >= u_con_size.x ||  cy >= u_con_size.y) return;
     cy = u_con_size.y - cy;
     vec2 uv = (vec2(cx, cy) + 0.5) / u_con_size * 2.0 - 1.0;
-    imageStore(destTex, ivec2(cx, cy), tracing(uv.x, uv.y));
+    imageStore(destTex, ivec2(cx, cy), tracing(uv.x, uv.y, ivec2(cx, cy)));
 }

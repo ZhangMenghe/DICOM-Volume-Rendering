@@ -97,6 +97,7 @@ void texvrRenderer::draw_scene(){
     glBindVertexArray(vao_slice); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
 
     shader_->UnUse();
+    glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
