@@ -16,17 +16,19 @@ private:
 
     Shader* shader_;
     GLuint frame_buff_ = 0;
-    GLuint vao_slice = 0, vbo_instance;
+    GLuint vao_front = 0, vbo_front;
+    GLuint vao_back = 0, vbo_back;
+
     bool DRAW_BAKED;
     bool b_init_successful = false;
     int cut_id = 0;
 
     //for screen baking
     bool baked_dirty_ = true;
-    void init_vertices();
+    void init_vertices(GLuint &vao_slice, GLuint& vbo_instance,bool is_front);
     void draw_scene();
     void draw_baked();
-    void update_instance_data();
+    void update_instance_data(GLuint& vbo_instance,bool is_front);
 
 public:
     texvrRenderer(bool screen_baked = true);

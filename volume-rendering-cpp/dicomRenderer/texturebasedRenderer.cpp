@@ -12,11 +12,10 @@ texvrRenderer::texvrRenderer(bool screen_baked)
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
     vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
-
     setCuttingPlane(.0f);
 }
 
-void texvrRenderer::init_vertices(){
+void texvrRenderer::init_vertices(GLuint &vao_slice, GLuint& vbo_instance,bool is_front){
     glGenBuffers(1, &vbo_instance);
     glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
     glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * MAX_DIMENSIONS, nullptr, GL_STATIC_DRAW);
@@ -46,18 +45,26 @@ void texvrRenderer::init_vertices(){
     glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute.
     b_init_successful = true;
 
-    update_instance_data();
+    update_instance_data(vbo_instance, is_front);
 }
-void texvrRenderer::update_instance_data(){
+void texvrRenderer::update_instance_data(GLuint& vbo_instance, bool is_front){
     if(dimensions == 0) return;
     glm::vec2 *zInfos = new glm::vec2[dimensions];
 
     float zTex = .0f;
     float step = 1.0f / dimensions;
-    float mappedZVal = - (dimensions - 1) / 2.0f * step; //-scale_inv;// + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
-    for (int i = 0; i < dimensions; i++){
-        zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
-        mappedZVal+=step; zTex+=dimension_inv;
+    if(is_front){
+        float mappedZVal = - (dimensions - 1) / 2.0f * step; //-scale_inv;// + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
+        for (int i = 0; i < dimensions; i++){
+            zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
+            mappedZVal+=step; zTex+=dimension_inv;
+        }
+    }else{
+        float mappedZVal = (dimensions - 1) / 2.0f * step; //-scale_inv;// + 0.5f* (MAX_DIMENSIONS - dimensions)/MAX_DIMENSIONS;
+        for (int i = 0; i < dimensions; i++){
+            zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
+            mappedZVal-=step; zTex+=dimension_inv;
+        }
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
@@ -82,19 +89,21 @@ void texvrRenderer::draw_scene(){
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
     Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * modelmat);
-    if(vrController::param_bool[dvr::CHECK_CUTTING])
-        Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
-    else
-        Shader::Uniform(sp, "u_cut_texz", 1.0f);
+    Shader::Uniform(sp, "u_cut", vrController::param_bool[dvr::CHECK_CUTTING]);
 
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
-//    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
-//    if(glm::dot(vrController::camera->getViewDirection(), dir) < 0) glFrontFace(GL_CCW);
-    if(rotmat[2][2] > 0) glFrontFace(GL_CCW);
-    else glFrontFace(GL_CW);
-
-    glBindVertexArray(vao_slice); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
+    if(rotmat[2][2] > 0){
+        Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
+        Shader::Uniform(sp, "u_front", true);
+        glFrontFace(GL_CCW);
+        glBindVertexArray(vao_front); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
+    }else{
+        Shader::Uniform(sp, "u_cut_texz", dimension_inv * cut_id);
+        Shader::Uniform(sp, "u_front", false);
+        glFrontFace(GL_CW);
+        glBindVertexArray(vao_back); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
+    }
 
     shader_->UnUse();
     glDisable(GL_BLEND);
@@ -103,7 +112,7 @@ void texvrRenderer::draw_scene(){
 }
 
 void texvrRenderer::Draw(){
-    if(!b_init_successful) init_vertices();
+    if(!b_init_successful) {init_vertices(vao_front,vbo_front,true);init_vertices(vao_back,vbo_back,false);}
     if(DRAW_BAKED) {draw_baked(); return;}
     draw_scene();
 }
@@ -131,7 +140,9 @@ void texvrRenderer::setDimension(int dims, float thickness){
         else if(dims > 100) vol_thickness_factor = dims / 300.f;
         else vol_thickness_factor = dims / 200.f;
     }
-    update_instance_data();
+    update_instance_data(vbo_front, true);
+    update_instance_data(vbo_back, false);
+
 }
 void texvrRenderer::setCuttingPlane(float percent){
     cut_id = int(dimensions * percent);
