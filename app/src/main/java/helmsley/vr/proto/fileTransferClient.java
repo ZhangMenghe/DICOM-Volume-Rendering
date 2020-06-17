@@ -307,7 +307,6 @@ public class fileTransferClient {
             int id = 0;
             while(data_itor.hasNext()){
                 volumeWholeResponse data = data_itor.next();
-
                 JNIInterface.JNIsendData(0, id, data.getData().size(), 2, data.getData().toByteArray());
                 id++;
             }

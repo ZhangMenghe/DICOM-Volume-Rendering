@@ -30,7 +30,7 @@ vrController::~vrController(){
 vrController::vrController(){
     onReset();
     _screen_w = 0; _screen_h = 0;
-    shader_contents = std::vector<std::string>(dvr::SHADER_END);
+    shader_contents = std::vector<std::string>(dvr::SHADER_ANDROID_END);
     myPtr_ = this;
 }
 void vrController::onReset() {
@@ -108,15 +108,21 @@ void vrController::onViewChange(int width, int height){
     screenQuad::instance()->onScreenSizeChange(width, height);
     _screen_w = width; _screen_h = height;
 }
+
+bool vrController::isDirty() {
+    return tex_volume && (volume_model_dirty||baked_dirty_);
+}
 void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
-
     if(isRayCasting())  raycastRenderer_->Draw();
     else texvrRenderer_->Draw();
+    //todo:
+//    if(isRayCasting())  {raycastRenderer_->dirtyPrecompute();raycastRenderer_->Draw();}
+//    else {texvrRenderer_->dirtyPrecompute();texvrRenderer_->Draw();}
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
@@ -216,6 +222,15 @@ void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content)
     if(fid < dvr::SHADER_END)
         shader_contents[fid] = content;
 }
+void vrController::setRenderParam(float* values){
+    memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));
+    baked_dirty_=true;
+}
+void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
+    RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv;
+    volume_model_dirty=true;
+}
+
 void vrController::updateVolumeModelMat(){
     ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
                  * RotateMat_
@@ -230,11 +245,17 @@ bool vrController::addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::
     return true;
 }
 
-bool vrController::addStatus(std::string name){
+bool vrController::addStatus(std::string name, bool use_current_status){
     auto it = rStates_.find(name);
     if(it != rStates_.end()) return false;
 
-    rStates_[name] = reservedStatus();
+    if(use_current_status){
+        if(volume_model_dirty){
+            updateVolumeModelMat();
+            volume_model_dirty = false;
+        }
+        rStates_[name] = reservedStatus(ModelMat_, RotateMat_, ScaleVec3_, PosVec3_, new Camera(name.c_str()));
+    }else rStates_[name] = reservedStatus();
     if(_screen_w != 0)rStates_[name].vcam->setProjMat(_screen_w, _screen_h);
     return true;
 }
@@ -246,27 +267,6 @@ void vrController::setMVPStatus(std::string name){
 
     volume_model_dirty = false;
     cst_name = name;
-//    //save changes to current status
-//    if(status_name == cst_name) return;
-//    if(!cst_name.empty()) rStates_[cst_name] = reservedStatus(ModelMat_, RotateMat_, ScaleVec3_, PosVec3_, camera);
-//
-//    //restore / create status
-//    auto it = rStates_.find(status_name);
-//    if (it == rStates_.end()) {
-//        rStates_[status_name] = reservedStatus();
-//        //LOGE("===create status for %s\n", status_name.c_str());
-//        // for debug camera only
-//        //if(status_name == "Raycasting") rStates_[status_name].vcam->setPosition();
-//        if(_screen_w != 0)rStates_[status_name].vcam->setProjMat(_screen_w, _screen_h);
-//    }
-//
-//    auto rstate_ = rStates_[status_name];
-//    ModelMat_=rstate_.model_mat; RotateMat_=rstate_.rot_mat; ScaleVec3_=rstate_.scale_vec; PosVec3_=rstate_.pos_vec; camera=rstate_.vcam;
-//
-//    volume_model_dirty = false;
-//    cst_name = status_name;
-////    auto cpos= camera->getCameraPosition();
-////    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
 void vrController::setCuttingPlane(float value){
     if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);

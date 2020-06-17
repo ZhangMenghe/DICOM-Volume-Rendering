@@ -19,6 +19,7 @@ DRAW_BAKED(screen_baked){
 }
 void raycastRenderer::Draw() {
     if (DRAW_BAKED) draw_baked();
+    else if(vrController::param_bool[dvr::CHECK_AR_ENABLED]) draw_to_texture();
     else draw_scene();
 }
 
@@ -78,14 +79,13 @@ float* raycastRenderer::getCuttingPlane(){
     return cutter_->getCutPlane();
 }
 void raycastRenderer::draw_baked(){
-    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
+    if(!vrController::param_bool[dvr::CHECK_AR_ENABLED] && !baked_dirty_) return;
     if(!cshader_){
         cshader_ = new Shader;
         if(!cshader_->AddShader(GL_COMPUTE_SHADER, vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
            ||!cshader_->CompileAndLink())
             LOGE("Raycast=====Failed to create raycast geometry shader");
         vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL]="";
-
     }
 
     if(vrController::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
@@ -94,16 +94,18 @@ void raycastRenderer::draw_baked(){
     GLuint sp = cshader_->Use();
     Texture* ray_baked_screen  = screenQuad::instance()->getTex();
     glBindImageTexture(0, vrController::instance()->getBakedTex(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);//GL_RGBA8);
-    glBindImageTexture(1, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, screenQuad::instance()->getTex()->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(2, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
     Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
 
     glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrix() * dim_scale_mat);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
-    Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), vrController::camera->getCameraPosition()));
+    Shader::Uniform(sp, "u_CamToWorld", vrController::camera->getCameraPose());
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "usample_step_inverse", 1.0f / 600.0f);
+
     cutter_->Update();
     cutter_->setCuttingParams(sp, true);
 
@@ -111,13 +113,24 @@ void raycastRenderer::draw_baked(){
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);//GL_RGBA8);
-    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_RGBA8);
+    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     cshader_->UnUse();
     baked_dirty_ = false;
 
     //todo: draw screen quad
     screenQuad::instance()->Draw();
+}
+void raycastRenderer::draw_to_texture(){
+    if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
+    glm::vec2 ts = screenQuad::instance()->getTexSize();
+    glViewport(0, 0, ts.x, ts.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    draw_scene();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    baked_dirty_ = false;
 }
 void raycastRenderer::setDimension(int dims, float thickness){
     if(thickness > 0 ){

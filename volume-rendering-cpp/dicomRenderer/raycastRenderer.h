@@ -16,6 +16,7 @@ private:
     glm::mat4 dim_scale_mat = glm::mat4(1.0);
 
     void draw_baked();
+    void draw_to_texture();
     void draw_scene();
 public:
     raycastRenderer(bool screen_baked = true);

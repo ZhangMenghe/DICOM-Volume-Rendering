@@ -19,6 +19,8 @@ namespace dvr{
 
     inline jlong nativeAddr;
 
+    inline bool camera_switch_dirty;
+
     inline jlong getNativeClassAddr(nEntrance * native_controller){
         return reinterpret_cast<intptr_t>(native_controller);
     }

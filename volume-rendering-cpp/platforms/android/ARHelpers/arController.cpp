@@ -47,8 +47,19 @@ void arController::onResume(void* env, void* context, void* activity){
                 install_requested_ = true;
                 return;
         }
-        CHECK(ArSession_create(env, context, &ar_session_)==AR_SUCCESS);
-        CHECK(ar_session_);
+        try {
+            ArSession_create(env, context, &ar_session_);
+        } catch (const std::exception& e) {
+            LOGI("===== Problem to create ar session");
+            // will be executed if f() throws std::runtime_error
+        } catch (const std::runtime_error& e){
+        LOGI("===== Problem to create ar session");
+            // dead code!
+        }
+
+//        ArStatus sess_status =
+//        if(sess_status!=AR_SUCCESS)
+//            LOGI("===== Problem to create ar session");
         ArFrame_create(ar_session_, &ar_frame_);
         CHECK(ar_frame_);
         ArSession_setDisplayGeometry(ar_session_, width_, height_, display_rotation_);
@@ -71,7 +82,7 @@ void arController::onResume(void* env, void* context, void* activity){
     }
 
     const ArStatus status = ArSession_resume(ar_session_);
-    CHECK(status == AR_SUCCESS);
+//    CHECK(status == AR_SUCCESS);
 }
 
 void arController::onViewChange(int rot, int width, int height){

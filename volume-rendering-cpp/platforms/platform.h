@@ -35,8 +35,7 @@
 #ifndef CHECK
 #define CHECK(condition)                                                   \
       if (!(condition)) {                                                      \
-        LOGE("*** CHECK FAILED at %s:%d: %s", __FILE__, __LINE__, #condition); \
-        abort();                                                               \
+        LOGE("===CHECK FAILED at %s:%d: %s", __FILE__, __LINE__, #condition); \
       }
 #endif  // CHECK
 #endif

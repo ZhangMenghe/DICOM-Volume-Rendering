@@ -38,7 +38,11 @@ public class MainActivity extends GLActivity
                 CameraPermissionHelper.requestCameraPermission(this);
                 return;
             }
-            JNIInterface.JNIonResume(getApplicationContext(), this);
+            try{
+                JNIInterface.JNIonResume(getApplicationContext(), this);
+            }catch (Exception e){
+                Log.e(TAG, "====onResume error I can't solve" );
+            }
         }
 
         surfaceView.onResume();

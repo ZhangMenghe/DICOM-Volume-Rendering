@@ -8,6 +8,7 @@
 #include <vector>
 #include <overlayController.h>
 #include <platforms/android/ARHelpers/arController.h>
+#include <dicomRenderer/screenQuad.h>
 
 using namespace dvr;
 namespace {
@@ -19,6 +20,7 @@ namespace {
     float g_vol_h, g_vol_w, g_vol_depth = 0;
     size_t g_ssize = 0, g_vol_len;
     size_t n_data_offset[3] = {0};
+    bool arInitialized = false;
 
     void setupShaderContents(){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
@@ -102,15 +104,43 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
-    nativeApp(nativeAddr)->onDraw();
-    overlayController::instance()->onDraw();
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    if(!vrController::param_bool[dvr::CHECK_AR_ENABLED]){
+        if(camera_switch_dirty){vrController::instance()->setMVPStatus("template");camera_switch_dirty = false;}
+        if(vrController::instance()->isDirty()){
+            //order matters
+            screenQuad::instance()->Clear();
+            nativeApp(nativeAddr)->onDraw();
+        }
+        screenQuad::instance()->Draw();
+        overlayController::instance()->onDraw();
+    }
+    else{
+        if(camera_switch_dirty){vrController::instance()->setMVPStatus("ARCam");camera_switch_dirty = false;}
+        screenQuad::instance()->Clear();
+        arController::instance()->onDraw();
+
+        if(arInitialized){
+            nativeApp(nativeAddr)->onDraw();
+        }else{
+            //update model mat of volume
+            auto tplanes = arController::instance()->getTrackedPlanes();
+            if(!tplanes.empty()){
+                vrController::instance()->setVolumeRST(tplanes[0].rotMat, glm::vec3(0.2f), tplanes[0].centerVec);
+                vrController::instance()->setMVPStatus("ARCam");
+                arInitialized = true;
+                nativeApp(nativeAddr)->onDraw();
+            }
+        }
+        screenQuad::instance()->Draw();
+        overlayController::instance()->onDraw();
+    }
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){
-    //check initialization
     if(!g_VolumeTexData) return;
     jbyte *data = env->GetByteArrayElements(jdata, 0);
-
     GLubyte* buffer = g_VolumeTexData+n_data_offset[target];
     if(chunk_size !=0 && unit_size == CHANEL_NUM) memcpy(buffer, data, (size_t)chunk_size);
     else{

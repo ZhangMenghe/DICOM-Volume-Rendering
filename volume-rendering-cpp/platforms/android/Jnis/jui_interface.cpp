@@ -31,6 +31,8 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
     }
     env->ReleaseBooleanArrayElements(jvalues,values,0);
     vrController::baked_dirty_ = true;
+    vrController::instance()->addStatus("ARCam");
+    camera_switch_dirty = true;
 }
 
 JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint wid){
@@ -54,7 +56,10 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
 
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
-        vrController::param_bool[it -param_checks.begin()] = value;
+        int bpos = (int)(it - param_checks.begin());
+        vrController::param_bool[bpos] = value;
+        if(bpos == CHECK_AR_ENABLED)
+            camera_switch_dirty = true;
 //        LOGE("======SET  %s, %d", key.c_str(), value);
         vrController::baked_dirty_ = true;
     }
@@ -109,11 +114,20 @@ JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
 
     jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
     jfloat* cam_arr = env->GetFloatArrayElements(jcam_pose, 0);
+
+    glm::mat4 rot_mat = glm::mat4(1.0);
+//    memcpy(glm::value_ptr(rot_mat), &vol_arr[6], 16* sizeof(float));
+    int id = 6;
+    for(int i=0;i<4;i++){
+        for(int j=0;j<4;j++){
+            rot_mat[i][j] = vol_arr[id++];
+        }
+    }
     //unwrap pose information
     vrController::instance()->onReset(
             glm::vec3(vol_arr[0], vol_arr[1], vol_arr[2]),
             glm::vec3(vol_arr[3], vol_arr[4], vol_arr[5]),
-            glm::make_mat4(vol_arr+6),
+            rot_mat,
             new Camera(
                     glm::vec3(cam_arr[0], cam_arr[1], cam_arr[2]),
                     glm::vec3(cam_arr[3], cam_arr[4], cam_arr[5]),
