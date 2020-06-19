@@ -32,6 +32,17 @@
             app:layout_constraintHeight_percent="0.4"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
+        <CheckBox
+            android:id="@+id/check_mask_color"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginStart="@dimen/activity_horizontal_margin"
+            android:text="@string/mask_color_name"
+            android:theme="@style/CommonCheckBox"
+            android:textColor="@color/brightBlue"
+            app:layout_constraintHeight_percent="0.4"
+            app:layout_constraintStart_toEndOf="@+id/check_mask_show"
+            app:layout_constraintTop_toTopOf="parent"/>
         <android.support.v7.widget.RecyclerView
             android:id="@+id/mask_recycle"
             android:scrollbars="horizontal"

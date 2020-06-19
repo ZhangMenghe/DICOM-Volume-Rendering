@@ -38,9 +38,10 @@
     <string name="tune_widget_name_prefix">Id</string>
 
 <!--    mask panel subs-->
-    <string name="mask_check_name">ShowMask</string>
+    <string name="mask_check_name">Show</string>
+    <string name="mask_color_name">Recolor</string>
 
-<!--    cut panel subs-->
+    <!--    cut panel subs-->
     <string name="cutting_check_name">Cutting</string>
     <string name="check_freeze_name">Freeze</string>
     <string name="freezeplane_check_name">Freeze Plane</string>

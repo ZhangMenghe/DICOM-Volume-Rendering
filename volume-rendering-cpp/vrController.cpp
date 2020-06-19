@@ -187,6 +187,8 @@ void vrController::precompute(){
     Shader::Uniform(sp, "u_tex_size", glm::vec3(float(tex_volume->Width()), float(tex_volume->Height()), float(tex_volume->Depth())));
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
     Shader::Uniform(sp, "u_organ_num", mask_num_);
+    Shader::Uniform(sp, "u_mask_color", param_bool[CHECK_MASK_RECOLOR]);
+
     float* widget_data_pointer;
     int widget_num;
     overlayController::instance()->getWidgetFlatPoints(widget_data_pointer, widget_num);

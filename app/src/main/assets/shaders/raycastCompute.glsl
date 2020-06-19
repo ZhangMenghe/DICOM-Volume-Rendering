@@ -33,6 +33,7 @@ uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
 uniform int u_visible_bits;
+uniform bool u_mask_color;
 //uniform float u_contrast_level;
 const vec3 ORGAN_COLORS[7]= vec3[7](vec3(0.24, 0.004, 0.64), vec3(0.008, 0.278, 0.99), vec3(0.75, 0.634, 0.996),
                             vec3(1, 0.87, 0.14),vec3(0.98, 0.88, 1.0),vec3(0.99, 0.106, 0.365), vec3(.0, 0.314,0.75));
@@ -123,8 +124,7 @@ vec3 TransferColor(float intensity, int ORGAN_BIT){
     #endif
 
     #ifdef SHOW_ORGANS
-        if(ORGAN_BIT > int(0))
-        color = transfer_scheme(ORGAN_BIT, intensity);
+        if(u_mask_color && ORGAN_BIT > int(0)) color = transfer_scheme(ORGAN_BIT, intensity);
     #endif
     return color;
 }
