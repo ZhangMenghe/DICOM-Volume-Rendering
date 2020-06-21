@@ -20,17 +20,17 @@ JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jintArray jnums, jfloat
 }
 void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
     param_checks.clear();
-    vrController::param_bool.clear();
+    Manager::param_bool.clear();
     jboolean* values = env->GetBooleanArrayElements(jvalues, 0);
     for(int i=0; i<num; i++){
         jstring jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
         std::string key = dvr::jstring2string(env,jkey);
         param_checks.push_back(key);
-        vrController::param_bool.push_back(values[i]);
+        Manager::param_bool.push_back(values[i]);
 //        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
     env->ReleaseBooleanArrayElements(jvalues,values,0);
-    vrController::baked_dirty_ = true;
+    Manager::baked_dirty_ = true;
 }
 
 JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint wid){
@@ -54,13 +54,13 @@ JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring jkey, jboolean valu
 
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
-        vrController::param_bool[it -param_checks.begin()] = value;
+        Manager::param_bool[it -param_checks.begin()] = value;
 //        LOGE("======SET  %s, %d", key.c_str(), value);
-//        if(key=="Raycasting") vrController::widget_id = value?1:0;
-//        if(key==freeze_keyworkd) vrController::cutDirty = true;
+//        if(key=="Raycasting") Manager::widget_id = value?1:0;
+//        if(key==freeze_keyworkd) Manager::cutDirty = true;
 //            //!!debug only,
 ////        else if(key == "Raycasting") vrController::instance()->setMVPStatus(value?"Raycasting":"texturebased");
-        vrController::baked_dirty_ = true;
+        Manager::baked_dirty_ = true;
     }
 }
 JUI_METHOD(jfloatArray, JUIgetVCStates)(JNIEnv * env, jclass){
@@ -86,11 +86,11 @@ JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value){
 JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint num, jint mbits){
     vrController::instance()->mask_num_ = (unsigned int)num;
     vrController::instance()->mask_bits_ = (unsigned int)mbits;
-    vrController::baked_dirty_ = true;
+    Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
-    vrController::color_scheme_id = id;
-    vrController::baked_dirty_ = true;
+    Manager::color_scheme_id = id;
+    Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint id, jint width, jint height, jint left, jint top){
     overlayController::instance()->setOverlayRect(id, width, height, left, top);
@@ -104,11 +104,12 @@ JUI_METHOD(void, JUIsetAllTuneParamById)(JNIEnv* env, jclass, jint id, jfloatArr
 }
 JUI_METHOD(void, JUIsetTuneWidgetVisibility)(JNIEnv*, jclass, jint wid, jboolean value){
     overlayController::instance()->setWidgetsVisibility(wid, value);
-    vrController::baked_dirty_ = true;
+    Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
         jint num, jobjectArray jkeys, jbooleanArray jvalues,
         jfloatArray jvol_pose, jfloatArray jcam_pose){
+    manager->onReset();
     InitCheckParam(env, num, jkeys, jvalues);
 
     jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);

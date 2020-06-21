@@ -65,6 +65,7 @@ namespace {
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     _asset_manager = AAssetManager_fromJava(env, asset_manager);
     nativeAddr =  getNativeClassAddr(new vrController());
+    manager = new Manager;
     setupShaderContents();
     return nativeAddr;
 }
@@ -75,13 +76,14 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
+    manager->onViewChange(w, h);
     nativeApp(nativeAddr)->onViewChange(w, h);
     overlayController::instance()->onViewChange(w, h);
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     nativeApp(nativeAddr)->onDraw();
-    overlayController::instance()->onDraw();
+    if(vrController::instance()->isDrawing()) overlayController::instance()->onDraw();
 }
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chunk_size, jint unit_size, jbyteArray jdata){

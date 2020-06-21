@@ -41,7 +41,7 @@ void onCreated(){
 	//load data
 	if(loader_.loadData("helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/data", "helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/mask")){
 	// if(loader_.loadData("dicom-images/sample_data_2bytes_2012", LOAD_DICOM)){
-		controller_.assembleTexture(512,512,144,loader_.getVolumeData(), loader_.getChannelNum());
+        controller_.assembleTexture(2, 512,512,144, -1, -1, -1, loader_.getVolumeData(), loader_.getChannelNum());
 		loader_.reset();
 	}
 }
@@ -107,28 +107,28 @@ void setupApplication(){
 }
 
 int main(int argc, char** argv){
-	setupShaderContents(&controller_);
+	// setupShaderContents(&controller_);
 	
-	if(!InitWindow()) return -1;
+	// if(!InitWindow()) return -1;
 
-	setupApplication();
-	onCreated();
+	// setupApplication();
+	// onCreated();
 
-	do{
-		onDraw();
-		// Swap buffers
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+	// do{
+	// 	// onDraw();
+	// 	// Swap buffers
+	// 	glfwSwapBuffers(window);
+	// 	glfwPollEvents();
 
-	} // Check if the ESC key was pressed or the window was closed
-	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-		   glfwWindowShouldClose(window) == 0 );
+	// } // Check if the ESC key was pressed or the window was closed
+	// while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+	// 	   glfwWindowShouldClose(window) == 0 );
 	
-	onDestroy();
+	// onDestroy();
 
-	glfwDestroyWindow(window);
-	// Close OpenGL window and terminate GLFW
-	glfwTerminate();
+	// glfwDestroyWindow(window);
+	// // Close OpenGL window and terminate GLFW
+	// glfwTerminate();
 
 	return 0;
 }
