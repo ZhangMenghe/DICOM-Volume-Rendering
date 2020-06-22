@@ -8,11 +8,11 @@ screenQuad* screenQuad::instance(){
 }
 screenQuad::screenQuad(){
     Mesh::InitQuadWithTex(vao_, quad_vertices_tex_standard, 4, quad_indices, 6);
-    if(!qshader_.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_QUAD_VERT])
-       ||!qshader_.AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_QUAD_FRAG])
+    if(!qshader_.AddShader(GL_VERTEX_SHADER, Manager::shader_contents[dvr::SHADER_QUAD_VERT])
+       ||!qshader_.AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_QUAD_FRAG])
        ||!qshader_.CompileAndLink())
         LOGE("Screen===Failed to create screen shader program===\n");
-    vrController::shader_contents[dvr::SHADER_QUAD_VERT] = "";vrController::shader_contents[dvr::SHADER_QUAD_FRAG]="";
+    Manager::shader_contents[dvr::SHADER_QUAD_VERT] = "";Manager::shader_contents[dvr::SHADER_QUAD_FRAG]="";
     myPtr_ = this;
 }
 void screenQuad::onScreenSizeChange(float width, float height){

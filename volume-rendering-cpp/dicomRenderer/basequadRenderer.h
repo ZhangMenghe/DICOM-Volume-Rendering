@@ -1,7 +1,7 @@
 #ifndef BASE_QUAD_RENDERER_H
 #define BASE_QUAD_RENDERER_H
 
-#include <GLES3/gl32.h>
+#include <platforms/platform.h>
 #include <GLPipeline/Shader.h>
 #include <algorithm>
 

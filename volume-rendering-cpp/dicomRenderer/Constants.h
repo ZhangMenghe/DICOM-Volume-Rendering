@@ -1,6 +1,7 @@
 #ifndef DICOMRENDERER_CONSTANTS_H
 #define DICOMRENDERER_CONSTANTS_H
 #include <string>
+#include <glm/glm.hpp>
 namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,

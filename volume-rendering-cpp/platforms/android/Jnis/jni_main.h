@@ -4,6 +4,7 @@
 #include <jni.h>
 #include <string>
 #include <vector>
+#include <Manager.h>
 #include "nEntrance.h"
 
 #define JNI_METHOD(returnType, funcName)\
@@ -16,7 +17,7 @@
 
 namespace dvr{
     inline jlong nativeAddr;
-
+    inline Manager* manager;
     inline jlong getNativeClassAddr(nEntrance * native_controller){
         return reinterpret_cast<intptr_t>(native_controller);
     }

@@ -16,7 +16,7 @@ cuttingController* cuttingController::instance(){
 cuttingController::cuttingController(){
     auto model_mat = vrController::instance()->getModelMatrix();
     mat4 vm_inv = transpose(inverse(model_mat));
-    update_plane_(vec3MatNorm(vm_inv, vrController::camera->getViewDirection()));
+    update_plane_(vec3MatNorm(vm_inv, Manager::camera->getViewDirection()));
 
     p_point_ = p_start_;
     p_point_world = glm::vec3(model_mat* glm::vec4(p_point_,1.0f));
@@ -34,7 +34,7 @@ p_start_(ps), p_norm_(pn){
 }
 void cuttingController::UpdateAndDraw(){
     Update();
-    if(vrController::param_bool[dvr::CHECK_CUTTING]) draw_plane();
+    if(Manager::param_bool[dvr::CHECK_CUTTING]) draw_plane();
 }
 void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
 //    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
@@ -77,15 +77,15 @@ void cuttingController::Update(){
 void cuttingController::draw_plane(){
     if(!pshader){
         pshader = new Shader();
-        if(!pshader->AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_CPLANE_VERT])
-           ||!pshader->AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_CPLANE_FRAG])
+        if(!pshader->AddShader(GL_VERTEX_SHADER,Manager::shader_contents[dvr::SHADER_CPLANE_VERT])
+           ||!pshader->AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_CPLANE_FRAG])
            ||!pshader->CompileAndLink())
             LOGE("Raycast===Failed to create cutting plane shader program===");
-        vrController::shader_contents[dvr::SHADER_CPLANE_VERT] = "";vrController::shader_contents[dvr::SHADER_CPLANE_FRAG]="";
+        Manager::shader_contents[dvr::SHADER_CPLANE_VERT] = "";Manager::shader_contents[dvr::SHADER_CPLANE_FRAG]="";
 
     }
     GLuint sp = pshader->Use();
-    Shader::Uniform(sp,"uMVP", vrController::camera->getVPMat()* p_p2w_mat);
+    Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat()* p_p2w_mat);
     Shader::Uniform(sp,"uBaseColor", plane_color_);
     if (!pVAO_) {
         float vertices[] = {
@@ -122,7 +122,7 @@ void cuttingController::setCutPlane(float value){
     p_p2o_dirty = true;
 }
 bool cuttingController::keep_cutting_position(){
-    return vrController::param_bool[dvr::CHECK_FREEZE_CPLANE];
+    return Manager::param_bool[dvr::CHECK_FREEZE_CPLANE];
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){
@@ -170,7 +170,7 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
     p_norm_ = pNorm;
     mat4 vm_inv = transpose(inverse(vrController::instance()->getModelMatrix()));
     p_rotate_mat_ = rotMatFromDir(pNorm);
-    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
+    glm::vec3 vp_obj = vec3MatNorm(vm_inv, Manager::camera->getCameraPosition());
     //cloest point
     p_start_ = cloestVertexToPlane(pNorm, vp_obj);
 }
