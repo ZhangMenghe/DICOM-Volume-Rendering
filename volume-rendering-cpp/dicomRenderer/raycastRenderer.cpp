@@ -3,7 +3,7 @@
 #include "screenQuad.h"
 #include <GLPipeline/Primitive.h>
 raycastRenderer::raycastRenderer(bool screen_baked):
-DRAW_BAKED(screen_baked){
+    DRAW_BAKED(screen_baked){
     //geometry
     Mesh::InitQuadWithTex(vao_cube_, cuboid_with_texture, 8, cuboid_indices, 36);
 
@@ -102,7 +102,7 @@ void raycastRenderer::draw_baked(){
 
     glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrix() * dim_scale_mat);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
-    Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), Manager::camera->getCameraPosition()));
+    Shader::Uniform(sp, "u_CamToWorld", Manager::camera->getCameraPose());
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "usample_step_inverse", 1.0f / 600.0f);
 
