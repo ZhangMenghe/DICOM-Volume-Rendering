@@ -57,7 +57,7 @@ namespace {
         for(int i=0; i<int(dvr::SHADER_ANDROID_END) - int(dvr::SHADER_END); i++){
             std::string content;
             assetLoader::instance()->LoadTextFileFromAssetManager(android_shader_file_names[i], &content);
-            vrController::shader_contents[dvr::SHADER_END + i] = content;
+            Manager::shader_contents[dvr::SHADER_END + i] = content;
         }
     }
 }
@@ -68,6 +68,7 @@ jint JNI_OnLoad(JavaVM *vm, void *) {
 
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     new assetLoader(AAssetManager_fromJava(env, asset_manager));
+    manager = new Manager;
     nativeAddr =  getNativeClassAddr(new vrController());
     setupShaderContents();
     return nativeAddr;
@@ -98,6 +99,7 @@ JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
+    manager->onViewChange(w, h);
     nativeApp(nativeAddr)->onViewChange(w, h);
     overlayController::instance()->onViewChange(w, h);
     arController::instance()->onViewChange(rot,w,h);
@@ -106,7 +108,7 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    if(!vrController::param_bool[dvr::CHECK_AR_ENABLED]){
+    if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
         if(camera_switch_dirty){vrController::instance()->setMVPStatus("template");camera_switch_dirty = false;}
         if(vrController::instance()->isDirty()){
             //order matters
@@ -114,7 +116,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
             nativeApp(nativeAddr)->onDraw();
         }
         screenQuad::instance()->Draw();
-        overlayController::instance()->onDraw();
+        if(vrController::instance()->isDrawing())overlayController::instance()->onDraw();
     }
     else{
         if(camera_switch_dirty){vrController::instance()->setMVPStatus("ARCam");camera_switch_dirty = false;}
@@ -134,7 +136,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
             }
         }
         screenQuad::instance()->Draw();
-        overlayController::instance()->onDraw();
+        if(vrController::instance()->isDrawing())overlayController::instance()->onDraw();
     }
 }
 

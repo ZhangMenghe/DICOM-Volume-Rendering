@@ -43,6 +43,7 @@ add_library(vrNative
         SHARED
         vrController.cpp
         overlayController.cpp
+        Manager.cpp
         ${DICOM_RENDERERS}
         ${GL_PIPELINE_FILES}
 #        ${UTILS_FILES}

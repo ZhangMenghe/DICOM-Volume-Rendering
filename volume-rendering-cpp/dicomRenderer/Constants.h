@@ -1,6 +1,7 @@
 #ifndef DICOMRENDERER_CONSTANTS_H
 #define DICOMRENDERER_CONSTANTS_H
 #include <string>
+#include <glm/glm.hpp>
 namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,
@@ -9,6 +10,7 @@ namespace dvr{
         CHECK_FREEZE_VOLUME,
         CHECK_FREEZE_CPLANE,
         CHECK_MASKON,
+        CHECK_MASK_RECOLOR,
         CHECK_AR_ENABLED,
     };
     enum PARAM_TUNE{
@@ -54,7 +56,8 @@ namespace dvr{
         SHADER_AR_POINTCLOUD_FRAG,
         SHADER_AR_PLANE_VERT,
         SHADER_AR_PLANE_FRAG,
-        SHADER_ANDROID_END
+        SHADER_ANDROID_END,
+        SHADER_ALL_END
     };
     enum TEX_IDS{
         BAKED_TEX_ID=0,

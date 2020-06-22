@@ -4,6 +4,7 @@
 #include <jni.h>
 #include <string>
 #include <vector>
+#include <Manager.h>
 #include "nEntrance.h"
 
 #define JNI_METHOD(returnType, funcName)\
@@ -16,10 +17,9 @@
 
 namespace dvr{
     inline static JavaVM *g_vm = nullptr;
-
     inline jlong nativeAddr;
-
     inline bool camera_switch_dirty;
+    inline Manager* manager;
 
     inline jlong getNativeClassAddr(nEntrance * native_controller){
         return reinterpret_cast<intptr_t>(native_controller);
@@ -27,7 +27,6 @@ namespace dvr{
     inline nEntrance * nativeApp(jlong ptr){
         return reinterpret_cast<nEntrance *>(ptr);
     }
-
     inline std::string jstring2string(JNIEnv *env, jstring jStr){
         const char *cstr = env->GetStringUTFChars(jStr, NULL);
         std::string str = std::string(cstr);

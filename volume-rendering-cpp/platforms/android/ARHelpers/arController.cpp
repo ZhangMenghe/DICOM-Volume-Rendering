@@ -117,8 +117,8 @@ void arController::onDraw(){
     ArFrame_acquireCamera(ar_session_, ar_frame_, &camera);
     ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
     ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
-    vrController::instance()->camera->setProjMat(proj_mat);
-    vrController::instance()->camera->setViewMat(view_mat);
+    Manager::camera->setProjMat(proj_mat);
+    Manager::camera->setViewMat(view_mat);
 
 
     // If the camera isn't tracking don't bother rendering other objects.
@@ -170,7 +170,7 @@ void arController::onDraw(){
 //    vrController::instance()->camera->setCamPos(glm::vec3(camera_pose_raw[4], camera_pose_raw[5],camera_pose_raw[6]));
 
     ArPose_getMatrix(ar_session_, camera_pose, glm::value_ptr(camera_pose_col_major_) );
-    vrController::instance()->camera->updateCameraPose(camera_pose_col_major_);//(glm::transpose(camera_pose_col_major_));
+    Manager::camera->updateCameraPose(camera_pose_col_major_);//(glm::transpose(camera_pose_col_major_));
 
 //    float normal_distance_to_plane = util::CalculateDistanceToPlane(
 //            *ar_session_, *hit_pose, *camera_pose);

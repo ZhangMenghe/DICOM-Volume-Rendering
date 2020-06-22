@@ -21,16 +21,16 @@ public:
     void reset(){
         delete[] g_VolumeTexData;
         g_VolumeTexData = nullptr;
-        n_data_offset = 0;
+        for(auto& offset:n_data_offset) offset = 0;
     }
 private:
-    int img_w, img_h, vol_dim;
-    size_t single_csize, single_size, total_size;
-    size_t mask_single_csize, mask_total_size;
     int CHANEL_NUM = 4;
-    size_t n_data_offset = 0, n_mask_offset=0;
-
     GLubyte* g_VolumeTexData = nullptr;
+    int g_img_h=0, g_img_w=0, g_img_d=0;
+    float g_vol_h, g_vol_w, g_vol_depth = 0;
+    size_t g_ssize = 0, g_vol_len;
+    size_t n_data_offset[3] = {0};
+
     void send_dicom_data(mLoadTarget target, int id, int chunk_size, int unit_size, char* data);
 };
 

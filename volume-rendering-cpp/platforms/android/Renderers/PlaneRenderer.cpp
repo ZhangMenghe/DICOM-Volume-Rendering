@@ -39,8 +39,8 @@ PlaneRenderer::PlaneRenderer(bool screen_baked)
     glGenerateMipmap(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    if(!shader_.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_AR_PLANE_VERT])
-       ||!shader_.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_AR_PLANE_FRAG])
+    if(!shader_.AddShader(GL_VERTEX_SHADER, Manager::shader_contents[dvr::SHADER_AR_PLANE_VERT])
+       ||!shader_.AddShader(GL_FRAGMENT_SHADER,  Manager::shader_contents[dvr::SHADER_AR_PLANE_FRAG])
        ||!shader_.CompileAndLink())
         LOGE("PLANE===Failed to create shader program===");
 }

@@ -16,8 +16,8 @@ PointCloudRenderer::PointCloudRenderer(bool screen_baked)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    if(!shader_.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_AR_POINTCLOUD_VERT])
-       ||!shader_.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_AR_POINTCLOUD_FRAG])
+    if(!shader_.AddShader(GL_VERTEX_SHADER, Manager::shader_contents[dvr::SHADER_AR_POINTCLOUD_VERT])
+       ||!shader_.AddShader(GL_FRAGMENT_SHADER,  Manager::shader_contents[dvr::SHADER_AR_POINTCLOUD_FRAG])
        ||!shader_.CompileAndLink())
         LOGE("point cloud===Failed to create shader program===");
 }
@@ -44,7 +44,7 @@ void PointCloudRenderer::draw_to_texture(glm::mat4 mvp){
 }
 void PointCloudRenderer::draw_scene(glm::mat4 mvp){
     GLuint sp = shader_.Use();
-    Shader::Uniform(sp, "uMVP", mvp);//vrController::camera->getProjMat() * vrController::camera->getViewMat());
+    Shader::Uniform(sp, "uMVP", mvp);
     glBindVertexArray(vao_);
     glDrawArrays(GL_POINTS, 0, draw_point_num);
     glBindVertexArray(0);

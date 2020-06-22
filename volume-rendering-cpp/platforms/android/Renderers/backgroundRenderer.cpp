@@ -28,8 +28,8 @@ backgroundRenderer::backgroundRenderer(bool screen_baked)
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_EXTERNAL_OES, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    if(!shader_.AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_AR_BACKGROUND_SCREEN_VERT])
-       ||!shader_.AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_AR_BACKGROUND_SCREEN_FRAG])
+    if(!shader_.AddShader(GL_VERTEX_SHADER, Manager::shader_contents[dvr::SHADER_AR_BACKGROUND_SCREEN_VERT])
+       ||!shader_.AddShader(GL_FRAGMENT_SHADER,  Manager::shader_contents[dvr::SHADER_AR_BACKGROUND_SCREEN_FRAG])
        ||!shader_.CompileAndLink())
         LOGE("ar-background===Failed to create opacity shader program===");
 }

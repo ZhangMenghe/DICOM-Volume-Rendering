@@ -4,23 +4,15 @@
 #include <dicomRenderer/texturebasedRenderer.h>
 #include <dicomRenderer/raycastRenderer.h>
 #include <GLPipeline/Texture.h>
-#include "GLPipeline/Camera.h"
 #include "nEntrance.h"
 #include "dicomRenderer/Constants.h"
+#include "Manager.h"
 #include <unordered_map>
-#include <vector>
 #include <map>
 
 class vrController:public nEntrance{
 public:
-    static Camera* camera;
-    static std::vector<bool> param_bool;
-    static std::vector<std::string> shader_contents;
-
-    static bool baked_dirty_;
-    static int color_scheme_id;
     unsigned int mask_num_, mask_bits_;
-
     static vrController* instance();
     bool isDrawing(){return tex_volume!= nullptr;}
 
@@ -96,13 +88,12 @@ private:
 
     //ui
     glm::fvec2 Mouse_old;
-    float _screen_w, _screen_h;
 
     //flags
     bool volume_model_dirty;
 
     void updateVolumeModelMat();
     void precompute();
-    bool isRayCasting(){return param_bool[dvr::CHECK_RAYCAST];}
+    bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
 };
 #endif

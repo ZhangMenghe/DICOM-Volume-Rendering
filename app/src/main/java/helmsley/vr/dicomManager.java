@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -30,23 +32,21 @@ import com.imebra.TransformsChain;
 import com.imebra.VOILUT;
 import com.imebra.drawBitmapType_t;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 
-import helmsley.vr.DUIs.DSCardRecyclerViewAdapter;
 import helmsley.vr.Utils.PushToImebraPipe;
 import helmsley.vr.proto.datasetResponse;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.volumeResponse;
-
-//import static helmsley.vr.DUIs.dialogUIs.progress_dialog;
 
 public class dicomManager {
     private static final String TAG = "dicomManager";
@@ -97,9 +97,15 @@ public class dicomManager {
         File sel_file = new File(splits[1]);
         //build stream list
         File pd = sel_file.getParentFile();
-        String[] flst = pd.list();
-        for (String f : flst) streams.add(pd.getAbsolutePath()+'/'+f);
-        build_volume(pd.getAbsolutePath(), pd.getName(), streams);
+        File[] flst = pd.listFiles();
+        for (File f : flst) {
+            if(f.isDirectory()) continue;
+            streams.add(f.getAbsolutePath());
+        }
+        File pd_mask = new File(pd, "mask");
+
+        boolean mask_ava = pd_mask.exists();// && (pd_mask.listFiles().length ==streams.size());
+        build_volume(pd.getAbsolutePath(), pd.getName(), streams, mask_ava);
     }
 
     private void show_file_dir_dialog() {
@@ -215,7 +221,7 @@ public class dicomManager {
             }
         });
     }
-    private void build_volume(String folder_path, String vol_name, List<String> file_names) {
+    private void build_volume(String folder_path, String vol_name, List<String> file_names, boolean mask_ava) {
         long width=0, height=0; int ssize=0;
         byte[][] datas = new byte[file_names.size()][];
         boolean is_first = true;
@@ -225,7 +231,7 @@ public class dicomManager {
                 .setFolderName(vol_name)
                 .setFolderPath(folder_path)
                 .setVolumeLocRange(-1)
-                .setWithMask(false)
+                .setWithMask(mask_ava)
                 .setDataSource(volumeResponse.volumeInfo.DataSource.DEVICE);
 
         for(String name:file_names){
@@ -235,14 +241,11 @@ public class dicomManager {
                 //build dataset info
 
                 width = dicomImage.getWidth(); height = dicomImage.getHeight();
-                JNIInterface.JNIsendDataPrepare( (int)height, (int)width, file_names.size(), -1,-1, -1, false);
+                JNIInterface.JNIsendDataPrepare( (int)height, (int)width, file_names.size(), -1,-1, -1, mask_ava);
                 ssize = (int)(width * height) * 2;
 
                 is_first = false;
 
-//                String patient_name = loadDataSet.getString(new TagId(0x0010, 0x0010), 0);
-//                String date_str = loadDataSet.getString(new TagId(0x0008, 0x0023), 0);
-//                String physicanName = loadDataSet.getString(new TagId(0x0008,0x0090), 0);
                 ds_builder = datasetResponse.datasetInfo.newBuilder().setFolderName(DEFAULT_DS_NAME).setPatientName("UNKNOWN")
                         .setDate("UNKNOWN").setPhysicanName("UNKNOWN");
                 TagId po_tag = new TagId(0x0020, 0x0020);
@@ -255,7 +258,6 @@ public class dicomManager {
                 }
                 vinfo_builder.addDims((int)height);vinfo_builder.addDims((int)width);vinfo_builder.addDims((int)file_names.size());
                 vinfo_builder.addResolution(-1);vinfo_builder.addResolution(-1);
-//                Random random = new Random();
                 volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
                         .setRgroupId(-1)
                         .setRankId(-1)
@@ -271,6 +273,32 @@ public class dicomManager {
         }
         for(int i=0; i<datas.length;i++)
             JNIInterface.JNIsendData(0, i, ssize, 2, datas[i]);
+        //load mask
+        if(mask_ava){
+            byte[] mdata = new byte[ssize];
+            for(int i=0; i<datas.length; i++){
+                try{
+                    java.io.FileInputStream in = new FileInputStream(folder_path + "/mask/" + (datas.length-i-1) + ".png");
+                    Bitmap bmp = BitmapFactory.decodeStream(in);
+                    int w = bmp.getWidth();
+                    int h = bmp.getHeight();
+                    int idx = 0;
+                    for(int y=0;y<h;y++){
+                        for(int x=0; x<w; x++){
+                            int pixel = bmp.getPixel(x,y);
+                            int value = Color.red(pixel);
+                            mdata[2*(int)idx+1] = (byte)(value>>>8);
+                            mdata[2*(int)idx] = (byte)value;
+                            idx++;
+                        }
+                    }
+                }catch (FileNotFoundException e){
+                    mdata = new byte[ssize];
+                }
+                JNIInterface.JNIsendData(1, i, ssize, 2, mdata);
+            }
+        }
+
         is_finished = true;
         int sam_size = ssize / 2;
         byte[] sample_data = datas[(int)(datas.length / 2)];
@@ -321,15 +349,16 @@ public class dicomManager {
         try{
             File pd = new File(vinfo.getFolderPath());
 
-            String[] flst = pd.list();
-            for (String f : flst) {
+            File[] flst = pd.listFiles();
+
+            for (File f : flst) {
                 try {
-                    String fname = pd.getAbsolutePath()+'/'+f;
-                    loadDataSet = CodecFactory.load(fname);
+                    if(f.isDirectory()) continue;
+                    loadDataSet = CodecFactory.load(f.getAbsolutePath());
                     Image dicomImage = loadDataSet.getImageApplyModalityTransform(0);
                     if(is_first) {
                         is_first = false;
-                        JNIInterface.JNIsendDataPrepare(height, width, nums,-1,-1, -1, false);
+                        JNIInterface.JNIsendDataPrepare(height, width, nums,-1,-1, -1, vinfo.getWithMask());
                     }
                     int ins_id = Integer.parseInt(loadDataSet.getString(new TagId(0x0020,0x0013),0)) - 1;
                     datas[ins_id] = get_image_pure_bytes(dicomImage, ssize, width, height);
@@ -343,6 +372,31 @@ public class dicomManager {
         }
         for(int i=0; i<datas.length;i++)
             JNIInterface.JNIsendData(0, i, ssize, 2, datas[i]);
+
+        if(vinfo.getWithMask()){
+            byte[] mdata = new byte[ssize];
+            for(int i=0; i<datas.length; i++){
+                try{
+                    java.io.FileInputStream in = new FileInputStream(vinfo.getFolderPath() + "/mask/" + (datas.length-i-1) + ".png");
+                    Bitmap bmp = BitmapFactory.decodeStream(in);
+                    int w = bmp.getWidth();
+                    int h = bmp.getHeight();
+                    int idx = 0;
+                    for(int y=0;y<h;y++){
+                        for(int x=0; x<w; x++){
+                            int pixel = bmp.getPixel(x,y);
+                            int value = Color.red(pixel);
+                            mdata[2*(int)idx+1] = (byte)(value>>>8);
+                            mdata[2*(int)idx] = (byte)value;
+                            idx++;
+                        }
+                    }
+                }catch (FileNotFoundException e){
+                    mdata = new byte[ssize];
+                }
+                JNIInterface.JNIsendData(1, i, ssize, 2, mdata);
+            }
+        }
         is_finished = true;
         return true;
 

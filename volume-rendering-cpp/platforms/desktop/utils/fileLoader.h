@@ -38,6 +38,6 @@ inline void setupShaderContents(vrController* vrc){
                 "shaders/opaViz.frag"
         };
         for(int i = 0; i<int(dvr::SHADER_END); i++)
-            vrc->setShaderContents(dvr::SHADER_FILES (i), LoadTextFile(shader_file_names[i]));
+            vrc->setShaderContents(dvr::SHADER_FILES (i), LoadTextFile(shader_file_names[i]));        
     }
 #endif 

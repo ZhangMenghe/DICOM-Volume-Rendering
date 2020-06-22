@@ -45,11 +45,12 @@
 <!--    mask panel-->
     <string-array name="mask_check_params">
         <item>@string/mask_check_name</item>
+        <item>@string/mask_color_name</item>
     </string-array>
-    <array name="mask_check_values">
+    <string-array name="mask_check_values">
         <item>false</item>
-    </array>
-
+        <item>true</item>
+    </string-array>
 
 <!--    cutting panel-->
     <string-array name="cut_check_params">

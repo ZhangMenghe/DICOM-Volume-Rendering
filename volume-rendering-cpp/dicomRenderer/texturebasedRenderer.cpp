@@ -7,11 +7,11 @@ texvrRenderer::texvrRenderer(bool screen_baked)
         :DRAW_BAKED(screen_baked){
     //program
     shader_ = new Shader();
-    if(!shader_->AddShader(GL_VERTEX_SHADER, vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT])
-       ||!shader_->AddShader(GL_FRAGMENT_SHADER, vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG])
+    if(!shader_->AddShader(GL_VERTEX_SHADER, Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT])
+       ||!shader_->AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG])
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
-    vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";vrController::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
+    Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
     setCuttingPlane(.0f);
 }
 
@@ -88,8 +88,8 @@ void texvrRenderer::draw_scene(){
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
-    Shader::Uniform(sp, "uMVP", vrController::camera->getProjMat() * vrController::camera->getViewMat() * modelmat);
-    Shader::Uniform(sp, "u_cut", vrController::param_bool[dvr::CHECK_CUTTING]);
+    Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat() * modelmat);
+    Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
@@ -114,12 +114,12 @@ void texvrRenderer::draw_scene(){
 
 void texvrRenderer::Draw(){
     if(!b_init_successful) {init_vertices(vao_front,vbo_front,true);init_vertices(vao_back,vbo_back,false);}
-    if(DRAW_BAKED || vrController::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked();
+    if(DRAW_BAKED || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked();
     else draw_scene();
 }
 
 void texvrRenderer::draw_baked() {
-    if(!vrController::param_bool[dvr::CHECK_AR_ENABLED] && !baked_dirty_) return;
+    if(!Manager::param_bool[dvr::CHECK_AR_ENABLED] && !baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     //render to texture
     glm::vec2 tsize = screenQuad::instance()->getTexSize();

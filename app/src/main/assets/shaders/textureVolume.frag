@@ -15,5 +15,6 @@ void main(){
 		if(u_front && vTexcoord.z > u_cut_texz) discard;
 		else if(!u_front && vTexcoord.z < u_cut_texz) discard;
 	}
-	gl_FragColor = texture(uSampler_baked, vTexcoord);
+	if(u_front)gl_FragColor = texture(uSampler_baked, vTexcoord);
+	else gl_FragColor = texture(uSampler_baked, vec3(vTexcoord.xy, 1.0-vTexcoord.z));
 }

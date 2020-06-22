@@ -47,7 +47,7 @@ private:
     std::vector<bool> widget_visibilities_;
     std::vector<float*> widget_points_;
     float* default_widget_points_;
-    float* u_opacity_data_;
+    float* u_opacity_data_ = nullptr;
     //rect
     float _screen_w, _screen_h;
     int _screen_h_offset;

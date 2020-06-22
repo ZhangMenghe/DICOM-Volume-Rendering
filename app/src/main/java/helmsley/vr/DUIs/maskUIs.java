@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import com.google.common.primitives.Booleans;
 
@@ -34,6 +36,17 @@ public class maskUIs extends BasePanel{
         recyclerViewAdapter = new maskRecyclerViewAdapter(activity, recyclerView);
         recyclerView.setAdapter(recyclerViewAdapter);
 
+        CheckBox ccb = (CheckBox)panel_.findViewById(R.id.check_mask_color);
+        String[] narr = activity.getResources().getStringArray(R.array.mask_check_params);
+        String[] varr = activity.getResources().getStringArray(R.array.mask_check_values);
+        ccb.setChecked(Boolean.parseBoolean(varr[1]));
+        ccb.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                JUIInterface.JUIsetChecks(narr[1], isChecked);
+            }
+        });
         setup_checks(
                 panel_,
                 R.array.mask_check_params, R.array.mask_check_values,

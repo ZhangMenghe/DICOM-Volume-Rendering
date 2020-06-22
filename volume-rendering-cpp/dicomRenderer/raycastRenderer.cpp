@@ -9,17 +9,17 @@ DRAW_BAKED(screen_baked){
 
     //program
     shader_ = new Shader();
-    if(!shader_->AddShader(GL_VERTEX_SHADER,vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT])
-            ||!shader_->AddShader(GL_FRAGMENT_SHADER,  vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG])
+    if(!shader_->AddShader(GL_VERTEX_SHADER,Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT])
+            ||!shader_->AddShader(GL_FRAGMENT_SHADER,  Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG])
             ||!shader_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
-    vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";vrController::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
+    Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
 
     cutter_ = new cuttingController;
 }
 void raycastRenderer::Draw() {
     if (DRAW_BAKED) draw_baked();
-    else if(vrController::param_bool[dvr::CHECK_AR_ENABLED]) draw_to_texture();
+    else if(Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_to_texture();
     else draw_scene();
 }
 
@@ -37,17 +37,17 @@ void raycastRenderer::draw_scene(){
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
     Shader::Uniform(sp, "uSampler", dvr::BAKED_TEX_ID);
 
-    Shader::Uniform(sp, "uProjMat", vrController::camera->getProjMat());
-    Shader::Uniform(sp, "uViewMat", vrController::camera->getViewMat());
+    Shader::Uniform(sp, "uProjMat", Manager::camera->getProjMat());
+    Shader::Uniform(sp, "uViewMat", Manager::camera->getViewMat());
     Shader::Uniform(sp, "uModelMat", vrController::instance()->getModelMatrix());
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
     glm::mat4 model_inv = glm::inverse(modelmat * dim_scale_mat);
     Shader::Uniform(sp, "uCamposObjSpace",
-            glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
-//    Shader::Uniform(sp,"sample_step_inverse", 1.0f / vrController::param_ray[dvr::TR_DENSITY]);
+            glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
+//    Shader::Uniform(sp,"sample_step_inverse", 1.0f / Manager::param_ray[dvr::TR_DENSITY]);
     Shader::Uniform(sp,"sample_step_inverse", 1.0f/400);
-    if(vrController::param_bool[dvr::CHECK_CUTTING])shader_->EnableKeyword("CUTTING_PLANE");
+    if(Manager::param_bool[dvr::CHECK_CUTTING])shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
 
     cutter_->setCuttingParams(sp);
@@ -55,7 +55,7 @@ void raycastRenderer::draw_scene(){
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
 //    glm::vec3 dir = glm::vec3(rotmat[0][2], rotmat[1][2],rotmat[2][2]);
-//    if(glm::dot(vrController::camera->getViewDirection(), dir) < 0) glFrontFace(GL_CCW);
+//    if(glm::dot(Manager::camera->getViewDirection(), dir) < 0) glFrontFace(GL_CCW);
     if(rotmat[2][2] > 0) glFrontFace(GL_CCW);
     else glFrontFace(GL_CW);
 
@@ -79,16 +79,16 @@ float* raycastRenderer::getCuttingPlane(){
     return cutter_->getCutPlane();
 }
 void raycastRenderer::draw_baked(){
-    if(!vrController::param_bool[dvr::CHECK_AR_ENABLED] && !baked_dirty_) return;
+    if(!Manager::param_bool[dvr::CHECK_AR_ENABLED] && !baked_dirty_) return;
     if(!cshader_){
         cshader_ = new Shader;
-        if(!cshader_->AddShader(GL_COMPUTE_SHADER, vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
+        if(!cshader_->AddShader(GL_COMPUTE_SHADER, Manager::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
            ||!cshader_->CompileAndLink())
             LOGE("Raycast=====Failed to create raycast geometry shader");
-        vrController::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL]="";
+        Manager::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL]="";
     }
 
-    if(vrController::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
+    if(Manager::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
     else cshader_->DisableKeyword("CUTTING_PLANE");
 
     GLuint sp = cshader_->Use();
@@ -98,12 +98,12 @@ void raycastRenderer::draw_baked(){
     glBindImageTexture(2, ray_baked_screen->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
-    Shader::Uniform(sp, "u_fov", vrController::camera->getFOV());
+    Shader::Uniform(sp, "u_fov", Manager::camera->getFOV());
 
     glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrix() * dim_scale_mat);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
-    Shader::Uniform(sp, "u_CamToWorld", vrController::camera->getCameraPose());
-    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(vrController::camera->getCameraPosition(), 1.0)));
+    Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), Manager::camera->getCameraPosition()));
+    Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "usample_step_inverse", 1.0f / 600.0f);
 
     cutter_->Update();
