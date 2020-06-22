@@ -1,13 +1,15 @@
-
-
 #include <platforms/platform.h>
 #include <vrController.h>
+#include <overlayController.h>
+
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
 #include "utils/fileLoader.h"
 GLFWwindow* window;
 dicomLoader loader_;
 uiController ui_;
+//order matters
+Manager manager_;
 vrController controller_;
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
@@ -33,13 +35,15 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 }
 
 void onCreated(){
-	ui_.InitTuneParam();
-	ui_.InitCheckParam();
-	ui_.setMaskBits(4, 30);
+	ui_.InitAll();
 	controller_.onViewCreated();
+	overlayController::instance()->onViewCreated();
+	ui_.AddTuneParams();
+	overlayController::instance()->setOverlayRect(0, 1080, 85, 0,776);
+    overlayController::instance()->setOverlayRect(1, 1080, 36, 0,740);
 
 	//load data
-	if(loader_.loadData("helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/data", "helmsley_cached/Larry-2016-10-26-MRI/series_214_DYN_COR_VIBE_3_RUNS/mask")){
+	if(loader_.loadData("helmsley_cached/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/data", "helmsley_cached/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/mask")){
 	// if(loader_.loadData("dicom-images/sample_data_2bytes_2012", LOAD_DICOM)){
         controller_.assembleTexture(2, 512,512,144, -1, -1, -1, loader_.getVolumeData(), loader_.getChannelNum());
 		loader_.reset();
@@ -47,12 +51,14 @@ void onCreated(){
 }
 void onDraw(){
 	controller_.onDraw();
+	if(controller_.isDrawing()) overlayController::instance()->onDraw();
 }
 void onViewChange(int width, int height){
+	manager_.onViewChange(width, height);
 	controller_.onViewChange(width, height);
+	overlayController::instance()->onViewChange(width, height);
 }
 void onDestroy(){
-	delete &controller_;
 }
 
 bool InitWindow(){
@@ -70,7 +76,7 @@ bool InitWindow(){
 	
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 430, 768, "Volume Rendering", nullptr, nullptr);
+	window = glfwCreateWindow(430, 768, "Volume Rendering", nullptr, nullptr);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		glfwTerminate();
@@ -98,37 +104,31 @@ bool InitWindow(){
 void setupApplication(){
 	int dims = 144;
 	loader_.setupDCMIConfig(512,512,dims,true);
-//	controller_.setVolumeConfig(512,512,dims);
-	// if(loader_.loadData("dicom-images/sample_data_2bytes", LOAD_DICOM, 2)){
-	// 	controller_.assembleTexture(loader_.getVolumeData());
-	// 	loader_.reset();
-	// }
-
 }
 
 int main(int argc, char** argv){
-	// setupShaderContents(&controller_);
+	setupShaderContents(&controller_);
 	
-	// if(!InitWindow()) return -1;
+	if(!InitWindow()) return -1;
 
-	// setupApplication();
-	// onCreated();
+	setupApplication();
+	onCreated();
 
-	// do{
-	// 	// onDraw();
-	// 	// Swap buffers
-	// 	glfwSwapBuffers(window);
-	// 	glfwPollEvents();
+	do{
+		onDraw();
+		// Swap buffers
+		glfwSwapBuffers(window);
+		glfwPollEvents();
 
-	// } // Check if the ESC key was pressed or the window was closed
-	// while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-	// 	   glfwWindowShouldClose(window) == 0 );
+	} // Check if the ESC key was pressed or the window was closed
+	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
+		   glfwWindowShouldClose(window) == 0 );
 	
-	// onDestroy();
+	onDestroy();
 
-	// glfwDestroyWindow(window);
-	// // Close OpenGL window and terminate GLFW
-	// glfwTerminate();
+	glfwDestroyWindow(window);
+	// Close OpenGL window and terminate GLFW
+	glfwTerminate();
 
 	return 0;
 }

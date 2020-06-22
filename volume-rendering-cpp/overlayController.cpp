@@ -69,7 +69,7 @@ void overlayController::onDraw(){
     for(auto render:renderers_) render.second->Draw();
 }
 void overlayController::update_widget_points_1d_array(){
-    if(u_opacity_data_){delete[]u_opacity_data_; u_opacity_data_= nullptr;}
+    if(nullptr!=u_opacity_data_){delete[]u_opacity_data_; u_opacity_data_= nullptr;}
     u_opacity_data_ = new float[12 * widget_points_.size()];
     for(int i=0;i<widget_points_.size();i++)memcpy(u_opacity_data_+12*i, widget_points_[i], 12* sizeof(float));
 }

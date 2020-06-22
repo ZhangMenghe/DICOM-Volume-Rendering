@@ -64,8 +64,9 @@ namespace {
 }
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     _asset_manager = AAssetManager_fromJava(env, asset_manager);
-    nativeAddr =  getNativeClassAddr(new vrController());
+    //order matters
     manager = new Manager;
+    nativeAddr =  getNativeClassAddr(new vrController());
     setupShaderContents();
     return nativeAddr;
 }
