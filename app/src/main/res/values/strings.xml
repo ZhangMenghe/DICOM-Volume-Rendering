@@ -49,6 +49,7 @@
     <string name="freezeVolume_check_name">Freeze Volume</string>
 <!--ar sub panel-->
     <string name="ar_check_name">AR Enabled</string>
+    <string name="ar_draw_name">Draw</string>
 
     <!--    sys operation names-->
     <string name="sys_name">System</string>

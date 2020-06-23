@@ -76,7 +76,7 @@ public abstract class MultiFingerTapDetector {
             onSingleTapUp(pointerNum, event);
     }
 
-    public boolean onTouchEvent(MotionEvent event) {
+    boolean onTouchEvent(MotionEvent event) {
         switch(event.getActionMasked()) {
             // ACTION_DOWN - when the first finger touches the screen
             case MotionEvent.ACTION_DOWN:
@@ -195,7 +195,7 @@ public abstract class MultiFingerTapDetector {
                     if(event.getEventTime() - event.getDownTime() > LONG_PRESS_TIMEOUT &&
                             Math.abs(event.getX() - lastx) < SAME_POS_THREADHOOD &&
                             Math.abs(event.getY() - lasty) < SAME_POS_THREADHOOD)
-                        onOneFingerLongPress();
+                        onOneFingerLongPress(event);
                     else
                         onOneFingerMove(event);
                     return true;
@@ -237,7 +237,7 @@ public abstract class MultiFingerTapDetector {
 
     public abstract void onOneFingerDoubleTap(float ex, float ey);
     public abstract void onOneFingerTripleTap();
-    public abstract void onOneFingerLongPress();
+    public abstract void onOneFingerLongPress(MotionEvent event);
 
     // TWO FINGER TAPS
     public abstract void onTwoFingerDoubleTap(float ex, float ey);

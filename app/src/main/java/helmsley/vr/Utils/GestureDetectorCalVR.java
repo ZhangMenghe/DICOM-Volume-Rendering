@@ -24,7 +24,6 @@ public class GestureDetectorCalVR {
 //                Log.e(TAG, "onOneFingerDown: ======move" );
 //                UIsController.JUIonTouchMove(event.getX(), event.getY());
                 JUIInterface.JUIonTouchMove(event.getX(), event.getY());
-
             }
 
             public void onFling(int pointerNum, float srcx, float srcy, float dstx, float dsty){}
@@ -93,7 +92,9 @@ public class GestureDetectorCalVR {
 //                JNIInterface.JNIonDoubleTouch(0, ex, ey);
             }
             public void onOneFingerTripleTap(){}
-            public void onOneFingerLongPress(){}
+            public void onOneFingerLongPress(MotionEvent event){
+                JUIInterface.JUIonLongPress(event.getX(), event.getY());
+            }
 
             // TWO FINGER DOUBLE: right double
             public void onTwoFingerDoubleTap(float ex, float ey){

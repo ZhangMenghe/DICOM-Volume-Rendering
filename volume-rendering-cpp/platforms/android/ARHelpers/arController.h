@@ -18,6 +18,7 @@ public:
     void onPause();
     void onResume(void* env, void* context, void* activity);
     int getTouchedAnchorNum(){return anchor_id;}
+    void getTouchedAnchor(glm::mat4& rotMat, glm::vec3& pos);
 
 /*Override*/
     void onViewCreated();
@@ -26,10 +27,12 @@ public:
     void onReset();
     void onDestroy(){}
 
-    void onSingleTouchDown(float x, float y);
+    void onSingleTouchDown(float x, float y){}
     void onTouchMove(float x, float y){}
     void onScale(float sx, float sy){}
     void onPan(float x, float y){}
+
+    bool onLongPress(float x, float y);
 
     //plane
     struct tPlane{
@@ -70,8 +73,8 @@ private:
 
     const static int MAX_TRACKED_ANCHORS = 20;
     int anchor_id = 0;
-    ArAnchor* anchors_[MAX_TRACKED_ANCHORS];
-
+//    ArAnchor* anchors_[MAX_TRACKED_ANCHORS];
+    ArAnchor* last_anchor = nullptr;
 
     std::vector<glm::vec3> plane_vertices_;
     std::vector<GLushort> plane_triangles_;

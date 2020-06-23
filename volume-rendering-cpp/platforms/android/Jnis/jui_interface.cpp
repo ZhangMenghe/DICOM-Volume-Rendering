@@ -4,6 +4,8 @@
 #include <vrController.h>
 #include <overlayController.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <platforms/android/ARHelpers/arController.h>
+
 using namespace dvr;
 
 namespace {
@@ -27,7 +29,7 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
         std::string key = dvr::jstring2string(env,jkey);
         param_checks.push_back(key);
         Manager::param_bool.push_back(values[i]);
-//        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
+        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
     env->ReleaseBooleanArrayElements(jvalues,values,0);
     Manager::baked_dirty_ = true;
@@ -149,4 +151,24 @@ JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat sx, jfloat sy){
 }
 JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat x, jfloat y){
     nativeApp(nativeAddr)->onPan(x,y);
+}
+JUI_METHOD(void, JUIonLongPress)(JNIEnv *env, jobject obj, jfloat x, jfloat y){
+    if(arController::instance()->onLongPress(x,y)){
+        //call back to java
+        jclass cls = env->FindClass("helmsley/vr/DUIs/arUIs");
+        cls = static_cast<jclass>(env->NewGlobalRef(cls));
+        jmethodID mid = env->GetStaticMethodID( cls, "ShowPopMenu", "(FF)V");
+        if (mid == 0) {
+            return;
+        }
+        env->CallStaticVoidMethod(cls, mid, x, y);
+    }
+}
+JUI_METHOD(void, JUIonARRequest)(JNIEnv * env, jclass, jint id){
+    if(id == dvr::PLACE_VOLUME){
+        glm::mat4 rotMat;
+        glm::vec3 pos;
+        arController::instance()->getTouchedAnchor(rotMat, pos);
+        vrController::instance()->setVolumeRST(rotMat, glm::vec3(0.2f), pos);
+    }
 }

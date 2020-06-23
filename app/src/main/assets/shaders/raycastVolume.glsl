@@ -142,6 +142,7 @@ vec4 tracing(float u, float v, ivec2 spos){
     vec4 bg_color = getBackground(spos);
     if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, bg_color, u_plane_color.a):bg_color;
 
+//    vec4 tcolor = vec4(.0, 1.0, 1.0, 1.0);
     vec4 tcolor = Volume(ro + 0.5, rd, intersect.x, intersect.y);
     return mix(tcolor, bg_color, 1.0-tcolor.a);
 }

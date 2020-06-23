@@ -29,9 +29,20 @@
         android:text="@string/ar_check_name"
         android:theme="@style/CommonCheckBox"
         android:textColor="@color/brightBlue"
-        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintHeight_percent="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
+    <Spinner
+        android:id="@+id/check_render_spinner"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:gravity="center"
+        android:spinnerMode="dropdown"
+        app:layout_constraintHeight_percent="0.5"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/check_ar_enabled"
+        style="@style/Spinner"/>
 </android.support.constraint.ConstraintLayout>
 
 <!--    </android.support.constraint.ConstraintLayout>-->

@@ -12,6 +12,8 @@ namespace dvr{
         CHECK_MASKON,
         CHECK_MASK_RECOLOR,
         CHECK_AR_ENABLED,
+        CHECK_AR_DRAW_POINT,
+        CHECK_AR_DRAW_PLANE,
     };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
@@ -24,6 +26,10 @@ namespace dvr{
     enum PARAM_DUAL{
         CONTRAST_LIMIT=0,
         DUAL_END
+    };
+    enum AR_REQUEST{
+        PLACE_VOLUME=0,
+        PLACE_ANCHOR
     };
     enum PARAM_RENDER_TUNE{
 //        RENDER_CONTRAST_LEVEL=0,

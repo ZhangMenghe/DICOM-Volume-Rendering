@@ -9,6 +9,7 @@ extern "C"{
     JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat, jfloat);
     JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat, jfloat);
     JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat, jfloat);
+    JUI_METHOD(void, JUIonLongPress)(JNIEnv *, jobject , jfloat, jfloat);
 
     JUI_METHOD(void, JUIAddTuneParams)(JNIEnv *, jclass, jintArray, jfloatArray);
     JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint);
@@ -26,6 +27,7 @@ extern "C"{
     JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint, jint);
     JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint);
     JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint, jint, jint, jint, jint);
+    JUI_METHOD(void, JUIonARRequest)(JNIEnv * env, jclass, jint);
 }
 
 

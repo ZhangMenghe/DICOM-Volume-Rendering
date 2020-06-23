@@ -17,4 +17,5 @@ void main(){
 	}
 	if(u_front)gl_FragColor = texture(uSampler_baked, vTexcoord);
 	else gl_FragColor = texture(uSampler_baked, vec3(vTexcoord.xy, 1.0-vTexcoord.z));
+//	gl_FragColor =vec4(.0, 1.0, 1.0, 1.0);
 }
