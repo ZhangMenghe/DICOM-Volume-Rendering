@@ -26,6 +26,7 @@ void arController::onViewCreated(){
     bg_render = new backgroundRenderer(true);
     point_cloud_renderer_ = new PointCloudRenderer(true);
     plane_renderer_ = new PlaneRenderer(true);
+    stroke_renderer = new lineRenderer(true);
 }
 
 void arController::onPause(){
@@ -168,16 +169,15 @@ void arController::onDraw(){
     ArCamera_release(camera);
     float camera_pose_raw[7] = {0.f};
     ArPose_getPoseRaw(ar_session_, camera_pose, camera_pose_raw);
-//    vrController::instance()->camera->setCamPos(glm::vec3(camera_pose_raw[4], camera_pose_raw[5],camera_pose_raw[6]));
+//    Manager::camera->setCamPos(glm::vec3(camera_pose_raw[4], camera_pose_raw[5],camera_pose_raw[6]));
 
     ArPose_getMatrix(ar_session_, camera_pose, glm::value_ptr(camera_pose_col_major_) );
     Manager::camera->updateCameraPose(camera_pose_col_major_);//(glm::transpose(camera_pose_col_major_));
 
-//    float normal_distance_to_plane = util::CalculateDistanceToPlane(
-//            *ar_session_, *hit_pose, *camera_pose);
-//
-//    ArPose_destroy(hit_pose);
     ArPose_destroy(camera_pose);
+
+    //draw stroke
+    stroke_renderer->Draw(proj_mat * view_mat);
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -453,3 +453,12 @@ void arController::onReset(){
     //todo:set reset values
 }
 
+void arController::onSingleTouchDown(float x, float y){
+    //perform raycast
+    stroke_renderer->setStartPoint(x,y);
+    stroke_renderer->StartDraw();
+}
+void arController::onSingleTouchUp(){
+    stroke_renderer->Dismiss();
+    //stop ray
+}

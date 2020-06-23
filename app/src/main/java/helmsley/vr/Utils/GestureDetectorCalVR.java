@@ -18,7 +18,7 @@ public class GestureDetectorCalVR {
             public void onOneFingerDown(MotionEvent event){
 //                Log.e(TAG, "onOneFingerDown: ======down" );
 //                UIsController.JUIonSingleTouchDown(event.getX(), event.getY());
-                JUIInterface.JUIonSingleTouchDown(event.getX(), event.getY());
+                JUIInterface.JUIonSingleTouchDown(0, event.getX(), event.getY());
             }
             public void onOneFingerMove(MotionEvent event){
 //                Log.e(TAG, "onOneFingerDown: ======move" );

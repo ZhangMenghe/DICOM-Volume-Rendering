@@ -40,13 +40,14 @@ namespace {
                 "shaders/opaViz.vert",
                 "shaders/opaViz.frag"
         };
-        const char* android_shader_file_names[6] = {
+        const char* android_shader_file_names[7] = {
                 "shaders/arcore_screen_quad.vert",
                 "shaders/arcore_screen_quad.frag",
                 "shaders/pointcloud.vert",
                 "shaders/pointcloud.frag",
                 "shaders/plane.vert",
-                "shaders/plane.frag"
+                "shaders/plane.frag",
+                "shaders/naive2d.vert"
         };
         for(int i = 0; i<int(dvr::SHADER_END); i++){
             std::string content;

@@ -24,7 +24,6 @@ PointCloudRenderer::PointCloudRenderer(bool screen_baked)
 void PointCloudRenderer::Draw(glm::mat4 mvp, int point_num, const float * pointcloud){
     if(point_num > 0){
         draw_point_num = point_num;
-
         glBindBuffer(GL_ARRAY_BUFFER, vbo_);
         glBufferSubData(GL_ARRAY_BUFFER,0, point_num*4* sizeof(float),pointcloud);
         glBindBuffer(GL_ARRAY_BUFFER, 0);

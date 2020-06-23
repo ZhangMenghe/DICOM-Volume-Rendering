@@ -25,9 +25,10 @@ public class JUIInterface {
     public static native void JUIonARRequest(int id);
 
     //touch action
-    public static native void JUIonSingleTouchDown(float x, float y);
+    public static native void JUIonSingleTouchDown(int target, float x, float y);
     public static native void JUIonTouchMove(float x, float y);
     public static native void JUIonScale(float sx, float sy);
     public static native void JUIonPan(float x, float y);
     public static native void JUIonLongPress(float x, float y);
+    public static native void JUIonSingleTouchUp();
 }

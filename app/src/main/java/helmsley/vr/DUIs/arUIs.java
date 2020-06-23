@@ -6,10 +6,13 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
@@ -30,10 +33,12 @@ import helmsley.vr.UIsManager;
 public class arUIs extends BasePanel{
     private static WeakReference<arUIs> selfRef;
     private Spinner spinner_check_render;
+    private CheckBox check_pointer;
     //Spinner adapter
     private checklistAdapter cb_adapter;
     private PopupMenu pop_menu;
     private View pop_parent;
+    private View bottom_panel;
 
     public arUIs(final Activity activity, ViewGroup parent_view) {
         super(activity, parent_view);
@@ -50,6 +55,53 @@ public class arUIs extends BasePanel{
                 R.array.ar_check_params, R.array.ar_check_values,
                 R.id.check_ar_enabled, 0);
 
+        //bottom panel
+        bottom_panel = mInflater.inflate(R.layout.ar_bottom_panel, parent_view, false);
+        sub_panels_.add(bottom_panel);
+        FloatingActionButton fab = bottom_panel.findViewById(R.id.action_button);
+
+        fab.setOnTouchListener(new View.OnTouchListener(){
+            public boolean onTouch(View view, MotionEvent event) {
+                float vx = -1.0f, vy =-1.0f;
+                  switch (event.getActionMasked()) {
+                    case MotionEvent.ACTION_DOWN:
+                        fab.setAlpha(0.5f);
+                        if(vx < 0 ){
+                            vx = view.getX() + view.getWidth() * 0.5f;
+                            vy = view.getY() + view.getHeight()*0.5f;
+                        }
+                        JUIInterface.JUIonSingleTouchDown(1, vx, vy);
+
+//                        JUIInterface.JUIonSingleTouchDown(1, event.getX(), event.getY());
+                        break;
+
+                    case MotionEvent.ACTION_MOVE:
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        fab.setAlpha(1.f);
+                        JUIInterface.JUIonSingleTouchUp();
+                        break;
+                    case MotionEvent.ACTION_BUTTON_PRESS:
+                    default:
+                        return false;
+                }
+                return true;
+            }
+
+        });
+        bottom_panel.setVisibility(View.GONE);
+
+        check_pointer = (CheckBox)panel_.findViewById(R.id.check_float_widget);
+        check_pointer.setChecked(false);
+        check_pointer.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                if(isChecked) bottom_panel.setVisibility(View.VISIBLE);
+                else bottom_panel.setVisibility(View.GONE);
+            }
+        });
         setup_pop_dialog(activity, parent_view);
     }
     private void setup_pop_dialog(Activity activity, ViewGroup parent_view){
@@ -81,6 +133,8 @@ public class arUIs extends BasePanel{
     public void Reset(){
         spinner_check_render.setAdapter(cb_adapter);
         primary_checkbox.setChecked(default_primary_check);
+        check_pointer.setChecked(false);
+//        bottom_panel.setVisibility(View.GONE);
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
         LinkedHashMap maskmap = (LinkedHashMap) map.getOrDefault("mask", null);

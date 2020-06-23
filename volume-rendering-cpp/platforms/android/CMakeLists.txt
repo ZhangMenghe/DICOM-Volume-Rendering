@@ -15,6 +15,7 @@ SET(AR_FILES
         ARHelpers/arController.cpp
         )
 SET(RENDER_FILES
+        Renderers/lineRenderer.cpp
         Renderers/PlaneRenderer.cpp
         Renderers/PointCloudRenderer.cpp
         Renderers/backgroundRenderer.cpp)

@@ -29,7 +29,7 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
         std::string key = dvr::jstring2string(env,jkey);
         param_checks.push_back(key);
         Manager::param_bool.push_back(values[i]);
-        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
+//        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
     env->ReleaseBooleanArrayElements(jvalues,values,0);
     Manager::baked_dirty_ = true;
@@ -140,8 +140,12 @@ JUI_METHOD(void, JUIonReset)(JNIEnv* env, jclass,
     env->ReleaseFloatArrayElements(jvol_pose, vol_arr, 0);
     env->ReleaseFloatArrayElements(jcam_pose, cam_arr, 0);
 }
-JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass,jfloat x, jfloat y){
-    nativeApp(nativeAddr)->onSingleTouchDown(x, y);
+JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass, jint target, jfloat x, jfloat y){
+    if(target == TOUCH_VOLUME) vrController::instance()->onSingleTouchDown(x, y);
+    else if(target == TOUCH_AR_BUTTON) arController::instance()->onSingleTouchDown(x,y);
+}
+JUI_METHOD(void, JUIonSingleTouchUp)(JNIEnv *, jobject){
+    arController::instance()->onSingleTouchUp();
 }
 JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat x, jfloat y){
     nativeApp(nativeAddr)->onTouchMove(x, y);

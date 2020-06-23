@@ -108,6 +108,9 @@ void vrController::onDraw() {
     if(isRayCasting())  raycastRenderer_->Draw();
     else texvrRenderer_->Draw();
 }
+void vrController::onSingleTouchDown(float x, float y){
+    Mouse_old = glm::fvec2(x, y);
+}
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
 
@@ -120,11 +123,10 @@ void vrController::onTouchMove(float x, float y) {
     xoffset *= MOUSE_ROTATE_SENSITIVITY;
     yoffset *= -MOUSE_ROTATE_SENSITIVITY;
 
-    if(Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]){
+    if(Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]) {
         cuttingController::instance()->onRotate(xoffset, yoffset);
         return;
     }
-//    cuttingController::instance()->setTarget(param_bool[dvr::CHECK_FREEZE_CPLANE]?VOLUME:PLANE);
 
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
     volume_model_dirty = true;

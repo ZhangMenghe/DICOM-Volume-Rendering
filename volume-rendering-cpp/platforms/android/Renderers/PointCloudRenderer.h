@@ -7,9 +7,9 @@ public:
     PointCloudRenderer(bool screen_baked = true);
     ~PointCloudRenderer() = default;
 
-    void Draw(glm::mat4 mvp, int point_num, const float * pointcloud);
+    virtual void Draw(glm::mat4 mvp, int point_num, const float * pointcloud);
 
-private:
+protected:
     Shader shader_;
     GLuint frame_buff_ = 0;
     GLuint vao_, vbo_;
@@ -17,8 +17,8 @@ private:
     int draw_point_num = 0;
     const int MAX_POINT_NUM = 200;
 
-    void draw_to_texture(glm::mat4 mvp);
-    void draw_scene(glm::mat4 mvp);
+    virtual void draw_to_texture(glm::mat4 mvp);
+    virtual void draw_scene(glm::mat4 mvp);
 };
 
 #endif

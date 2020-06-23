@@ -30,7 +30,7 @@ public:
     void onResume(void* env, void* context, void* activity){}
     void onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam);
 
-    void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
+    void onSingleTouchDown(float x, float y);
     void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);

@@ -62,6 +62,8 @@ namespace dvr{
         SHADER_AR_POINTCLOUD_FRAG,
         SHADER_AR_PLANE_VERT,
         SHADER_AR_PLANE_FRAG,
+        SHADER_NAIVE_2D_VERT,
+//        SHADER_LINE_FRAG,
         SHADER_ANDROID_END,
         SHADER_ALL_END
     };
@@ -74,6 +76,10 @@ namespace dvr{
     enum DRAW_OVERLAY_IDS{
         OVERLAY_GRAPH=0,
         OVERLAY_COLOR_BARS
+    };
+    enum TOUCH_TARGET{
+        TOUCH_VOLUME=0,
+        TOUCH_AR_BUTTON=1
     };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;

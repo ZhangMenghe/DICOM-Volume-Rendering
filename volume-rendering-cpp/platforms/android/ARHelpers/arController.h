@@ -7,6 +7,7 @@
 #include <platforms/android/Renderers/backgroundRenderer.h>
 #include <platforms/android/Renderers/PointCloudRenderer.h>
 #include <platforms/android/Renderers/PlaneRenderer.h>
+#include <platforms/android/Renderers/lineRenderer.h>
 
 class arController:public nEntrance{
 public:
@@ -28,7 +29,8 @@ public:
     void onReset();
     void onDestroy(){}
 
-    void onSingleTouchDown(float x, float y){}
+    void onSingleTouchDown(float x, float y);
+    void onSingleTouchUp();
     void onTouchMove(float x, float y){}
     void onScale(float sx, float sy){}
     void onPan(float x, float y){}
@@ -58,6 +60,7 @@ private:
     backgroundRenderer* bg_render = nullptr;
     PointCloudRenderer* point_cloud_renderer_ = nullptr;
     PlaneRenderer* plane_renderer_ = nullptr;
+    lineRenderer* stroke_renderer = nullptr;
 
     //ar camera
     float transformed_uvs_[8];
