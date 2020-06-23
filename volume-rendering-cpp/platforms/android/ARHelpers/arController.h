@@ -19,6 +19,7 @@ public:
     void onResume(void* env, void* context, void* activity);
     int getTouchedAnchorNum(){return anchor_id;}
     void getTouchedAnchor(glm::mat4& rotMat, glm::vec3& pos);
+    bool getTouchedPosition(glm::vec3& pos);
 
 /*Override*/
     void onViewCreated();

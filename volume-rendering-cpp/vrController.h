@@ -44,6 +44,7 @@ public:
     void setRenderParam(int id, float value);
     void setRenderParam(float* values);
     void setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv);
+    void setVolumePosition(glm::vec3 pv){PosVec3_ = pv;volume_model_dirty=true;}
     bool addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam);
     bool addStatus(std::string name, bool use_current_status = false);
 

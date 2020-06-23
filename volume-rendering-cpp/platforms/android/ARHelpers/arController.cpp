@@ -434,7 +434,21 @@ void arController::getTouchedAnchor(glm::mat4& rotMat, glm::vec3& pos){
     ArPose_destroy(anchor_pose);
     pos = glm::vec3(mmat[0][3],mmat[1][3],mmat[2][3] );
     rotMat = mmat;
+    rotMat[0][3] = rotMat[1][3] = rotMat[2][3] = .0f;
 }
+bool arController::getTouchedPosition(glm::vec3& pos){
+    if(last_anchor == nullptr)return false;
+    ArPose* anchor_pose = nullptr;
+    ArPose_create(ar_session_, nullptr, &anchor_pose);
+    ArAnchor_getPose(ar_session_, last_anchor, anchor_pose);
+    float pose_raw[7] = {0.f};
+    ArPose_getPoseRaw(ar_session_, anchor_pose, pose_raw);
+    pos = glm::vec3(pose_raw[4],pose_raw[5],pose_raw[6]);
+    ArPose_destroy(anchor_pose);
+    return true;
+}
+
+
 void arController::onReset(){
     //todo:set reset values
 }

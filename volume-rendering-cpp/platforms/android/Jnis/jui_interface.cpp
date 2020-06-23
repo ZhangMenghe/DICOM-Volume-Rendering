@@ -166,9 +166,8 @@ JUI_METHOD(void, JUIonLongPress)(JNIEnv *env, jobject obj, jfloat x, jfloat y){
 }
 JUI_METHOD(void, JUIonARRequest)(JNIEnv * env, jclass, jint id){
     if(id == dvr::PLACE_VOLUME){
-        glm::mat4 rotMat;
         glm::vec3 pos;
-        arController::instance()->getTouchedAnchor(rotMat, pos);
-        vrController::instance()->setVolumeRST(rotMat, glm::vec3(0.2f), pos);
+        if(arController::instance()->getTouchedPosition(pos));
+            vrController::instance()->setVolumePosition(pos);
     }
 }
