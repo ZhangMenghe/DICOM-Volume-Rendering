@@ -13,6 +13,7 @@ public:
     static bool baked_dirty_;
     static int color_scheme_id;
     static int screen_w, screen_h;
+    static bool ar_intersect;
 
     Manager();
     ~Manager();

@@ -6,11 +6,12 @@ std::vector<std::string> Manager::shader_contents;
 bool Manager::baked_dirty_;
 int Manager::color_scheme_id;
 int Manager::screen_w, Manager::screen_h;
-
+bool Manager::ar_intersect;
 
 Manager::Manager(){
     shader_contents = std::vector<std::string>(dvr::SHADER_ALL_END-1);
     screen_w = 0; screen_h = 0;
+    ar_intersect = false;
     onReset();
 }
 Manager::~Manager(){

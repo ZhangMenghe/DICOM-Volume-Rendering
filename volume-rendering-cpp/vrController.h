@@ -93,8 +93,14 @@ private:
     //flags
     bool volume_model_dirty;
 
+    //vec3
+    glm::vec4 ray_dir;
+    bool ray_initialized = false;
+
+
     void updateVolumeModelMat();
     void precompute();
     bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
+    bool check_ar_ray_intersect();
 };
 #endif

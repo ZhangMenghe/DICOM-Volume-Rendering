@@ -5,6 +5,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 using namespace dvr;
+using namespace glm;
 vrController* vrController::myPtr_ = nullptr;
 
 vrController* vrController::instance(){
@@ -99,10 +100,39 @@ bool vrController::isDirty() {
     if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
     return texvrRenderer_->isPrecomputeDirty();
 }
+bool vrController::check_ar_ray_intersect(){
+    Camera* cam = Manager::camera;
+    glm::mat4 model_inv = glm::inverse(ModelMat_ * raycastRenderer_->getDimScaleMat());
+    glm::vec3 ro = glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0));
+    if(!ray_initialized){
+        float tangent = tan(Manager::camera->getFOV() * 0.5f);
+        vec2 ts = screenQuad::instance()->getTexSize();
+        float ar = ts.x / ts.y;
+        float u = (ts.x *0.5f + 0.5f)/ts.x * 2.0f -1.0f;
+        float v = (ts.y * 0.5f + 0.5f)/ts.y * 2.0f -1.0f;
+        ray_dir = vec4(u* tangent*ar, v*tangent, -1.0, .0);
+        ray_initialized = true;
+    }
+
+    glm::vec3 rd = glm::vec3(glm::normalize(model_inv * Manager::camera->getCameraPose() *ray_dir));
+    vec3 extents = vec3(.5f);
+
+    vec3 tMin = (-extents - ro) / rd;
+    vec3 tMax = (extents - ro) / rd;
+    vec3 t1 = min(tMin, tMax);
+    vec3 t2 = max(tMin, tMax);
+    vec2 res =  vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
+    return res.x<res.y;
+}
 void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
+    if(Manager::ar_intersect){
+        Manager::baked_dirty_ = true;
+        Manager::param_bool[dvr::CHECK_MASKON] = check_ar_ray_intersect();
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
     if(isRayCasting())  raycastRenderer_->Draw();

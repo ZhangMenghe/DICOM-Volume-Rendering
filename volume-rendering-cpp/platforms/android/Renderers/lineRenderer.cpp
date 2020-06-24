@@ -2,6 +2,7 @@
 #include <Manager.h>
 #include <dicomRenderer/Constants.h>
 #include "lineRenderer.h"
+using namespace glm;
 lineRenderer::lineRenderer(bool screen_baked)//:PointCloudRenderer(screen_baked){}
 {
     DRAW_TO_TEXTURE = screen_baked;
@@ -24,7 +25,7 @@ lineRenderer::lineRenderer(bool screen_baked)//:PointCloudRenderer(screen_baked)
 }
 
 void lineRenderer::Draw(glm::mat4 mvp){
-    if(!is_drawing) return;
+    if(!Manager::ar_intersect) return;
 
     //calculate far point
     glm::vec3 cpos = Manager::camera->getCameraPosition();
@@ -35,6 +36,7 @@ void lineRenderer::Draw(glm::mat4 mvp){
             startPoint.x, startPoint.y,
             sp.x, sp.y
     };
+//    LOGE("===TEST %f, %f", startPoint.x, startPoint.y);
     glLineWidth(5.0f);
 
     draw_point_num = 2;
