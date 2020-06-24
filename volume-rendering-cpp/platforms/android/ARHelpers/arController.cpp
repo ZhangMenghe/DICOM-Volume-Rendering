@@ -456,8 +456,9 @@ void arController::onReset(){
 void arController::onSingleTouchDown(float x, float y){
     //perform raycast
     stroke_renderer->setStartPoint(x,y);
-    Manager::ar_intersect = true;
+    Manager::show_ar_ray = true;
 }
 void arController::onSingleTouchUp(){
-    Manager::ar_intersect = false;
+    Manager::show_ar_ray = false;
+    Manager::volume_ar_hold = false;
 }

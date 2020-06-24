@@ -58,7 +58,7 @@ public:
     void updateCameraPose(glm::mat4 pose) {
         //pose is in column major
         _eyePos = glm::vec3(pose[3][0], pose[3][1], pose[3][2]);
-        _front = glm::vec3(pose[2][0], pose[2][1], pose[2][2]);
+        _front = -glm::vec3(pose[2][0], pose[2][1], pose[2][2]);
         pose_mat = pose;
     }
 

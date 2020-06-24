@@ -34,6 +34,7 @@ void vrController::onReset() {
 void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
     Mouse_old = glm::fvec2(.0f);
     rStates_.clear();
+    cst_name="";
     glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
                  * rm
                  * glm::scale(glm::mat4(1.0), sv);
@@ -126,11 +127,24 @@ bool vrController::check_ar_ray_intersect(){
 }
 void vrController::onDraw() {
     if(!tex_volume) return;
-
+    vec3 dir = Manager::camera->getViewDirection();
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    if(Manager::ar_intersect){
-        Manager::baked_dirty_ = true;
-        Manager::param_bool[dvr::CHECK_MASKON] = check_ar_ray_intersect();
+
+    //check if start to hold
+    if(Manager::show_ar_ray && !Manager::volume_ar_hold)
+        if(check_ar_ray_intersect()) Manager::volume_ar_hold = true;
+    if(Manager::volume_ar_hold){
+        vec3 view_dir = glm::normalize(Manager::camera->getViewDirection());
+        PosVec3_ = Manager::camera->getCameraPosition()+ view_dir;
+
+        //a is the vector you want to translate to and b is where you are
+        const glm::vec3 a = -view_dir;
+        const glm::vec3 b = vec3(0,0,1);
+        glm::vec3 v = glm::cross(b, a);
+        float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
+        RotateMat_ = glm::rotate(angle, v);
+
+        updateVolumeModelMat();
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
