@@ -72,7 +72,14 @@ public:
     glm::vec3 getViewDirection(){return _front;}
     glm::vec3 getViewUpDirection(){return _up;}
     glm::mat4 getCameraPose(){return pose_mat;}
-
+    glm::mat4 getRotationMatrixOfCameraDirection(){
+        //a is the vector you want to translate to and b is where you are
+        const glm::vec3 a = -_front;//src_dir;
+        const glm::vec3 b = glm::vec3(0,0,1);//dest_dir;
+        glm::vec3 v = glm::cross(b, a);
+        float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
+        return glm::rotate(angle, v);
+    }
     void rotateCamera(int axis, glm::vec4 center, float offset){
         glm::vec3 rotateAxis = (axis==3)?glm::vec3(0,1,0):glm::vec3(1,0,0);
         glm::mat4 modelMat = glm::mat4(1.0);

@@ -30,7 +30,7 @@ void lineRenderer::Draw(glm::mat4 mvp){
     //calculate far point
     glm::vec3 cpos = Manager::camera->getCameraPosition();
     glm::vec3 dir = Manager::camera->getViewDirection();
-    glm::vec3 far_pos = cpos + dir * 10.0f;
+    far_pos = cpos + dir * 10.0f;
     glm::vec2 sp = glm::vec2(mvp * glm::vec4(far_pos, 1.0));
     float points[4] = {
             startPoint.x, startPoint.y,

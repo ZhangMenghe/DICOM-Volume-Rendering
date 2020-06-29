@@ -76,13 +76,6 @@ JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatus)(JNIEnv * env, jclass){
     return res;
 }
 JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv *, jclass, jint id, jfloat value){
-//    auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
-//    auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
-////    LOGE("======CUTTING %d, %f, %d", id, value, freeze_plane?1:0);
-//    auto it = std::find (vec->begin(), vec->end(), cutting_keyword);
-//    (*tvec)[it - vec->begin()] = value;
-//    vrController::cutDirty = true;
-//    vrController::baked_dirty_ = true;
     vrController::instance()->setCuttingPlane(value);
 }
 JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint num, jint mbits){

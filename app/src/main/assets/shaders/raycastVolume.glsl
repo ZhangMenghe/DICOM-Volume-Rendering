@@ -1,6 +1,7 @@
 #version 310 es
 
 #pragma multi_compile CUTTING_PLANE
+#pragma multi_compile DRAW_PLANE_SQUARE
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -125,6 +126,7 @@ vec4 tracing(float u, float v, ivec2 spos){
     VolumeSize = vec3(imageSize(srcTex));
 
     bool drawed_square=false; bool blocked_by_plane=false;
+
     //plane
     #ifdef CUTTING_PLANE
     float t;
@@ -135,14 +137,18 @@ vec4 tracing(float u, float v, ivec2 spos){
     }
     else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-    drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
+    #ifdef DRAW_PLANE_SQUARE
+        drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
+    #endif
 
-    if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    if(blocked_by_plane && intersect.x <= intersect.y){
+        if(drawed_square) return mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a);
+        vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+        return mix(traced_color, getBackground(spos), 1.0-traced_color.a);
+    }
     #endif
     vec4 bg_color = getBackground(spos);
     if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, bg_color, u_plane_color.a):bg_color;
-
-//    vec4 tcolor = vec4(.0, 1.0, 1.0, 1.0);
     vec4 tcolor = Volume(ro + 0.5, rd, intersect.x, intersect.y);
     return mix(tcolor, bg_color, 1.0-tcolor.a);
 }

@@ -14,6 +14,7 @@ public:
     static int color_scheme_id;
     static int screen_w, screen_h;
     static bool show_ar_ray, volume_ar_hold;
+    static bool isRayCut();
 
     Manager();
     ~Manager();

@@ -8,6 +8,7 @@
 #include <platforms/android/Renderers/PointCloudRenderer.h>
 #include <platforms/android/Renderers/PlaneRenderer.h>
 #include <platforms/android/Renderers/lineRenderer.h>
+#include <platforms/android/Renderers/cutplaneRenderer.h>
 
 class arController:public nEntrance{
 public:
@@ -61,6 +62,7 @@ private:
     PointCloudRenderer* point_cloud_renderer_ = nullptr;
     PlaneRenderer* plane_renderer_ = nullptr;
     lineRenderer* stroke_renderer = nullptr;
+    cutplaneRenderer* cutplane_renderer = nullptr;
 
     //ar camera
     float transformed_uvs_[8];

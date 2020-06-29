@@ -2,8 +2,9 @@
 #include "arController.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <dicomRenderer/screenQuad.h>
-#include <vrController.h>
 #include <glm/gtx/quaternion.hpp>
+#include <Manager.h>
+#include <dicomRenderer/Constants.h>
 
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
@@ -27,6 +28,7 @@ void arController::onViewCreated(){
     point_cloud_renderer_ = new PointCloudRenderer(true);
     plane_renderer_ = new PlaneRenderer(true);
     stroke_renderer = new lineRenderer(true);
+    cutplane_renderer = new cutplaneRenderer(true);
 }
 
 void arController::onPause(){
@@ -120,6 +122,7 @@ void arController::onDraw(){
     ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
     Manager::camera->setProjMat(proj_mat);
     Manager::camera->setViewMat(view_mat);
+    glm::mat4 mVP = proj_mat * view_mat;
 
 
     // If the camera isn't tracking don't bother rendering other objects.
@@ -158,7 +161,7 @@ void arController::onDraw(){
             ArPointCloud_getData(ar_session_, ar_point_cloud, &point_cloud_data);
         }
         if(Manager::param_bool[dvr::CHECK_AR_DRAW_POINT])
-            point_cloud_renderer_->Draw(proj_mat * view_mat, number_of_points, point_cloud_data);
+            point_cloud_renderer_->Draw(mVP, number_of_points, point_cloud_data);
 
         ArPointCloud_release(ar_point_cloud);
     }
@@ -177,7 +180,9 @@ void arController::onDraw(){
     ArPose_destroy(camera_pose);
 
     //draw stroke
-    stroke_renderer->Draw(proj_mat * view_mat);
+    stroke_renderer->Draw(mVP);
+    //draw cutting plane
+    cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection());
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);

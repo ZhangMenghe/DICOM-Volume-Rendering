@@ -22,6 +22,9 @@ namespace {
     size_t n_data_offset[3] = {0};
     bool arInitialized = false;
 
+    glm::vec4 ray_dir;
+    bool ray_initialized = false;
+
     void setupShaderContents(){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
         const char* shader_file_names[14] = {
@@ -40,14 +43,16 @@ namespace {
                 "shaders/opaViz.vert",
                 "shaders/opaViz.frag"
         };
-        const char* android_shader_file_names[7] = {
+        const char* android_shader_file_names[9] = {
                 "shaders/arcore_screen_quad.vert",
                 "shaders/arcore_screen_quad.frag",
                 "shaders/pointcloud.vert",
                 "shaders/pointcloud.frag",
                 "shaders/plane.vert",
                 "shaders/plane.frag",
-                "shaders/naive2d.vert"
+                "shaders/naive2d.vert",
+                "shaders/ar_cutplane.vert",
+                "shaders/ar_cutplane.frag"
         };
         for(int i = 0; i<int(dvr::SHADER_END); i++){
             std::string content;
@@ -106,6 +111,49 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
     arController::instance()->onViewChange(rot,w,h);
 }
 
+void on_draw_native(){
+    if(Manager::show_ar_ray && !Manager::volume_ar_hold){
+        //check ar ray intersect
+        Camera* cam = Manager::camera;
+        glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrixScaled());
+
+        glm::vec3 ro = glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0));
+        if(!ray_initialized){
+            float tangent = tan(Manager::camera->getFOV() * 0.5f);
+            glm::vec2 ts = screenQuad::instance()->getTexSize();
+            float ar = ts.x / ts.y;
+            float u = (ts.x *0.5f + 0.5f)/ts.x * 2.0f -1.0f;
+            float v = (ts.y * 0.5f + 0.5f)/ts.y * 2.0f -1.0f;
+            ray_dir = glm::vec4(u* tangent*ar, v*tangent, -1.0, .0);
+            ray_initialized = true;
+        }
+
+        glm::vec3 rd = glm::vec3(glm::normalize(model_inv * Manager::camera->getCameraPose() *ray_dir));
+        glm::vec3 tMin = (-glm::vec3(.5f) - ro) / rd;
+        glm::vec3 tMax = (glm::vec3(.5f) - ro) / rd;
+        glm::vec3 t1 = min(tMin, tMax);
+        glm::vec3 t2 = max(tMin, tMax);
+        glm::vec2 res =  glm::vec2(glm::max(glm::max(t1.x, t1.y), t1.z), glm::min(glm::min(t2.x, t2.y), t2.z));
+
+        //intersect
+        if(Manager::isRayCut()){
+            if(res.x<res.y){
+            glm::vec3 pn = cam->getViewDirection();
+            glm::vec3 pp = cam->getCameraPosition() + glm::normalize(pn)*0.5f;
+
+            pp = glm::vec3(model_inv * glm::vec4(pp, 1.0f));
+            pn = glm::vec3(model_inv * glm::vec4(pn, 1.0f));
+
+            vrController::instance()->setCuttingPlane(pp, pn);}
+            else{
+                vrController::instance()->setCuttingPlane(glm::vec3(-10.0f), glm::vec3(1.0));
+            }
+        }else{
+            Manager::volume_ar_hold = (res.x<res.y);
+        }
+    }
+    nativeApp(nativeAddr)->onDraw();
+}
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -125,7 +173,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
         arController::instance()->onDraw();
 
         if(arInitialized){
-            nativeApp(nativeAddr)->onDraw();
+            on_draw_native();
         }else{
             //update model mat of volume
             auto tplanes = arController::instance()->getTrackedPlanes();
@@ -133,7 +181,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
                 vrController::instance()->setVolumeRST(tplanes[0].rotMat, glm::vec3(0.2f), tplanes[0].centerVec);
                 vrController::instance()->setMVPStatus("ARCam");
                 arInitialized = true;
-                nativeApp(nativeAddr)->onDraw();
+                on_draw_native();
             }
         }
         screenQuad::instance()->Draw();

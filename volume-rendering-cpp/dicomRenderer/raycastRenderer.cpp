@@ -47,7 +47,11 @@ void raycastRenderer::draw_scene(){
             glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
 //    Shader::Uniform(sp,"sample_step_inverse", 1.0f / Manager::param_ray[dvr::TR_DENSITY]);
     Shader::Uniform(sp,"sample_step_inverse", 1.0f/400);
-    if(Manager::param_bool[dvr::CHECK_CUTTING])shader_->EnableKeyword("CUTTING_PLANE");
+    if(Manager::param_bool[dvr::CHECK_CUTTING]){
+        cshader_->EnableKeyword("CUTTING_PLANE");
+        if(!Manager::param_bool[dvr::CHECK_AR_ENABLED])  cshader_->EnableKeyword("DRAW_PLANE_SQUARE");
+        else cshader_->DisableKeyword("DRAW_PLANE_SQUARE");
+    }
     else shader_->DisableKeyword("CUTTING_PLANE");
 
     cutter_->setCuttingParams(sp);
@@ -88,7 +92,11 @@ void raycastRenderer::draw_baked(){
         Manager::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL]="";
     }
 
-    if(Manager::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
+    if(Manager::param_bool[dvr::CHECK_CUTTING]){
+        cshader_->EnableKeyword("CUTTING_PLANE");
+        if(!Manager::param_bool[dvr::CHECK_AR_ENABLED])  cshader_->EnableKeyword("DRAW_PLANE_SQUARE");
+        else cshader_->DisableKeyword("DRAW_PLANE_SQUARE");
+    }
     else cshader_->DisableKeyword("CUTTING_PLANE");
 
     GLuint sp = cshader_->Use();

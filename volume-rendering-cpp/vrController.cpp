@@ -131,18 +131,19 @@ void vrController::onDraw() {
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
 
     //check if start to hold
-    if(Manager::show_ar_ray && !Manager::volume_ar_hold)
-        if(check_ar_ray_intersect()) Manager::volume_ar_hold = true;
+//    if(!Manager::isRayCut() && Manager::show_ar_ray && !Manager::volume_ar_hold)
+//        if(check_ar_ray_intersect()) Manager::volume_ar_hold = true;
     if(Manager::volume_ar_hold){
         vec3 view_dir = glm::normalize(Manager::camera->getViewDirection());
         PosVec3_ = Manager::camera->getCameraPosition()+ view_dir;
+        RotateMat_ = Manager::camera->getRotationMatrixOfCameraDirection();
 
-        //a is the vector you want to translate to and b is where you are
-        const glm::vec3 a = -view_dir;
-        const glm::vec3 b = vec3(0,0,1);
-        glm::vec3 v = glm::cross(b, a);
-        float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
-        RotateMat_ = glm::rotate(angle, v);
+//        //a is the vector you want to translate to and b is where you are
+//        const glm::vec3 a = -view_dir;
+//        const glm::vec3 b = vec3(0,0,1);
+//        glm::vec3 v = glm::cross(b, a);
+//        float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
+//        RotateMat_ = glm::rotate(angle, v);
 
         updateVolumeModelMat();
     }
@@ -268,6 +269,7 @@ void vrController::updateVolumeModelMat(){
     ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
                  * RotateMat_
                  * glm::scale(glm::mat4(1.0), ScaleVec3_);
+//    ModelMatInv_ = glm::inverse(ModelMat_ * raycastRenderer_->getDimScaleMat());
 }
 bool vrController::addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){
     auto it = rStates_.find(name);
@@ -297,7 +299,6 @@ void vrController::setMVPStatus(std::string name){
     if(name == cst_name) return;
     auto rstate_ = rStates_[name];
     ModelMat_=rstate_.model_mat; RotateMat_=rstate_.rot_mat; ScaleVec3_=rstate_.scale_vec; PosVec3_=rstate_.pos_vec; Manager::camera=rstate_.vcam;
-
     volume_model_dirty = false;
     cst_name = name;
 }

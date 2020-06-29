@@ -63,7 +63,8 @@ namespace dvr{
         SHADER_AR_PLANE_VERT,
         SHADER_AR_PLANE_FRAG,
         SHADER_NAIVE_2D_VERT,
-//        SHADER_LINE_FRAG,
+        SHADER_CUT_PLANE_VERT,
+        SHADER_CUT_PLANE_FRAG,
         SHADER_ANDROID_END,
         SHADER_ALL_END
     };

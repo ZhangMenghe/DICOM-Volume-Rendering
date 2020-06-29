@@ -51,7 +51,9 @@ public:
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(){return ModelMat_;}
+    glm::mat4 getModelMatrixScaled(){return ModelMat_ * raycastRenderer_->getDimScaleMat();}
     glm::mat4 getRotationMatrix(){return RotateMat_;}
+    glm::vec3 getModelPos(){return PosVec3_;}
     float* getCurrentReservedStates();
     float* getCuttingPlane();
     bool isDirty();
