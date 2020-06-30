@@ -154,6 +154,7 @@
 <!--other functions-->
     <string-array name="functions">
         <item>@string/sys_reset</item>
+        <item>@string/sys_sync_start</item>
         <item>@string/sys_template_save</item>
         <item>@string/sys_template_load</item>
     </string-array>

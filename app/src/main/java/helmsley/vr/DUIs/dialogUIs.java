@@ -41,11 +41,11 @@ public class dialogUIs {
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
-    private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
+    private boolean b_await_data = false, b_await_config=false, b_await_config_export=false, b_await_broadcast = false;
     private boolean b_init_pick_alert = false;
     private DSCardRecyclerViewAdapter local_card_adp;
     private ConfigCardRecyclerViewAdapter config_adp;
-    private View download_progress, main_progress;
+    private View download_progress, main_progress, broadcast_icon;
     private boolean remote_layout_set = false, config_layout_set = false;
 
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
@@ -64,6 +64,7 @@ public class dialogUIs {
 
         loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL);
         main_progress = activity_.findViewById(R.id.loading_layout);
+        broadcast_icon = activity_.findViewById(R.id.broadcast_img);
     }
     void ShowDatasetRemote(){
         if(!remote_connection_success){b_await_data=true;setup_remote_connection();}
@@ -94,6 +95,15 @@ public class dialogUIs {
     void LoadConfig(String content){
         muiRef.get().LoadConfig(content);
         loadconfig_dialog.dismiss();
+    }
+    void StartBroadcast(){
+        if(!remote_connection_success){b_await_broadcast=true;setup_remote_connection();}
+        else{
+            broadcast_icon.setVisibility(View.VISIBLE);
+        }
+    }
+    void StopBroadcast(){
+        broadcast_icon.setVisibility(View.GONE);
     }
     public void NotifyLocalCardUpdate(String ds_name, List<volumeResponse.volumeInfo> info_lst){
         local_card_adp.updateLstContent(ds_name, info_lst);
@@ -177,6 +187,9 @@ public class dialogUIs {
                         setup_export_dialog();
                         saveconfig_dialog.show();
                         b_await_config_export = false;
+                    }else if(b_await_broadcast){
+                        broadcast_icon.setVisibility(View.VISIBLE);
+                        b_await_broadcast = false;
                     }
                 } else {
                     errText.setText(res_msg);

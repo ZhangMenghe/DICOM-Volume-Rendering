@@ -23,7 +23,10 @@ public class mainUIs {
     final static String TAG = "mainUIs";
     private final WeakReference<Activity> actRef;
     private final WeakReference<UIsManager> mUIManagerRef;
-    private final String NAME_RESET, NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD, NAME_DATA_REMOTE, NAME_DATA_DEVICE, NAME_DATA_LOCAL;
+    private final String NAME_RESET,
+            NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD,
+            NAME_DATA_REMOTE, NAME_DATA_DEVICE, NAME_DATA_LOCAL,
+            NAME_START_BROADCAST, NAME_STOP_BROADCAST;
 
     private Spinner spinner_check;
     private dialogUIs dialogController;
@@ -53,6 +56,7 @@ public class mainUIs {
         NAME_RESET = res.getString(R.string.sys_reset);
         NAME_TEMPLATE_SAVE = res.getString(R.string.sys_template_save);NAME_TEMPLATE_LOAD = res.getString(R.string.sys_template_load);
         NAME_DATA_REMOTE = res.getString(R.string.sys_data_remote); NAME_DATA_LOCAL = res.getString(R.string.sys_data_local);NAME_DATA_DEVICE=res.getString(R.string.sys_data_device);
+        NAME_START_BROADCAST = res.getString(R.string.sys_sync_start);NAME_STOP_BROADCAST = res.getString(R.string.sys_sync_stop);
     }
 
     public void Reset(){
@@ -121,9 +125,14 @@ public class mainUIs {
                         holder.text_name.setTextAppearance(R.style.itemHighlightText);
                         String text_title = ((TextView)v).getText().toString();
                         if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
-//                        else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
-//                        else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
-//                        else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
+                        else if(text_title.equals(NAME_START_BROADCAST)){
+                            dialogController.StartBroadcast();
+                            holder.text_name.setText(NAME_STOP_BROADCAST);
+                        }
+                        else if(text_title.equals(NAME_STOP_BROADCAST)){
+                            dialogController.StopBroadcast();
+                            holder.text_name.setText(NAME_START_BROADCAST);
+                        }
                         else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
                         else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
                         new android.os.Handler().postDelayed(
@@ -163,12 +172,9 @@ public class mainUIs {
                 public void onClick(View v) {
                     holder.text_name.setTextAppearance(R.style.itemHighlightText);
                     String text_title = ((TextView)v).getText().toString();
-//                    if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
                     if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
                     else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
                     else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
-//                    else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
-//                    else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
                     new android.os.Handler().postDelayed(
                             new Runnable() {
                                 public void run() {

@@ -24,6 +24,7 @@ public class rpcManager {
     public static inspectorSyncGrpc.inspectorSyncStub operate_stub;
 
     private fileTransferClient data_manager;
+    private operateClient opa_manager;
 
     public rpcManager(Activity activity, dialogUIs dui) {
         actRef = new WeakReference<Activity>(activity);
@@ -38,6 +39,7 @@ public class rpcManager {
             data_stub = dataTransferGrpc.newBlockingStub(mChannel);
             mask_stub = dataTransferGrpc.newStub(mChannel);
             operate_stub = inspectorSyncGrpc.newStub(mChannel);
+            data_manager.Setup();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
@@ -45,7 +47,6 @@ public class rpcManager {
             pw.flush();
             return String.format("Failed... : %n%s", sw);
         }
-        data_manager.Setup();
         return "";
     }
 

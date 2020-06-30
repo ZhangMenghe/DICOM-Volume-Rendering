@@ -51,6 +51,9 @@
     <string name="sys_name">System</string>
     <string name="data_name">Data</string>
     <string name="sys_reset">Reset</string>
+    <string name="sys_sync_start">Start broadcast..</string>
+    <string name="sys_sync_stop">Stop broadcast..</string>
+
     <string name="sys_template_save">Save Workspace As..</string>
     <string name="sys_template_load">Open Workspace..</string>
     <string name="sys_data_remote">From Remote..</string>
