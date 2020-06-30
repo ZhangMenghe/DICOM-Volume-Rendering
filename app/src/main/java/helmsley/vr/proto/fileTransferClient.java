@@ -34,13 +34,6 @@ public class fileTransferClient {
     private static WeakReference<fileTransferClient> selfReference;
     private static boolean finished = false, finished_mask=false;
 
-    private ManagedChannel mChannel;
-    private dataTransferGrpc.dataTransferBlockingStub data_stub;
-    private dataTransferGrpc.dataTransferStub mask_stub;
-    private inspectorSyncGrpc.inspectorSyncStub operate_stub;
-
-
-    private final int CLIENT_ID = 1;
     private datasetInfo target_ds;
     private volumeInfo target_vol;
 
@@ -63,26 +56,12 @@ public class fileTransferClient {
         DCM_MASK_FILE_NAME = activity.getString(R.string.cf_dcmmask_name);
         DCM_WMASK_FILE_NAME = activity.getString(R.string.cf_dcmwmask_name);
     }
-    public String Setup(String host, String portStr){
-        try{
-            mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
-            Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
-            data_stub = dataTransferGrpc.newBlockingStub(mChannel);
-            mask_stub = dataTransferGrpc.newStub(mChannel);
-            operate_stub = inspectorSyncGrpc.newStub(mChannel);
-
-            //init availables
-            available_remote_datasets =  data_stub.getAvailableDatasets(req).getDatasetsList();
-            available_config_files = data_stub.getAvailableConfigs(req).getConfigsList();
-            config_dirty = false;
-            return "";
-        }catch (Exception e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
-            pw.flush();
-            return String.format("Failed... : %n%s", sw);
-        }
+    public void Setup(){
+        //init availables
+        Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
+        available_remote_datasets =  rpcManager.data_stub.getAvailableDatasets(req).getDatasetsList();
+        available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
+        config_dirty = false;
     }
     public void SetupLocal(){
         if(local_initialized) return;
@@ -148,9 +127,9 @@ public class fileTransferClient {
     public List<configResponse.configInfo> getAvailableConfigFiles(){
         if(config_dirty){
             try{
-                Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
+                Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
 //                dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-                available_config_files = data_stub.getAvailableConfigs(req).getConfigsList();
+                available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
                 config_dirty = false;
             }catch (Exception e) {
                 e.printStackTrace();
@@ -168,12 +147,12 @@ public class fileTransferClient {
         for(datasetInfo dsInfo: available_remote_datasets){
             if(dsInfo.getFolderName().equals(dataset_name)){target_ds = dsInfo; break;}
         }
-        Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(dataset_name).build();
+        Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).setReqMsg(dataset_name).build();
 //        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
         Iterator<volumeResponse> data_itor;
 
         List<volumeInfo> res_lst = new ArrayList<>();
-        data_itor = data_stub.getVolumeFromDataset(req);
+        data_itor = rpcManager.data_stub.getVolumeFromDataset(req);
         while(data_itor.hasNext())
             res_lst.addAll(data_itor.next().getVolumesList());
         return res_lst;
@@ -223,9 +202,9 @@ public class fileTransferClient {
 
     public void ExportConfig(String content){
         if(content == null) return;
-        Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(content).build();
+        Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).setReqMsg(content).build();
 //        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-        Response res = data_stub.exportConfigs(req);
+        Response res = rpcManager.data_stub.exportConfigs(req);
         if(res.getSuccess()) Toast.makeText(activityReference.get(), "Config Exported", Toast.LENGTH_LONG).show();
         config_dirty = true;
     }
@@ -239,14 +218,14 @@ public class fileTransferClient {
             //todo: check and timeout for loading failure
             if(is_local)
                 return LoadDataFromLocal(ds_name + "/" + target_vol.getFolderName());
-            new GrpcTask(new DownloadDICOMRunnable(), mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
+            new GrpcTask(new DownloadDICOMRunnable(), rpcManager.mChannel, this).execute(Paths.get(target_ds.getFolderName(), target_volume.getFolderName()).toString());
         }
         return true;
     }
     private void DownloadMasks(String target_path){
         if(!target_vol.getWithMask()) return;
         Log.e(TAG, "====Start to DownloadMasks: " + target_path );
-        new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(target_path);
+        new GrpcTask(new DownloadMasksRunnable(), rpcManager.mChannel, this).execute(target_path);
     }
 
     private static class DownloadDICOMRunnable implements GrpcTask.GrpcRunnable {
@@ -501,7 +480,7 @@ public class fileTransferClient {
     }
 
     public void Shutdown() throws InterruptedException {
-        mChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
+        rpcManager.mChannel.shutdown().awaitTermination(5, TimeUnit.SECONDS);
     }
     public boolean isDownloadingProcessFinished(){
         return finished;

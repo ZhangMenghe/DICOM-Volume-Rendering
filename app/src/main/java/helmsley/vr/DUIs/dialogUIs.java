@@ -23,6 +23,7 @@ import helmsley.vr.JNIInterface;
 import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.proto.rpcManager;
 
 public class dialogUIs {
     private static WeakReference<Activity> activityReference;
@@ -30,6 +31,7 @@ public class dialogUIs {
 
     private final static String TAG = "dialogUIs";
     private static fileTransferClient downloader;
+    private rpcManager rpc_manager;
     private TextView errText;
     private Button sendButton;
     private boolean remote_connection_success = false;
@@ -49,6 +51,7 @@ public class dialogUIs {
         activityReference = new WeakReference<>(activity_);
         muiRef = new WeakReference<>(mui);
         parentRef = new WeakReference<>(parent_view);
+        rpc_manager = new rpcManager();
         downloader = new fileTransferClient(activity_, this);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity_.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
@@ -151,11 +154,12 @@ public class dialogUIs {
                 host_addr = host_addr.isEmpty() ? hostEdit.getHint().toString() : host_addr;
                 String port_addr = portEdit.getText().toString();
                 port_addr = port_addr.isEmpty() ? portEdit.getHint().toString() : port_addr;
-                String res_msg = downloader.Setup(host_addr, port_addr);
+                String res_msg = rpc_manager.Setup(host_addr, port_addr);
                 if (res_msg.equals("")) {
                     Log.i(TAG, "=====Connect to server successfully=====");
                     connect_dialog.dismiss();
                     remote_connection_success = true;
+                    downloader.Setup();
                     if (b_await_data){
                         loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);
                         //order matters
