@@ -1,16 +1,15 @@
 package helmsley.vr.proto;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
-import helmsley.vr.DUIs.DSCardRecyclerViewAdapter;
 import helmsley.vr.DUIs.dialogUIs;
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.Utils.fileUtils;
 import helmsley.vr.dicomManager;
+import helmsley.vr.proto.GrpcTask;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
@@ -26,9 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
-
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Ints;
 import com.google.protobuf.ByteString;
 
 public class fileTransferClient {
@@ -39,6 +35,10 @@ public class fileTransferClient {
     private static boolean finished = false, finished_mask=false;
 
     private ManagedChannel mChannel;
+    private dataTransferGrpc.dataTransferBlockingStub data_stub;
+    private dataTransferGrpc.dataTransferStub mask_stub;
+    private inspectorSyncGrpc.inspectorSyncStub operate_stub;
+
 
     private final int CLIENT_ID = 1;
     private datasetInfo target_ds;
@@ -67,9 +67,13 @@ public class fileTransferClient {
         try{
             mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
             Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
-            dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-            available_remote_datasets =  blockingStub.getAvailableDatasets(req).getDatasetsList();
-            available_config_files = blockingStub.getAvailableConfigs(req).getConfigsList();
+            data_stub = dataTransferGrpc.newBlockingStub(mChannel);
+            mask_stub = dataTransferGrpc.newStub(mChannel);
+            operate_stub = inspectorSyncGrpc.newStub(mChannel);
+
+            //init availables
+            available_remote_datasets =  data_stub.getAvailableDatasets(req).getDatasetsList();
+            available_config_files = data_stub.getAvailableConfigs(req).getConfigsList();
             config_dirty = false;
             return "";
         }catch (Exception e) {
@@ -145,8 +149,8 @@ public class fileTransferClient {
         if(config_dirty){
             try{
                 Request req = Request.newBuilder().setClientId(CLIENT_ID).build();
-                dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-                available_config_files = blockingStub.getAvailableConfigs(req).getConfigsList();
+//                dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+                available_config_files = data_stub.getAvailableConfigs(req).getConfigsList();
                 config_dirty = false;
             }catch (Exception e) {
                 e.printStackTrace();
@@ -165,11 +169,11 @@ public class fileTransferClient {
             if(dsInfo.getFolderName().equals(dataset_name)){target_ds = dsInfo; break;}
         }
         Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(dataset_name).build();
-        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+//        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
         Iterator<volumeResponse> data_itor;
 
         List<volumeInfo> res_lst = new ArrayList<>();
-        data_itor = blockingStub.getVolumeFromDataset(req);
+        data_itor = data_stub.getVolumeFromDataset(req);
         while(data_itor.hasNext())
             res_lst.addAll(data_itor.next().getVolumesList());
         return res_lst;
@@ -220,8 +224,8 @@ public class fileTransferClient {
     public void ExportConfig(String content){
         if(content == null) return;
         Request req = Request.newBuilder().setClientId(CLIENT_ID).setReqMsg(content).build();
-        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-        Response res = blockingStub.exportConfigs(req);
+//        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
+        Response res = data_stub.exportConfigs(req);
         if(res.getSuccess()) Toast.makeText(activityReference.get(), "Config Exported", Toast.LENGTH_LONG).show();
         config_dirty = true;
     }
@@ -245,47 +249,7 @@ public class fileTransferClient {
         new GrpcTask(new DownloadMasksRunnable(), mChannel, this).execute(target_path);
     }
 
-    private static class GrpcTask extends AsyncTask<String, Void, String> {
-        private final GrpcRunnable grpcRunnable;
-        private final ManagedChannel channel;
-        private final WeakReference<fileTransferClient> activityReference;
-
-        GrpcTask(GrpcRunnable grpcRunnable, ManagedChannel channel, fileTransferClient activity) {
-            this.grpcRunnable = grpcRunnable;
-            this.channel = channel;
-            this.activityReference = new WeakReference<fileTransferClient>(activity);
-        }
-
-        @Override
-        protected String doInBackground(String... params) {
-            try {
-                String folder_name = params[0];
-                return this.grpcRunnable.run(folder_name, dataTransferGrpc.newBlockingStub(channel), dataTransferGrpc.newStub(channel));
-            } catch (Exception e) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                e.printStackTrace(pw);
-                pw.flush();
-                return "===Failed... :\n" + sw;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            fileTransferClient activity = activityReference.get();
-            if (activity == null) {
-                return;
-            }
-            grpcRunnable.onPostExecute(activity);
-        }
-    }
-
-    private interface GrpcRunnable {
-        /** Perform a grpcRunnable and return all the logs. */
-        String run(String folder_name, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub) throws Exception;
-        void onPostExecute(fileTransferClient activity);
-    }
-    private static class DownloadDICOMRunnable implements GrpcRunnable{
+    private static class DownloadDICOMRunnable implements GrpcTask.GrpcRunnable {
         private String target_path;
         @Override
         public String run(String folder_path, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
@@ -324,7 +288,7 @@ public class fileTransferClient {
             }
         }
     }
-    private static class DownloadMasksRunnable implements GrpcRunnable{
+    private static class DownloadMasksRunnable implements GrpcTask.GrpcRunnable {
         @Override
         public String run(String folder_name, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{

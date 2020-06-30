@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "helmsley.vr.proto";
+option java_outer_classname = "commonProto";
+option objc_class_prefix = "TRP";
+
+package helmsley;
+
+// package helmsley;
+message Response{
+    bool success = 1;
+    string res_msg = 2;
+}

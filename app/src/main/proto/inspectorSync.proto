@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "helmsley.vr.proto";
+option java_outer_classname = "inspectorSyncProto";
+option objc_class_prefix = "TRP";
+
+package helmsley;
+import "common.proto";
+
+
+enum ReqType{
+    SET = 0;
+    GET = 1;
+}
+message VPMsg{
+    int32 client_id = 1;
+    ReqType req_type = 2;
+    enum VPType{
+        POS = 0;
+        SCALE = 1;
+        ROT = 2;
+    }
+    VPType volume_pose_type = 3;
+    repeated float values = 4;
+}
+
+service inspectorSync{
+    // setter
+    rpc gsVolumePose(VPMsg) returns(Response);
+}

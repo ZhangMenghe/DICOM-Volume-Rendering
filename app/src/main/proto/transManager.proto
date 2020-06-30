@@ -7,6 +7,8 @@ option objc_class_prefix = "TRP";
 
 package helmsley;
 
+import "common.proto";
+
 message configResponse{
     message configInfo{
         string file_name = 1;
@@ -75,10 +77,10 @@ message RequestWholeVolume{
     int32 unit_size = 3;
 }
 
-message Response{
-    bool success = 1;
-    string res_msg = 2;
-}
+// message Response{
+//     bool success = 1;
+//     string res_msg = 2;
+// }
 service dataTransfer{
     rpc getAvailableConfigs(Request) returns(configResponse);
     rpc exportConfigs(Request) returns(Response);
@@ -88,4 +90,5 @@ service dataTransfer{
     rpc DownloadVolume(RequestWholeVolume) returns(stream volumeWholeResponse);
     rpc DownloadMasks(Request) returns(stream dcmImage);
     rpc DownloadMasksVolume(Request) returns(stream volumeWholeResponse);
+
 }
