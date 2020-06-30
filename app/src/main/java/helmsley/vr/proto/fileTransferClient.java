@@ -9,9 +9,6 @@ import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.Utils.fileUtils;
 import helmsley.vr.dicomManager;
-import helmsley.vr.proto.GrpcTask;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.volumeResponse.volumeInfo;
@@ -39,14 +36,12 @@ public class fileTransferClient {
 
     private List<datasetInfo> available_remote_datasets,
             available_local_datasets = new ArrayList<>();
-    private List<configResponse.configInfo> available_config_files;
     private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
     private boolean local_initialized = false;
-    private boolean config_dirty = true;
     private static String DCM_FILE_NAME, DCM_MASK_FILE_NAME, DCM_WMASK_FILE_NAME;
     private static String TARGET_ROOT_DIR, LOCAL_INDEX_FILE_PATH;
-    public fileTransferClient(Activity activity, dialogUIs dui){
+    fileTransferClient(Activity activity, dialogUIs dui){
         activityReference = new WeakReference<Activity>(activity);
         duiRef = new WeakReference<>(dui);
         TARGET_ROOT_DIR = activity.getFilesDir().getAbsolutePath() + "/" + activity.getString(R.string.cf_cache_folder_name);
@@ -56,14 +51,12 @@ public class fileTransferClient {
         DCM_MASK_FILE_NAME = activity.getString(R.string.cf_dcmmask_name);
         DCM_WMASK_FILE_NAME = activity.getString(R.string.cf_dcmwmask_name);
     }
-    public void Setup(){
+    void Setup(){
         //init availables
         Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
         available_remote_datasets =  rpcManager.data_stub.getAvailableDatasets(req).getDatasetsList();
-        available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
-        config_dirty = false;
     }
-    public void SetupLocal(){
+    void SetupLocal(){
         if(local_initialized) return;
         List<String> lpc = fileUtils.readLines(LOCAL_INDEX_FILE_PATH);
         int record_num = lpc.size() / 2;
@@ -124,19 +117,7 @@ public class fileTransferClient {
         }
         local_initialized = true;
     }
-    public List<configResponse.configInfo> getAvailableConfigFiles(){
-        if(config_dirty){
-            try{
-                Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
-//                dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-                available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
-                config_dirty = false;
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return available_config_files;
-    }
+
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
         return isLocal? available_local_datasets: available_remote_datasets;
     }
@@ -200,14 +181,7 @@ public class fileTransferClient {
         return false;
     }
 
-    public void ExportConfig(String content){
-        if(content == null) return;
-        Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).setReqMsg(content).build();
-//        dataTransferGrpc.dataTransferBlockingStub blockingStub = dataTransferGrpc.newBlockingStub(mChannel);
-        Response res = rpcManager.data_stub.exportConfigs(req);
-        if(res.getSuccess()) Toast.makeText(activityReference.get(), "Config Exported", Toast.LENGTH_LONG).show();
-        config_dirty = true;
-    }
+
     public boolean Download(String ds_name, volumeInfo target_volume, boolean is_local){
         target_vol = target_volume;
         if(target_volume.getDataSource() == volumeInfo.DataSource.DEVICE){
@@ -413,7 +387,10 @@ public class fileTransferClient {
             Log.e(TAG, "====Failed to Save Results to file");
         }
         finished = true;
-        selfReference.get().duiRef.get().NotifyLocalCardUpdate(tds.getFolderName());
+        selfReference.get().notify_local_data_update(tds.getFolderName());
+    }
+    private void notify_local_data_update(String ds_name){
+        duiRef.get().NotifyLocalCardUpdate(ds_name, local_dv_map.get(ds_name));
     }
     private void update_local_info(datasetInfo tds, volumeInfo tvol){
         String dsname = tds.getFolderName();

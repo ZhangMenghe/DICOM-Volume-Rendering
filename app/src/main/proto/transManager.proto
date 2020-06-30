@@ -83,7 +83,7 @@ message RequestWholeVolume{
 // }
 service dataTransfer{
     rpc getAvailableConfigs(Request) returns(configResponse);
-    rpc exportConfigs(Request) returns(Response);
+    rpc exportConfigs(Request) returns(commonResponse);
     rpc getAvailableDatasets(Request) returns(datasetResponse);
     rpc getVolumeFromDataset(Request) returns(stream volumeResponse);
     rpc Download(Request) returns (stream dcmImage);

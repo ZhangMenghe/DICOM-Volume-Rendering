@@ -27,5 +27,5 @@ message VPMsg{
 
 service inspectorSync{
     // setter
-    rpc gsVolumePose(VPMsg) returns(Response);
+    rpc gsVolumePose(VPMsg) returns(commonResponse);
 }

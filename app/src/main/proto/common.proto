@@ -8,7 +8,7 @@ option objc_class_prefix = "TRP";
 package helmsley;
 
 // package helmsley;
-message Response{
+message commonResponse{
     bool success = 1;
     string res_msg = 2;
 }
