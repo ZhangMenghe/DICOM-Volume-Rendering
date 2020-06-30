@@ -198,7 +198,6 @@ public class dialogUIs {
         final Activity activity = activityReference.get();
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, parentRef.get(), false);
-        download_progress = dialogView.findViewById(R.id.loading_layout);
 
         //recycle view
         RecyclerView content_view = dialogView.findViewById(R.id.contentRecView);
@@ -215,6 +214,7 @@ public class dialogUIs {
                 content_view.setAdapter(local_card_adp);
                 break;
             case DATA_REMOTE:
+                download_progress = dialogView.findViewById(R.id.loading_layout);
                 DSCardRecyclerViewAdapter remote_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE);
                 content_view.setAdapter(remote_card_adp);
                 break;
