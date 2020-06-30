@@ -112,14 +112,14 @@ public class renderUIs extends BasePanel{
 
                 int[]location = new int[2];
                 trans_graph_panel.getLocationInWindow(location);
-                JUIInterface.JuisetGraphRect(0,trans_graph_panel.getWidth(),trans_graph_panel.getHeight(),location[0],location[1]);
+                JUIInterface.JUIsetGraphRect(0,trans_graph_panel.getWidth(),trans_graph_panel.getHeight(),location[0],location[1]);
                 trans_graph_panel.setVisibility(View.INVISIBLE);
                 trans_gray_panel.setVisibility(View.INVISIBLE);
                 trans_color_mix_panel.setVisibility(View.INVISIBLE);
                 trans_colorscheme_panel.getLocationInWindow(location);
                 trans_colorscheme_panel.setVisibility(View.INVISIBLE);
                 int height = trans_colorscheme_panel.getHeight() + trans_gray_panel.getHeight()+trans_color_mix_panel.getHeight();
-                JUIInterface.JuisetGraphRect(1,trans_colorscheme_panel.getWidth(),height,location[0],location[1]);
+                JUIInterface.JUIsetGraphRect(1,trans_colorscheme_panel.getWidth(),height,location[0],location[1]);
 
                 trans_graph_panel.getViewTreeObserver().removeOnGlobalLayoutListener(this);
             }
@@ -383,7 +383,7 @@ public class renderUIs extends BasePanel{
             for(int i=0; i<mTunerRefs.size();i++)
                 mTunerRefs.get(i).get().addInstance(current_id);
             item_visibility.add(true);
-            JUIInterface.JUIAddTuneParams(jui_default_lengths, values);
+            JUIInterface.JUIaddTuneParams(jui_default_lengths, values);
             JUIInterface.JUIsetTuneWidgetById(current_id);
 
             notifyDataSetChanged();
@@ -458,14 +458,14 @@ public class renderUIs extends BasePanel{
         }
         void setTitleById(int id){
             super.setTitleById(id);
-            JUIInterface.JuisetColorScheme(id);
+            JUIInterface.JUIsetColorScheme(id);
         }
         void setTitleByText(String title) {
             super.setTitleByText(title);
-            JUIInterface.JuisetColorScheme(item_names.indexOf(this.title));
+            JUIInterface.JUIsetColorScheme(item_names.indexOf(this.title));
         }
         void onItemClick(int position){
-            JUIInterface.JuisetColorScheme(position);
+            JUIInterface.JUIsetColorScheme(position);
         }
     }
 }

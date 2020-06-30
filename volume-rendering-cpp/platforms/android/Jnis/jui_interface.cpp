@@ -10,7 +10,7 @@ namespace {
     std::vector<std::string> param_checks;
 }
 //current only opacity has multiple widgets
-JUI_METHOD(void, JUIAddTuneParams)(JNIEnv * env, jclass, jintArray jnums, jfloatArray jvalues){
+JUI_METHOD(void, JUIaddTuneParams)(JNIEnv * env, jclass, jintArray jnums, jfloatArray jvalues){
     jint* nums = env->GetIntArrayElements(jnums, 0);
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
     overlayController::instance()->addWidget(std::vector<float>(values, values+nums[0]));
@@ -88,11 +88,11 @@ JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint num, jint mbits){
     vrController::instance()->mask_bits_ = (unsigned int)mbits;
     Manager::baked_dirty_ = true;
 }
-JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint id){
+JUI_METHOD(void, JUIsetColorScheme)(JNIEnv * env, jclass, jint id){
     Manager::color_scheme_id = id;
     Manager::baked_dirty_ = true;
 }
-JUI_METHOD(void, JuisetGraphRect)(JNIEnv*, jclass, jint id, jint width, jint height, jint left, jint top){
+JUI_METHOD(void, JUIsetGraphRect)(JNIEnv*, jclass, jint id, jint width, jint height, jint left, jint top){
 //    LOGE("====%d, %d, %d, %d,%d", id, width, height, left,top);
     overlayController::instance()->setOverlayRect(id, width, height, left, top);
 }

@@ -10,7 +10,7 @@ extern "C"{
     JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat, jfloat);
     JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat, jfloat);
 
-    JUI_METHOD(void, JUIAddTuneParams)(JNIEnv *, jclass, jintArray, jfloatArray);
+    JUI_METHOD(void, JUIaddTuneParams)(JNIEnv *, jclass, jintArray, jfloatArray);
     JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint);
     JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint);
     JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass);
@@ -24,8 +24,8 @@ extern "C"{
     JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat);
     JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatus)(JNIEnv * env, jclass);
     JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint, jint);
-    JUI_METHOD(void, JuisetColorScheme)(JNIEnv * env, jclass, jint);
-    JUI_METHOD(void, JuisetGraphRect)(JNIEnv * env, jclass, jint, jint, jint, jint, jint);
+    JUI_METHOD(void, JUIsetColorScheme)(JNIEnv * env, jclass, jint);
+    JUI_METHOD(void, JUIsetGraphRect)(JNIEnv * env, jclass, jint, jint, jint, jint, jint);
 }
 
 
