@@ -5,12 +5,79 @@
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
 #include "utils/fileLoader.h"
+
+#include <grpc/grpc.h>
+#include <grpcpp/channel.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/create_channel.h>
+#include <grpcpp/security/credentials.h>
+
+#include <proto/common.grpc.pb.h>
+#include <proto/common.pb.h>
+#include <proto/inspectorSync.grpc.pb.h>
+#include <proto/inspectorSync.pb.h>
+#include <proto/transManager.grpc.pb.h>
+#include <proto/transManager.pb.h>
+
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::ClientReader;
+using grpc::ClientReaderWriter;
+using grpc::ClientWriter;
+using grpc::Status;
+using namespace helmsley;
+
+class syncClient{
+public:
+	syncClient(std::shared_ptr<Channel> channel)
+      : stub_(inspectorSync::NewStub(channel)) {
+		//   mc = &controller;//std::unique_ptr<vrController>(controller);
+	  }
+	helmsley::GestureOp getOperations(){
+		Request req;
+		ClientContext context;
+		OperationResponse feature;
+
+		std::unique_ptr<ClientReader<OperationResponse> > reader(
+        stub_->getOperations(&context, req));
+    // while (
+		reader->Read(&feature);
+		return feature.gesture_op();
+		// ) {
+		// const helmsley::GestureOp op = feature.gesture_op();
+    //   std::cout <<res.x() <<std::endl;
+		// switch (op.type()){
+		// case GestureOp_OPType_TOUCH_DOWN:
+		// 	mc->onSingleTouchDown(op.x(), op.y());
+		// 	break;
+		// case GestureOp_OPType_TOUCH_MOVE:
+		// 	mc->onTouchMove(op.x(), op.y());
+		// 	break;
+		// case GestureOp_OPType_SCALE:
+		// 	mc->onScale(op.x(), op.y());
+		// 	break;
+		// case GestureOp_OPType_PAN:
+		// 	mc->onPan(op.x(), op.y());
+		// 	break;
+		// default:
+		// 	break;
+		// }
+    // }
+	}  
+private:
+  	std::unique_ptr<inspectorSync::Stub> stub_;
+  	// std::unique_ptr<vrController> mc;
+vrController* mc;
+};
+
 GLFWwindow* window;
 dicomLoader loader_;
 uiController ui_;
 //order matters
 Manager manager_;
 vrController controller_;
+syncClient* rpc_manager;
+
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
 	if(is_pressed){
@@ -104,8 +171,18 @@ bool InitWindow(){
 void setupApplication(){
 	int dims = 144;
 	loader_.setupDCMIConfig(512,512,dims,true);
-}
 
+	rpc_manager = new syncClient(grpc::CreateChannel(
+      "localhost:23333", grpc::InsecureChannelCredentials()));
+}
+// int main(int argc, char** argv){
+// //setup grpc stuff
+// 	syncClient rpc_manager(grpc::CreateChannel(
+//       "localhost:23333", grpc::InsecureChannelCredentials()));
+// 	while(true){
+// 		rpc_manager.getOperations();
+// 	}
+// }
 int main(int argc, char** argv){
 	setupShaderContents(&controller_);
 	
@@ -115,6 +192,25 @@ int main(int argc, char** argv){
 	onCreated();
 
 	do{
+		auto op = rpc_manager->getOperations();
+
+		switch (op.type()){
+		case GestureOp_OPType_TOUCH_DOWN:
+			controller_.onSingleTouchDown(op.x(), op.y());
+			break;
+		case GestureOp_OPType_TOUCH_MOVE:
+			controller_.onTouchMove(op.x(), op.y());
+			break;
+		case GestureOp_OPType_SCALE:
+			controller_.onScale(op.x(), op.y());
+			break;
+		case GestureOp_OPType_PAN:
+			controller_.onPan(op.x(), op.y());
+			break;
+		default:
+			break;
+		}
+
 		onDraw();
 		// Swap buffers
 		glfwSwapBuffers(window);
