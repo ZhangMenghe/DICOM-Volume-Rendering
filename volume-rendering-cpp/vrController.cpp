@@ -121,7 +121,6 @@ void vrController::onTouchMove(float x, float y) {
         cuttingController::instance()->onRotate(xoffset, yoffset);
         return;
     }
-//    cuttingController::instance()->setTarget(param_bool[dvr::CHECK_FREEZE_CPLANE]?VOLUME:PLANE);
 
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
     volume_model_dirty = true;

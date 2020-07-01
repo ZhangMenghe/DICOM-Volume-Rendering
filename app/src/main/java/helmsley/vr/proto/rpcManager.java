@@ -30,7 +30,7 @@ public class rpcManager {
         actRef = new WeakReference<Activity>(activity);
         duiRef = new WeakReference<>(dui);
         data_manager = new fileTransferClient(activity, dui);
-
+        opa_manager = new operateClient();
     }
 
     public String Setup(String host, String portStr) {

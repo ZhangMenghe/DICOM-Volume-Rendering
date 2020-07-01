@@ -66,10 +66,10 @@ message dcmImage{
     bytes data = 3;
 }
 
-message Request{
-    int32 client_id = 1;
-    string req_msg = 2;
-}
+//message Request{
+//    int32 client_id = 1;
+//    string req_msg = 2;
+//}
 
 message RequestWholeVolume{
     int32 client_id = 1;
@@ -90,5 +90,4 @@ service dataTransfer{
     rpc DownloadVolume(RequestWholeVolume) returns(stream volumeWholeResponse);
     rpc DownloadMasks(Request) returns(stream dcmImage);
     rpc DownloadMasksVolume(Request) returns(stream volumeWholeResponse);
-
 }

@@ -24,8 +24,25 @@ message VPMsg{
     VPType volume_pose_type = 3;
     repeated float values = 4;
 }
+message GestureOp{
+    enum OPType{
+        TOUCH_DOWN = 0;
+        TOUCH_MOVE = 1;
+        SCALE = 2;
+        PAN=3;
+    }
+    OPType type = 1;
+    float x = 2;
+    float y = 3;
+}
 
+message OperationResponse{
+    GestureOp gesture_op = 1;
+}
 service inspectorSync{
-    // setter
+    rpc startBroadcast(Request) returns(commonResponse);
+
     rpc gsVolumePose(VPMsg) returns(commonResponse);
+    rpc setGestureOp(GestureOp) returns(commonResponse);
+    rpc getOperations(Request) returns(stream OperationResponse);
 }
