@@ -33,16 +33,19 @@ public:
       : stub_(inspectorSync::NewStub(channel)) {
 		//   mc = &controller;//std::unique_ptr<vrController>(controller);
 	  }
-	helmsley::GestureOp getOperations(){
+	std::vector<helmsley::GestureOp> getOperations(){
+		std::vector<helmsley::GestureOp> op_pool;
+
 		Request req;
 		ClientContext context;
 		OperationResponse feature;
 
 		std::unique_ptr<ClientReader<OperationResponse> > reader(
         stub_->getOperations(&context, req));
-    // while (
-		reader->Read(&feature);
-		return feature.gesture_op();
+    while (reader->Read(&feature))
+		op_pool.push_back(feature.gesture_op());
+		return op_pool;
+		// return feature.gesture_op();
 		// ) {
 		// const helmsley::GestureOp op = feature.gesture_op();
     //   std::cout <<res.x() <<std::endl;
@@ -192,8 +195,8 @@ int main(int argc, char** argv){
 	onCreated();
 
 	do{
-		auto op = rpc_manager->getOperations();
-
+		auto ops = rpc_manager->getOperations();
+		for(auto op:ops){
 		switch (op.type()){
 		case GestureOp_OPType_TOUCH_DOWN:
 			controller_.onSingleTouchDown(op.x(), op.y());
@@ -209,7 +212,7 @@ int main(int argc, char** argv){
 			break;
 		default:
 			break;
-		}
+		}}
 
 		onDraw();
 		// Swap buffers
