@@ -18,7 +18,9 @@
 #include <proto/inspectorSync.pb.h>
 #include <proto/transManager.grpc.pb.h>
 #include <proto/transManager.pb.h>
-
+#include <chrono>
+#include <iomanip>
+#include <cstdio>
 using grpc::Channel;
 using grpc::ClientContext;
 using grpc::ClientReader;
@@ -26,7 +28,7 @@ using grpc::ClientReaderWriter;
 using grpc::ClientWriter;
 using grpc::Status;
 using namespace helmsley;
-
+using namespace std::chrono;
 class syncClient{
 public:
 	syncClient(std::shared_ptr<Channel> channel)
@@ -38,13 +40,20 @@ public:
 
 		Request req;
 		ClientContext context;
-		OperationResponse feature;
-
-		std::unique_ptr<ClientReader<OperationResponse> > reader(
-        stub_->getOperations(&context, req));
-    while (reader->Read(&feature))
-		op_pool.push_back(feature.gesture_op());
+		OperationBatch op_batch;
+		stub_->getOperations(&context,req, &op_batch);
+		// std::cout<<op_batch.bid()<<std::endl;
+		for(auto op: op_batch.gesture_op())
+			op_pool.push_back(op);
 		return op_pool;
+
+	// 	OperationResponse feature;
+
+	// 	std::unique_ptr<ClientReader<OperationResponse> > reader(
+    //     stub_->getOperations(&context, req));
+    // while (reader->Read(&feature))
+	// 	op_pool.push_back(feature.gesture_op());
+	// 	return op_pool;
 		// return feature.gesture_op();
 		// ) {
 		// const helmsley::GestureOp op = feature.gesture_op();
@@ -194,9 +203,14 @@ int main(int argc, char** argv){
 	setupApplication();
 	onCreated();
 
+	auto last_ts = std::chrono::system_clock::now();
+	size_t ops_count = 0;
 	do{
 		auto ops = rpc_manager->getOperations();
+		ops_count += ops.size();
 		for(auto op:ops){
+			// printf("%.2f %.2f\n", op.x(), op.y());
+			// std::cout << std::setprecision(2) <<op.x()<< " "<<op.y()<<std::endl; 
 		switch (op.type()){
 		case GestureOp_OPType_TOUCH_DOWN:
 			controller_.onSingleTouchDown(op.x(), op.y());
@@ -213,6 +227,13 @@ int main(int argc, char** argv){
 		default:
 			break;
 		}}
+		auto duration = std::chrono::system_clock::now() - last_ts;
+		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+		if (seconds > 2) {
+			// std::cerr << "ops: " << ops_count << std::endl;
+			last_ts = std::chrono::system_clock::now();
+			ops_count = 0;
+		}
 
 		onDraw();
 		// Swap buffers

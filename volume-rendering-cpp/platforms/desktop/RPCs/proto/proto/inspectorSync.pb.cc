@@ -24,10 +24,10 @@ class GestureOpDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<GestureOp> _instance;
 } _GestureOp_default_instance_;
-class OperationResponseDefaultTypeInternal {
+class OperationBatchDefaultTypeInternal {
  public:
-  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<OperationResponse> _instance;
-} _OperationResponse_default_instance_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<OperationBatch> _instance;
+} _OperationBatch_default_instance_;
 }  // namespace helmsley
 static void InitDefaultsscc_info_GestureOp_proto_2finspectorSync_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -43,19 +43,19 @@ static void InitDefaultsscc_info_GestureOp_proto_2finspectorSync_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GestureOp_proto_2finspectorSync_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_GestureOp_proto_2finspectorSync_2eproto}, {}};
 
-static void InitDefaultsscc_info_OperationResponse_proto_2finspectorSync_2eproto() {
+static void InitDefaultsscc_info_OperationBatch_proto_2finspectorSync_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
   {
-    void* ptr = &::helmsley::_OperationResponse_default_instance_;
-    new (ptr) ::helmsley::OperationResponse();
+    void* ptr = &::helmsley::_OperationBatch_default_instance_;
+    new (ptr) ::helmsley::OperationBatch();
     ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
   }
-  ::helmsley::OperationResponse::InitAsDefaultInstance();
+  ::helmsley::OperationBatch::InitAsDefaultInstance();
 }
 
-::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_OperationResponse_proto_2finspectorSync_2eproto =
-    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_OperationResponse_proto_2finspectorSync_2eproto}, {
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<1> scc_info_OperationBatch_proto_2finspectorSync_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_OperationBatch_proto_2finspectorSync_2eproto}, {
       &scc_info_GestureOp_proto_2finspectorSync_2eproto.base,}};
 
 static void InitDefaultsscc_info_VPMsg_proto_2finspectorSync_2eproto() {
@@ -91,26 +91,28 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_proto_2finspectorSync_2eproto:
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::helmsley::GestureOp, gid_),
   PROTOBUF_FIELD_OFFSET(::helmsley::GestureOp, type_),
   PROTOBUF_FIELD_OFFSET(::helmsley::GestureOp, x_),
   PROTOBUF_FIELD_OFFSET(::helmsley::GestureOp, y_),
   ~0u,  // no _has_bits_
-  PROTOBUF_FIELD_OFFSET(::helmsley::OperationResponse, _internal_metadata_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::OperationBatch, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::helmsley::OperationResponse, gesture_op_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::OperationBatch, bid_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::OperationBatch, gesture_op_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::helmsley::VPMsg)},
   { 9, -1, sizeof(::helmsley::GestureOp)},
-  { 17, -1, sizeof(::helmsley::OperationResponse)},
+  { 18, -1, sizeof(::helmsley::OperationBatch)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_VPMsg_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_GestureOp_default_instance_),
-  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_OperationResponse_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_OperationBatch_default_instance_),
 };
 
 const char descriptor_table_protodef_proto_2finspectorSync_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -119,31 +121,31 @@ const char descriptor_table_protodef_proto_2finspectorSync_2eproto[] PROTOBUF_SE
   "\030\001 \001(\005\022#\n\010req_type\030\002 \001(\0162\021.helmsley.ReqT"
   "ype\0220\n\020volume_pose_type\030\003 \001(\0162\026.helmsley"
   ".VPMsg.VPType\022\016\n\006values\030\004 \003(\002\"%\n\006VPType\022"
-  "\007\n\003POS\020\000\022\t\n\005SCALE\020\001\022\007\n\003ROT\020\002\"\211\001\n\tGesture"
-  "Op\022(\n\004type\030\001 \001(\0162\032.helmsley.GestureOp.OP"
-  "Type\022\t\n\001x\030\002 \001(\002\022\t\n\001y\030\003 \001(\002\"<\n\006OPType\022\016\n\n"
-  "TOUCH_DOWN\020\000\022\016\n\nTOUCH_MOVE\020\001\022\t\n\005SCALE\020\002\022"
-  "\007\n\003PAN\020\003\"<\n\021OperationResponse\022\'\n\ngesture"
-  "_op\030\001 \001(\0132\023.helmsley.GestureOp*\033\n\007ReqTyp"
-  "e\022\007\n\003SET\020\000\022\007\n\003GET\020\0012\336\001\n\rinspectorSync\022+\n"
-  "\016startBroadcast\022\010.Request\032\017.commonRespon"
-  "se\0220\n\014gsVolumePose\022\017.helmsley.VPMsg\032\017.co"
-  "mmonResponse\0224\n\014setGestureOp\022\023.helmsley."
-  "GestureOp\032\017.commonResponse\0228\n\rgetOperati"
-  "ons\022\010.Request\032\033.helmsley.OperationRespon"
-  "se0\001b\006proto3"
+  "\007\n\003POS\020\000\022\t\n\005SCALE\020\001\022\007\n\003ROT\020\002\"\226\001\n\tGesture"
+  "Op\022\013\n\003gid\030\001 \001(\003\022(\n\004type\030\002 \001(\0162\032.helmsley"
+  ".GestureOp.OPType\022\t\n\001x\030\003 \001(\002\022\t\n\001y\030\004 \001(\002\""
+  "<\n\006OPType\022\016\n\nTOUCH_DOWN\020\000\022\016\n\nTOUCH_MOVE\020"
+  "\001\022\t\n\005SCALE\020\002\022\007\n\003PAN\020\003\"F\n\016OperationBatch\022"
+  "\013\n\003bid\030\001 \001(\002\022\'\n\ngesture_op\030\002 \003(\0132\023.helms"
+  "ley.GestureOp*\033\n\007ReqType\022\007\n\003SET\020\000\022\007\n\003GET"
+  "\020\0012\331\001\n\rinspectorSync\022+\n\016startBroadcast\022\010"
+  ".Request\032\017.commonResponse\0220\n\014gsVolumePos"
+  "e\022\017.helmsley.VPMsg\032\017.commonResponse\0224\n\014s"
+  "etGestureOp\022\023.helmsley.GestureOp\032\017.commo"
+  "nResponse\0223\n\rgetOperations\022\010.Request\032\030.h"
+  "elmsley.OperationBatchb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_proto_2finspectorSync_2eproto_deps[1] = {
   &::descriptor_table_proto_2fcommon_2eproto,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_proto_2finspectorSync_2eproto_sccs[3] = {
   &scc_info_GestureOp_proto_2finspectorSync_2eproto.base,
-  &scc_info_OperationResponse_proto_2finspectorSync_2eproto.base,
+  &scc_info_OperationBatch_proto_2finspectorSync_2eproto.base,
   &scc_info_VPMsg_proto_2finspectorSync_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_proto_2finspectorSync_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_proto_2finspectorSync_2eproto = {
-  false, false, descriptor_table_protodef_proto_2finspectorSync_2eproto, "proto/inspectorSync.proto", 692,
+  false, false, descriptor_table_protodef_proto_2finspectorSync_2eproto, "proto/inspectorSync.proto", 710,
   &descriptor_table_proto_2finspectorSync_2eproto_once, descriptor_table_proto_2finspectorSync_2eproto_sccs, descriptor_table_proto_2finspectorSync_2eproto_deps, 3, 1,
   schemas, file_default_instances, TableStruct_proto_2finspectorSync_2eproto::offsets,
   file_level_metadata_proto_2finspectorSync_2eproto, 3, file_level_enum_descriptors_proto_2finspectorSync_2eproto, file_level_service_descriptors_proto_2finspectorSync_2eproto,
@@ -523,16 +525,16 @@ GestureOp::GestureOp(::PROTOBUF_NAMESPACE_ID::Arena* arena)
 GestureOp::GestureOp(const GestureOp& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  ::memcpy(&type_, &from.type_,
+  ::memcpy(&gid_, &from.gid_,
     static_cast<size_t>(reinterpret_cast<char*>(&y_) -
-    reinterpret_cast<char*>(&type_)) + sizeof(y_));
+    reinterpret_cast<char*>(&gid_)) + sizeof(y_));
   // @@protoc_insertion_point(copy_constructor:helmsley.GestureOp)
 }
 
 void GestureOp::SharedCtor() {
-  ::memset(&type_, 0, static_cast<size_t>(
+  ::memset(&gid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&y_) -
-      reinterpret_cast<char*>(&type_)) + sizeof(y_));
+      reinterpret_cast<char*>(&gid_)) + sizeof(y_));
 }
 
 GestureOp::~GestureOp() {
@@ -566,9 +568,9 @@ void GestureOp::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  ::memset(&type_, 0, static_cast<size_t>(
+  ::memset(&gid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&y_) -
-      reinterpret_cast<char*>(&type_)) + sizeof(y_));
+      reinterpret_cast<char*>(&gid_)) + sizeof(y_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -580,24 +582,31 @@ const char* GestureOp::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // .helmsley.GestureOp.OPType type = 1;
+      // int64 gid = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          gid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .helmsley.GestureOp.OPType type = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
           ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_type(static_cast<::helmsley::GestureOp_OPType>(val));
         } else goto handle_unusual;
         continue;
-      // float x = 2;
-      case 2:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 21)) {
+      // float x = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29)) {
           x_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
         continue;
-      // float y = 3;
-      case 3:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29)) {
+      // float y = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37)) {
           y_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
           ptr += sizeof(float);
         } else goto handle_unusual;
@@ -630,23 +639,29 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .helmsley.GestureOp.OPType type = 1;
+  // int64 gid = 1;
+  if (this->gid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_gid(), target);
+  }
+
+  // .helmsley.GestureOp.OPType type = 2;
   if (this->type() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
-      1, this->_internal_type(), target);
+      2, this->_internal_type(), target);
   }
 
-  // float x = 2;
+  // float x = 3;
   if (!(this->x() <= 0 && this->x() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(2, this->_internal_x(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(3, this->_internal_x(), target);
   }
 
-  // float y = 3;
+  // float y = 4;
   if (!(this->y() <= 0 && this->y() >= 0)) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(3, this->_internal_y(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_y(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -665,18 +680,25 @@ size_t GestureOp::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .helmsley.GestureOp.OPType type = 1;
+  // int64 gid = 1;
+  if (this->gid() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
+        this->_internal_gid());
+  }
+
+  // .helmsley.GestureOp.OPType type = 2;
   if (this->type() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
   }
 
-  // float x = 2;
+  // float x = 3;
   if (!(this->x() <= 0 && this->x() >= 0)) {
     total_size += 1 + 4;
   }
 
-  // float y = 3;
+  // float y = 4;
   if (!(this->y() <= 0 && this->y() >= 0)) {
     total_size += 1 + 4;
   }
@@ -712,6 +734,9 @@ void GestureOp::MergeFrom(const GestureOp& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (from.gid() != 0) {
+    _internal_set_gid(from._internal_gid());
+  }
   if (from.type() != 0) {
     _internal_set_type(from._internal_type());
   }
@@ -747,9 +772,9 @@ void GestureOp::InternalSwap(GestureOp* other) {
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(GestureOp, y_)
       + sizeof(GestureOp::y_)
-      - PROTOBUF_FIELD_OFFSET(GestureOp, type_)>(
-          reinterpret_cast<char*>(&type_),
-          reinterpret_cast<char*>(&other->type_));
+      - PROTOBUF_FIELD_OFFSET(GestureOp, gid_)>(
+          reinterpret_cast<char*>(&gid_),
+          reinterpret_cast<char*>(&other->gid_));
 }
 
 ::PROTOBUF_NAMESPACE_ID::Metadata GestureOp::GetMetadata() const {
@@ -759,81 +784,69 @@ void GestureOp::InternalSwap(GestureOp* other) {
 
 // ===================================================================
 
-void OperationResponse::InitAsDefaultInstance() {
-  ::helmsley::_OperationResponse_default_instance_._instance.get_mutable()->gesture_op_ = const_cast< ::helmsley::GestureOp*>(
-      ::helmsley::GestureOp::internal_default_instance());
+void OperationBatch::InitAsDefaultInstance() {
 }
-class OperationResponse::_Internal {
+class OperationBatch::_Internal {
  public:
-  static const ::helmsley::GestureOp& gesture_op(const OperationResponse* msg);
 };
 
-const ::helmsley::GestureOp&
-OperationResponse::_Internal::gesture_op(const OperationResponse* msg) {
-  return *msg->gesture_op_;
-}
-OperationResponse::OperationResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+OperationBatch::OperationBatch(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  gesture_op_(arena) {
   SharedCtor();
   RegisterArenaDtor(arena);
-  // @@protoc_insertion_point(arena_constructor:helmsley.OperationResponse)
+  // @@protoc_insertion_point(arena_constructor:helmsley.OperationBatch)
 }
-OperationResponse::OperationResponse(const OperationResponse& from)
-  : ::PROTOBUF_NAMESPACE_ID::Message() {
+OperationBatch::OperationBatch(const OperationBatch& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      gesture_op_(from.gesture_op_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  if (from._internal_has_gesture_op()) {
-    gesture_op_ = new ::helmsley::GestureOp(*from.gesture_op_);
-  } else {
-    gesture_op_ = nullptr;
-  }
-  // @@protoc_insertion_point(copy_constructor:helmsley.OperationResponse)
+  bid_ = from.bid_;
+  // @@protoc_insertion_point(copy_constructor:helmsley.OperationBatch)
 }
 
-void OperationResponse::SharedCtor() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_OperationResponse_proto_2finspectorSync_2eproto.base);
-  gesture_op_ = nullptr;
+void OperationBatch::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_OperationBatch_proto_2finspectorSync_2eproto.base);
+  bid_ = 0;
 }
 
-OperationResponse::~OperationResponse() {
-  // @@protoc_insertion_point(destructor:helmsley.OperationResponse)
+OperationBatch::~OperationBatch() {
+  // @@protoc_insertion_point(destructor:helmsley.OperationBatch)
   SharedDtor();
   _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-void OperationResponse::SharedDtor() {
+void OperationBatch::SharedDtor() {
   GOOGLE_DCHECK(GetArena() == nullptr);
-  if (this != internal_default_instance()) delete gesture_op_;
 }
 
-void OperationResponse::ArenaDtor(void* object) {
-  OperationResponse* _this = reinterpret_cast< OperationResponse* >(object);
+void OperationBatch::ArenaDtor(void* object) {
+  OperationBatch* _this = reinterpret_cast< OperationBatch* >(object);
   (void)_this;
 }
-void OperationResponse::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+void OperationBatch::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
 }
-void OperationResponse::SetCachedSize(int size) const {
+void OperationBatch::SetCachedSize(int size) const {
   _cached_size_.Set(size);
 }
-const OperationResponse& OperationResponse::default_instance() {
-  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_OperationResponse_proto_2finspectorSync_2eproto.base);
+const OperationBatch& OperationBatch::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_OperationBatch_proto_2finspectorSync_2eproto.base);
   return *internal_default_instance();
 }
 
 
-void OperationResponse::Clear() {
-// @@protoc_insertion_point(message_clear_start:helmsley.OperationResponse)
+void OperationBatch::Clear() {
+// @@protoc_insertion_point(message_clear_start:helmsley.OperationBatch)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (GetArena() == nullptr && gesture_op_ != nullptr) {
-    delete gesture_op_;
-  }
-  gesture_op_ = nullptr;
+  gesture_op_.Clear();
+  bid_ = 0;
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-const char* OperationResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+const char* OperationBatch::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
   while (!ctx->Done(&ptr)) {
@@ -841,11 +854,23 @@ const char* OperationResponse::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // .helmsley.GestureOp gesture_op = 1;
+      // float bid = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          ptr = ctx->ParseMessage(_internal_mutable_gesture_op(), ptr);
-          CHK_(ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13)) {
+          bid_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // repeated .helmsley.GestureOp gesture_op = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_gesture_op(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
         } else goto handle_unusual;
         continue;
       default: {
@@ -870,41 +895,52 @@ failure:
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* OperationResponse::_InternalSerialize(
+::PROTOBUF_NAMESPACE_ID::uint8* OperationBatch::_InternalSerialize(
     ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
-  // @@protoc_insertion_point(serialize_to_array_start:helmsley.OperationResponse)
+  // @@protoc_insertion_point(serialize_to_array_start:helmsley.OperationBatch)
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // .helmsley.GestureOp gesture_op = 1;
-  if (this->has_gesture_op()) {
+  // float bid = 1;
+  if (!(this->bid() <= 0 && this->bid() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(1, this->_internal_bid(), target);
+  }
+
+  // repeated .helmsley.GestureOp gesture_op = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_gesture_op_size()); i < n; i++) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
-      InternalWriteMessage(
-        1, _Internal::gesture_op(this), target, stream);
+      InternalWriteMessage(2, this->_internal_gesture_op(i), target, stream);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
-  // @@protoc_insertion_point(serialize_to_array_end:helmsley.OperationResponse)
+  // @@protoc_insertion_point(serialize_to_array_end:helmsley.OperationBatch)
   return target;
 }
 
-size_t OperationResponse::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:helmsley.OperationResponse)
+size_t OperationBatch::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:helmsley.OperationBatch)
   size_t total_size = 0;
 
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // .helmsley.GestureOp gesture_op = 1;
-  if (this->has_gesture_op()) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
-        *gesture_op_);
+  // repeated .helmsley.GestureOp gesture_op = 2;
+  total_size += 1UL * this->_internal_gesture_op_size();
+  for (const auto& msg : this->gesture_op_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // float bid = 1;
+  if (!(this->bid() <= 0 && this->bid() >= 0)) {
+    total_size += 1 + 4;
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -916,58 +952,60 @@ size_t OperationResponse::ByteSizeLong() const {
   return total_size;
 }
 
-void OperationResponse::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:helmsley.OperationResponse)
+void OperationBatch::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:helmsley.OperationBatch)
   GOOGLE_DCHECK_NE(&from, this);
-  const OperationResponse* source =
-      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<OperationResponse>(
+  const OperationBatch* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<OperationBatch>(
           &from);
   if (source == nullptr) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.OperationResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.OperationBatch)
     ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
   } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.OperationResponse)
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.OperationBatch)
     MergeFrom(*source);
   }
 }
 
-void OperationResponse::MergeFrom(const OperationResponse& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.OperationResponse)
+void OperationBatch::MergeFrom(const OperationBatch& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.OperationBatch)
   GOOGLE_DCHECK_NE(&from, this);
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (from.has_gesture_op()) {
-    _internal_mutable_gesture_op()->::helmsley::GestureOp::MergeFrom(from._internal_gesture_op());
+  gesture_op_.MergeFrom(from.gesture_op_);
+  if (!(from.bid() <= 0 && from.bid() >= 0)) {
+    _internal_set_bid(from._internal_bid());
   }
 }
 
-void OperationResponse::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:helmsley.OperationResponse)
+void OperationBatch::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:helmsley.OperationBatch)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-void OperationResponse::CopyFrom(const OperationResponse& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.OperationResponse)
+void OperationBatch::CopyFrom(const OperationBatch& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.OperationBatch)
   if (&from == this) return;
   Clear();
   MergeFrom(from);
 }
 
-bool OperationResponse::IsInitialized() const {
+bool OperationBatch::IsInitialized() const {
   return true;
 }
 
-void OperationResponse::InternalSwap(OperationResponse* other) {
+void OperationBatch::InternalSwap(OperationBatch* other) {
   using std::swap;
   _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
-  swap(gesture_op_, other->gesture_op_);
+  gesture_op_.InternalSwap(&other->gesture_op_);
+  swap(bid_, other->bid_);
 }
 
-::PROTOBUF_NAMESPACE_ID::Metadata OperationResponse::GetMetadata() const {
+::PROTOBUF_NAMESPACE_ID::Metadata OperationBatch::GetMetadata() const {
   return GetMetadataStatic();
 }
 
@@ -981,8 +1019,8 @@ template<> PROTOBUF_NOINLINE ::helmsley::VPMsg* Arena::CreateMaybeMessage< ::hel
 template<> PROTOBUF_NOINLINE ::helmsley::GestureOp* Arena::CreateMaybeMessage< ::helmsley::GestureOp >(Arena* arena) {
   return Arena::CreateMessageInternal< ::helmsley::GestureOp >(arena);
 }
-template<> PROTOBUF_NOINLINE ::helmsley::OperationResponse* Arena::CreateMaybeMessage< ::helmsley::OperationResponse >(Arena* arena) {
-  return Arena::CreateMessageInternal< ::helmsley::OperationResponse >(arena);
+template<> PROTOBUF_NOINLINE ::helmsley::OperationBatch* Arena::CreateMaybeMessage< ::helmsley::OperationBatch >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::helmsley::OperationBatch >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

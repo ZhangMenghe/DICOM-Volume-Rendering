@@ -27,17 +27,19 @@ message GestureOp{
         SCALE = 2;
         PAN=3;
     }
-    OPType type = 1;
-    float x = 2;
-    float y = 3;
+    int64 gid = 1;
+    OPType type = 2;
+    float x = 3;
+    float y = 4;
 }
-message OperationResponse{
-    GestureOp gesture_op = 1;
+message OperationBatch{
+    float bid = 1;
+    repeated GestureOp gesture_op = 2;
 }
 service inspectorSync{
     rpc startBroadcast(Request) returns(commonResponse);
 
     rpc gsVolumePose(VPMsg) returns(commonResponse);
     rpc setGestureOp(GestureOp) returns(commonResponse);
-    rpc getOperations(Request) returns(stream OperationResponse);
+    rpc getOperations(Request) returns(OperationBatch);
 }

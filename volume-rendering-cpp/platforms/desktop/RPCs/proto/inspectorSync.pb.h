@@ -60,16 +60,16 @@ namespace helmsley {
 class GestureOp;
 class GestureOpDefaultTypeInternal;
 extern GestureOpDefaultTypeInternal _GestureOp_default_instance_;
-class OperationResponse;
-class OperationResponseDefaultTypeInternal;
-extern OperationResponseDefaultTypeInternal _OperationResponse_default_instance_;
+class OperationBatch;
+class OperationBatchDefaultTypeInternal;
+extern OperationBatchDefaultTypeInternal _OperationBatch_default_instance_;
 class VPMsg;
 class VPMsgDefaultTypeInternal;
 extern VPMsgDefaultTypeInternal _VPMsg_default_instance_;
 }  // namespace helmsley
 PROTOBUF_NAMESPACE_OPEN
 template<> ::helmsley::GestureOp* Arena::CreateMaybeMessage<::helmsley::GestureOp>(Arena*);
-template<> ::helmsley::OperationResponse* Arena::CreateMaybeMessage<::helmsley::OperationResponse>(Arena*);
+template<> ::helmsley::OperationBatch* Arena::CreateMaybeMessage<::helmsley::OperationBatch>(Arena*);
 template<> ::helmsley::VPMsg* Arena::CreateMaybeMessage<::helmsley::VPMsg>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace helmsley {
@@ -517,11 +517,21 @@ class GestureOp PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kTypeFieldNumber = 1,
-    kXFieldNumber = 2,
-    kYFieldNumber = 3,
+    kGidFieldNumber = 1,
+    kTypeFieldNumber = 2,
+    kXFieldNumber = 3,
+    kYFieldNumber = 4,
   };
-  // .helmsley.GestureOp.OPType type = 1;
+  // int32 gid = 1;
+  void clear_gid();
+  ::PROTOBUF_NAMESPACE_ID::int32 gid() const;
+  void set_gid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_gid() const;
+  void _internal_set_gid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // .helmsley.GestureOp.OPType type = 2;
   void clear_type();
   ::helmsley::GestureOp_OPType type() const;
   void set_type(::helmsley::GestureOp_OPType value);
@@ -530,7 +540,7 @@ class GestureOp PROTOBUF_FINAL :
   void _internal_set_type(::helmsley::GestureOp_OPType value);
   public:
 
-  // float x = 2;
+  // float x = 3;
   void clear_x();
   float x() const;
   void set_x(float value);
@@ -539,7 +549,7 @@ class GestureOp PROTOBUF_FINAL :
   void _internal_set_x(float value);
   public:
 
-  // float y = 3;
+  // float y = 4;
   void clear_y();
   float y() const;
   void set_y(float value);
@@ -555,6 +565,7 @@ class GestureOp PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 gid_;
   int type_;
   float x_;
   float y_;
@@ -563,23 +574,23 @@ class GestureOp PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
-class OperationResponse PROTOBUF_FINAL :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.OperationResponse) */ {
+class OperationBatch PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.OperationBatch) */ {
  public:
-  inline OperationResponse() : OperationResponse(nullptr) {};
-  virtual ~OperationResponse();
+  inline OperationBatch() : OperationBatch(nullptr) {};
+  virtual ~OperationBatch();
 
-  OperationResponse(const OperationResponse& from);
-  OperationResponse(OperationResponse&& from) noexcept
-    : OperationResponse() {
+  OperationBatch(const OperationBatch& from);
+  OperationBatch(OperationBatch&& from) noexcept
+    : OperationBatch() {
     *this = ::std::move(from);
   }
 
-  inline OperationResponse& operator=(const OperationResponse& from) {
+  inline OperationBatch& operator=(const OperationBatch& from) {
     CopyFrom(from);
     return *this;
   }
-  inline OperationResponse& operator=(OperationResponse&& from) noexcept {
+  inline OperationBatch& operator=(OperationBatch&& from) noexcept {
     if (GetArena() == from.GetArena()) {
       if (this != &from) InternalSwap(&from);
     } else {
@@ -597,20 +608,20 @@ class OperationResponse PROTOBUF_FINAL :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return GetMetadataStatic().reflection;
   }
-  static const OperationResponse& default_instance();
+  static const OperationBatch& default_instance();
 
   static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
-  static inline const OperationResponse* internal_default_instance() {
-    return reinterpret_cast<const OperationResponse*>(
-               &_OperationResponse_default_instance_);
+  static inline const OperationBatch* internal_default_instance() {
+    return reinterpret_cast<const OperationBatch*>(
+               &_OperationBatch_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     2;
 
-  friend void swap(OperationResponse& a, OperationResponse& b) {
+  friend void swap(OperationBatch& a, OperationBatch& b) {
     a.Swap(&b);
   }
-  inline void Swap(OperationResponse* other) {
+  inline void Swap(OperationBatch* other) {
     if (other == this) return;
     if (GetArena() == other->GetArena()) {
       InternalSwap(other);
@@ -618,7 +629,7 @@ class OperationResponse PROTOBUF_FINAL :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(OperationResponse* other) {
+  void UnsafeArenaSwap(OperationBatch* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetArena() == other->GetArena());
     InternalSwap(other);
@@ -626,17 +637,17 @@ class OperationResponse PROTOBUF_FINAL :
 
   // implements Message ----------------------------------------------
 
-  inline OperationResponse* New() const final {
-    return CreateMaybeMessage<OperationResponse>(nullptr);
+  inline OperationBatch* New() const final {
+    return CreateMaybeMessage<OperationBatch>(nullptr);
   }
 
-  OperationResponse* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<OperationResponse>(arena);
+  OperationBatch* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<OperationBatch>(arena);
   }
   void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
   void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
-  void CopyFrom(const OperationResponse& from);
-  void MergeFrom(const OperationResponse& from);
+  void CopyFrom(const OperationBatch& from);
+  void MergeFrom(const OperationBatch& from);
   PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
   bool IsInitialized() const final;
 
@@ -650,13 +661,13 @@ class OperationResponse PROTOBUF_FINAL :
   inline void SharedCtor();
   inline void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(OperationResponse* other);
+  void InternalSwap(OperationBatch* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "helmsley.OperationResponse";
+    return "helmsley.OperationBatch";
   }
   protected:
-  explicit OperationResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  explicit OperationBatch(::PROTOBUF_NAMESPACE_ID::Arena* arena);
   private:
   static void ArenaDtor(void* object);
   inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
@@ -676,34 +687,45 @@ class OperationResponse PROTOBUF_FINAL :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kGestureOpFieldNumber = 1,
+    kGestureOpFieldNumber = 2,
+    kBidFieldNumber = 1,
   };
-  // .helmsley.GestureOp gesture_op = 1;
-  bool has_gesture_op() const;
+  // repeated .helmsley.GestureOp gesture_op = 2;
+  int gesture_op_size() const;
   private:
-  bool _internal_has_gesture_op() const;
+  int _internal_gesture_op_size() const;
   public:
   void clear_gesture_op();
-  const ::helmsley::GestureOp& gesture_op() const;
-  ::helmsley::GestureOp* release_gesture_op();
-  ::helmsley::GestureOp* mutable_gesture_op();
-  void set_allocated_gesture_op(::helmsley::GestureOp* gesture_op);
+  ::helmsley::GestureOp* mutable_gesture_op(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >*
+      mutable_gesture_op();
   private:
-  const ::helmsley::GestureOp& _internal_gesture_op() const;
-  ::helmsley::GestureOp* _internal_mutable_gesture_op();
+  const ::helmsley::GestureOp& _internal_gesture_op(int index) const;
+  ::helmsley::GestureOp* _internal_add_gesture_op();
   public:
-  void unsafe_arena_set_allocated_gesture_op(
-      ::helmsley::GestureOp* gesture_op);
-  ::helmsley::GestureOp* unsafe_arena_release_gesture_op();
+  const ::helmsley::GestureOp& gesture_op(int index) const;
+  ::helmsley::GestureOp* add_gesture_op();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >&
+      gesture_op() const;
 
-  // @@protoc_insertion_point(class_scope:helmsley.OperationResponse)
+  // float bid = 1;
+  void clear_bid();
+  float bid() const;
+  void set_bid(float value);
+  private:
+  float _internal_bid() const;
+  void _internal_set_bid(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:helmsley.OperationBatch)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::helmsley::GestureOp* gesture_op_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp > gesture_op_;
+  float bid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_proto_2finspectorSync_2eproto;
 };
@@ -829,7 +851,27 @@ VPMsg::mutable_values() {
 
 // GestureOp
 
-// .helmsley.GestureOp.OPType type = 1;
+// int32 gid = 1;
+inline void GestureOp::clear_gid() {
+  gid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 GestureOp::_internal_gid() const {
+  return gid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 GestureOp::gid() const {
+  // @@protoc_insertion_point(field_get:helmsley.GestureOp.gid)
+  return _internal_gid();
+}
+inline void GestureOp::_internal_set_gid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  gid_ = value;
+}
+inline void GestureOp::set_gid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_gid(value);
+  // @@protoc_insertion_point(field_set:helmsley.GestureOp.gid)
+}
+
+// .helmsley.GestureOp.OPType type = 2;
 inline void GestureOp::clear_type() {
   type_ = 0;
 }
@@ -849,7 +891,7 @@ inline void GestureOp::set_type(::helmsley::GestureOp_OPType value) {
   // @@protoc_insertion_point(field_set:helmsley.GestureOp.type)
 }
 
-// float x = 2;
+// float x = 3;
 inline void GestureOp::clear_x() {
   x_ = 0;
 }
@@ -869,7 +911,7 @@ inline void GestureOp::set_x(float value) {
   // @@protoc_insertion_point(field_set:helmsley.GestureOp.x)
 }
 
-// float y = 3;
+// float y = 4;
 inline void GestureOp::clear_y() {
   y_ = 0;
 }
@@ -891,87 +933,65 @@ inline void GestureOp::set_y(float value) {
 
 // -------------------------------------------------------------------
 
-// OperationResponse
+// OperationBatch
 
-// .helmsley.GestureOp gesture_op = 1;
-inline bool OperationResponse::_internal_has_gesture_op() const {
-  return this != internal_default_instance() && gesture_op_ != nullptr;
+// float bid = 1;
+inline void OperationBatch::clear_bid() {
+  bid_ = 0;
 }
-inline bool OperationResponse::has_gesture_op() const {
-  return _internal_has_gesture_op();
+inline float OperationBatch::_internal_bid() const {
+  return bid_;
 }
-inline void OperationResponse::clear_gesture_op() {
-  if (GetArena() == nullptr && gesture_op_ != nullptr) {
-    delete gesture_op_;
-  }
-  gesture_op_ = nullptr;
+inline float OperationBatch::bid() const {
+  // @@protoc_insertion_point(field_get:helmsley.OperationBatch.bid)
+  return _internal_bid();
 }
-inline const ::helmsley::GestureOp& OperationResponse::_internal_gesture_op() const {
-  const ::helmsley::GestureOp* p = gesture_op_;
-  return p != nullptr ? *p : *reinterpret_cast<const ::helmsley::GestureOp*>(
-      &::helmsley::_GestureOp_default_instance_);
-}
-inline const ::helmsley::GestureOp& OperationResponse::gesture_op() const {
-  // @@protoc_insertion_point(field_get:helmsley.OperationResponse.gesture_op)
-  return _internal_gesture_op();
-}
-inline void OperationResponse::unsafe_arena_set_allocated_gesture_op(
-    ::helmsley::GestureOp* gesture_op) {
-  if (GetArena() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(gesture_op_);
-  }
-  gesture_op_ = gesture_op;
-  if (gesture_op) {
-    
-  } else {
-    
-  }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:helmsley.OperationResponse.gesture_op)
-}
-inline ::helmsley::GestureOp* OperationResponse::release_gesture_op() {
-  auto temp = unsafe_arena_release_gesture_op();
-  if (GetArena() != nullptr) {
-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
-  }
-  return temp;
-}
-inline ::helmsley::GestureOp* OperationResponse::unsafe_arena_release_gesture_op() {
-  // @@protoc_insertion_point(field_release:helmsley.OperationResponse.gesture_op)
+inline void OperationBatch::_internal_set_bid(float value) {
   
-  ::helmsley::GestureOp* temp = gesture_op_;
-  gesture_op_ = nullptr;
-  return temp;
+  bid_ = value;
 }
-inline ::helmsley::GestureOp* OperationResponse::_internal_mutable_gesture_op() {
-  
-  if (gesture_op_ == nullptr) {
-    auto* p = CreateMaybeMessage<::helmsley::GestureOp>(GetArena());
-    gesture_op_ = p;
-  }
+inline void OperationBatch::set_bid(float value) {
+  _internal_set_bid(value);
+  // @@protoc_insertion_point(field_set:helmsley.OperationBatch.bid)
+}
+
+// repeated .helmsley.GestureOp gesture_op = 2;
+inline int OperationBatch::_internal_gesture_op_size() const {
+  return gesture_op_.size();
+}
+inline int OperationBatch::gesture_op_size() const {
+  return _internal_gesture_op_size();
+}
+inline void OperationBatch::clear_gesture_op() {
+  gesture_op_.Clear();
+}
+inline ::helmsley::GestureOp* OperationBatch::mutable_gesture_op(int index) {
+  // @@protoc_insertion_point(field_mutable:helmsley.OperationBatch.gesture_op)
+  return gesture_op_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >*
+OperationBatch::mutable_gesture_op() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.OperationBatch.gesture_op)
+  return &gesture_op_;
+}
+inline const ::helmsley::GestureOp& OperationBatch::_internal_gesture_op(int index) const {
+  return gesture_op_.Get(index);
+}
+inline const ::helmsley::GestureOp& OperationBatch::gesture_op(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.OperationBatch.gesture_op)
+  return _internal_gesture_op(index);
+}
+inline ::helmsley::GestureOp* OperationBatch::_internal_add_gesture_op() {
+  return gesture_op_.Add();
+}
+inline ::helmsley::GestureOp* OperationBatch::add_gesture_op() {
+  // @@protoc_insertion_point(field_add:helmsley.OperationBatch.gesture_op)
+  return _internal_add_gesture_op();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >&
+OperationBatch::gesture_op() const {
+  // @@protoc_insertion_point(field_list:helmsley.OperationBatch.gesture_op)
   return gesture_op_;
-}
-inline ::helmsley::GestureOp* OperationResponse::mutable_gesture_op() {
-  // @@protoc_insertion_point(field_mutable:helmsley.OperationResponse.gesture_op)
-  return _internal_mutable_gesture_op();
-}
-inline void OperationResponse::set_allocated_gesture_op(::helmsley::GestureOp* gesture_op) {
-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
-  if (message_arena == nullptr) {
-    delete gesture_op_;
-  }
-  if (gesture_op) {
-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(gesture_op);
-    if (message_arena != submessage_arena) {
-      gesture_op = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, gesture_op, submessage_arena);
-    }
-    
-  } else {
-    
-  }
-  gesture_op_ = gesture_op;
-  // @@protoc_insertion_point(field_set_allocated:helmsley.OperationResponse.gesture_op)
 }
 
 #ifdef __GNUC__

@@ -38,7 +38,7 @@ inspectorSync::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chan
   : channel_(channel), rpcmethod_startBroadcast_(inspectorSync_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_gsVolumePose_(inspectorSync_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_setGestureOp_(inspectorSync_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_getOperations_(inspectorSync_method_names[3], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
+  , rpcmethod_getOperations_(inspectorSync_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status inspectorSync::Stub::startBroadcast(::grpc::ClientContext* context, const ::Request& request, ::commonResponse* response) {
@@ -125,20 +125,32 @@ void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext
   return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setGestureOp_, context, request, false);
 }
 
-::grpc::ClientReader< ::helmsley::OperationResponse>* inspectorSync::Stub::getOperationsRaw(::grpc::ClientContext* context, const ::Request& request) {
-  return ::grpc_impl::internal::ClientReaderFactory< ::helmsley::OperationResponse>::Create(channel_.get(), rpcmethod_getOperations_, context, request);
+::grpc::Status inspectorSync::Stub::getOperations(::grpc::ClientContext* context, const ::Request& request, ::helmsley::OperationBatch* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_getOperations_, context, request, response);
 }
 
-void inspectorSync::Stub::experimental_async::getOperations(::grpc::ClientContext* context, ::Request* request, ::grpc::experimental::ClientReadReactor< ::helmsley::OperationResponse>* reactor) {
-  ::grpc_impl::internal::ClientCallbackReaderFactory< ::helmsley::OperationResponse>::Create(stub_->channel_.get(), stub_->rpcmethod_getOperations_, context, request, reactor);
+void inspectorSync::Stub::experimental_async::getOperations(::grpc::ClientContext* context, const ::Request* request, ::helmsley::OperationBatch* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_getOperations_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncReader< ::helmsley::OperationResponse>* inspectorSync::Stub::AsyncgetOperationsRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::helmsley::OperationResponse>::Create(channel_.get(), cq, rpcmethod_getOperations_, context, request, true, tag);
+void inspectorSync::Stub::experimental_async::getOperations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::helmsley::OperationBatch* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_getOperations_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncReader< ::helmsley::OperationResponse>* inspectorSync::Stub::PrepareAsyncgetOperationsRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::helmsley::OperationResponse>::Create(channel_.get(), cq, rpcmethod_getOperations_, context, request, false, nullptr);
+void inspectorSync::Stub::experimental_async::getOperations(::grpc::ClientContext* context, const ::Request* request, ::helmsley::OperationBatch* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_getOperations_, context, request, response, reactor);
+}
+
+void inspectorSync::Stub::experimental_async::getOperations(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::helmsley::OperationBatch* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_getOperations_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::helmsley::OperationBatch>* inspectorSync::Stub::AsyncgetOperationsRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::helmsley::OperationBatch>::Create(channel_.get(), cq, rpcmethod_getOperations_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::helmsley::OperationBatch>* inspectorSync::Stub::PrepareAsyncgetOperationsRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::helmsley::OperationBatch>::Create(channel_.get(), cq, rpcmethod_getOperations_, context, request, false);
 }
 
 inspectorSync::Service::Service() {
@@ -174,13 +186,13 @@ inspectorSync::Service::Service() {
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       inspectorSync_method_names[3],
-      ::grpc::internal::RpcMethod::SERVER_STREAMING,
-      new ::grpc::internal::ServerStreamingHandler< inspectorSync::Service, ::Request, ::helmsley::OperationResponse>(
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::Request, ::helmsley::OperationBatch>(
           [](inspectorSync::Service* service,
              ::grpc_impl::ServerContext* ctx,
              const ::Request* req,
-             ::grpc_impl::ServerWriter<::helmsley::OperationResponse>* writer) {
-               return service->getOperations(ctx, req, writer);
+             ::helmsley::OperationBatch* resp) {
+               return service->getOperations(ctx, req, resp);
              }, this)));
 }
 
@@ -208,10 +220,10 @@ inspectorSync::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status inspectorSync::Service::getOperations(::grpc::ServerContext* context, const ::Request* request, ::grpc::ServerWriter< ::helmsley::OperationResponse>* writer) {
+::grpc::Status inspectorSync::Service::getOperations(::grpc::ServerContext* context, const ::Request* request, ::helmsley::OperationBatch* response) {
   (void) context;
   (void) request;
-  (void) writer;
+  (void) response;
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
