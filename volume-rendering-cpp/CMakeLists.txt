@@ -1,10 +1,13 @@
 cmake_minimum_required(VERSION 3.4.1)
-
+project(vrNative)
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
-    set(CMAKE_CXX_STANDARD 14)
-#    set(CMAKE_BUILD_TYPE "Debug")
+    set(CMAKE_CXX_STANDARD 11)
+#     set(CMAKE_BUILD_TYPE "Debug")
     find_package(OpenGL REQUIRED)
     find_package(GLEW REQUIRED)
+    Message(STATUS ${GLEW_LIBRARIES})
+    Message(STATUS ${OPENGL_LIBRARY})
+
     set(OpenGL_LIBS
         glfw
         ${GLEW_LIBRARIES}

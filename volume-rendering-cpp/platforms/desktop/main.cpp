@@ -29,6 +29,44 @@ using grpc::ClientWriter;
 using grpc::Status;
 using namespace helmsley;
 using namespace std::chrono;
+#include <mutex>
+#include <condition_variable>
+#include <chrono>
+#include <thread>
+#include <unistd.h>
+using namespace std;
+
+class semaphore{
+public:
+
+  semaphore(int count_ = 0) : count{count_}
+  {}
+
+  void notify()
+  {
+    unique_lock<mutex> lck(mtx);
+    ++count;
+    cv.notify_one();
+  }
+
+  void wait()
+  {
+	// std::cout<<"count "<< count<<std::endl;
+    // unique_lock<mutex> lck(mtx);
+    // while(count == 0)
+    // {
+    //   cv.wait(lck);
+    // }
+	count = 0;
+    // --count;
+  }
+
+private:
+
+  mutex mtx;
+  condition_variable cv;
+  int count;
+};
 class syncClient{
 public:
 	syncClient(std::shared_ptr<Channel> channel)
@@ -89,6 +127,7 @@ uiController ui_;
 Manager manager_;
 vrController controller_;
 syncClient* rpc_manager;
+semaphore sp;
 
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
@@ -183,58 +222,65 @@ bool InitWindow(){
 void setupApplication(){
 	int dims = 144;
 	loader_.setupDCMIConfig(512,512,dims,true);
+}
 
+void rpc_thread(){
+
+	// auto last_ts = std::chrono::system_clock::now();
+	// size_t ops_count = 0;
 	rpc_manager = new syncClient(grpc::CreateChannel(
       "localhost:23333", grpc::InsecureChannelCredentials()));
-}
-// int main(int argc, char** argv){
-// //setup grpc stuff
-// 	syncClient rpc_manager(grpc::CreateChannel(
-//       "localhost:23333", grpc::InsecureChannelCredentials()));
-// 	while(true){
-// 		rpc_manager.getOperations();
-// 	}
-// }
-int main(int argc, char** argv){
-	setupShaderContents(&controller_);
-	
-	if(!InitWindow()) return -1;
-
-	setupApplication();
-	onCreated();
-
-	auto last_ts = std::chrono::system_clock::now();
-	size_t ops_count = 0;
-	do{
+	while(true){
 		auto ops = rpc_manager->getOperations();
-		ops_count += ops.size();
+		// ops_count += ops.size();
 		for(auto op:ops){
 			// printf("%.2f %.2f\n", op.x(), op.y());
 			// std::cout << std::setprecision(2) <<op.x()<< " "<<op.y()<<std::endl; 
 		switch (op.type()){
 		case GestureOp_OPType_TOUCH_DOWN:
 			controller_.onSingleTouchDown(op.x(), op.y());
+			sp.notify();
 			break;
 		case GestureOp_OPType_TOUCH_MOVE:
 			controller_.onTouchMove(op.x(), op.y());
+			sp.notify();
 			break;
 		case GestureOp_OPType_SCALE:
 			controller_.onScale(op.x(), op.y());
+			sp.notify();
 			break;
 		case GestureOp_OPType_PAN:
 			controller_.onPan(op.x(), op.y());
+			sp.notify();
 			break;
 		default:
 			break;
 		}}
-		auto duration = std::chrono::system_clock::now() - last_ts;
-		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
-		if (seconds > 2) {
-			// std::cerr << "ops: " << ops_count << std::endl;
-			last_ts = std::chrono::system_clock::now();
-			ops_count = 0;
-		}
+		// auto duration = std::chrono::system_clock::now() - last_ts;
+		// auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+		// if (seconds > 2) {
+		// 	// std::cerr << "ops: " << ops_count << std::endl;
+		// 	last_ts = std::chrono::system_clock::now();
+		// 	ops_count = 0;
+		// }
+		
+		
+		// std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		// std::cout<<"rpc"<<std::endl;
+	}
+}
+void main_thread(){
+	setupShaderContents(&controller_);
+	
+	if(!InitWindow()) return;
 
+	setupApplication();
+	onCreated();
+
+	do{
+		sp.wait();
+		// std::cout<<"draw"<<std::endl;
+		// usleep(500);
 		onDraw();
 		// Swap buffers
 		glfwSwapBuffers(window);
@@ -249,7 +295,13 @@ int main(int argc, char** argv){
 	glfwDestroyWindow(window);
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
-
-	return 0;
 }
 
+int main(int argc, char** argv){
+	std::thread t1(&main_thread);
+	std::thread t2(&rpc_thread);
+
+	t1.join();
+	t2.join();
+	return 0;
+}
