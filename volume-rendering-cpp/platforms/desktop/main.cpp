@@ -73,7 +73,7 @@ public:
       : stub_(inspectorSync::NewStub(channel)) {
 		//   mc = &controller;//std::unique_ptr<vrController>(controller);
 	  }
-	std::vector<helmsley::GestureOp> getOperations(){
+	const google::protobuf::RepeatedPtrField<helmsley::GestureOp> getOperations(){
 		std::vector<helmsley::GestureOp> op_pool;
 
 		Request req;
@@ -81,9 +81,9 @@ public:
 		OperationBatch op_batch;
 		stub_->getOperations(&context,req, &op_batch);
 		// std::cout<<op_batch.bid()<<std::endl;
-		for(auto op: op_batch.gesture_op())
-			op_pool.push_back(op);
-		return op_pool;
+		// for(auto op: op_batch.gesture_op())
+		// 	op_pool.push_back(op);
+		return op_batch.gesture_op();
 
 	// 	OperationResponse feature;
 
@@ -93,30 +93,9 @@ public:
 	// 	op_pool.push_back(feature.gesture_op());
 	// 	return op_pool;
 		// return feature.gesture_op();
-		// ) {
-		// const helmsley::GestureOp op = feature.gesture_op();
-    //   std::cout <<res.x() <<std::endl;
-		// switch (op.type()){
-		// case GestureOp_OPType_TOUCH_DOWN:
-		// 	mc->onSingleTouchDown(op.x(), op.y());
-		// 	break;
-		// case GestureOp_OPType_TOUCH_MOVE:
-		// 	mc->onTouchMove(op.x(), op.y());
-		// 	break;
-		// case GestureOp_OPType_SCALE:
-		// 	mc->onScale(op.x(), op.y());
-		// 	break;
-		// case GestureOp_OPType_PAN:
-		// 	mc->onPan(op.x(), op.y());
-		// 	break;
-		// default:
-		// 	break;
-		// }
-    // }
 	}  
 private:
   	std::unique_ptr<inspectorSync::Stub> stub_;
-  	// std::unique_ptr<vrController> mc;
 vrController* mc;
 };
 
@@ -127,7 +106,8 @@ uiController ui_;
 Manager manager_;
 vrController controller_;
 syncClient* rpc_manager;
-semaphore sp;
+// semaphore sp;
+// std::mutex mtx;
 
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
@@ -239,19 +219,19 @@ void rpc_thread(){
 		switch (op.type()){
 		case GestureOp_OPType_TOUCH_DOWN:
 			controller_.onSingleTouchDown(op.x(), op.y());
-			sp.notify();
+			// sp.notify();
 			break;
 		case GestureOp_OPType_TOUCH_MOVE:
 			controller_.onTouchMove(op.x(), op.y());
-			sp.notify();
+			// sp.notify();
 			break;
 		case GestureOp_OPType_SCALE:
 			controller_.onScale(op.x(), op.y());
-			sp.notify();
+			// sp.notify();
 			break;
 		case GestureOp_OPType_PAN:
 			controller_.onPan(op.x(), op.y());
-			sp.notify();
+			// sp.notify();
 			break;
 		default:
 			break;
@@ -278,7 +258,7 @@ void main_thread(){
 	onCreated();
 
 	do{
-		sp.wait();
+		// sp.wait();
 		// std::cout<<"draw"<<std::endl;
 		// usleep(500);
 		onDraw();
