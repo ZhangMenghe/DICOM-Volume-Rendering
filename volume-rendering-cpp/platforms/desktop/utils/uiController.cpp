@@ -53,7 +53,7 @@ void uiController::InitCheckParam(){
     };
     bool values[7] = {
         false,
-        false,
+        true,
         false,
         false,
         false,

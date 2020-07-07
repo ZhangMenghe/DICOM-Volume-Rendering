@@ -38,6 +38,5 @@ public class operateClient {
 //            ops = 0;
 //            last_timestamp = System.currentTimeMillis();
 //        }
-
     }
 }

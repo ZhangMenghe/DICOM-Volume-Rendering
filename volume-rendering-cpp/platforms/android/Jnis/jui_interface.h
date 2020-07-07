@@ -3,29 +3,29 @@
 #include "jni_main.h"
 
 extern "C"{
-    JUI_METHOD(void, JUIsetAllTuneParamById)(JNIEnv*, jclass, jint, jfloatArray);
-    JUI_METHOD(void, JUIonReset)(JNIEnv*, jclass, jint, jobjectArray, jbooleanArray, jfloatArray, jfloatArray);
-    JUI_METHOD(void, JUIonSingleTouchDown)(JNIEnv *, jclass, jfloat, jfloat);
-    JUI_METHOD(void, JUIonTouchMove)(JNIEnv *, jclass, jfloat, jfloat);
-    JUI_METHOD(void, JUIonScale)(JNIEnv *, jclass, jfloat, jfloat);
-    JUI_METHOD(void, JUIonPan)(JNIEnv *, jclass, jfloat, jfloat);
+    JUI_METHOD(void, JUIsetAllTuneParamByIdNative)(JNIEnv*, jclass, jint, jfloatArray);
+    JUI_METHOD(void, JUIonResetNative)(JNIEnv*, jclass, jint, jobjectArray, jbooleanArray, jfloatArray, jfloatArray);
+    JUI_METHOD(void, JUIonSingleTouchDownNative)(JNIEnv *, jclass, jfloat, jfloat);
+    JUI_METHOD(void, JUIonTouchMoveNative)(JNIEnv *, jclass, jfloat, jfloat);
+    JUI_METHOD(void, JUIonScaleNative)(JNIEnv *, jclass, jfloat, jfloat);
+    JUI_METHOD(void, JUIonPanNative)(JNIEnv *, jclass, jfloat, jfloat);
 
-    JUI_METHOD(void, JUIaddTuneParams)(JNIEnv *, jclass, jintArray, jfloatArray);
-    JUI_METHOD(void, JUIsetTuneWidgetById)(JNIEnv *, jclass, jint);
-    JUI_METHOD(void, JUIremoveTuneWidgetById)(JNIEnv *, jclass, jint);
-    JUI_METHOD(void, JUIremoveAllTuneWidget)(JNIEnv *, jclass);
-    JUI_METHOD(void, JUIsetTuneWidgetVisibility)(JNIEnv *, jclass, jint, jboolean);
+    JUI_METHOD(void, JUIaddTuneParamsNative)(JNIEnv *, jclass, jintArray, jfloatArray);
+    JUI_METHOD(void, JUIsetTuneWidgetByIdNative)(JNIEnv *, jclass, jint);
+    JUI_METHOD(void, JUIremoveTuneWidgetByIdNative)(JNIEnv *, jclass, jint);
+    JUI_METHOD(void, JUIremoveAllTuneWidgetNative)(JNIEnv *, jclass);
+    JUI_METHOD(void, JUIsetTuneWidgetVisibilityNative)(JNIEnv *, jclass, jint, jboolean);
 
-    JUI_METHOD(void, JUIsetTuneParamById)(JNIEnv *, jclass, jint, jint, jfloat);
-    JUI_METHOD(void, JUIsetDualParamById)(JNIEnv *, jclass, jint, jfloat, jfloat);
-    JUI_METHOD(void, JUIsetChecks)(JNIEnv * env, jclass, jstring, jboolean);
+    JUI_METHOD(void, JUIsetTuneParamByIdNative)(JNIEnv *, jclass, jint, jint, jfloat);
+    JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint, jfloat, jfloat);
+    JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring, jboolean);
 
-    JUI_METHOD(jfloatArray, JUIgetVCStates)(JNIEnv * env, jclass);
-    JUI_METHOD(void, JUIsetCuttingPlane)(JNIEnv * env, jclass, jint, jfloat);
-    JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatus)(JNIEnv * env, jclass);
-    JUI_METHOD(void, JUIsetMaskBits)(JNIEnv * env, jclass, jint, jint);
-    JUI_METHOD(void, JUIsetColorScheme)(JNIEnv * env, jclass, jint);
-    JUI_METHOD(void, JUIsetGraphRect)(JNIEnv * env, jclass, jint, jint, jint, jint, jint);
+    JUI_METHOD(jfloatArray, JUIgetVCStatesNative)(JNIEnv * env, jclass);
+    JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv * env, jclass, jint, jfloat);
+    JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatusNative)(JNIEnv * env, jclass);
+    JUI_METHOD(void, JUIsetMaskBitsNative)(JNIEnv * env, jclass, jint, jint);
+    JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint);
+    JUI_METHOD(void, JUIsetGraphRectNative)(JNIEnv * env, jclass, jint, jint, jint, jint, jint);
 }
 
 

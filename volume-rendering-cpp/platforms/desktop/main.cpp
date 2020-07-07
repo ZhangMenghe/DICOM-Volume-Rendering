@@ -36,6 +36,7 @@ using namespace std::chrono;
 #include <unistd.h>
 using namespace std;
 
+//todo: try to implement operation merge
 class semaphore{
 public:
 
@@ -137,8 +138,10 @@ void onCreated(){
 	controller_.onViewCreated();
 	overlayController::instance()->onViewCreated();
 	ui_.AddTuneParams();
-	overlayController::instance()->setOverlayRect(0, 1080, 85, 0,776);
-    overlayController::instance()->setOverlayRect(1, 1080, 36, 0,740);
+
+	// 430, 768,
+	overlayController::instance()->setOverlayRect(0, 430, 85, 0, 310);
+    overlayController::instance()->setOverlayRect(1, 430, 36, 0, 295);
 
 	//load data
 	if(loader_.loadData("helmsley_cached/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/data", "helmsley_cached/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/mask")){
