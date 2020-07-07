@@ -114,7 +114,7 @@ public class cutplaneUIs extends BasePanel{
 
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         int max_seek_value = Integer.valueOf(params[1]);
-        double percent = (Double)cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
+        float percent = (Float) cutmap.getOrDefault("percentage", Float.valueOf(params[0]));
         seek_bar_.setProgress((int)(percent * max_seek_value));
 
         //todo:jui send cutting plane status(pos/ori)
@@ -145,8 +145,9 @@ public class cutplaneUIs extends BasePanel{
         map.put("freeze volume", cbAdapter_.getValue(0));
         map.put("freeze plane", cbAdapter_.getValue(1));
         map.put("percentage", (float)seek_bar_.getProgress() / Integer.parseInt(params[1]));
-        map.put("ppoint", new float[]{cpv[0], cpv[1], cpv[2]});
-        map.put("pnorm", new float[]{cpv[3], cpv[4], cpv[5]});
+
+        map.put("ppoint", new ArrayList<Float>(Arrays.asList(cpv[0], cpv[1], cpv[2])));
+        map.put("pnorm", new ArrayList<Float>(Arrays.asList(cpv[3], cpv[4], cpv[5])));
         return map;
     }
     public void showHidePanel(boolean show_panel, boolean isRaycast){

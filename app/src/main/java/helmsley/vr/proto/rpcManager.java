@@ -21,7 +21,6 @@ public class rpcManager {
     public static ManagedChannel mChannel;
     public static dataTransferGrpc.dataTransferBlockingStub data_stub;
     public static dataTransferGrpc.dataTransferStub mask_stub;
-    public static inspectorSyncGrpc.inspectorSyncStub operate_stub;
 
     private fileTransferClient data_manager;
     private operateClient opa_manager;
@@ -38,7 +37,7 @@ public class rpcManager {
             mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
             data_stub = dataTransferGrpc.newBlockingStub(mChannel);
             mask_stub = dataTransferGrpc.newStub(mChannel);
-            operate_stub = inspectorSyncGrpc.newStub(mChannel);
+            opa_manager.Setup(mChannel);
             data_manager.Setup();
         } catch (Exception e) {
             StringWriter sw = new StringWriter();

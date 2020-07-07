@@ -57,7 +57,7 @@ void uiController::InitCheckParam(){
         false,
         false,
         false,
-        false,
+        true,
         true
     };
     InitCheckParam(7, keys, values);
@@ -78,4 +78,17 @@ void uiController::setMaskBits(int num, unsigned int mbits){
     vrController::instance()->mask_num_ = (unsigned int)num;
     vrController::instance()->mask_bits_ = (unsigned int)mbits;
     Manager::baked_dirty_ = true;
+}
+void uiController::setMaskBits(helmsley::MaskMsg msg){
+    setMaskBits(msg.num(), (unsigned int)msg.mbits());
+}
+void uiController::setCheck(std::string key, bool value){
+    auto it = std::find (param_checks.begin(), param_checks.end(), key);
+    if (it != param_checks.end()){
+        Manager::param_bool[it - param_checks.begin()] = value;
+        Manager::baked_dirty_ = true;
+    }
+}
+void uiController::setCheck(helmsley::CheckMsg msg){
+    setCheck(msg.key(), msg.value());
 }

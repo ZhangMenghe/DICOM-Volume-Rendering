@@ -49,7 +49,7 @@ struct TableStruct_proto_2finspectorSync_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[3]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[8]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -57,19 +57,39 @@ struct TableStruct_proto_2finspectorSync_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_proto_2finspectorSync_2eproto;
 namespace helmsley {
+class CheckMsg;
+class CheckMsgDefaultTypeInternal;
+extern CheckMsgDefaultTypeInternal _CheckMsg_default_instance_;
+class FrameUpdateMsg;
+class FrameUpdateMsgDefaultTypeInternal;
+extern FrameUpdateMsgDefaultTypeInternal _FrameUpdateMsg_default_instance_;
 class GestureOp;
 class GestureOpDefaultTypeInternal;
 extern GestureOpDefaultTypeInternal _GestureOp_default_instance_;
+class MaskMsg;
+class MaskMsgDefaultTypeInternal;
+extern MaskMsgDefaultTypeInternal _MaskMsg_default_instance_;
 class OperationBatch;
 class OperationBatchDefaultTypeInternal;
 extern OperationBatchDefaultTypeInternal _OperationBatch_default_instance_;
+class ResetMsg;
+class ResetMsgDefaultTypeInternal;
+extern ResetMsgDefaultTypeInternal _ResetMsg_default_instance_;
+class TuneMsg;
+class TuneMsgDefaultTypeInternal;
+extern TuneMsgDefaultTypeInternal _TuneMsg_default_instance_;
 class VPMsg;
 class VPMsgDefaultTypeInternal;
 extern VPMsgDefaultTypeInternal _VPMsg_default_instance_;
 }  // namespace helmsley
 PROTOBUF_NAMESPACE_OPEN
+template<> ::helmsley::CheckMsg* Arena::CreateMaybeMessage<::helmsley::CheckMsg>(Arena*);
+template<> ::helmsley::FrameUpdateMsg* Arena::CreateMaybeMessage<::helmsley::FrameUpdateMsg>(Arena*);
 template<> ::helmsley::GestureOp* Arena::CreateMaybeMessage<::helmsley::GestureOp>(Arena*);
+template<> ::helmsley::MaskMsg* Arena::CreateMaybeMessage<::helmsley::MaskMsg>(Arena*);
 template<> ::helmsley::OperationBatch* Arena::CreateMaybeMessage<::helmsley::OperationBatch>(Arena*);
+template<> ::helmsley::ResetMsg* Arena::CreateMaybeMessage<::helmsley::ResetMsg>(Arena*);
+template<> ::helmsley::TuneMsg* Arena::CreateMaybeMessage<::helmsley::TuneMsg>(Arena*);
 template<> ::helmsley::VPMsg* Arena::CreateMaybeMessage<::helmsley::VPMsg>(Arena*);
 PROTOBUF_NAMESPACE_CLOSE
 namespace helmsley {
@@ -126,6 +146,66 @@ inline bool GestureOp_OPType_Parse(
     const std::string& name, GestureOp_OPType* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<GestureOp_OPType>(
     GestureOp_OPType_descriptor(), name, value);
+}
+enum TuneMsg_TuneType : int {
+  TuneMsg_TuneType_ADD_ONE = 0,
+  TuneMsg_TuneType_REMOVE_ONE = 1,
+  TuneMsg_TuneType_REMOTE_ALL = 2,
+  TuneMsg_TuneType_SET_ONE = 3,
+  TuneMsg_TuneType_SET_ALL = 4,
+  TuneMsg_TuneType_SET_VISIBLE = 5,
+  TuneMsg_TuneType_SET_TARGET = 6,
+  TuneMsg_TuneType_CUT_PLANE = 7,
+  TuneMsg_TuneType_COLOR_SCHEME = 8,
+  TuneMsg_TuneType_TuneMsg_TuneType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  TuneMsg_TuneType_TuneMsg_TuneType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool TuneMsg_TuneType_IsValid(int value);
+constexpr TuneMsg_TuneType TuneMsg_TuneType_TuneType_MIN = TuneMsg_TuneType_ADD_ONE;
+constexpr TuneMsg_TuneType TuneMsg_TuneType_TuneType_MAX = TuneMsg_TuneType_COLOR_SCHEME;
+constexpr int TuneMsg_TuneType_TuneType_ARRAYSIZE = TuneMsg_TuneType_TuneType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* TuneMsg_TuneType_descriptor();
+template<typename T>
+inline const std::string& TuneMsg_TuneType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, TuneMsg_TuneType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function TuneMsg_TuneType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    TuneMsg_TuneType_descriptor(), enum_t_value);
+}
+inline bool TuneMsg_TuneType_Parse(
+    const std::string& name, TuneMsg_TuneType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<TuneMsg_TuneType>(
+    TuneMsg_TuneType_descriptor(), name, value);
+}
+enum FrameUpdateMsg_MsgType : int {
+  FrameUpdateMsg_MsgType_GESTURE = 0,
+  FrameUpdateMsg_MsgType_TUNE = 1,
+  FrameUpdateMsg_MsgType_CHECK = 2,
+  FrameUpdateMsg_MsgType_MASK = 3,
+  FrameUpdateMsg_MsgType_RESET = 4,
+  FrameUpdateMsg_MsgType_FrameUpdateMsg_MsgType_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  FrameUpdateMsg_MsgType_FrameUpdateMsg_MsgType_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool FrameUpdateMsg_MsgType_IsValid(int value);
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg_MsgType_MsgType_MIN = FrameUpdateMsg_MsgType_GESTURE;
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg_MsgType_MsgType_MAX = FrameUpdateMsg_MsgType_RESET;
+constexpr int FrameUpdateMsg_MsgType_MsgType_ARRAYSIZE = FrameUpdateMsg_MsgType_MsgType_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* FrameUpdateMsg_MsgType_descriptor();
+template<typename T>
+inline const std::string& FrameUpdateMsg_MsgType_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, FrameUpdateMsg_MsgType>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function FrameUpdateMsg_MsgType_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    FrameUpdateMsg_MsgType_descriptor(), enum_t_value);
+}
+inline bool FrameUpdateMsg_MsgType_Parse(
+    const std::string& name, FrameUpdateMsg_MsgType* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<FrameUpdateMsg_MsgType>(
+    FrameUpdateMsg_MsgType_descriptor(), name, value);
 }
 enum ReqType : int {
   SET = 0,
@@ -522,13 +602,13 @@ class GestureOp PROTOBUF_FINAL :
     kXFieldNumber = 3,
     kYFieldNumber = 4,
   };
-  // int32 gid = 1;
+  // int64 gid = 1;
   void clear_gid();
-  ::PROTOBUF_NAMESPACE_ID::int32 gid() const;
-  void set_gid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int64 gid() const;
+  void set_gid(::PROTOBUF_NAMESPACE_ID::int64 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_gid() const;
-  void _internal_set_gid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int64 _internal_gid() const;
+  void _internal_set_gid(::PROTOBUF_NAMESPACE_ID::int64 value);
   public:
 
   // .helmsley.GestureOp.OPType type = 2;
@@ -565,7 +645,7 @@ class GestureOp PROTOBUF_FINAL :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::int32 gid_;
+  ::PROTOBUF_NAMESPACE_ID::int64 gid_;
   int type_;
   float x_;
   float y_;
@@ -729,6 +809,1066 @@ class OperationBatch PROTOBUF_FINAL :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_proto_2finspectorSync_2eproto;
 };
+// -------------------------------------------------------------------
+
+class ResetMsg PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.ResetMsg) */ {
+ public:
+  inline ResetMsg() : ResetMsg(nullptr) {};
+  virtual ~ResetMsg();
+
+  ResetMsg(const ResetMsg& from);
+  ResetMsg(ResetMsg&& from) noexcept
+    : ResetMsg() {
+    *this = ::std::move(from);
+  }
+
+  inline ResetMsg& operator=(const ResetMsg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ResetMsg& operator=(ResetMsg&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const ResetMsg& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const ResetMsg* internal_default_instance() {
+    return reinterpret_cast<const ResetMsg*>(
+               &_ResetMsg_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    3;
+
+  friend void swap(ResetMsg& a, ResetMsg& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(ResetMsg* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ResetMsg* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ResetMsg* New() const final {
+    return CreateMaybeMessage<ResetMsg>(nullptr);
+  }
+
+  ResetMsg* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<ResetMsg>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const ResetMsg& from);
+  void MergeFrom(const ResetMsg& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ResetMsg* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "helmsley.ResetMsg";
+  }
+  protected:
+  explicit ResetMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_proto_2finspectorSync_2eproto);
+    return ::descriptor_table_proto_2finspectorSync_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kCheckKeysFieldNumber = 1,
+    kCheckValuesFieldNumber = 2,
+    kVolumePoseFieldNumber = 3,
+    kCameraPoseFieldNumber = 4,
+  };
+  // repeated string check_keys = 1;
+  int check_keys_size() const;
+  private:
+  int _internal_check_keys_size() const;
+  public:
+  void clear_check_keys();
+  const std::string& check_keys(int index) const;
+  std::string* mutable_check_keys(int index);
+  void set_check_keys(int index, const std::string& value);
+  void set_check_keys(int index, std::string&& value);
+  void set_check_keys(int index, const char* value);
+  void set_check_keys(int index, const char* value, size_t size);
+  std::string* add_check_keys();
+  void add_check_keys(const std::string& value);
+  void add_check_keys(std::string&& value);
+  void add_check_keys(const char* value);
+  void add_check_keys(const char* value, size_t size);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>& check_keys() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>* mutable_check_keys();
+  private:
+  const std::string& _internal_check_keys(int index) const;
+  std::string* _internal_add_check_keys();
+  public:
+
+  // repeated bool check_values = 2;
+  int check_values_size() const;
+  private:
+  int _internal_check_values_size() const;
+  public:
+  void clear_check_values();
+  private:
+  bool _internal_check_values(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+      _internal_check_values() const;
+  void _internal_add_check_values(bool value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+      _internal_mutable_check_values();
+  public:
+  bool check_values(int index) const;
+  void set_check_values(int index, bool value);
+  void add_check_values(bool value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+      check_values() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+      mutable_check_values();
+
+  // repeated float volume_pose = 3;
+  int volume_pose_size() const;
+  private:
+  int _internal_volume_pose_size() const;
+  public:
+  void clear_volume_pose();
+  private:
+  float _internal_volume_pose(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_volume_pose() const;
+  void _internal_add_volume_pose(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_volume_pose();
+  public:
+  float volume_pose(int index) const;
+  void set_volume_pose(int index, float value);
+  void add_volume_pose(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      volume_pose() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_volume_pose();
+
+  // repeated float camera_pose = 4;
+  int camera_pose_size() const;
+  private:
+  int _internal_camera_pose_size() const;
+  public:
+  void clear_camera_pose();
+  private:
+  float _internal_camera_pose(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_camera_pose() const;
+  void _internal_add_camera_pose(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_camera_pose();
+  public:
+  float camera_pose(int index) const;
+  void set_camera_pose(int index, float value);
+  void add_camera_pose(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      camera_pose() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_camera_pose();
+
+  // @@protoc_insertion_point(class_scope:helmsley.ResetMsg)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> check_keys_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool > check_values_;
+  mutable std::atomic<int> _check_values_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > volume_pose_;
+  mutable std::atomic<int> _volume_pose_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > camera_pose_;
+  mutable std::atomic<int> _camera_pose_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_proto_2finspectorSync_2eproto;
+};
+// -------------------------------------------------------------------
+
+class TuneMsg PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.TuneMsg) */ {
+ public:
+  inline TuneMsg() : TuneMsg(nullptr) {};
+  virtual ~TuneMsg();
+
+  TuneMsg(const TuneMsg& from);
+  TuneMsg(TuneMsg&& from) noexcept
+    : TuneMsg() {
+    *this = ::std::move(from);
+  }
+
+  inline TuneMsg& operator=(const TuneMsg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline TuneMsg& operator=(TuneMsg&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const TuneMsg& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const TuneMsg* internal_default_instance() {
+    return reinterpret_cast<const TuneMsg*>(
+               &_TuneMsg_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    4;
+
+  friend void swap(TuneMsg& a, TuneMsg& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(TuneMsg* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(TuneMsg* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline TuneMsg* New() const final {
+    return CreateMaybeMessage<TuneMsg>(nullptr);
+  }
+
+  TuneMsg* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<TuneMsg>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const TuneMsg& from);
+  void MergeFrom(const TuneMsg& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(TuneMsg* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "helmsley.TuneMsg";
+  }
+  protected:
+  explicit TuneMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_proto_2finspectorSync_2eproto);
+    return ::descriptor_table_proto_2finspectorSync_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  typedef TuneMsg_TuneType TuneType;
+  static constexpr TuneType ADD_ONE =
+    TuneMsg_TuneType_ADD_ONE;
+  static constexpr TuneType REMOVE_ONE =
+    TuneMsg_TuneType_REMOVE_ONE;
+  static constexpr TuneType REMOTE_ALL =
+    TuneMsg_TuneType_REMOTE_ALL;
+  static constexpr TuneType SET_ONE =
+    TuneMsg_TuneType_SET_ONE;
+  static constexpr TuneType SET_ALL =
+    TuneMsg_TuneType_SET_ALL;
+  static constexpr TuneType SET_VISIBLE =
+    TuneMsg_TuneType_SET_VISIBLE;
+  static constexpr TuneType SET_TARGET =
+    TuneMsg_TuneType_SET_TARGET;
+  static constexpr TuneType CUT_PLANE =
+    TuneMsg_TuneType_CUT_PLANE;
+  static constexpr TuneType COLOR_SCHEME =
+    TuneMsg_TuneType_COLOR_SCHEME;
+  static inline bool TuneType_IsValid(int value) {
+    return TuneMsg_TuneType_IsValid(value);
+  }
+  static constexpr TuneType TuneType_MIN =
+    TuneMsg_TuneType_TuneType_MIN;
+  static constexpr TuneType TuneType_MAX =
+    TuneMsg_TuneType_TuneType_MAX;
+  static constexpr int TuneType_ARRAYSIZE =
+    TuneMsg_TuneType_TuneType_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  TuneType_descriptor() {
+    return TuneMsg_TuneType_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& TuneType_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, TuneType>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function TuneType_Name.");
+    return TuneMsg_TuneType_Name(enum_t_value);
+  }
+  static inline bool TuneType_Parse(const std::string& name,
+      TuneType* value) {
+    return TuneMsg_TuneType_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kValuesFieldNumber = 5,
+    kTypeFieldNumber = 1,
+    kTargetFieldNumber = 2,
+    kSubTargetFieldNumber = 3,
+    kValueFieldNumber = 4,
+  };
+  // repeated float values = 5;
+  int values_size() const;
+  private:
+  int _internal_values_size() const;
+  public:
+  void clear_values();
+  private:
+  float _internal_values(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_values() const;
+  void _internal_add_values(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_values();
+  public:
+  float values(int index) const;
+  void set_values(int index, float value);
+  void add_values(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      values() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_values();
+
+  // .helmsley.TuneMsg.TuneType type = 1;
+  void clear_type();
+  ::helmsley::TuneMsg_TuneType type() const;
+  void set_type(::helmsley::TuneMsg_TuneType value);
+  private:
+  ::helmsley::TuneMsg_TuneType _internal_type() const;
+  void _internal_set_type(::helmsley::TuneMsg_TuneType value);
+  public:
+
+  // int32 target = 2;
+  void clear_target();
+  ::PROTOBUF_NAMESPACE_ID::int32 target() const;
+  void set_target(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_target() const;
+  void _internal_set_target(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 sub_target = 3;
+  void clear_sub_target();
+  ::PROTOBUF_NAMESPACE_ID::int32 sub_target() const;
+  void set_sub_target(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_sub_target() const;
+  void _internal_set_sub_target(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // float value = 4;
+  void clear_value();
+  float value() const;
+  void set_value(float value);
+  private:
+  float _internal_value() const;
+  void _internal_set_value(float value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:helmsley.TuneMsg)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > values_;
+  mutable std::atomic<int> _values_cached_byte_size_;
+  int type_;
+  ::PROTOBUF_NAMESPACE_ID::int32 target_;
+  ::PROTOBUF_NAMESPACE_ID::int32 sub_target_;
+  float value_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_proto_2finspectorSync_2eproto;
+};
+// -------------------------------------------------------------------
+
+class CheckMsg PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.CheckMsg) */ {
+ public:
+  inline CheckMsg() : CheckMsg(nullptr) {};
+  virtual ~CheckMsg();
+
+  CheckMsg(const CheckMsg& from);
+  CheckMsg(CheckMsg&& from) noexcept
+    : CheckMsg() {
+    *this = ::std::move(from);
+  }
+
+  inline CheckMsg& operator=(const CheckMsg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline CheckMsg& operator=(CheckMsg&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const CheckMsg& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const CheckMsg* internal_default_instance() {
+    return reinterpret_cast<const CheckMsg*>(
+               &_CheckMsg_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(CheckMsg& a, CheckMsg& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(CheckMsg* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(CheckMsg* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CheckMsg* New() const final {
+    return CreateMaybeMessage<CheckMsg>(nullptr);
+  }
+
+  CheckMsg* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<CheckMsg>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const CheckMsg& from);
+  void MergeFrom(const CheckMsg& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CheckMsg* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "helmsley.CheckMsg";
+  }
+  protected:
+  explicit CheckMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_proto_2finspectorSync_2eproto);
+    return ::descriptor_table_proto_2finspectorSync_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kKeyFieldNumber = 1,
+    kValueFieldNumber = 2,
+  };
+  // string key = 1;
+  void clear_key();
+  const std::string& key() const;
+  void set_key(const std::string& value);
+  void set_key(std::string&& value);
+  void set_key(const char* value);
+  void set_key(const char* value, size_t size);
+  std::string* mutable_key();
+  std::string* release_key();
+  void set_allocated_key(std::string* key);
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  std::string* unsafe_arena_release_key();
+  GOOGLE_PROTOBUF_RUNTIME_DEPRECATED("The unsafe_arena_ accessors for"
+  "    string fields are deprecated and will be removed in a"
+  "    future release.")
+  void unsafe_arena_set_allocated_key(
+      std::string* key);
+  private:
+  const std::string& _internal_key() const;
+  void _internal_set_key(const std::string& value);
+  std::string* _internal_mutable_key();
+  public:
+
+  // bool value = 2;
+  void clear_value();
+  bool value() const;
+  void set_value(bool value);
+  private:
+  bool _internal_value() const;
+  void _internal_set_value(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:helmsley.CheckMsg)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr key_;
+  bool value_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_proto_2finspectorSync_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MaskMsg PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.MaskMsg) */ {
+ public:
+  inline MaskMsg() : MaskMsg(nullptr) {};
+  virtual ~MaskMsg();
+
+  MaskMsg(const MaskMsg& from);
+  MaskMsg(MaskMsg&& from) noexcept
+    : MaskMsg() {
+    *this = ::std::move(from);
+  }
+
+  inline MaskMsg& operator=(const MaskMsg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MaskMsg& operator=(MaskMsg&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const MaskMsg& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const MaskMsg* internal_default_instance() {
+    return reinterpret_cast<const MaskMsg*>(
+               &_MaskMsg_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(MaskMsg& a, MaskMsg& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MaskMsg* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MaskMsg* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MaskMsg* New() const final {
+    return CreateMaybeMessage<MaskMsg>(nullptr);
+  }
+
+  MaskMsg* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MaskMsg>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const MaskMsg& from);
+  void MergeFrom(const MaskMsg& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MaskMsg* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "helmsley.MaskMsg";
+  }
+  protected:
+  explicit MaskMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_proto_2finspectorSync_2eproto);
+    return ::descriptor_table_proto_2finspectorSync_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kNumFieldNumber = 1,
+    kMbitsFieldNumber = 2,
+  };
+  // int32 num = 1;
+  void clear_num();
+  ::PROTOBUF_NAMESPACE_ID::int32 num() const;
+  void set_num(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_num() const;
+  void _internal_set_num(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 mbits = 2;
+  void clear_mbits();
+  ::PROTOBUF_NAMESPACE_ID::int32 mbits() const;
+  void set_mbits(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_mbits() const;
+  void _internal_set_mbits(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:helmsley.MaskMsg)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 num_;
+  ::PROTOBUF_NAMESPACE_ID::int32 mbits_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_proto_2finspectorSync_2eproto;
+};
+// -------------------------------------------------------------------
+
+class FrameUpdateMsg PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.FrameUpdateMsg) */ {
+ public:
+  inline FrameUpdateMsg() : FrameUpdateMsg(nullptr) {};
+  virtual ~FrameUpdateMsg();
+
+  FrameUpdateMsg(const FrameUpdateMsg& from);
+  FrameUpdateMsg(FrameUpdateMsg&& from) noexcept
+    : FrameUpdateMsg() {
+    *this = ::std::move(from);
+  }
+
+  inline FrameUpdateMsg& operator=(const FrameUpdateMsg& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline FrameUpdateMsg& operator=(FrameUpdateMsg&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const FrameUpdateMsg& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const FrameUpdateMsg* internal_default_instance() {
+    return reinterpret_cast<const FrameUpdateMsg*>(
+               &_FrameUpdateMsg_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    7;
+
+  friend void swap(FrameUpdateMsg& a, FrameUpdateMsg& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(FrameUpdateMsg* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(FrameUpdateMsg* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline FrameUpdateMsg* New() const final {
+    return CreateMaybeMessage<FrameUpdateMsg>(nullptr);
+  }
+
+  FrameUpdateMsg* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<FrameUpdateMsg>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const FrameUpdateMsg& from);
+  void MergeFrom(const FrameUpdateMsg& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(FrameUpdateMsg* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "helmsley.FrameUpdateMsg";
+  }
+  protected:
+  explicit FrameUpdateMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_proto_2finspectorSync_2eproto);
+    return ::descriptor_table_proto_2finspectorSync_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  typedef FrameUpdateMsg_MsgType MsgType;
+  static constexpr MsgType GESTURE =
+    FrameUpdateMsg_MsgType_GESTURE;
+  static constexpr MsgType TUNE =
+    FrameUpdateMsg_MsgType_TUNE;
+  static constexpr MsgType CHECK =
+    FrameUpdateMsg_MsgType_CHECK;
+  static constexpr MsgType MASK =
+    FrameUpdateMsg_MsgType_MASK;
+  static constexpr MsgType RESET =
+    FrameUpdateMsg_MsgType_RESET;
+  static inline bool MsgType_IsValid(int value) {
+    return FrameUpdateMsg_MsgType_IsValid(value);
+  }
+  static constexpr MsgType MsgType_MIN =
+    FrameUpdateMsg_MsgType_MsgType_MIN;
+  static constexpr MsgType MsgType_MAX =
+    FrameUpdateMsg_MsgType_MsgType_MAX;
+  static constexpr int MsgType_ARRAYSIZE =
+    FrameUpdateMsg_MsgType_MsgType_ARRAYSIZE;
+  static inline const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor*
+  MsgType_descriptor() {
+    return FrameUpdateMsg_MsgType_descriptor();
+  }
+  template<typename T>
+  static inline const std::string& MsgType_Name(T enum_t_value) {
+    static_assert(::std::is_same<T, MsgType>::value ||
+      ::std::is_integral<T>::value,
+      "Incorrect type passed to function MsgType_Name.");
+    return FrameUpdateMsg_MsgType_Name(enum_t_value);
+  }
+  static inline bool MsgType_Parse(const std::string& name,
+      MsgType* value) {
+    return FrameUpdateMsg_MsgType_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTypesFieldNumber = 1,
+    kGesturesFieldNumber = 2,
+    kTunesFieldNumber = 3,
+    kChecksFieldNumber = 4,
+    kMaskValueFieldNumber = 5,
+    kResetValueFieldNumber = 6,
+  };
+  // repeated .helmsley.FrameUpdateMsg.MsgType types = 1;
+  int types_size() const;
+  private:
+  int _internal_types_size() const;
+  public:
+  void clear_types();
+  private:
+  ::helmsley::FrameUpdateMsg_MsgType _internal_types(int index) const;
+  void _internal_add_types(::helmsley::FrameUpdateMsg_MsgType value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_types();
+  public:
+  ::helmsley::FrameUpdateMsg_MsgType types(int index) const;
+  void set_types(int index, ::helmsley::FrameUpdateMsg_MsgType value);
+  void add_types(::helmsley::FrameUpdateMsg_MsgType value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& types() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_types();
+
+  // repeated .helmsley.GestureOp gestures = 2;
+  int gestures_size() const;
+  private:
+  int _internal_gestures_size() const;
+  public:
+  void clear_gestures();
+  ::helmsley::GestureOp* mutable_gestures(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >*
+      mutable_gestures();
+  private:
+  const ::helmsley::GestureOp& _internal_gestures(int index) const;
+  ::helmsley::GestureOp* _internal_add_gestures();
+  public:
+  const ::helmsley::GestureOp& gestures(int index) const;
+  ::helmsley::GestureOp* add_gestures();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >&
+      gestures() const;
+
+  // repeated .helmsley.TuneMsg tunes = 3;
+  int tunes_size() const;
+  private:
+  int _internal_tunes_size() const;
+  public:
+  void clear_tunes();
+  ::helmsley::TuneMsg* mutable_tunes(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::TuneMsg >*
+      mutable_tunes();
+  private:
+  const ::helmsley::TuneMsg& _internal_tunes(int index) const;
+  ::helmsley::TuneMsg* _internal_add_tunes();
+  public:
+  const ::helmsley::TuneMsg& tunes(int index) const;
+  ::helmsley::TuneMsg* add_tunes();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::TuneMsg >&
+      tunes() const;
+
+  // repeated .helmsley.CheckMsg checks = 4;
+  int checks_size() const;
+  private:
+  int _internal_checks_size() const;
+  public:
+  void clear_checks();
+  ::helmsley::CheckMsg* mutable_checks(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::CheckMsg >*
+      mutable_checks();
+  private:
+  const ::helmsley::CheckMsg& _internal_checks(int index) const;
+  ::helmsley::CheckMsg* _internal_add_checks();
+  public:
+  const ::helmsley::CheckMsg& checks(int index) const;
+  ::helmsley::CheckMsg* add_checks();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::CheckMsg >&
+      checks() const;
+
+  // .helmsley.MaskMsg mask_value = 5;
+  bool has_mask_value() const;
+  private:
+  bool _internal_has_mask_value() const;
+  public:
+  void clear_mask_value();
+  const ::helmsley::MaskMsg& mask_value() const;
+  ::helmsley::MaskMsg* release_mask_value();
+  ::helmsley::MaskMsg* mutable_mask_value();
+  void set_allocated_mask_value(::helmsley::MaskMsg* mask_value);
+  private:
+  const ::helmsley::MaskMsg& _internal_mask_value() const;
+  ::helmsley::MaskMsg* _internal_mutable_mask_value();
+  public:
+  void unsafe_arena_set_allocated_mask_value(
+      ::helmsley::MaskMsg* mask_value);
+  ::helmsley::MaskMsg* unsafe_arena_release_mask_value();
+
+  // .helmsley.ResetMsg reset_value = 6;
+  bool has_reset_value() const;
+  private:
+  bool _internal_has_reset_value() const;
+  public:
+  void clear_reset_value();
+  const ::helmsley::ResetMsg& reset_value() const;
+  ::helmsley::ResetMsg* release_reset_value();
+  ::helmsley::ResetMsg* mutable_reset_value();
+  void set_allocated_reset_value(::helmsley::ResetMsg* reset_value);
+  private:
+  const ::helmsley::ResetMsg& _internal_reset_value() const;
+  ::helmsley::ResetMsg* _internal_mutable_reset_value();
+  public:
+  void unsafe_arena_set_allocated_reset_value(
+      ::helmsley::ResetMsg* reset_value);
+  ::helmsley::ResetMsg* unsafe_arena_release_reset_value();
+
+  // @@protoc_insertion_point(class_scope:helmsley.FrameUpdateMsg)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int> types_;
+  mutable std::atomic<int> _types_cached_byte_size_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp > gestures_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::TuneMsg > tunes_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::CheckMsg > checks_;
+  ::helmsley::MaskMsg* mask_value_;
+  ::helmsley::ResetMsg* reset_value_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_proto_2finspectorSync_2eproto;
+};
 // ===================================================================
 
 
@@ -851,22 +1991,22 @@ VPMsg::mutable_values() {
 
 // GestureOp
 
-// int32 gid = 1;
+// int64 gid = 1;
 inline void GestureOp::clear_gid() {
-  gid_ = 0;
+  gid_ = PROTOBUF_LONGLONG(0);
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 GestureOp::_internal_gid() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 GestureOp::_internal_gid() const {
   return gid_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 GestureOp::gid() const {
+inline ::PROTOBUF_NAMESPACE_ID::int64 GestureOp::gid() const {
   // @@protoc_insertion_point(field_get:helmsley.GestureOp.gid)
   return _internal_gid();
 }
-inline void GestureOp::_internal_set_gid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void GestureOp::_internal_set_gid(::PROTOBUF_NAMESPACE_ID::int64 value) {
   
   gid_ = value;
 }
-inline void GestureOp::set_gid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void GestureOp::set_gid(::PROTOBUF_NAMESPACE_ID::int64 value) {
   _internal_set_gid(value);
   // @@protoc_insertion_point(field_set:helmsley.GestureOp.gid)
 }
@@ -994,9 +2134,844 @@ OperationBatch::gesture_op() const {
   return gesture_op_;
 }
 
+// -------------------------------------------------------------------
+
+// ResetMsg
+
+// repeated string check_keys = 1;
+inline int ResetMsg::_internal_check_keys_size() const {
+  return check_keys_.size();
+}
+inline int ResetMsg::check_keys_size() const {
+  return _internal_check_keys_size();
+}
+inline void ResetMsg::clear_check_keys() {
+  check_keys_.Clear();
+}
+inline std::string* ResetMsg::add_check_keys() {
+  // @@protoc_insertion_point(field_add_mutable:helmsley.ResetMsg.check_keys)
+  return _internal_add_check_keys();
+}
+inline const std::string& ResetMsg::_internal_check_keys(int index) const {
+  return check_keys_.Get(index);
+}
+inline const std::string& ResetMsg::check_keys(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.ResetMsg.check_keys)
+  return _internal_check_keys(index);
+}
+inline std::string* ResetMsg::mutable_check_keys(int index) {
+  // @@protoc_insertion_point(field_mutable:helmsley.ResetMsg.check_keys)
+  return check_keys_.Mutable(index);
+}
+inline void ResetMsg::set_check_keys(int index, const std::string& value) {
+  // @@protoc_insertion_point(field_set:helmsley.ResetMsg.check_keys)
+  check_keys_.Mutable(index)->assign(value);
+}
+inline void ResetMsg::set_check_keys(int index, std::string&& value) {
+  // @@protoc_insertion_point(field_set:helmsley.ResetMsg.check_keys)
+  check_keys_.Mutable(index)->assign(std::move(value));
+}
+inline void ResetMsg::set_check_keys(int index, const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  check_keys_.Mutable(index)->assign(value);
+  // @@protoc_insertion_point(field_set_char:helmsley.ResetMsg.check_keys)
+}
+inline void ResetMsg::set_check_keys(int index, const char* value, size_t size) {
+  check_keys_.Mutable(index)->assign(
+    reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:helmsley.ResetMsg.check_keys)
+}
+inline std::string* ResetMsg::_internal_add_check_keys() {
+  return check_keys_.Add();
+}
+inline void ResetMsg::add_check_keys(const std::string& value) {
+  check_keys_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add:helmsley.ResetMsg.check_keys)
+}
+inline void ResetMsg::add_check_keys(std::string&& value) {
+  check_keys_.Add(std::move(value));
+  // @@protoc_insertion_point(field_add:helmsley.ResetMsg.check_keys)
+}
+inline void ResetMsg::add_check_keys(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  check_keys_.Add()->assign(value);
+  // @@protoc_insertion_point(field_add_char:helmsley.ResetMsg.check_keys)
+}
+inline void ResetMsg::add_check_keys(const char* value, size_t size) {
+  check_keys_.Add()->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_add_pointer:helmsley.ResetMsg.check_keys)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>&
+ResetMsg::check_keys() const {
+  // @@protoc_insertion_point(field_list:helmsley.ResetMsg.check_keys)
+  return check_keys_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
+ResetMsg::mutable_check_keys() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.ResetMsg.check_keys)
+  return &check_keys_;
+}
+
+// repeated bool check_values = 2;
+inline int ResetMsg::_internal_check_values_size() const {
+  return check_values_.size();
+}
+inline int ResetMsg::check_values_size() const {
+  return _internal_check_values_size();
+}
+inline void ResetMsg::clear_check_values() {
+  check_values_.Clear();
+}
+inline bool ResetMsg::_internal_check_values(int index) const {
+  return check_values_.Get(index);
+}
+inline bool ResetMsg::check_values(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.ResetMsg.check_values)
+  return _internal_check_values(index);
+}
+inline void ResetMsg::set_check_values(int index, bool value) {
+  check_values_.Set(index, value);
+  // @@protoc_insertion_point(field_set:helmsley.ResetMsg.check_values)
+}
+inline void ResetMsg::_internal_add_check_values(bool value) {
+  check_values_.Add(value);
+}
+inline void ResetMsg::add_check_values(bool value) {
+  _internal_add_check_values(value);
+  // @@protoc_insertion_point(field_add:helmsley.ResetMsg.check_values)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+ResetMsg::_internal_check_values() const {
+  return check_values_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >&
+ResetMsg::check_values() const {
+  // @@protoc_insertion_point(field_list:helmsley.ResetMsg.check_values)
+  return _internal_check_values();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+ResetMsg::_internal_mutable_check_values() {
+  return &check_values_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< bool >*
+ResetMsg::mutable_check_values() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.ResetMsg.check_values)
+  return _internal_mutable_check_values();
+}
+
+// repeated float volume_pose = 3;
+inline int ResetMsg::_internal_volume_pose_size() const {
+  return volume_pose_.size();
+}
+inline int ResetMsg::volume_pose_size() const {
+  return _internal_volume_pose_size();
+}
+inline void ResetMsg::clear_volume_pose() {
+  volume_pose_.Clear();
+}
+inline float ResetMsg::_internal_volume_pose(int index) const {
+  return volume_pose_.Get(index);
+}
+inline float ResetMsg::volume_pose(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.ResetMsg.volume_pose)
+  return _internal_volume_pose(index);
+}
+inline void ResetMsg::set_volume_pose(int index, float value) {
+  volume_pose_.Set(index, value);
+  // @@protoc_insertion_point(field_set:helmsley.ResetMsg.volume_pose)
+}
+inline void ResetMsg::_internal_add_volume_pose(float value) {
+  volume_pose_.Add(value);
+}
+inline void ResetMsg::add_volume_pose(float value) {
+  _internal_add_volume_pose(value);
+  // @@protoc_insertion_point(field_add:helmsley.ResetMsg.volume_pose)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+ResetMsg::_internal_volume_pose() const {
+  return volume_pose_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+ResetMsg::volume_pose() const {
+  // @@protoc_insertion_point(field_list:helmsley.ResetMsg.volume_pose)
+  return _internal_volume_pose();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+ResetMsg::_internal_mutable_volume_pose() {
+  return &volume_pose_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+ResetMsg::mutable_volume_pose() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.ResetMsg.volume_pose)
+  return _internal_mutable_volume_pose();
+}
+
+// repeated float camera_pose = 4;
+inline int ResetMsg::_internal_camera_pose_size() const {
+  return camera_pose_.size();
+}
+inline int ResetMsg::camera_pose_size() const {
+  return _internal_camera_pose_size();
+}
+inline void ResetMsg::clear_camera_pose() {
+  camera_pose_.Clear();
+}
+inline float ResetMsg::_internal_camera_pose(int index) const {
+  return camera_pose_.Get(index);
+}
+inline float ResetMsg::camera_pose(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.ResetMsg.camera_pose)
+  return _internal_camera_pose(index);
+}
+inline void ResetMsg::set_camera_pose(int index, float value) {
+  camera_pose_.Set(index, value);
+  // @@protoc_insertion_point(field_set:helmsley.ResetMsg.camera_pose)
+}
+inline void ResetMsg::_internal_add_camera_pose(float value) {
+  camera_pose_.Add(value);
+}
+inline void ResetMsg::add_camera_pose(float value) {
+  _internal_add_camera_pose(value);
+  // @@protoc_insertion_point(field_add:helmsley.ResetMsg.camera_pose)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+ResetMsg::_internal_camera_pose() const {
+  return camera_pose_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+ResetMsg::camera_pose() const {
+  // @@protoc_insertion_point(field_list:helmsley.ResetMsg.camera_pose)
+  return _internal_camera_pose();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+ResetMsg::_internal_mutable_camera_pose() {
+  return &camera_pose_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+ResetMsg::mutable_camera_pose() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.ResetMsg.camera_pose)
+  return _internal_mutable_camera_pose();
+}
+
+// -------------------------------------------------------------------
+
+// TuneMsg
+
+// .helmsley.TuneMsg.TuneType type = 1;
+inline void TuneMsg::clear_type() {
+  type_ = 0;
+}
+inline ::helmsley::TuneMsg_TuneType TuneMsg::_internal_type() const {
+  return static_cast< ::helmsley::TuneMsg_TuneType >(type_);
+}
+inline ::helmsley::TuneMsg_TuneType TuneMsg::type() const {
+  // @@protoc_insertion_point(field_get:helmsley.TuneMsg.type)
+  return _internal_type();
+}
+inline void TuneMsg::_internal_set_type(::helmsley::TuneMsg_TuneType value) {
+  
+  type_ = value;
+}
+inline void TuneMsg::set_type(::helmsley::TuneMsg_TuneType value) {
+  _internal_set_type(value);
+  // @@protoc_insertion_point(field_set:helmsley.TuneMsg.type)
+}
+
+// int32 target = 2;
+inline void TuneMsg::clear_target() {
+  target_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TuneMsg::_internal_target() const {
+  return target_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TuneMsg::target() const {
+  // @@protoc_insertion_point(field_get:helmsley.TuneMsg.target)
+  return _internal_target();
+}
+inline void TuneMsg::_internal_set_target(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  target_ = value;
+}
+inline void TuneMsg::set_target(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_target(value);
+  // @@protoc_insertion_point(field_set:helmsley.TuneMsg.target)
+}
+
+// int32 sub_target = 3;
+inline void TuneMsg::clear_sub_target() {
+  sub_target_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TuneMsg::_internal_sub_target() const {
+  return sub_target_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 TuneMsg::sub_target() const {
+  // @@protoc_insertion_point(field_get:helmsley.TuneMsg.sub_target)
+  return _internal_sub_target();
+}
+inline void TuneMsg::_internal_set_sub_target(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  sub_target_ = value;
+}
+inline void TuneMsg::set_sub_target(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_sub_target(value);
+  // @@protoc_insertion_point(field_set:helmsley.TuneMsg.sub_target)
+}
+
+// float value = 4;
+inline void TuneMsg::clear_value() {
+  value_ = 0;
+}
+inline float TuneMsg::_internal_value() const {
+  return value_;
+}
+inline float TuneMsg::value() const {
+  // @@protoc_insertion_point(field_get:helmsley.TuneMsg.value)
+  return _internal_value();
+}
+inline void TuneMsg::_internal_set_value(float value) {
+  
+  value_ = value;
+}
+inline void TuneMsg::set_value(float value) {
+  _internal_set_value(value);
+  // @@protoc_insertion_point(field_set:helmsley.TuneMsg.value)
+}
+
+// repeated float values = 5;
+inline int TuneMsg::_internal_values_size() const {
+  return values_.size();
+}
+inline int TuneMsg::values_size() const {
+  return _internal_values_size();
+}
+inline void TuneMsg::clear_values() {
+  values_.Clear();
+}
+inline float TuneMsg::_internal_values(int index) const {
+  return values_.Get(index);
+}
+inline float TuneMsg::values(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.TuneMsg.values)
+  return _internal_values(index);
+}
+inline void TuneMsg::set_values(int index, float value) {
+  values_.Set(index, value);
+  // @@protoc_insertion_point(field_set:helmsley.TuneMsg.values)
+}
+inline void TuneMsg::_internal_add_values(float value) {
+  values_.Add(value);
+}
+inline void TuneMsg::add_values(float value) {
+  _internal_add_values(value);
+  // @@protoc_insertion_point(field_add:helmsley.TuneMsg.values)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+TuneMsg::_internal_values() const {
+  return values_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+TuneMsg::values() const {
+  // @@protoc_insertion_point(field_list:helmsley.TuneMsg.values)
+  return _internal_values();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+TuneMsg::_internal_mutable_values() {
+  return &values_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+TuneMsg::mutable_values() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.TuneMsg.values)
+  return _internal_mutable_values();
+}
+
+// -------------------------------------------------------------------
+
+// CheckMsg
+
+// string key = 1;
+inline void CheckMsg::clear_key() {
+  key_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline const std::string& CheckMsg::key() const {
+  // @@protoc_insertion_point(field_get:helmsley.CheckMsg.key)
+  return _internal_key();
+}
+inline void CheckMsg::set_key(const std::string& value) {
+  _internal_set_key(value);
+  // @@protoc_insertion_point(field_set:helmsley.CheckMsg.key)
+}
+inline std::string* CheckMsg::mutable_key() {
+  // @@protoc_insertion_point(field_mutable:helmsley.CheckMsg.key)
+  return _internal_mutable_key();
+}
+inline const std::string& CheckMsg::_internal_key() const {
+  return key_.Get();
+}
+inline void CheckMsg::_internal_set_key(const std::string& value) {
+  
+  key_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), value, GetArena());
+}
+inline void CheckMsg::set_key(std::string&& value) {
+  
+  key_.Set(
+    &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::move(value), GetArena());
+  // @@protoc_insertion_point(field_set_rvalue:helmsley.CheckMsg.key)
+}
+inline void CheckMsg::set_key(const char* value) {
+  GOOGLE_DCHECK(value != nullptr);
+  
+  key_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(value),
+              GetArena());
+  // @@protoc_insertion_point(field_set_char:helmsley.CheckMsg.key)
+}
+inline void CheckMsg::set_key(const char* value,
+    size_t size) {
+  
+  key_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), ::std::string(
+      reinterpret_cast<const char*>(value), size), GetArena());
+  // @@protoc_insertion_point(field_set_pointer:helmsley.CheckMsg.key)
+}
+inline std::string* CheckMsg::_internal_mutable_key() {
+  
+  return key_.Mutable(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline std::string* CheckMsg::release_key() {
+  // @@protoc_insertion_point(field_release:helmsley.CheckMsg.key)
+  return key_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+}
+inline void CheckMsg::set_allocated_key(std::string* key) {
+  if (key != nullptr) {
+    
+  } else {
+    
+  }
+  key_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), key,
+      GetArena());
+  // @@protoc_insertion_point(field_set_allocated:helmsley.CheckMsg.key)
+}
+inline std::string* CheckMsg::unsafe_arena_release_key() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:helmsley.CheckMsg.key)
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  
+  return key_.UnsafeArenaRelease(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      GetArena());
+}
+inline void CheckMsg::unsafe_arena_set_allocated_key(
+    std::string* key) {
+  GOOGLE_DCHECK(GetArena() != nullptr);
+  if (key != nullptr) {
+    
+  } else {
+    
+  }
+  key_.UnsafeArenaSetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      key, GetArena());
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:helmsley.CheckMsg.key)
+}
+
+// bool value = 2;
+inline void CheckMsg::clear_value() {
+  value_ = false;
+}
+inline bool CheckMsg::_internal_value() const {
+  return value_;
+}
+inline bool CheckMsg::value() const {
+  // @@protoc_insertion_point(field_get:helmsley.CheckMsg.value)
+  return _internal_value();
+}
+inline void CheckMsg::_internal_set_value(bool value) {
+  
+  value_ = value;
+}
+inline void CheckMsg::set_value(bool value) {
+  _internal_set_value(value);
+  // @@protoc_insertion_point(field_set:helmsley.CheckMsg.value)
+}
+
+// -------------------------------------------------------------------
+
+// MaskMsg
+
+// int32 num = 1;
+inline void MaskMsg::clear_num() {
+  num_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MaskMsg::_internal_num() const {
+  return num_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MaskMsg::num() const {
+  // @@protoc_insertion_point(field_get:helmsley.MaskMsg.num)
+  return _internal_num();
+}
+inline void MaskMsg::_internal_set_num(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  num_ = value;
+}
+inline void MaskMsg::set_num(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_num(value);
+  // @@protoc_insertion_point(field_set:helmsley.MaskMsg.num)
+}
+
+// int32 mbits = 2;
+inline void MaskMsg::clear_mbits() {
+  mbits_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MaskMsg::_internal_mbits() const {
+  return mbits_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MaskMsg::mbits() const {
+  // @@protoc_insertion_point(field_get:helmsley.MaskMsg.mbits)
+  return _internal_mbits();
+}
+inline void MaskMsg::_internal_set_mbits(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  mbits_ = value;
+}
+inline void MaskMsg::set_mbits(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_mbits(value);
+  // @@protoc_insertion_point(field_set:helmsley.MaskMsg.mbits)
+}
+
+// -------------------------------------------------------------------
+
+// FrameUpdateMsg
+
+// repeated .helmsley.FrameUpdateMsg.MsgType types = 1;
+inline int FrameUpdateMsg::_internal_types_size() const {
+  return types_.size();
+}
+inline int FrameUpdateMsg::types_size() const {
+  return _internal_types_size();
+}
+inline void FrameUpdateMsg::clear_types() {
+  types_.Clear();
+}
+inline ::helmsley::FrameUpdateMsg_MsgType FrameUpdateMsg::_internal_types(int index) const {
+  return static_cast< ::helmsley::FrameUpdateMsg_MsgType >(types_.Get(index));
+}
+inline ::helmsley::FrameUpdateMsg_MsgType FrameUpdateMsg::types(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.FrameUpdateMsg.types)
+  return _internal_types(index);
+}
+inline void FrameUpdateMsg::set_types(int index, ::helmsley::FrameUpdateMsg_MsgType value) {
+  types_.Set(index, value);
+  // @@protoc_insertion_point(field_set:helmsley.FrameUpdateMsg.types)
+}
+inline void FrameUpdateMsg::_internal_add_types(::helmsley::FrameUpdateMsg_MsgType value) {
+  types_.Add(value);
+}
+inline void FrameUpdateMsg::add_types(::helmsley::FrameUpdateMsg_MsgType value) {
+  // @@protoc_insertion_point(field_add:helmsley.FrameUpdateMsg.types)
+  _internal_add_types(value);
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>&
+FrameUpdateMsg::types() const {
+  // @@protoc_insertion_point(field_list:helmsley.FrameUpdateMsg.types)
+  return types_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+FrameUpdateMsg::_internal_mutable_types() {
+  return &types_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
+FrameUpdateMsg::mutable_types() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.FrameUpdateMsg.types)
+  return _internal_mutable_types();
+}
+
+// repeated .helmsley.GestureOp gestures = 2;
+inline int FrameUpdateMsg::_internal_gestures_size() const {
+  return gestures_.size();
+}
+inline int FrameUpdateMsg::gestures_size() const {
+  return _internal_gestures_size();
+}
+inline void FrameUpdateMsg::clear_gestures() {
+  gestures_.Clear();
+}
+inline ::helmsley::GestureOp* FrameUpdateMsg::mutable_gestures(int index) {
+  // @@protoc_insertion_point(field_mutable:helmsley.FrameUpdateMsg.gestures)
+  return gestures_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >*
+FrameUpdateMsg::mutable_gestures() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.FrameUpdateMsg.gestures)
+  return &gestures_;
+}
+inline const ::helmsley::GestureOp& FrameUpdateMsg::_internal_gestures(int index) const {
+  return gestures_.Get(index);
+}
+inline const ::helmsley::GestureOp& FrameUpdateMsg::gestures(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.FrameUpdateMsg.gestures)
+  return _internal_gestures(index);
+}
+inline ::helmsley::GestureOp* FrameUpdateMsg::_internal_add_gestures() {
+  return gestures_.Add();
+}
+inline ::helmsley::GestureOp* FrameUpdateMsg::add_gestures() {
+  // @@protoc_insertion_point(field_add:helmsley.FrameUpdateMsg.gestures)
+  return _internal_add_gestures();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::GestureOp >&
+FrameUpdateMsg::gestures() const {
+  // @@protoc_insertion_point(field_list:helmsley.FrameUpdateMsg.gestures)
+  return gestures_;
+}
+
+// repeated .helmsley.TuneMsg tunes = 3;
+inline int FrameUpdateMsg::_internal_tunes_size() const {
+  return tunes_.size();
+}
+inline int FrameUpdateMsg::tunes_size() const {
+  return _internal_tunes_size();
+}
+inline void FrameUpdateMsg::clear_tunes() {
+  tunes_.Clear();
+}
+inline ::helmsley::TuneMsg* FrameUpdateMsg::mutable_tunes(int index) {
+  // @@protoc_insertion_point(field_mutable:helmsley.FrameUpdateMsg.tunes)
+  return tunes_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::TuneMsg >*
+FrameUpdateMsg::mutable_tunes() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.FrameUpdateMsg.tunes)
+  return &tunes_;
+}
+inline const ::helmsley::TuneMsg& FrameUpdateMsg::_internal_tunes(int index) const {
+  return tunes_.Get(index);
+}
+inline const ::helmsley::TuneMsg& FrameUpdateMsg::tunes(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.FrameUpdateMsg.tunes)
+  return _internal_tunes(index);
+}
+inline ::helmsley::TuneMsg* FrameUpdateMsg::_internal_add_tunes() {
+  return tunes_.Add();
+}
+inline ::helmsley::TuneMsg* FrameUpdateMsg::add_tunes() {
+  // @@protoc_insertion_point(field_add:helmsley.FrameUpdateMsg.tunes)
+  return _internal_add_tunes();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::TuneMsg >&
+FrameUpdateMsg::tunes() const {
+  // @@protoc_insertion_point(field_list:helmsley.FrameUpdateMsg.tunes)
+  return tunes_;
+}
+
+// repeated .helmsley.CheckMsg checks = 4;
+inline int FrameUpdateMsg::_internal_checks_size() const {
+  return checks_.size();
+}
+inline int FrameUpdateMsg::checks_size() const {
+  return _internal_checks_size();
+}
+inline void FrameUpdateMsg::clear_checks() {
+  checks_.Clear();
+}
+inline ::helmsley::CheckMsg* FrameUpdateMsg::mutable_checks(int index) {
+  // @@protoc_insertion_point(field_mutable:helmsley.FrameUpdateMsg.checks)
+  return checks_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::CheckMsg >*
+FrameUpdateMsg::mutable_checks() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.FrameUpdateMsg.checks)
+  return &checks_;
+}
+inline const ::helmsley::CheckMsg& FrameUpdateMsg::_internal_checks(int index) const {
+  return checks_.Get(index);
+}
+inline const ::helmsley::CheckMsg& FrameUpdateMsg::checks(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.FrameUpdateMsg.checks)
+  return _internal_checks(index);
+}
+inline ::helmsley::CheckMsg* FrameUpdateMsg::_internal_add_checks() {
+  return checks_.Add();
+}
+inline ::helmsley::CheckMsg* FrameUpdateMsg::add_checks() {
+  // @@protoc_insertion_point(field_add:helmsley.FrameUpdateMsg.checks)
+  return _internal_add_checks();
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::helmsley::CheckMsg >&
+FrameUpdateMsg::checks() const {
+  // @@protoc_insertion_point(field_list:helmsley.FrameUpdateMsg.checks)
+  return checks_;
+}
+
+// .helmsley.MaskMsg mask_value = 5;
+inline bool FrameUpdateMsg::_internal_has_mask_value() const {
+  return this != internal_default_instance() && mask_value_ != nullptr;
+}
+inline bool FrameUpdateMsg::has_mask_value() const {
+  return _internal_has_mask_value();
+}
+inline void FrameUpdateMsg::clear_mask_value() {
+  if (GetArena() == nullptr && mask_value_ != nullptr) {
+    delete mask_value_;
+  }
+  mask_value_ = nullptr;
+}
+inline const ::helmsley::MaskMsg& FrameUpdateMsg::_internal_mask_value() const {
+  const ::helmsley::MaskMsg* p = mask_value_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::helmsley::MaskMsg*>(
+      &::helmsley::_MaskMsg_default_instance_);
+}
+inline const ::helmsley::MaskMsg& FrameUpdateMsg::mask_value() const {
+  // @@protoc_insertion_point(field_get:helmsley.FrameUpdateMsg.mask_value)
+  return _internal_mask_value();
+}
+inline void FrameUpdateMsg::unsafe_arena_set_allocated_mask_value(
+    ::helmsley::MaskMsg* mask_value) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(mask_value_);
+  }
+  mask_value_ = mask_value;
+  if (mask_value) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:helmsley.FrameUpdateMsg.mask_value)
+}
+inline ::helmsley::MaskMsg* FrameUpdateMsg::release_mask_value() {
+  auto temp = unsafe_arena_release_mask_value();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::helmsley::MaskMsg* FrameUpdateMsg::unsafe_arena_release_mask_value() {
+  // @@protoc_insertion_point(field_release:helmsley.FrameUpdateMsg.mask_value)
+  
+  ::helmsley::MaskMsg* temp = mask_value_;
+  mask_value_ = nullptr;
+  return temp;
+}
+inline ::helmsley::MaskMsg* FrameUpdateMsg::_internal_mutable_mask_value() {
+  
+  if (mask_value_ == nullptr) {
+    auto* p = CreateMaybeMessage<::helmsley::MaskMsg>(GetArena());
+    mask_value_ = p;
+  }
+  return mask_value_;
+}
+inline ::helmsley::MaskMsg* FrameUpdateMsg::mutable_mask_value() {
+  // @@protoc_insertion_point(field_mutable:helmsley.FrameUpdateMsg.mask_value)
+  return _internal_mutable_mask_value();
+}
+inline void FrameUpdateMsg::set_allocated_mask_value(::helmsley::MaskMsg* mask_value) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete mask_value_;
+  }
+  if (mask_value) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(mask_value);
+    if (message_arena != submessage_arena) {
+      mask_value = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, mask_value, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  mask_value_ = mask_value;
+  // @@protoc_insertion_point(field_set_allocated:helmsley.FrameUpdateMsg.mask_value)
+}
+
+// .helmsley.ResetMsg reset_value = 6;
+inline bool FrameUpdateMsg::_internal_has_reset_value() const {
+  return this != internal_default_instance() && reset_value_ != nullptr;
+}
+inline bool FrameUpdateMsg::has_reset_value() const {
+  return _internal_has_reset_value();
+}
+inline void FrameUpdateMsg::clear_reset_value() {
+  if (GetArena() == nullptr && reset_value_ != nullptr) {
+    delete reset_value_;
+  }
+  reset_value_ = nullptr;
+}
+inline const ::helmsley::ResetMsg& FrameUpdateMsg::_internal_reset_value() const {
+  const ::helmsley::ResetMsg* p = reset_value_;
+  return p != nullptr ? *p : *reinterpret_cast<const ::helmsley::ResetMsg*>(
+      &::helmsley::_ResetMsg_default_instance_);
+}
+inline const ::helmsley::ResetMsg& FrameUpdateMsg::reset_value() const {
+  // @@protoc_insertion_point(field_get:helmsley.FrameUpdateMsg.reset_value)
+  return _internal_reset_value();
+}
+inline void FrameUpdateMsg::unsafe_arena_set_allocated_reset_value(
+    ::helmsley::ResetMsg* reset_value) {
+  if (GetArena() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(reset_value_);
+  }
+  reset_value_ = reset_value;
+  if (reset_value) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:helmsley.FrameUpdateMsg.reset_value)
+}
+inline ::helmsley::ResetMsg* FrameUpdateMsg::release_reset_value() {
+  auto temp = unsafe_arena_release_reset_value();
+  if (GetArena() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+  return temp;
+}
+inline ::helmsley::ResetMsg* FrameUpdateMsg::unsafe_arena_release_reset_value() {
+  // @@protoc_insertion_point(field_release:helmsley.FrameUpdateMsg.reset_value)
+  
+  ::helmsley::ResetMsg* temp = reset_value_;
+  reset_value_ = nullptr;
+  return temp;
+}
+inline ::helmsley::ResetMsg* FrameUpdateMsg::_internal_mutable_reset_value() {
+  
+  if (reset_value_ == nullptr) {
+    auto* p = CreateMaybeMessage<::helmsley::ResetMsg>(GetArena());
+    reset_value_ = p;
+  }
+  return reset_value_;
+}
+inline ::helmsley::ResetMsg* FrameUpdateMsg::mutable_reset_value() {
+  // @@protoc_insertion_point(field_mutable:helmsley.FrameUpdateMsg.reset_value)
+  return _internal_mutable_reset_value();
+}
+inline void FrameUpdateMsg::set_allocated_reset_value(::helmsley::ResetMsg* reset_value) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+  if (message_arena == nullptr) {
+    delete reset_value_;
+  }
+  if (reset_value) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(reset_value);
+    if (message_arena != submessage_arena) {
+      reset_value = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, reset_value, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  reset_value_ = reset_value;
+  // @@protoc_insertion_point(field_set_allocated:helmsley.FrameUpdateMsg.reset_value)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -1017,6 +2992,16 @@ template <> struct is_proto_enum< ::helmsley::GestureOp_OPType> : ::std::true_ty
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::helmsley::GestureOp_OPType>() {
   return ::helmsley::GestureOp_OPType_descriptor();
+}
+template <> struct is_proto_enum< ::helmsley::TuneMsg_TuneType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::helmsley::TuneMsg_TuneType>() {
+  return ::helmsley::TuneMsg_TuneType_descriptor();
+}
+template <> struct is_proto_enum< ::helmsley::FrameUpdateMsg_MsgType> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::helmsley::FrameUpdateMsg_MsgType>() {
+  return ::helmsley::FrameUpdateMsg_MsgType_descriptor();
 }
 template <> struct is_proto_enum< ::helmsley::ReqType> : ::std::true_type {};
 template <>

@@ -21,6 +21,7 @@ import com.google.common.primitives.Floats;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 
@@ -173,9 +174,19 @@ public class renderUIs extends BasePanel{
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
-        map.put("contrast", rendertuneAdapter.getCurrentValues());
-        ArrayList<float[]> opa_values = new ArrayList<>();
-        opa_values.addAll(widAdapter.getAllValues());
+        ArrayList<Float> contrast_values= new ArrayList<Float>(); // (Arrays.asList((Float[])rendertuneAdapter.getCurrentValues()));\
+        for(float v: rendertuneAdapter.getCurrentValues())contrast_values.add(v);
+        map.put("contrast", contrast_values);
+//        ArrayList<float[]> opa_values = new ArrayList<>();
+//        opa_values.addAll(widAdapter.getAllValues());
+
+       ArrayList<ArrayList<Float>> opa_values = new ArrayList<>();
+        for(float[] v: widAdapter.getAllValues()){
+            ArrayList<Float> vl = new ArrayList<Float>();
+            for(float vli: v) vl.add(vli);
+            opa_values.add(vl);
+        }
+
         map.put("opacity", opa_values);
         map.put("color scheme", colorAdapter.getTitle());
         return map;

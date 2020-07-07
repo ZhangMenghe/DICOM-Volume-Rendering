@@ -24,8 +24,13 @@ namespace helmsley {
 static const char* inspectorSync_method_names[] = {
   "/helmsley.inspectorSync/startBroadcast",
   "/helmsley.inspectorSync/gsVolumePose",
-  "/helmsley.inspectorSync/setGestureOp",
   "/helmsley.inspectorSync/getOperations",
+  "/helmsley.inspectorSync/getUpdates",
+  "/helmsley.inspectorSync/reqestReset",
+  "/helmsley.inspectorSync/setGestureOp",
+  "/helmsley.inspectorSync/setTuneParams",
+  "/helmsley.inspectorSync/setCheckParams",
+  "/helmsley.inspectorSync/setMaskParams",
 };
 
 std::unique_ptr< inspectorSync::Stub> inspectorSync::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -37,8 +42,13 @@ std::unique_ptr< inspectorSync::Stub> inspectorSync::NewStub(const std::shared_p
 inspectorSync::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
   : channel_(channel), rpcmethod_startBroadcast_(inspectorSync_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   , rpcmethod_gsVolumePose_(inspectorSync_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_setGestureOp_(inspectorSync_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_getOperations_(inspectorSync_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_getOperations_(inspectorSync_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_getUpdates_(inspectorSync_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_reqestReset_(inspectorSync_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_setGestureOp_(inspectorSync_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_setTuneParams_(inspectorSync_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_setCheckParams_(inspectorSync_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_setMaskParams_(inspectorSync_method_names[8], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status inspectorSync::Stub::startBroadcast(::grpc::ClientContext* context, const ::Request& request, ::commonResponse* response) {
@@ -97,34 +107,6 @@ void inspectorSync::Stub::experimental_async::gsVolumePose(::grpc::ClientContext
   return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_gsVolumePose_, context, request, false);
 }
 
-::grpc::Status inspectorSync::Stub::setGestureOp(::grpc::ClientContext* context, const ::helmsley::GestureOp& request, ::commonResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_setGestureOp_, context, request, response);
-}
-
-void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::helmsley::GestureOp* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, std::move(f));
-}
-
-void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
-  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, std::move(f));
-}
-
-void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::helmsley::GestureOp* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, reactor);
-}
-
-void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
-  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, reactor);
-}
-
-::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::AsyncsetGestureOpRaw(::grpc::ClientContext* context, const ::helmsley::GestureOp& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setGestureOp_, context, request, true);
-}
-
-::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::PrepareAsyncsetGestureOpRaw(::grpc::ClientContext* context, const ::helmsley::GestureOp& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setGestureOp_, context, request, false);
-}
-
 ::grpc::Status inspectorSync::Stub::getOperations(::grpc::ClientContext* context, const ::Request& request, ::helmsley::OperationBatch* response) {
   return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_getOperations_, context, request, response);
 }
@@ -153,6 +135,174 @@ void inspectorSync::Stub::experimental_async::getOperations(::grpc::ClientContex
   return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::helmsley::OperationBatch>::Create(channel_.get(), cq, rpcmethod_getOperations_, context, request, false);
 }
 
+::grpc::Status inspectorSync::Stub::getUpdates(::grpc::ClientContext* context, const ::Request& request, ::helmsley::FrameUpdateMsg* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_getUpdates_, context, request, response);
+}
+
+void inspectorSync::Stub::experimental_async::getUpdates(::grpc::ClientContext* context, const ::Request* request, ::helmsley::FrameUpdateMsg* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_getUpdates_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::getUpdates(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::helmsley::FrameUpdateMsg* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_getUpdates_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::getUpdates(::grpc::ClientContext* context, const ::Request* request, ::helmsley::FrameUpdateMsg* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_getUpdates_, context, request, response, reactor);
+}
+
+void inspectorSync::Stub::experimental_async::getUpdates(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::helmsley::FrameUpdateMsg* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_getUpdates_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::helmsley::FrameUpdateMsg>* inspectorSync::Stub::AsyncgetUpdatesRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::helmsley::FrameUpdateMsg>::Create(channel_.get(), cq, rpcmethod_getUpdates_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::helmsley::FrameUpdateMsg>* inspectorSync::Stub::PrepareAsyncgetUpdatesRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::helmsley::FrameUpdateMsg>::Create(channel_.get(), cq, rpcmethod_getUpdates_, context, request, false);
+}
+
+::grpc::Status inspectorSync::Stub::reqestReset(::grpc::ClientContext* context, const ::helmsley::ResetMsg& request, ::commonResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_reqestReset_, context, request, response);
+}
+
+void inspectorSync::Stub::experimental_async::reqestReset(::grpc::ClientContext* context, const ::helmsley::ResetMsg* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_reqestReset_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::reqestReset(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_reqestReset_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::reqestReset(::grpc::ClientContext* context, const ::helmsley::ResetMsg* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_reqestReset_, context, request, response, reactor);
+}
+
+void inspectorSync::Stub::experimental_async::reqestReset(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_reqestReset_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::AsyncreqestResetRaw(::grpc::ClientContext* context, const ::helmsley::ResetMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_reqestReset_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::PrepareAsyncreqestResetRaw(::grpc::ClientContext* context, const ::helmsley::ResetMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_reqestReset_, context, request, false);
+}
+
+::grpc::Status inspectorSync::Stub::setGestureOp(::grpc::ClientContext* context, const ::helmsley::GestureOp& request, ::commonResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_setGestureOp_, context, request, response);
+}
+
+void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::helmsley::GestureOp* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::helmsley::GestureOp* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, reactor);
+}
+
+void inspectorSync::Stub::experimental_async::setGestureOp(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setGestureOp_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::AsyncsetGestureOpRaw(::grpc::ClientContext* context, const ::helmsley::GestureOp& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setGestureOp_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::PrepareAsyncsetGestureOpRaw(::grpc::ClientContext* context, const ::helmsley::GestureOp& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setGestureOp_, context, request, false);
+}
+
+::grpc::Status inspectorSync::Stub::setTuneParams(::grpc::ClientContext* context, const ::helmsley::TuneMsg& request, ::commonResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_setTuneParams_, context, request, response);
+}
+
+void inspectorSync::Stub::experimental_async::setTuneParams(::grpc::ClientContext* context, const ::helmsley::TuneMsg* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setTuneParams_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setTuneParams(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setTuneParams_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setTuneParams(::grpc::ClientContext* context, const ::helmsley::TuneMsg* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setTuneParams_, context, request, response, reactor);
+}
+
+void inspectorSync::Stub::experimental_async::setTuneParams(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setTuneParams_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::AsyncsetTuneParamsRaw(::grpc::ClientContext* context, const ::helmsley::TuneMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setTuneParams_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::PrepareAsyncsetTuneParamsRaw(::grpc::ClientContext* context, const ::helmsley::TuneMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setTuneParams_, context, request, false);
+}
+
+::grpc::Status inspectorSync::Stub::setCheckParams(::grpc::ClientContext* context, const ::helmsley::CheckMsg& request, ::commonResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_setCheckParams_, context, request, response);
+}
+
+void inspectorSync::Stub::experimental_async::setCheckParams(::grpc::ClientContext* context, const ::helmsley::CheckMsg* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setCheckParams_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setCheckParams(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setCheckParams_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setCheckParams(::grpc::ClientContext* context, const ::helmsley::CheckMsg* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setCheckParams_, context, request, response, reactor);
+}
+
+void inspectorSync::Stub::experimental_async::setCheckParams(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setCheckParams_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::AsyncsetCheckParamsRaw(::grpc::ClientContext* context, const ::helmsley::CheckMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setCheckParams_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::PrepareAsyncsetCheckParamsRaw(::grpc::ClientContext* context, const ::helmsley::CheckMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setCheckParams_, context, request, false);
+}
+
+::grpc::Status inspectorSync::Stub::setMaskParams(::grpc::ClientContext* context, const ::helmsley::MaskMsg& request, ::commonResponse* response) {
+  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_setMaskParams_, context, request, response);
+}
+
+void inspectorSync::Stub::experimental_async::setMaskParams(::grpc::ClientContext* context, const ::helmsley::MaskMsg* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setMaskParams_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setMaskParams(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc_impl::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_setMaskParams_, context, request, response, std::move(f));
+}
+
+void inspectorSync::Stub::experimental_async::setMaskParams(::grpc::ClientContext* context, const ::helmsley::MaskMsg* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setMaskParams_, context, request, response, reactor);
+}
+
+void inspectorSync::Stub::experimental_async::setMaskParams(::grpc::ClientContext* context, const ::grpc::ByteBuffer* request, ::commonResponse* response, ::grpc::experimental::ClientUnaryReactor* reactor) {
+  ::grpc_impl::internal::ClientCallbackUnaryFactory::Create(stub_->channel_.get(), stub_->rpcmethod_setMaskParams_, context, request, response, reactor);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::AsyncsetMaskParamsRaw(::grpc::ClientContext* context, const ::helmsley::MaskMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setMaskParams_, context, request, true);
+}
+
+::grpc::ClientAsyncResponseReader< ::commonResponse>* inspectorSync::Stub::PrepareAsyncsetMaskParamsRaw(::grpc::ClientContext* context, const ::helmsley::MaskMsg& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncResponseReaderFactory< ::commonResponse>::Create(channel_.get(), cq, rpcmethod_setMaskParams_, context, request, false);
+}
+
 inspectorSync::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       inspectorSync_method_names[0],
@@ -177,6 +327,36 @@ inspectorSync::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       inspectorSync_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::Request, ::helmsley::OperationBatch>(
+          [](inspectorSync::Service* service,
+             ::grpc_impl::ServerContext* ctx,
+             const ::Request* req,
+             ::helmsley::OperationBatch* resp) {
+               return service->getOperations(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      inspectorSync_method_names[3],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::Request, ::helmsley::FrameUpdateMsg>(
+          [](inspectorSync::Service* service,
+             ::grpc_impl::ServerContext* ctx,
+             const ::Request* req,
+             ::helmsley::FrameUpdateMsg* resp) {
+               return service->getUpdates(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      inspectorSync_method_names[4],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::helmsley::ResetMsg, ::commonResponse>(
+          [](inspectorSync::Service* service,
+             ::grpc_impl::ServerContext* ctx,
+             const ::helmsley::ResetMsg* req,
+             ::commonResponse* resp) {
+               return service->reqestReset(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      inspectorSync_method_names[5],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
       new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::helmsley::GestureOp, ::commonResponse>(
           [](inspectorSync::Service* service,
              ::grpc_impl::ServerContext* ctx,
@@ -185,14 +365,34 @@ inspectorSync::Service::Service() {
                return service->setGestureOp(ctx, req, resp);
              }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
-      inspectorSync_method_names[3],
+      inspectorSync_method_names[6],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::Request, ::helmsley::OperationBatch>(
+      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::helmsley::TuneMsg, ::commonResponse>(
           [](inspectorSync::Service* service,
              ::grpc_impl::ServerContext* ctx,
-             const ::Request* req,
-             ::helmsley::OperationBatch* resp) {
-               return service->getOperations(ctx, req, resp);
+             const ::helmsley::TuneMsg* req,
+             ::commonResponse* resp) {
+               return service->setTuneParams(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      inspectorSync_method_names[7],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::helmsley::CheckMsg, ::commonResponse>(
+          [](inspectorSync::Service* service,
+             ::grpc_impl::ServerContext* ctx,
+             const ::helmsley::CheckMsg* req,
+             ::commonResponse* resp) {
+               return service->setCheckParams(ctx, req, resp);
+             }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      inspectorSync_method_names[8],
+      ::grpc::internal::RpcMethod::NORMAL_RPC,
+      new ::grpc::internal::RpcMethodHandler< inspectorSync::Service, ::helmsley::MaskMsg, ::commonResponse>(
+          [](inspectorSync::Service* service,
+             ::grpc_impl::ServerContext* ctx,
+             const ::helmsley::MaskMsg* req,
+             ::commonResponse* resp) {
+               return service->setMaskParams(ctx, req, resp);
              }, this)));
 }
 
@@ -213,6 +413,27 @@ inspectorSync::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
+::grpc::Status inspectorSync::Service::getOperations(::grpc::ServerContext* context, const ::Request* request, ::helmsley::OperationBatch* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status inspectorSync::Service::getUpdates(::grpc::ServerContext* context, const ::Request* request, ::helmsley::FrameUpdateMsg* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status inspectorSync::Service::reqestReset(::grpc::ServerContext* context, const ::helmsley::ResetMsg* request, ::commonResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
 ::grpc::Status inspectorSync::Service::setGestureOp(::grpc::ServerContext* context, const ::helmsley::GestureOp* request, ::commonResponse* response) {
   (void) context;
   (void) request;
@@ -220,7 +441,21 @@ inspectorSync::Service::~Service() {
   return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
 }
 
-::grpc::Status inspectorSync::Service::getOperations(::grpc::ServerContext* context, const ::Request* request, ::helmsley::OperationBatch* response) {
+::grpc::Status inspectorSync::Service::setTuneParams(::grpc::ServerContext* context, const ::helmsley::TuneMsg* request, ::commonResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status inspectorSync::Service::setCheckParams(::grpc::ServerContext* context, const ::helmsley::CheckMsg* request, ::commonResponse* response) {
+  (void) context;
+  (void) request;
+  (void) response;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status inspectorSync::Service::setMaskParams(::grpc::ServerContext* context, const ::helmsley::MaskMsg* request, ::commonResponse* response) {
   (void) context;
   (void) request;
   (void) response;

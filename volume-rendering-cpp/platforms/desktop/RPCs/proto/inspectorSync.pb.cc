@@ -14,7 +14,11 @@
 #include <google/protobuf/wire_format.h>
 // @@protoc_insertion_point(includes)
 #include <google/protobuf/port_def.inc>
+extern PROTOBUF_INTERNAL_EXPORT_proto_2finspectorSync_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_CheckMsg_proto_2finspectorSync_2eproto;
 extern PROTOBUF_INTERNAL_EXPORT_proto_2finspectorSync_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GestureOp_proto_2finspectorSync_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_proto_2finspectorSync_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MaskMsg_proto_2finspectorSync_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_proto_2finspectorSync_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ResetMsg_proto_2finspectorSync_2eproto;
+extern PROTOBUF_INTERNAL_EXPORT_proto_2finspectorSync_2eproto ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TuneMsg_proto_2finspectorSync_2eproto;
 namespace helmsley {
 class VPMsgDefaultTypeInternal {
  public:
@@ -28,7 +32,60 @@ class OperationBatchDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<OperationBatch> _instance;
 } _OperationBatch_default_instance_;
+class ResetMsgDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<ResetMsg> _instance;
+} _ResetMsg_default_instance_;
+class TuneMsgDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<TuneMsg> _instance;
+} _TuneMsg_default_instance_;
+class CheckMsgDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<CheckMsg> _instance;
+} _CheckMsg_default_instance_;
+class MaskMsgDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<MaskMsg> _instance;
+} _MaskMsg_default_instance_;
+class FrameUpdateMsgDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<FrameUpdateMsg> _instance;
+} _FrameUpdateMsg_default_instance_;
 }  // namespace helmsley
+static void InitDefaultsscc_info_CheckMsg_proto_2finspectorSync_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::helmsley::_CheckMsg_default_instance_;
+    new (ptr) ::helmsley::CheckMsg();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::helmsley::CheckMsg::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_CheckMsg_proto_2finspectorSync_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_CheckMsg_proto_2finspectorSync_2eproto}, {}};
+
+static void InitDefaultsscc_info_FrameUpdateMsg_proto_2finspectorSync_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::helmsley::_FrameUpdateMsg_default_instance_;
+    new (ptr) ::helmsley::FrameUpdateMsg();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::helmsley::FrameUpdateMsg::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<5> scc_info_FrameUpdateMsg_proto_2finspectorSync_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 5, 0, InitDefaultsscc_info_FrameUpdateMsg_proto_2finspectorSync_2eproto}, {
+      &scc_info_GestureOp_proto_2finspectorSync_2eproto.base,
+      &scc_info_TuneMsg_proto_2finspectorSync_2eproto.base,
+      &scc_info_CheckMsg_proto_2finspectorSync_2eproto.base,
+      &scc_info_MaskMsg_proto_2finspectorSync_2eproto.base,
+      &scc_info_ResetMsg_proto_2finspectorSync_2eproto.base,}};
+
 static void InitDefaultsscc_info_GestureOp_proto_2finspectorSync_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -42,6 +99,20 @@ static void InitDefaultsscc_info_GestureOp_proto_2finspectorSync_2eproto() {
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_GestureOp_proto_2finspectorSync_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_GestureOp_proto_2finspectorSync_2eproto}, {}};
+
+static void InitDefaultsscc_info_MaskMsg_proto_2finspectorSync_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::helmsley::_MaskMsg_default_instance_;
+    new (ptr) ::helmsley::MaskMsg();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::helmsley::MaskMsg::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_MaskMsg_proto_2finspectorSync_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_MaskMsg_proto_2finspectorSync_2eproto}, {}};
 
 static void InitDefaultsscc_info_OperationBatch_proto_2finspectorSync_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -58,6 +129,34 @@ static void InitDefaultsscc_info_OperationBatch_proto_2finspectorSync_2eproto() 
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 1, 0, InitDefaultsscc_info_OperationBatch_proto_2finspectorSync_2eproto}, {
       &scc_info_GestureOp_proto_2finspectorSync_2eproto.base,}};
 
+static void InitDefaultsscc_info_ResetMsg_proto_2finspectorSync_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::helmsley::_ResetMsg_default_instance_;
+    new (ptr) ::helmsley::ResetMsg();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::helmsley::ResetMsg::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_ResetMsg_proto_2finspectorSync_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_ResetMsg_proto_2finspectorSync_2eproto}, {}};
+
+static void InitDefaultsscc_info_TuneMsg_proto_2finspectorSync_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::helmsley::_TuneMsg_default_instance_;
+    new (ptr) ::helmsley::TuneMsg();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::helmsley::TuneMsg::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_TuneMsg_proto_2finspectorSync_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_TuneMsg_proto_2finspectorSync_2eproto}, {}};
+
 static void InitDefaultsscc_info_VPMsg_proto_2finspectorSync_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -72,8 +171,8 @@ static void InitDefaultsscc_info_VPMsg_proto_2finspectorSync_2eproto() {
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_VPMsg_proto_2finspectorSync_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_VPMsg_proto_2finspectorSync_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_proto_2finspectorSync_2eproto[3];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_proto_2finspectorSync_2eproto[3];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_proto_2finspectorSync_2eproto[8];
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_proto_2finspectorSync_2eproto[5];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_proto_2finspectorSync_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_proto_2finspectorSync_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -102,17 +201,71 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_proto_2finspectorSync_2eproto:
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::helmsley::OperationBatch, bid_),
   PROTOBUF_FIELD_OFFSET(::helmsley::OperationBatch, gesture_op_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::helmsley::ResetMsg, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::helmsley::ResetMsg, check_keys_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::ResetMsg, check_values_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::ResetMsg, volume_pose_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::ResetMsg, camera_pose_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::helmsley::TuneMsg, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::helmsley::TuneMsg, type_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::TuneMsg, target_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::TuneMsg, sub_target_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::TuneMsg, value_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::TuneMsg, values_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::helmsley::CheckMsg, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::helmsley::CheckMsg, key_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::CheckMsg, value_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::helmsley::MaskMsg, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::helmsley::MaskMsg, num_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::MaskMsg, mbits_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::helmsley::FrameUpdateMsg, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::helmsley::FrameUpdateMsg, types_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::FrameUpdateMsg, gestures_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::FrameUpdateMsg, tunes_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::FrameUpdateMsg, checks_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::FrameUpdateMsg, mask_value_),
+  PROTOBUF_FIELD_OFFSET(::helmsley::FrameUpdateMsg, reset_value_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::helmsley::VPMsg)},
   { 9, -1, sizeof(::helmsley::GestureOp)},
   { 18, -1, sizeof(::helmsley::OperationBatch)},
+  { 25, -1, sizeof(::helmsley::ResetMsg)},
+  { 34, -1, sizeof(::helmsley::TuneMsg)},
+  { 44, -1, sizeof(::helmsley::CheckMsg)},
+  { 51, -1, sizeof(::helmsley::MaskMsg)},
+  { 58, -1, sizeof(::helmsley::FrameUpdateMsg)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_VPMsg_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_GestureOp_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_OperationBatch_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_ResetMsg_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_TuneMsg_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_CheckMsg_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_MaskMsg_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_FrameUpdateMsg_default_instance_),
 };
 
 const char descriptor_table_protodef_proto_2finspectorSync_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -122,33 +275,64 @@ const char descriptor_table_protodef_proto_2finspectorSync_2eproto[] PROTOBUF_SE
   "ype\0220\n\020volume_pose_type\030\003 \001(\0162\026.helmsley"
   ".VPMsg.VPType\022\016\n\006values\030\004 \003(\002\"%\n\006VPType\022"
   "\007\n\003POS\020\000\022\t\n\005SCALE\020\001\022\007\n\003ROT\020\002\"\226\001\n\tGesture"
-  "Op\022\013\n\003gid\030\001 \001(\005\022(\n\004type\030\002 \001(\0162\032.helmsley"
+  "Op\022\013\n\003gid\030\001 \001(\003\022(\n\004type\030\002 \001(\0162\032.helmsley"
   ".GestureOp.OPType\022\t\n\001x\030\003 \001(\002\022\t\n\001y\030\004 \001(\002\""
   "<\n\006OPType\022\016\n\nTOUCH_DOWN\020\000\022\016\n\nTOUCH_MOVE\020"
   "\001\022\t\n\005SCALE\020\002\022\007\n\003PAN\020\003\"F\n\016OperationBatch\022"
   "\013\n\003bid\030\001 \001(\002\022\'\n\ngesture_op\030\002 \003(\0132\023.helms"
-  "ley.GestureOp*\033\n\007ReqType\022\007\n\003SET\020\000\022\007\n\003GET"
-  "\020\0012\331\001\n\rinspectorSync\022+\n\016startBroadcast\022\010"
-  ".Request\032\017.commonResponse\0220\n\014gsVolumePos"
-  "e\022\017.helmsley.VPMsg\032\017.commonResponse\0224\n\014s"
-  "etGestureOp\022\023.helmsley.GestureOp\032\017.commo"
-  "nResponse\0223\n\rgetOperations\022\010.Request\032\030.h"
-  "elmsley.OperationBatchb\006proto3"
+  "ley.GestureOp\"^\n\010ResetMsg\022\022\n\ncheck_keys\030"
+  "\001 \003(\t\022\024\n\014check_values\030\002 \003(\010\022\023\n\013volume_po"
+  "se\030\003 \003(\002\022\023\n\013camera_pose\030\004 \003(\002\"\214\002\n\007TuneMs"
+  "g\022(\n\004type\030\001 \001(\0162\032.helmsley.TuneMsg.TuneT"
+  "ype\022\016\n\006target\030\002 \001(\005\022\022\n\nsub_target\030\003 \001(\005\022"
+  "\r\n\005value\030\004 \001(\002\022\016\n\006values\030\005 \003(\002\"\223\001\n\010TuneT"
+  "ype\022\013\n\007ADD_ONE\020\000\022\016\n\nREMOVE_ONE\020\001\022\016\n\nREMO"
+  "TE_ALL\020\002\022\013\n\007SET_ONE\020\003\022\013\n\007SET_ALL\020\004\022\017\n\013SE"
+  "T_VISIBLE\020\005\022\016\n\nSET_TARGET\020\006\022\r\n\tCUT_PLANE"
+  "\020\007\022\020\n\014COLOR_SCHEME\020\010\"&\n\010CheckMsg\022\013\n\003key\030"
+  "\001 \001(\t\022\r\n\005value\030\002 \001(\010\"%\n\007MaskMsg\022\013\n\003num\030\001"
+  " \001(\005\022\r\n\005mbits\030\002 \001(\005\"\300\002\n\016FrameUpdateMsg\022/"
+  "\n\005types\030\001 \003(\0162 .helmsley.FrameUpdateMsg."
+  "MsgType\022%\n\010gestures\030\002 \003(\0132\023.helmsley.Ges"
+  "tureOp\022 \n\005tunes\030\003 \003(\0132\021.helmsley.TuneMsg"
+  "\022\"\n\006checks\030\004 \003(\0132\022.helmsley.CheckMsg\022%\n\n"
+  "mask_value\030\005 \001(\0132\021.helmsley.MaskMsg\022\'\n\013r"
+  "eset_value\030\006 \001(\0132\022.helmsley.ResetMsg\"@\n\007"
+  "MsgType\022\013\n\007GESTURE\020\000\022\010\n\004TUNE\020\001\022\t\n\005CHECK\020"
+  "\002\022\010\n\004MASK\020\003\022\t\n\005RESET\020\004*\033\n\007ReqType\022\007\n\003SET"
+  "\020\000\022\007\n\003GET\020\0012\340\003\n\rinspectorSync\022+\n\016startBr"
+  "oadcast\022\010.Request\032\017.commonResponse\0220\n\014gs"
+  "VolumePose\022\017.helmsley.VPMsg\032\017.commonResp"
+  "onse\0223\n\rgetOperations\022\010.Request\032\030.helmsl"
+  "ey.OperationBatch\0220\n\ngetUpdates\022\010.Reques"
+  "t\032\030.helmsley.FrameUpdateMsg\0222\n\013reqestRes"
+  "et\022\022.helmsley.ResetMsg\032\017.commonResponse\022"
+  "4\n\014setGestureOp\022\023.helmsley.GestureOp\032\017.c"
+  "ommonResponse\0223\n\rsetTuneParams\022\021.helmsle"
+  "y.TuneMsg\032\017.commonResponse\0225\n\016setCheckPa"
+  "rams\022\022.helmsley.CheckMsg\032\017.commonRespons"
+  "e\0223\n\rsetMaskParams\022\021.helmsley.MaskMsg\032\017."
+  "commonResponseb\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_proto_2finspectorSync_2eproto_deps[1] = {
   &::descriptor_table_proto_2fcommon_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_proto_2finspectorSync_2eproto_sccs[3] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_proto_2finspectorSync_2eproto_sccs[8] = {
+  &scc_info_CheckMsg_proto_2finspectorSync_2eproto.base,
+  &scc_info_FrameUpdateMsg_proto_2finspectorSync_2eproto.base,
   &scc_info_GestureOp_proto_2finspectorSync_2eproto.base,
+  &scc_info_MaskMsg_proto_2finspectorSync_2eproto.base,
   &scc_info_OperationBatch_proto_2finspectorSync_2eproto.base,
+  &scc_info_ResetMsg_proto_2finspectorSync_2eproto.base,
+  &scc_info_TuneMsg_proto_2finspectorSync_2eproto.base,
   &scc_info_VPMsg_proto_2finspectorSync_2eproto.base,
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_proto_2finspectorSync_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_proto_2finspectorSync_2eproto = {
-  false, false, descriptor_table_protodef_proto_2finspectorSync_2eproto, "proto/inspectorSync.proto", 710,
-  &descriptor_table_proto_2finspectorSync_2eproto_once, descriptor_table_proto_2finspectorSync_2eproto_sccs, descriptor_table_proto_2finspectorSync_2eproto_deps, 3, 1,
+  false, false, descriptor_table_protodef_proto_2finspectorSync_2eproto, "proto/inspectorSync.proto", 1742,
+  &descriptor_table_proto_2finspectorSync_2eproto_once, descriptor_table_proto_2finspectorSync_2eproto_sccs, descriptor_table_proto_2finspectorSync_2eproto_deps, 8, 1,
   schemas, file_default_instances, TableStruct_proto_2finspectorSync_2eproto::offsets,
-  file_level_metadata_proto_2finspectorSync_2eproto, 3, file_level_enum_descriptors_proto_2finspectorSync_2eproto, file_level_service_descriptors_proto_2finspectorSync_2eproto,
+  file_level_metadata_proto_2finspectorSync_2eproto, 8, file_level_enum_descriptors_proto_2finspectorSync_2eproto, file_level_service_descriptors_proto_2finspectorSync_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -202,9 +386,71 @@ constexpr GestureOp_OPType GestureOp::OPType_MIN;
 constexpr GestureOp_OPType GestureOp::OPType_MAX;
 constexpr int GestureOp::OPType_ARRAYSIZE;
 #endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
-const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ReqType_descriptor() {
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* TuneMsg_TuneType_descriptor() {
   ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_proto_2finspectorSync_2eproto);
   return file_level_enum_descriptors_proto_2finspectorSync_2eproto[2];
+}
+bool TuneMsg_TuneType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+    case 5:
+    case 6:
+    case 7:
+    case 8:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr TuneMsg_TuneType TuneMsg::ADD_ONE;
+constexpr TuneMsg_TuneType TuneMsg::REMOVE_ONE;
+constexpr TuneMsg_TuneType TuneMsg::REMOTE_ALL;
+constexpr TuneMsg_TuneType TuneMsg::SET_ONE;
+constexpr TuneMsg_TuneType TuneMsg::SET_ALL;
+constexpr TuneMsg_TuneType TuneMsg::SET_VISIBLE;
+constexpr TuneMsg_TuneType TuneMsg::SET_TARGET;
+constexpr TuneMsg_TuneType TuneMsg::CUT_PLANE;
+constexpr TuneMsg_TuneType TuneMsg::COLOR_SCHEME;
+constexpr TuneMsg_TuneType TuneMsg::TuneType_MIN;
+constexpr TuneMsg_TuneType TuneMsg::TuneType_MAX;
+constexpr int TuneMsg::TuneType_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* FrameUpdateMsg_MsgType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_proto_2finspectorSync_2eproto);
+  return file_level_enum_descriptors_proto_2finspectorSync_2eproto[3];
+}
+bool FrameUpdateMsg_MsgType_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+      return true;
+    default:
+      return false;
+  }
+}
+
+#if (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg::GESTURE;
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg::TUNE;
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg::CHECK;
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg::MASK;
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg::RESET;
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg::MsgType_MIN;
+constexpr FrameUpdateMsg_MsgType FrameUpdateMsg::MsgType_MAX;
+constexpr int FrameUpdateMsg::MsgType_ARRAYSIZE;
+#endif  // (__cplusplus < 201703) && (!defined(_MSC_VER) || _MSC_VER >= 1900)
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* ReqType_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_proto_2finspectorSync_2eproto);
+  return file_level_enum_descriptors_proto_2finspectorSync_2eproto[4];
 }
 bool ReqType_IsValid(int value) {
   switch (value) {
@@ -582,7 +828,7 @@ const char* GestureOp::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     CHK_(ptr);
     switch (tag >> 3) {
-      // int32 gid = 1;
+      // int64 gid = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           gid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
@@ -639,10 +885,10 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 gid = 1;
+  // int64 gid = 1;
   if (this->gid() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_gid(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt64ToArray(1, this->_internal_gid(), target);
   }
 
   // .helmsley.GestureOp.OPType type = 2;
@@ -680,10 +926,10 @@ size_t GestureOp::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // int32 gid = 1;
+  // int64 gid = 1;
   if (this->gid() != 0) {
     total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int64Size(
         this->_internal_gid());
   }
 
@@ -1010,6 +1256,1498 @@ void OperationBatch::InternalSwap(OperationBatch* other) {
 }
 
 
+// ===================================================================
+
+void ResetMsg::InitAsDefaultInstance() {
+}
+class ResetMsg::_Internal {
+ public:
+};
+
+ResetMsg::ResetMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  check_keys_(arena),
+  check_values_(arena),
+  volume_pose_(arena),
+  camera_pose_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:helmsley.ResetMsg)
+}
+ResetMsg::ResetMsg(const ResetMsg& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      check_keys_(from.check_keys_),
+      check_values_(from.check_values_),
+      volume_pose_(from.volume_pose_),
+      camera_pose_(from.camera_pose_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:helmsley.ResetMsg)
+}
+
+void ResetMsg::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_ResetMsg_proto_2finspectorSync_2eproto.base);
+}
+
+ResetMsg::~ResetMsg() {
+  // @@protoc_insertion_point(destructor:helmsley.ResetMsg)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void ResetMsg::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void ResetMsg::ArenaDtor(void* object) {
+  ResetMsg* _this = reinterpret_cast< ResetMsg* >(object);
+  (void)_this;
+}
+void ResetMsg::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void ResetMsg::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const ResetMsg& ResetMsg::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_ResetMsg_proto_2finspectorSync_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void ResetMsg::Clear() {
+// @@protoc_insertion_point(message_clear_start:helmsley.ResetMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  check_keys_.Clear();
+  check_values_.Clear();
+  volume_pose_.Clear();
+  camera_pose_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* ResetMsg::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated string check_keys = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            auto str = _internal_add_check_keys();
+            ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+            CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "helmsley.ResetMsg.check_keys"));
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated bool check_values = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedBoolParser(_internal_mutable_check_values(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16) {
+          _internal_add_check_values(::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated float volume_pose = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_volume_pose(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 29) {
+          _internal_add_volume_pose(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // repeated float camera_pose = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_camera_pose(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37) {
+          _internal_add_camera_pose(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* ResetMsg::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:helmsley.ResetMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated string check_keys = 1;
+  for (int i = 0, n = this->_internal_check_keys_size(); i < n; i++) {
+    const auto& s = this->_internal_check_keys(i);
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      s.data(), static_cast<int>(s.length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "helmsley.ResetMsg.check_keys");
+    target = stream->WriteString(1, s, target);
+  }
+
+  // repeated bool check_values = 2;
+  if (this->_internal_check_values_size() > 0) {
+    target = stream->WriteFixedPacked(2, _internal_check_values(), target);
+  }
+
+  // repeated float volume_pose = 3;
+  if (this->_internal_volume_pose_size() > 0) {
+    target = stream->WriteFixedPacked(3, _internal_volume_pose(), target);
+  }
+
+  // repeated float camera_pose = 4;
+  if (this->_internal_camera_pose_size() > 0) {
+    target = stream->WriteFixedPacked(4, _internal_camera_pose(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:helmsley.ResetMsg)
+  return target;
+}
+
+size_t ResetMsg::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:helmsley.ResetMsg)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated string check_keys = 1;
+  total_size += 1 *
+      ::PROTOBUF_NAMESPACE_ID::internal::FromIntSize(check_keys_.size());
+  for (int i = 0, n = check_keys_.size(); i < n; i++) {
+    total_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+      check_keys_.Get(i));
+  }
+
+  // repeated bool check_values = 2;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_check_values_size());
+    size_t data_size = 1UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _check_values_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  // repeated float volume_pose = 3;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_volume_pose_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _volume_pose_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  // repeated float camera_pose = 4;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_camera_pose_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _camera_pose_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void ResetMsg::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:helmsley.ResetMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  const ResetMsg* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<ResetMsg>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.ResetMsg)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.ResetMsg)
+    MergeFrom(*source);
+  }
+}
+
+void ResetMsg::MergeFrom(const ResetMsg& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.ResetMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  check_keys_.MergeFrom(from.check_keys_);
+  check_values_.MergeFrom(from.check_values_);
+  volume_pose_.MergeFrom(from.volume_pose_);
+  camera_pose_.MergeFrom(from.camera_pose_);
+}
+
+void ResetMsg::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:helmsley.ResetMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void ResetMsg::CopyFrom(const ResetMsg& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.ResetMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool ResetMsg::IsInitialized() const {
+  return true;
+}
+
+void ResetMsg::InternalSwap(ResetMsg* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  check_keys_.InternalSwap(&other->check_keys_);
+  check_values_.InternalSwap(&other->check_values_);
+  volume_pose_.InternalSwap(&other->volume_pose_);
+  camera_pose_.InternalSwap(&other->camera_pose_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata ResetMsg::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void TuneMsg::InitAsDefaultInstance() {
+}
+class TuneMsg::_Internal {
+ public:
+};
+
+TuneMsg::TuneMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  values_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:helmsley.TuneMsg)
+}
+TuneMsg::TuneMsg(const TuneMsg& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      values_(from.values_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&type_, &from.type_,
+    static_cast<size_t>(reinterpret_cast<char*>(&value_) -
+    reinterpret_cast<char*>(&type_)) + sizeof(value_));
+  // @@protoc_insertion_point(copy_constructor:helmsley.TuneMsg)
+}
+
+void TuneMsg::SharedCtor() {
+  ::memset(&type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&value_) -
+      reinterpret_cast<char*>(&type_)) + sizeof(value_));
+}
+
+TuneMsg::~TuneMsg() {
+  // @@protoc_insertion_point(destructor:helmsley.TuneMsg)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void TuneMsg::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void TuneMsg::ArenaDtor(void* object) {
+  TuneMsg* _this = reinterpret_cast< TuneMsg* >(object);
+  (void)_this;
+}
+void TuneMsg::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void TuneMsg::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const TuneMsg& TuneMsg::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_TuneMsg_proto_2finspectorSync_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void TuneMsg::Clear() {
+// @@protoc_insertion_point(message_clear_start:helmsley.TuneMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  values_.Clear();
+  ::memset(&type_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&value_) -
+      reinterpret_cast<char*>(&type_)) + sizeof(value_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* TuneMsg::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // .helmsley.TuneMsg.TuneType type = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_type(static_cast<::helmsley::TuneMsg_TuneType>(val));
+        } else goto handle_unusual;
+        continue;
+      // int32 target = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          target_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 sub_target = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 24)) {
+          sub_target_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // float value = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 37)) {
+          value_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr);
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      // repeated float values = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_values(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 45) {
+          _internal_add_values(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* TuneMsg::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:helmsley.TuneMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // .helmsley.TuneMsg.TuneType type = 1;
+  if (this->type() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      1, this->_internal_type(), target);
+  }
+
+  // int32 target = 2;
+  if (this->target() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_target(), target);
+  }
+
+  // int32 sub_target = 3;
+  if (this->sub_target() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(3, this->_internal_sub_target(), target);
+  }
+
+  // float value = 4;
+  if (!(this->value() <= 0 && this->value() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteFloatToArray(4, this->_internal_value(), target);
+  }
+
+  // repeated float values = 5;
+  if (this->_internal_values_size() > 0) {
+    target = stream->WriteFixedPacked(5, _internal_values(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:helmsley.TuneMsg)
+  return target;
+}
+
+size_t TuneMsg::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:helmsley.TuneMsg)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated float values = 5;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_values_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _values_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  // .helmsley.TuneMsg.TuneType type = 1;
+  if (this->type() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_type());
+  }
+
+  // int32 target = 2;
+  if (this->target() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_target());
+  }
+
+  // int32 sub_target = 3;
+  if (this->sub_target() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_sub_target());
+  }
+
+  // float value = 4;
+  if (!(this->value() <= 0 && this->value() >= 0)) {
+    total_size += 1 + 4;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void TuneMsg::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:helmsley.TuneMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  const TuneMsg* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<TuneMsg>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.TuneMsg)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.TuneMsg)
+    MergeFrom(*source);
+  }
+}
+
+void TuneMsg::MergeFrom(const TuneMsg& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.TuneMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  values_.MergeFrom(from.values_);
+  if (from.type() != 0) {
+    _internal_set_type(from._internal_type());
+  }
+  if (from.target() != 0) {
+    _internal_set_target(from._internal_target());
+  }
+  if (from.sub_target() != 0) {
+    _internal_set_sub_target(from._internal_sub_target());
+  }
+  if (!(from.value() <= 0 && from.value() >= 0)) {
+    _internal_set_value(from._internal_value());
+  }
+}
+
+void TuneMsg::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:helmsley.TuneMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void TuneMsg::CopyFrom(const TuneMsg& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.TuneMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool TuneMsg::IsInitialized() const {
+  return true;
+}
+
+void TuneMsg::InternalSwap(TuneMsg* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  values_.InternalSwap(&other->values_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(TuneMsg, value_)
+      + sizeof(TuneMsg::value_)
+      - PROTOBUF_FIELD_OFFSET(TuneMsg, type_)>(
+          reinterpret_cast<char*>(&type_),
+          reinterpret_cast<char*>(&other->type_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata TuneMsg::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void CheckMsg::InitAsDefaultInstance() {
+}
+class CheckMsg::_Internal {
+ public:
+};
+
+CheckMsg::CheckMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:helmsley.CheckMsg)
+}
+CheckMsg::CheckMsg(const CheckMsg& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  key_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_key().empty()) {
+    key_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), from._internal_key(),
+      GetArena());
+  }
+  value_ = from.value_;
+  // @@protoc_insertion_point(copy_constructor:helmsley.CheckMsg)
+}
+
+void CheckMsg::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_CheckMsg_proto_2finspectorSync_2eproto.base);
+  key_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  value_ = false;
+}
+
+CheckMsg::~CheckMsg() {
+  // @@protoc_insertion_point(destructor:helmsley.CheckMsg)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void CheckMsg::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  key_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+}
+
+void CheckMsg::ArenaDtor(void* object) {
+  CheckMsg* _this = reinterpret_cast< CheckMsg* >(object);
+  (void)_this;
+}
+void CheckMsg::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void CheckMsg::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const CheckMsg& CheckMsg::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_CheckMsg_proto_2finspectorSync_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void CheckMsg::Clear() {
+// @@protoc_insertion_point(message_clear_start:helmsley.CheckMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  key_.ClearToEmpty(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  value_ = false;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* CheckMsg::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // string key = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          auto str = _internal_mutable_key();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "helmsley.CheckMsg.key"));
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool value = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          value_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* CheckMsg::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:helmsley.CheckMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // string key = 1;
+  if (this->key().size() > 0) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_key().data(), static_cast<int>(this->_internal_key().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "helmsley.CheckMsg.key");
+    target = stream->WriteStringMaybeAliased(
+        1, this->_internal_key(), target);
+  }
+
+  // bool value = 2;
+  if (this->value() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(2, this->_internal_value(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:helmsley.CheckMsg)
+  return target;
+}
+
+size_t CheckMsg::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:helmsley.CheckMsg)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string key = 1;
+  if (this->key().size() > 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_key());
+  }
+
+  // bool value = 2;
+  if (this->value() != 0) {
+    total_size += 1 + 1;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void CheckMsg::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:helmsley.CheckMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  const CheckMsg* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<CheckMsg>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.CheckMsg)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.CheckMsg)
+    MergeFrom(*source);
+  }
+}
+
+void CheckMsg::MergeFrom(const CheckMsg& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.CheckMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.key().size() > 0) {
+    _internal_set_key(from._internal_key());
+  }
+  if (from.value() != 0) {
+    _internal_set_value(from._internal_value());
+  }
+}
+
+void CheckMsg::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:helmsley.CheckMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void CheckMsg::CopyFrom(const CheckMsg& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.CheckMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CheckMsg::IsInitialized() const {
+  return true;
+}
+
+void CheckMsg::InternalSwap(CheckMsg* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  key_.Swap(&other->key_, &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArena());
+  swap(value_, other->value_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata CheckMsg::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void MaskMsg::InitAsDefaultInstance() {
+}
+class MaskMsg::_Internal {
+ public:
+};
+
+MaskMsg::MaskMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:helmsley.MaskMsg)
+}
+MaskMsg::MaskMsg(const MaskMsg& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&num_, &from.num_,
+    static_cast<size_t>(reinterpret_cast<char*>(&mbits_) -
+    reinterpret_cast<char*>(&num_)) + sizeof(mbits_));
+  // @@protoc_insertion_point(copy_constructor:helmsley.MaskMsg)
+}
+
+void MaskMsg::SharedCtor() {
+  ::memset(&num_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&mbits_) -
+      reinterpret_cast<char*>(&num_)) + sizeof(mbits_));
+}
+
+MaskMsg::~MaskMsg() {
+  // @@protoc_insertion_point(destructor:helmsley.MaskMsg)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void MaskMsg::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void MaskMsg::ArenaDtor(void* object) {
+  MaskMsg* _this = reinterpret_cast< MaskMsg* >(object);
+  (void)_this;
+}
+void MaskMsg::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void MaskMsg::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const MaskMsg& MaskMsg::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_MaskMsg_proto_2finspectorSync_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void MaskMsg::Clear() {
+// @@protoc_insertion_point(message_clear_start:helmsley.MaskMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&num_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&mbits_) -
+      reinterpret_cast<char*>(&num_)) + sizeof(mbits_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MaskMsg::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // int32 num = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          num_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 mbits = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          mbits_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* MaskMsg::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:helmsley.MaskMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 num = 1;
+  if (this->num() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_num(), target);
+  }
+
+  // int32 mbits = 2;
+  if (this->mbits() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_mbits(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:helmsley.MaskMsg)
+  return target;
+}
+
+size_t MaskMsg::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:helmsley.MaskMsg)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int32 num = 1;
+  if (this->num() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_num());
+  }
+
+  // int32 mbits = 2;
+  if (this->mbits() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_mbits());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void MaskMsg::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:helmsley.MaskMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  const MaskMsg* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<MaskMsg>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.MaskMsg)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.MaskMsg)
+    MergeFrom(*source);
+  }
+}
+
+void MaskMsg::MergeFrom(const MaskMsg& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.MaskMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from.num() != 0) {
+    _internal_set_num(from._internal_num());
+  }
+  if (from.mbits() != 0) {
+    _internal_set_mbits(from._internal_mbits());
+  }
+}
+
+void MaskMsg::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:helmsley.MaskMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void MaskMsg::CopyFrom(const MaskMsg& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.MaskMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MaskMsg::IsInitialized() const {
+  return true;
+}
+
+void MaskMsg::InternalSwap(MaskMsg* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(MaskMsg, mbits_)
+      + sizeof(MaskMsg::mbits_)
+      - PROTOBUF_FIELD_OFFSET(MaskMsg, num_)>(
+          reinterpret_cast<char*>(&num_),
+          reinterpret_cast<char*>(&other->num_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MaskMsg::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
+void FrameUpdateMsg::InitAsDefaultInstance() {
+  ::helmsley::_FrameUpdateMsg_default_instance_._instance.get_mutable()->mask_value_ = const_cast< ::helmsley::MaskMsg*>(
+      ::helmsley::MaskMsg::internal_default_instance());
+  ::helmsley::_FrameUpdateMsg_default_instance_._instance.get_mutable()->reset_value_ = const_cast< ::helmsley::ResetMsg*>(
+      ::helmsley::ResetMsg::internal_default_instance());
+}
+class FrameUpdateMsg::_Internal {
+ public:
+  static const ::helmsley::MaskMsg& mask_value(const FrameUpdateMsg* msg);
+  static const ::helmsley::ResetMsg& reset_value(const FrameUpdateMsg* msg);
+};
+
+const ::helmsley::MaskMsg&
+FrameUpdateMsg::_Internal::mask_value(const FrameUpdateMsg* msg) {
+  return *msg->mask_value_;
+}
+const ::helmsley::ResetMsg&
+FrameUpdateMsg::_Internal::reset_value(const FrameUpdateMsg* msg) {
+  return *msg->reset_value_;
+}
+FrameUpdateMsg::FrameUpdateMsg(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  types_(arena),
+  gestures_(arena),
+  tunes_(arena),
+  checks_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:helmsley.FrameUpdateMsg)
+}
+FrameUpdateMsg::FrameUpdateMsg(const FrameUpdateMsg& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      types_(from.types_),
+      gestures_(from.gestures_),
+      tunes_(from.tunes_),
+      checks_(from.checks_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_mask_value()) {
+    mask_value_ = new ::helmsley::MaskMsg(*from.mask_value_);
+  } else {
+    mask_value_ = nullptr;
+  }
+  if (from._internal_has_reset_value()) {
+    reset_value_ = new ::helmsley::ResetMsg(*from.reset_value_);
+  } else {
+    reset_value_ = nullptr;
+  }
+  // @@protoc_insertion_point(copy_constructor:helmsley.FrameUpdateMsg)
+}
+
+void FrameUpdateMsg::SharedCtor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&scc_info_FrameUpdateMsg_proto_2finspectorSync_2eproto.base);
+  ::memset(&mask_value_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&reset_value_) -
+      reinterpret_cast<char*>(&mask_value_)) + sizeof(reset_value_));
+}
+
+FrameUpdateMsg::~FrameUpdateMsg() {
+  // @@protoc_insertion_point(destructor:helmsley.FrameUpdateMsg)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void FrameUpdateMsg::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+  if (this != internal_default_instance()) delete mask_value_;
+  if (this != internal_default_instance()) delete reset_value_;
+}
+
+void FrameUpdateMsg::ArenaDtor(void* object) {
+  FrameUpdateMsg* _this = reinterpret_cast< FrameUpdateMsg* >(object);
+  (void)_this;
+}
+void FrameUpdateMsg::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void FrameUpdateMsg::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const FrameUpdateMsg& FrameUpdateMsg::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_FrameUpdateMsg_proto_2finspectorSync_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void FrameUpdateMsg::Clear() {
+// @@protoc_insertion_point(message_clear_start:helmsley.FrameUpdateMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  types_.Clear();
+  gestures_.Clear();
+  tunes_.Clear();
+  checks_.Clear();
+  if (GetArena() == nullptr && mask_value_ != nullptr) {
+    delete mask_value_;
+  }
+  mask_value_ = nullptr;
+  if (GetArena() == nullptr && reset_value_ != nullptr) {
+    delete reset_value_;
+  }
+  reset_value_ = nullptr;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* FrameUpdateMsg::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated .helmsley.FrameUpdateMsg.MsgType types = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedEnumParser(_internal_mutable_types(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_add_types(static_cast<::helmsley::FrameUpdateMsg_MsgType>(val));
+        } else goto handle_unusual;
+        continue;
+      // repeated .helmsley.GestureOp gestures = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 18)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_gestures(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<18>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .helmsley.TuneMsg tunes = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_tunes(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // repeated .helmsley.CheckMsg checks = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_checks(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // .helmsley.MaskMsg mask_value = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_mask_value(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .helmsley.ResetMsg reset_value = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 50)) {
+          ptr = ctx->ParseMessage(_internal_mutable_reset_value(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* FrameUpdateMsg::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:helmsley.FrameUpdateMsg)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .helmsley.FrameUpdateMsg.MsgType types = 1;
+  {
+    int byte_size = _types_cached_byte_size_.load(std::memory_order_relaxed);
+    if (byte_size > 0) {
+      target = stream->WriteEnumPacked(
+          1, types_, byte_size, target);
+    }
+  }
+
+  // repeated .helmsley.GestureOp gestures = 2;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_gestures_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(2, this->_internal_gestures(i), target, stream);
+  }
+
+  // repeated .helmsley.TuneMsg tunes = 3;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_tunes_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, this->_internal_tunes(i), target, stream);
+  }
+
+  // repeated .helmsley.CheckMsg checks = 4;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_checks_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(4, this->_internal_checks(i), target, stream);
+  }
+
+  // .helmsley.MaskMsg mask_value = 5;
+  if (this->has_mask_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::mask_value(this), target, stream);
+  }
+
+  // .helmsley.ResetMsg reset_value = 6;
+  if (this->has_reset_value()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        6, _Internal::reset_value(this), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:helmsley.FrameUpdateMsg)
+  return target;
+}
+
+size_t FrameUpdateMsg::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:helmsley.FrameUpdateMsg)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .helmsley.FrameUpdateMsg.MsgType types = 1;
+  {
+    size_t data_size = 0;
+    unsigned int count = static_cast<unsigned int>(this->_internal_types_size());for (unsigned int i = 0; i < count; i++) {
+      data_size += ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(
+        this->_internal_types(static_cast<int>(i)));
+    }
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _types_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  // repeated .helmsley.GestureOp gestures = 2;
+  total_size += 1UL * this->_internal_gestures_size();
+  for (const auto& msg : this->gestures_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .helmsley.TuneMsg tunes = 3;
+  total_size += 1UL * this->_internal_tunes_size();
+  for (const auto& msg : this->tunes_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // repeated .helmsley.CheckMsg checks = 4;
+  total_size += 1UL * this->_internal_checks_size();
+  for (const auto& msg : this->checks_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // .helmsley.MaskMsg mask_value = 5;
+  if (this->has_mask_value()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *mask_value_);
+  }
+
+  // .helmsley.ResetMsg reset_value = 6;
+  if (this->has_reset_value()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *reset_value_);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void FrameUpdateMsg::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:helmsley.FrameUpdateMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  const FrameUpdateMsg* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<FrameUpdateMsg>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.FrameUpdateMsg)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.FrameUpdateMsg)
+    MergeFrom(*source);
+  }
+}
+
+void FrameUpdateMsg::MergeFrom(const FrameUpdateMsg& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.FrameUpdateMsg)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  types_.MergeFrom(from.types_);
+  gestures_.MergeFrom(from.gestures_);
+  tunes_.MergeFrom(from.tunes_);
+  checks_.MergeFrom(from.checks_);
+  if (from.has_mask_value()) {
+    _internal_mutable_mask_value()->::helmsley::MaskMsg::MergeFrom(from._internal_mask_value());
+  }
+  if (from.has_reset_value()) {
+    _internal_mutable_reset_value()->::helmsley::ResetMsg::MergeFrom(from._internal_reset_value());
+  }
+}
+
+void FrameUpdateMsg::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:helmsley.FrameUpdateMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void FrameUpdateMsg::CopyFrom(const FrameUpdateMsg& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.FrameUpdateMsg)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool FrameUpdateMsg::IsInitialized() const {
+  return true;
+}
+
+void FrameUpdateMsg::InternalSwap(FrameUpdateMsg* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  types_.InternalSwap(&other->types_);
+  gestures_.InternalSwap(&other->gestures_);
+  tunes_.InternalSwap(&other->tunes_);
+  checks_.InternalSwap(&other->checks_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(FrameUpdateMsg, reset_value_)
+      + sizeof(FrameUpdateMsg::reset_value_)
+      - PROTOBUF_FIELD_OFFSET(FrameUpdateMsg, mask_value_)>(
+          reinterpret_cast<char*>(&mask_value_),
+          reinterpret_cast<char*>(&other->mask_value_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata FrameUpdateMsg::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace helmsley
 PROTOBUF_NAMESPACE_OPEN
@@ -1021,6 +2759,21 @@ template<> PROTOBUF_NOINLINE ::helmsley::GestureOp* Arena::CreateMaybeMessage< :
 }
 template<> PROTOBUF_NOINLINE ::helmsley::OperationBatch* Arena::CreateMaybeMessage< ::helmsley::OperationBatch >(Arena* arena) {
   return Arena::CreateMessageInternal< ::helmsley::OperationBatch >(arena);
+}
+template<> PROTOBUF_NOINLINE ::helmsley::ResetMsg* Arena::CreateMaybeMessage< ::helmsley::ResetMsg >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::helmsley::ResetMsg >(arena);
+}
+template<> PROTOBUF_NOINLINE ::helmsley::TuneMsg* Arena::CreateMaybeMessage< ::helmsley::TuneMsg >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::helmsley::TuneMsg >(arena);
+}
+template<> PROTOBUF_NOINLINE ::helmsley::CheckMsg* Arena::CreateMaybeMessage< ::helmsley::CheckMsg >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::helmsley::CheckMsg >(arena);
+}
+template<> PROTOBUF_NOINLINE ::helmsley::MaskMsg* Arena::CreateMaybeMessage< ::helmsley::MaskMsg >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::helmsley::MaskMsg >(arena);
+}
+template<> PROTOBUF_NOINLINE ::helmsley::FrameUpdateMsg* Arena::CreateMaybeMessage< ::helmsley::FrameUpdateMsg >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::helmsley::FrameUpdateMsg >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

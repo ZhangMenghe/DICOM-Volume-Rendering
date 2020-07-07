@@ -35,7 +35,9 @@ using namespace std::chrono;
 #include <thread>
 #include <unistd.h>
 using namespace std;
-
+using namespace helmsley;
+template<class T>
+using RPCVector = google::protobuf::RepeatedPtrField<T>;
 //todo: try to implement operation merge
 class semaphore{
 public:
@@ -74,11 +76,17 @@ public:
       : stub_(inspectorSync::NewStub(channel)) {
 		//   mc = &controller;//std::unique_ptr<vrController>(controller);
 	  }
-	const google::protobuf::RepeatedPtrField<helmsley::GestureOp> getOperations(){
-		std::vector<helmsley::GestureOp> op_pool;
+	
+	FrameUpdateMsg getUpdates(){
+	ClientContext context;
+		stub_->getUpdates(&context, req, &update_msg);
+		return update_msg;
+	}
+	const RPCVector<GestureOp> getOperations(){
+	ClientContext context;
 
-		Request req;
-		ClientContext context;
+		std::vector<GestureOp> op_pool;
+
 		OperationBatch op_batch;
 		stub_->getOperations(&context,req, &op_batch);
 		// std::cout<<op_batch.bid()<<std::endl;
@@ -97,7 +105,8 @@ public:
 	}  
 private:
   	std::unique_ptr<inspectorSync::Stub> stub_;
-vrController* mc;
+	Request req;
+	FrameUpdateMsg update_msg;
 };
 
 GLFWwindow* window;
@@ -207,18 +216,9 @@ void setupApplication(){
 	loader_.setupDCMIConfig(512,512,dims,true);
 }
 
-void rpc_thread(){
-
-	// auto last_ts = std::chrono::system_clock::now();
-	// size_t ops_count = 0;
-	rpc_manager = new syncClient(grpc::CreateChannel(
-      "localhost:23333", grpc::InsecureChannelCredentials()));
-	while(true){
-		auto ops = rpc_manager->getOperations();
-		// ops_count += ops.size();
-		for(auto op:ops){
-			// printf("%.2f %.2f\n", op.x(), op.y());
-			// std::cout << std::setprecision(2) <<op.x()<< " "<<op.y()<<std::endl; 
+void tackle_gesture_msg(const RPCVector<GestureOp> ops){
+		// auto ops = rpc_manager->getOperations();
+	for(auto op:ops){
 		switch (op.type()){
 		case GestureOp_OPType_TOUCH_DOWN:
 			controller_.onSingleTouchDown(op.x(), op.y());
@@ -238,7 +238,55 @@ void rpc_thread(){
 			break;
 		default:
 			break;
-		}}
+		}
+	}
+}
+void tack_tune_msg(TuneMsg msg){
+
+}
+
+void tackle_reset_msg(ResetMsg msg){
+	manager_.onReset();
+	//init check paramd
+}
+void tackle_update_msg(){
+	auto msg = rpc_manager->getUpdates();
+	int gid = 0, tid = 0, cid = 0;
+	bool gesture_finished = false;
+
+	for(auto type: msg.types()){
+		switch(type){
+			case FrameUpdateMsg_MsgType_GESTURE:
+				if(!gesture_finished){
+					tackle_gesture_msg(msg.gestures());
+					gesture_finished = true;
+				}
+				break;
+			case FrameUpdateMsg_MsgType_TUNE:
+				tack_tune_msg(msg.tunes().Get(tid++));
+				break;
+			case FrameUpdateMsg_MsgType_CHECK:
+				ui_.setCheck(msg.checks().Get(cid++));
+				break;
+			case FrameUpdateMsg_MsgType_MASK:
+				ui_.setMaskBits(msg.mask_value());
+				break;
+			case FrameUpdateMsg_MsgType_RESET:
+				tackle_reset_msg(msg.reset_value());
+				break;
+			default:
+				std::cout<<"UNKNOWN TYPE"<<std::endl;
+				break;
+		}
+	}
+}
+void rpc_thread(){
+	// auto last_ts = std::chrono::system_clock::now();
+	// size_t ops_count = 0;
+	rpc_manager = new syncClient(grpc::CreateChannel(
+      "localhost:23333", grpc::InsecureChannelCredentials()));
+	while(true) tackle_update_msg();
+
 		// auto duration = std::chrono::system_clock::now() - last_ts;
 		// auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
 		// if (seconds > 2) {
@@ -246,12 +294,8 @@ void rpc_thread(){
 		// 	last_ts = std::chrono::system_clock::now();
 		// 	ops_count = 0;
 		// }
-		
-		
 		// std::this_thread::sleep_for(std::chrono::milliseconds(500));
-		// std::cout<<"rpc"<<std::endl;
 	}
-}
 void main_thread(){
 	setupShaderContents(&controller_);
 	

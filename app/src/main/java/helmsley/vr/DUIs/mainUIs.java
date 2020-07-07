@@ -22,7 +22,7 @@ import helmsley.vr.UIsManager;
 public class mainUIs {
     final static String TAG = "mainUIs";
     private final WeakReference<Activity> actRef;
-    private final WeakReference<UIsManager> mUIManagerRef;
+    final WeakReference<UIsManager> mUIManagerRef;
     private final String NAME_RESET,
             NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD,
             NAME_DATA_REMOTE, NAME_DATA_DEVICE, NAME_DATA_LOCAL,
@@ -72,7 +72,7 @@ public class mainUIs {
         Yaml yloader = new Yaml();
         try{
 //            InputStream ins = actRef.get().getAssets().open("config.yml");
-            mUIManagerRef.get().RequestResetWithTemplate((LinkedHashMap)yloader.load(content));
+            mUIManagerRef.get().RequestResetWithTemplate((LinkedHashMap)yloader.load(content), true);
         }catch (Exception e){
             Log.e(TAG, "===fail to load yaml===");
             e.printStackTrace();

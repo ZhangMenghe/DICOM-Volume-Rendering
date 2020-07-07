@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import helmsley.vr.JNIInterface;
@@ -98,12 +99,18 @@ public class dialogUIs {
     }
     void StartBroadcast(){
         if(!remote_connection_success){b_await_broadcast=true;setup_remote_connection();}
-        else{
-            broadcast_icon.setVisibility(View.VISIBLE);
-        }
+        else on_start_broadcast();
     }
     void StopBroadcast(){
+        JUIInterface.setBroadcast(false);
         broadcast_icon.setVisibility(View.GONE);
+    }
+    private void on_start_broadcast(){
+        LinkedHashMap map = new LinkedHashMap();
+        muiRef.get().mUIManagerRef.get().getCurrentStates(map);
+        broadcast_icon.setVisibility(View.VISIBLE);
+        muiRef.get().mUIManagerRef.get().RequestResetWithTemplate(map, false);
+        JUIInterface.setBroadcast(true);
     }
     public void NotifyLocalCardUpdate(String ds_name, List<volumeResponse.volumeInfo> info_lst){
         local_card_adp.updateLstContent(ds_name, info_lst);
@@ -188,7 +195,7 @@ public class dialogUIs {
                         saveconfig_dialog.show();
                         b_await_config_export = false;
                     }else if(b_await_broadcast){
-                        broadcast_icon.setVisibility(View.VISIBLE);
+                        on_start_broadcast();
                         b_await_broadcast = false;
                     }
                 } else {

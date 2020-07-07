@@ -67,7 +67,9 @@ public class maskUIs extends BasePanel{
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
         map.put("status", primary_checkbox.isChecked());
-        map.put("value", recyclerViewAdapter.getValues());
+        ArrayList<Boolean> values= new ArrayList<Boolean>();
+        for(boolean b:recyclerViewAdapter.getValues()) values.add(b);
+        map.put("value", values);
         return map;
     }
     @Override
