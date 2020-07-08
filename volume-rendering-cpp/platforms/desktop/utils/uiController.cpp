@@ -2,6 +2,7 @@
 #include <vrController.h>
 #include <overlayController.h>
 #include <algorithm>
+#include <glm/gtc/type_ptr.hpp>
 
 void uiController::InitAll(){
     // AddTuneParams();
@@ -24,8 +25,8 @@ void uiController::AddTuneParams(){
     float opa_values[5] = {
         1.0f,
         .0f,
-        1.0f,
         2.0f,
+        0.0f,
         1.0f
     };
     overlayController::instance()->addWidget(std::vector<float>(opa_values, opa_values+5));
@@ -91,4 +92,60 @@ void uiController::setCheck(std::string key, bool value){
 }
 void uiController::setCheck(helmsley::CheckMsg msg){
     setCheck(msg.key(), msg.value());
+}
+void uiController::onReset(helmsley::ResetMsg msg){
+    auto cvs = msg.check_values();
+    int num = cvs.size();
+
+    if(param_checks.empty()){
+        auto f = msg.check_keys();
+        param_checks = std::vector<std::string> (f.begin(), f.end());
+    }
+    
+    Manager::param_bool = std::vector<bool> (cvs.begin(), cvs.end());
+    Manager::baked_dirty_ = true;
+
+    auto vps = msg.volume_pose();
+    auto cps = msg.camera_pose();
+
+    vrController::instance()->onReset(
+        glm::vec3(vps[0], vps[1], vps[2]),
+        glm::vec3(vps[3], vps[4], vps[5]),
+        glm::make_mat4(vps.Mutable(6)),
+        new Camera(
+                glm::vec3(cps[0], cps[1], cps[2]),
+                glm::vec3(cps[3], cps[4], cps[5]),
+                glm::vec3(cps[6], cps[7], cps[8])
+        ));
+}
+void uiController::addTuneParams(std::vector<float> values){
+    overlayController::instance()->addWidget(values);
+}
+void uiController::removeTuneWidgetById(int wid){
+    overlayController::instance()->removeWidget(wid);
+}
+void uiController::removeAllTuneWidget(){
+    overlayController::instance()->removeAll();
+}
+void uiController::setTuneParamById(int tid, int pid, float value){
+    if(tid == 0 && pid < dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
+    else if(tid == 1) vrController::instance()->setRenderParam(pid, value);
+}
+void uiController::setAllTuneParamById(int id, std::vector<float> values){  
+    if(id == 1)vrController::instance()->setRenderParam(&values[0]);
+    else if(id == 2)vrController::instance()->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
+}
+void uiController::setTuneWidgetVisibility(int wid, bool visibility){
+    overlayController::instance()->setWidgetsVisibility(wid, visibility);
+    Manager::baked_dirty_ = true;
+}
+void uiController::setTuneWidgetById(int id){
+    overlayController::instance()->setWidgetId(id);
+}
+void uiController::setCuttingPlane(int id, float value){
+    vrController::instance()->setCuttingPlane(value);
+}
+void uiController::setColorScheme(int id){
+    Manager::color_scheme_id = id;
+    Manager::baked_dirty_ = true;
 }

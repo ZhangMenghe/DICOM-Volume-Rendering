@@ -69,6 +69,7 @@ public class operateClient {
     }
     public static void setGestureOp(GestureOp.OPType type, float x, float y){
         if(!initialized) return;
+        gesture_builder.clear();
         GestureOp req = gesture_builder.setGid(System.currentTimeMillis()).setType(type).setX(x).setY(y).build();
         operate_stub.setGestureOp(req,observer);
 //        ops++;
@@ -79,6 +80,7 @@ public class operateClient {
     }
     public static void setCheckParams(String key, boolean value){
         if(!initialized) return;
+        check_builder.clear();
         CheckMsg cm = check_builder.setKey(key).setValue(value).build();
 //        if(rpcManager.operate_stub == null)
 //            check_pool.add(cm);
@@ -88,52 +90,61 @@ public class operateClient {
 
     public static void setMaskParams(int num, int mbits){
         if(!initialized) return;
+        msk_builder.clear();
         operate_stub.setMaskParams(msk_builder.setNum(num).setMbits(mbits).build(), observer);
     }
 
     public static void reqestReset( String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(!initialized) return;
+        reset_builder.clear();
         for(String ck:check_keys)reset_builder.addCheckKeys(ck);
         for(boolean cv:check_value)reset_builder.addCheckValues(cv);
         for(float vp:volume_pose)reset_builder.addVolumePose(vp);
-        for(float cp:camera_pose)reset_builder.addVolumePose(cp);
+        for(float cp:camera_pose)reset_builder.addCameraPose(cp);
 
         operate_stub.reqestReset(reset_builder.build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, float[] values){
         if(!initialized) return;
+        tune_builder.clear();
 
         for(float vp:values)tune_builder.addValues(vp);
         operate_stub.setTuneParams(tune_builder.setType(type).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int v){
         if(!initialized) return;
+        tune_builder.clear();
 
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(v).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, float v){
         if(!initialized) return;
+        tune_builder.clear();
 
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setValue(v).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type){
         if(!initialized) return;
+        tune_builder.clear();
 
         operate_stub.setTuneParams(tune_builder.setType(type).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, boolean v){
         if(!initialized) return;
+        tune_builder.clear();
 
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setValue(v?1:0).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, float[] values){
         if(!initialized) return;
+        tune_builder.clear();
 
         for(float vp:values)tune_builder.addValues(vp);
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, int sub_tar, float value){
         if(!initialized) return;
+        tune_builder.clear();
 
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setSubTarget(sub_tar).setValue(value).build(), observer);
     }

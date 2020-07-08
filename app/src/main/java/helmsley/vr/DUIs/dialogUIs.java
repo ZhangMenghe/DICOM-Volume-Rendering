@@ -109,8 +109,8 @@ public class dialogUIs {
         LinkedHashMap map = new LinkedHashMap();
         muiRef.get().mUIManagerRef.get().getCurrentStates(map);
         broadcast_icon.setVisibility(View.VISIBLE);
-        muiRef.get().mUIManagerRef.get().RequestResetWithTemplate(map, false);
         JUIInterface.setBroadcast(true);
+        muiRef.get().mUIManagerRef.get().RequestResetWithTemplate(map, false);
     }
     public void NotifyLocalCardUpdate(String ds_name, List<volumeResponse.volumeInfo> info_lst){
         local_card_adp.updateLstContent(ds_name, info_lst);

@@ -242,12 +242,45 @@ void tackle_gesture_msg(const RPCVector<GestureOp> ops){
 	}
 }
 void tack_tune_msg(TuneMsg msg){
-
+	google::protobuf::RepeatedField<float> f;
+	switch (msg.type()){
+		case TuneMsg_TuneType_ADD_ONE:
+			f = msg.values();
+			ui_.addTuneParams(std::vector<float> (f.begin(), f.end()));
+			break;
+		case TuneMsg_TuneType_REMOVE_ONE:
+			ui_.removeTuneWidgetById(msg.target());
+			break;
+		case TuneMsg_TuneType_REMOTE_ALL:
+			ui_.removeAllTuneWidget();
+			break;
+		case TuneMsg_TuneType_SET_ONE:
+			ui_.setTuneParamById(msg.target(), msg.sub_target(), msg.value());
+			break;
+		case TuneMsg_TuneType_SET_ALL:
+			f = msg.values();
+			ui_.setAllTuneParamById(msg.target(), std::vector<float> (f.begin(), f.end()));
+			break;
+		case TuneMsg_TuneType_SET_VISIBLE:
+			ui_.setTuneWidgetVisibility(msg.target(), (msg.value()>0)?true:false);
+			break;
+		case TuneMsg_TuneType_SET_TARGET:
+			ui_.setTuneWidgetById(msg.target());
+			break;
+		case TuneMsg_TuneType_CUT_PLANE:
+			ui_.setCuttingPlane(msg.target(), msg.value());
+			break;
+		case TuneMsg_TuneType_COLOR_SCHEME:
+			ui_.setColorScheme(msg.target());
+			break;
+		default:
+			break;
+	}
 }
 
 void tackle_reset_msg(ResetMsg msg){
 	manager_.onReset();
-	//init check paramd
+	ui_.onReset(msg);
 }
 void tackle_update_msg(){
 	auto msg = rpc_manager->getUpdates();

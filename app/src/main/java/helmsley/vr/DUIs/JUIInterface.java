@@ -8,11 +8,6 @@ import helmsley.vr.proto.operateClient;
 
 public class JUIInterface {
     private static boolean on_broadcast = false;
-//    static void startBroadcast(LinkedHashMap map){
-//        on_broadcast = true;
-////        operateClient.syncAll(map);
-//    }
-//    static void stopBroadcast(){on_broadcast = false;}
     static void setBroadcast(boolean on){on_broadcast = on;}
     public static void JUIonReset(boolean update_local, int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(update_local) JUIonResetNative(num, check_keys, check_value, volume_pose, camera_pose);

@@ -12,6 +12,7 @@ import android.widget.CompoundButton;
 import com.google.common.primitives.Booleans;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 import helmsley.vr.R;
@@ -19,6 +20,7 @@ import helmsley.vr.R;
 public class maskUIs extends BasePanel{
     private RecyclerView recyclerView;
     private maskRecyclerViewAdapter recyclerViewAdapter;
+    private CheckBox recolor_cb;
 
     public maskUIs(final Activity activity, ViewGroup parent_view) {
         super(activity, parent_view);
@@ -36,11 +38,11 @@ public class maskUIs extends BasePanel{
         recyclerViewAdapter = new maskRecyclerViewAdapter(activity, recyclerView);
         recyclerView.setAdapter(recyclerViewAdapter);
 
-        CheckBox ccb = (CheckBox)panel_.findViewById(R.id.check_mask_color);
+        recolor_cb = (CheckBox)panel_.findViewById(R.id.check_mask_color);
         String[] narr = activity.getResources().getStringArray(R.array.mask_check_params);
         String[] varr = activity.getResources().getStringArray(R.array.mask_check_values);
-        ccb.setChecked(Boolean.parseBoolean(varr[1]));
-        ccb.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+        recolor_cb.setChecked(Boolean.parseBoolean(varr[1]));
+        recolor_cb.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
@@ -62,11 +64,19 @@ public class maskUIs extends BasePanel{
         if(maskmap == null) return;
         boolean status = (Boolean) maskmap.getOrDefault("status", default_primary_check);
         primary_checkbox.setChecked(status);
+        values.add(status);
+
+        boolean recolor = (Boolean) maskmap.getOrDefault("recolor", default_primary_check);
+        recolor_cb.setChecked(recolor);
+        values.add(recolor);
+
         recyclerViewAdapter.Reset(Booleans.toArray((ArrayList<Boolean>)maskmap.getOrDefault("value", null)));
+        Collections.addAll(names, check_names_);
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
         map.put("status", primary_checkbox.isChecked());
+        map.put("recolor", recolor_cb.isChecked());
         ArrayList<Boolean> values= new ArrayList<Boolean>();
         for(boolean b:recyclerViewAdapter.getValues()) values.add(b);
         map.put("value", values);

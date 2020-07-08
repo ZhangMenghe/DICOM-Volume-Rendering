@@ -21,4 +21,5 @@ cutting plane:
     pnorm: [0,0,-1]
 mask:
     status: Off
+    recolor: On
     value: [On,On,On,On,On]
