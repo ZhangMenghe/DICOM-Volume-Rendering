@@ -112,7 +112,7 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
     env->ReleaseByteArrayElements(jdata, data, 0);
 }
 
-JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint height, jint width, jint dims,jfloat sh,jfloat sw, jfloat sd, jboolean b_mask){
+JNI_METHOD(void, JNIsendDataPrepareNative)(JNIEnv*, jclass, jint height, jint width, jint dims,jfloat sh,jfloat sw, jfloat sd, jboolean b_mask){
     CHANEL_NUM = b_mask? 4:2;
     g_img_h = height; g_img_w = width; g_img_d = dims;
     g_ssize = CHANEL_NUM * width * height;

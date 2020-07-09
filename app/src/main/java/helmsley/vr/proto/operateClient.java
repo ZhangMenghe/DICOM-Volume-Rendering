@@ -12,6 +12,7 @@ import java.util.List;
 
 import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
+import helmsley.vr.JNIInterface;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
 
@@ -25,7 +26,7 @@ public class operateClient {
     private static TuneMsg.Builder tune_builder;
     private static CheckMsg.Builder check_builder;
     private static MaskMsg.Builder msk_builder;
-    private static FrameUpdateMsg.Builder reserve_builder;
+    private static volumeConcise.Builder data_builder;
 
 
     private static List<FrameUpdateMsg.MsgType> type_pool = new ArrayList<>();
@@ -47,7 +48,7 @@ public class operateClient {
         tune_builder = TuneMsg.newBuilder();
         check_builder = CheckMsg.newBuilder();
         msk_builder = MaskMsg.newBuilder();
-        reserve_builder = FrameUpdateMsg.newBuilder();
+        data_builder = volumeConcise.newBuilder();
 
         observer = new StreamObserver<commonResponse>() {
             @Override
@@ -101,7 +102,6 @@ public class operateClient {
         for(boolean cv:check_value)reset_builder.addCheckValues(cv);
         for(float vp:volume_pose)reset_builder.addVolumePose(vp);
         for(float cp:camera_pose)reset_builder.addCameraPose(cp);
-
         operate_stub.reqestReset(reset_builder.build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, float[] values){
@@ -148,9 +148,15 @@ public class operateClient {
 
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setSubTarget(sub_tar).setValue(value).build(), observer);
     }
-    public static void syncAll(LinkedHashMap map){
-        if(!initialized) {
-            Log.e(TAG, "===syncAll: fail to sync");return;
+    public static void setDisplayVolume(String target_vol, int ph, int pw, int pd, float sh, float sw, float sd, boolean b_mask){
+        data_builder.clear();
+        data_builder.setVolPath(target_vol);
+        data_builder.addDims(ph).addDims(pw).addDims(pd).addSize(sh).addSize(sw).addSize(sd).setWithMask(b_mask);
+        if(JUIInterface.on_broadcast && initialized) operate_stub.setDisplayVolume(data_builder.build(), observer);
+    }
+    public static void sendVolume(){
+        if(initialized){
+            operate_stub.setDisplayVolume(data_builder.build(), observer);
         }
     }
 }

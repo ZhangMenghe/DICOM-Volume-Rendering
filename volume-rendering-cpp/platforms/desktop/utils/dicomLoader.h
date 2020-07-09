@@ -5,7 +5,7 @@
 #include <string>
 #include <fstream>
 #include <platforms/platform.h>
-
+#include <vrController.h>
 typedef enum{
     LOAD_DICOM = 0,
     LOAD_MASK
@@ -13,16 +13,17 @@ typedef enum{
 
 class dicomLoader{
 public:
-    void setupDCMIConfig(int width, int height, int dims, bool b_wmask);
+    void setupDCMIConfig(int height, int width, int dims, float sh, float sw, float sd, bool b_wmask);
     bool loadData(std::string filename, mLoadTarget target, int unit_size=2);
     bool loadData(std::string dicom_path, std::string mask_path,int data_unit_size=2, int mask_unit_size=2);
     int getChannelNum(){return CHANEL_NUM;}
     GLubyte* getVolumeData(){return g_VolumeTexData;}
     void reset(){
-        delete[] g_VolumeTexData;
-        g_VolumeTexData = nullptr;
-        for(auto& offset:n_data_offset) offset = 0;
+        // delete[] g_VolumeTexData;
+        // g_VolumeTexData = nullptr;
+        // for(auto& offset:n_data_offset) offset = 0;
     }
+    void startToAssemble(vrController* controller);
 private:
     int CHANEL_NUM = 4;
     GLubyte* g_VolumeTexData = nullptr;

@@ -118,6 +118,8 @@ vrController controller_;
 syncClient* rpc_manager;
 // semaphore sp;
 // std::mutex mtx;
+std::string DATA_PATH = "helmsley_cached/";
+bool new_data_available = false;
 
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
@@ -162,6 +164,11 @@ void onCreated(){
 void onDraw(){
 	controller_.onDraw();
 	if(controller_.isDrawing()) overlayController::instance()->onDraw();
+	if(new_data_available){
+		new_data_available = false;
+		loader_.startToAssemble(&controller_);
+		loader_.reset();
+	}
 }
 void onViewChange(int width, int height){
 	manager_.onViewChange(width, height);
@@ -213,7 +220,7 @@ bool InitWindow(){
 
 void setupApplication(){
 	int dims = 144;
-	loader_.setupDCMIConfig(512,512,dims,true);
+	loader_.setupDCMIConfig(512,512,dims,-1,-1,-1,true);
 }
 
 void tackle_gesture_msg(const RPCVector<GestureOp> ops){
@@ -277,7 +284,23 @@ void tack_tune_msg(TuneMsg msg){
 			break;
 	}
 }
+void tackle_volume_msg(volumeConcise msg){
+	//reset data
+	auto dims = msg.dims();
+	auto ss = msg.size();
+	loader_.setupDCMIConfig(dims[0], dims[1], dims[2],ss[0],ss[1],ss[2], msg.with_mask());
 
+	std::cout<<msg.vol_path()<<std::endl;
+	if(!loader_.loadData(DATA_PATH + msg.vol_path()+"/data", DATA_PATH + msg.vol_path()+"/mask")){
+		std::cout<<"file not exist"<<std::endl;
+		return;
+	}
+		//todo: request from server
+		
+
+
+	new_data_available = true;
+}
 void tackle_reset_msg(ResetMsg msg){
 	manager_.onReset();
 	ui_.onReset(msg);
@@ -306,6 +329,9 @@ void tackle_update_msg(){
 				break;
 			case FrameUpdateMsg_MsgType_RESET:
 				tackle_reset_msg(msg.reset_value());
+				break;
+			case FrameUpdateMsg_MsgType_DATA:
+				tackle_volume_msg(msg.data_value());
 				break;
 			default:
 				std::cout<<"UNKNOWN TYPE"<<std::endl;

@@ -12,7 +12,7 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager);
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*, jclass, jint, jint, jint, jint, jbyteArray);
 
-JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint, jint, jint, jfloat, jfloat,jfloat, jboolean);
+JNI_METHOD(void, JNIsendDataPrepareNative)(JNIEnv*, jclass, jint, jint, jint, jfloat, jfloat,jfloat, jboolean);
 
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass);
 

@@ -107,6 +107,7 @@ void uiController::onReset(helmsley::ResetMsg msg){
 
     auto vps = msg.volume_pose();
     auto cps = msg.camera_pose();
+    std::cout<<"size: "<<vps.size()<<" "<<cps.size()<<std::endl;
 
     vrController::instance()->onReset(
         glm::vec3(vps[0], vps[1], vps[2]),

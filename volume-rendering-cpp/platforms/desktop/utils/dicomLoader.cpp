@@ -2,12 +2,12 @@
 #include <platforms/desktop/common.h>
 #include <cstring> //memset
 
-void dicomLoader::setupDCMIConfig(int width, int height, int dims, bool b_mask){
-    CHANEL_NUM = b_mask? 4:2;
+void dicomLoader:: setupDCMIConfig(int height, int width, int dims, float sh, float sw, float sd, bool b_wmask){
+    CHANEL_NUM = b_wmask? 4:2;
     g_img_h = height; g_img_w = width; g_img_d = dims;
     g_ssize = CHANEL_NUM * width * height;
     g_vol_len = g_ssize* dims;
-    // g_vol_h=sh; g_vol_w=sw; g_vol_depth=sd;
+    g_vol_h=sh; g_vol_w=sw; g_vol_depth=sd;
     if(g_VolumeTexData!= nullptr){delete[]g_VolumeTexData; g_VolumeTexData = nullptr;}
     g_VolumeTexData = new GLubyte[ g_vol_len];
     memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
@@ -52,4 +52,10 @@ void dicomLoader::send_dicom_data(mLoadTarget target, int id, int chunk_size, in
         }
     }
    n_data_offset[target] += CHANEL_NUM / unit_size * chunk_size;   
+}
+void dicomLoader::startToAssemble(vrController* controller){
+    std::cout<<g_img_h<<" "<<g_img_w<< " "<< g_img_d<< " "<< g_vol_h<<" "<< g_vol_w<<" "<< g_vol_depth<<std::endl;
+    controller->assembleTexture(2, g_img_h, g_img_w, g_img_d, g_vol_h, g_vol_w, g_vol_depth, g_VolumeTexData, CHANEL_NUM);
+
+	// controller->assembleTexture(2, dims[0], dims[1], dims[2],-1,-1,-1, loader_.getVolumeData(), 4);
 }
