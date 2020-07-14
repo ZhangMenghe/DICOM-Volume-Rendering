@@ -5,7 +5,7 @@
 
 precision mediump float;
 
-out vec4 gl_FragColor;
+out vec4 fragColor;
 in VS_OUT {
     vec3 raydir;
     vec3 screenPos;
@@ -91,7 +91,7 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
 //void main(void){
-//    gl_FragColor =  vec4(fs_in.TexCoords, 1.0);
+//    fragColor =  vec4(fs_in.TexCoords, 1.0);
 //}
 void main(void){
     vec3 ray_origin = uCamposObjSpace;
@@ -109,5 +109,5 @@ void main(void){
 
     if (intersect.y < intersect.x)
         discard;
-    gl_FragColor = Volume(ray_origin+0.5, ray_dir, intersect.x, intersect.y);
+    fragColor = Volume(ray_origin+0.5, ray_dir, intersect.x, intersect.y);
 }

@@ -296,9 +296,6 @@ void tackle_volume_msg(volumeConcise msg){
 		return;
 	}
 		//todo: request from server
-		
-
-
 	new_data_available = true;
 }
 void tackle_reset_msg(ResetMsg msg){

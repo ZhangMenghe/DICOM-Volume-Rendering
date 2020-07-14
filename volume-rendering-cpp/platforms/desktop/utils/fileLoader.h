@@ -10,7 +10,12 @@
 
 inline std::string LoadTextFile(const char* filename){
     std::string content;
+    #ifdef RESOURCE_DESKTOP_DIR
     std::ifstream ShaderStream(PATH(filename), std::ios::in);
+    #else
+    std::ifstream ShaderStream(filename, std::ios::in);
+    #endif
+
        if(ShaderStream.is_open()){
            std::string Line = "";
            while(getline(ShaderStream, Line)) content += "\n" + Line;
