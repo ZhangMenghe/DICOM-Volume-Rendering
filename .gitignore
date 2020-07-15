@@ -21,7 +21,10 @@ local.properties
 
 # Signing files
 .signing/
-
+.project
+.settings/*
+app/.classpath
+app/.settings
 # User-specific configurations
 .idea/libraries/
 .idea/caches/

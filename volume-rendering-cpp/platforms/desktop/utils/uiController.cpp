@@ -42,23 +42,29 @@ void uiController::InitAllTuneParam(){
 }
 
 void uiController::InitCheckParam(){
-    const char* keys[7] = {
+    const char* keys[10] = {
         "Raycasting",
         "Overlays",
         "Cutting",
         "Freeze Volume",
         "Freeze Plane",
         "Show",
-        "Recolor"
+        "Recolor",
+        "AR Enabled",
+        "Points",
+        "Planes"
     };
-    bool values[7] = {
+    bool values[10] = {
         false,
         false,
         false,
         false,
         false,
         false,
-        true
+        true,
+        false,
+        false,
+        false
     };
     InitCheckParam(7, keys, values);
 }

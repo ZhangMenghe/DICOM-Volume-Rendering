@@ -5,6 +5,8 @@
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
 #include "utils/fileLoader.h"
+#include <dicomRenderer/screenQuad.h>
+
 GLFWwindow* window;
 dicomLoader loader_;
 uiController ui_;
@@ -50,8 +52,17 @@ void onCreated(){
 	}
 }
 void onDraw(){
-	controller_.onDraw();
-	if(controller_.isDrawing()) overlayController::instance()->onDraw();
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+	// if(camera_switch_dirty){vrController::instance()->setMVPStatus("template");camera_switch_dirty = false;}
+	if(vrController::instance()->isDirty()){
+		//order matters
+		screenQuad::instance()->Clear();
+		controller_.onDraw();
+	}
+	screenQuad::instance()->Draw();
+	if(controller_.isDrawing())overlayController::instance()->onDraw();
 }
 void onViewChange(int width, int height){
 	manager_.onViewChange(width, height);
