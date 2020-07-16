@@ -88,6 +88,9 @@ void texvrRenderer::draw_scene(){
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
+    //     glm::mat4 modelmat =
+    //     glm::translate(glm::mat4(1.0f), glm::vec3(.0,.0,1.0f)) 
+    //   * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
     Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat() * modelmat);
     Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
@@ -104,6 +107,8 @@ void texvrRenderer::draw_scene(){
         glFrontFace(GL_CW);
         glBindVertexArray(vao_back); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
     }
+    glFrontFace(GL_CCW);
+    glBindVertexArray(0);
 
     shader_->UnUse();
     glDisable(GL_BLEND);

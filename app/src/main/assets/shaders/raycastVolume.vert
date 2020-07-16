@@ -13,15 +13,13 @@ out VS_OUT {
     vec3 TexCoords;
 } vs_out;
 
-uniform mat4 uModelMat, uViewMat, uProjMat;
+uniform mat4 uModelMat, uVPMat;
 uniform vec3 uCamposObjSpace;
 
 void main(void){
-    gl_PointSize = 10.0;
-
     vs_out.raydir = aPos - uCamposObjSpace;
     vs_out.FragPos = vec3(uModelMat * vec4(aPos, 1.0f));
-    vec4 screen_pos = uProjMat * uViewMat * vec4(vs_out.FragPos, 1.0);
+    vec4 screen_pos = uVPMat * vec4(vs_out.FragPos, 1.0);
     vs_out.screenPos = screen_pos.xyw;
     vs_out.TexCoords = aTexCoord;
     gl_Position = screen_pos;

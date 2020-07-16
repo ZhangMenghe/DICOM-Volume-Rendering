@@ -1,4 +1,5 @@
 #version 310 es
+
 #pragma multi_compile CUTTING_PLANE
 
 #extension GL_EXT_shader_io_blocks : require
@@ -18,10 +19,15 @@ uniform vec3 uCamposObjSpace;
 struct Plane{
     vec3 p;
     vec3 normal;
+    vec3 s1, s2, s3;
 };
 uniform Plane uPlane;
 uniform mediump sampler3D uSampler;
-uniform float sample_step_inverse;
+uniform float usample_step_inverse;
+// void main_old(){
+//     fragColor = vec4(1.0, 1.0, .0, 1.0);
+// }
+
 
 vec2 RaySphere(vec3 ro, vec3 rd, vec3 center, float radius){
     //Ray-Sphere
@@ -53,7 +59,14 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
     float t = dot(planep - ro, planen);
     return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
-
+bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
+    vec3 dms1 = M-s1;
+    vec3 ds21 = s2 - s1; vec3 ds31 = s3 - s1; //should be perpendicular to each other
+    float u = dot(dms1, ds21);
+    float v = dot(dms1, ds31);
+    return (u >= 0.0 && u <= dot(ds21, ds21)
+    && v >= 0.0 && v <= dot(ds31,ds31));
+}
 vec4 Sample(vec3 p){
     return texture(uSampler, p);
 }
@@ -80,34 +93,44 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
         vec3 p = ro + rd * t;
         vec4 val_color = Sample(p);
         if(val_color.a > 0.01){
-            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, sample_step_inverse);
+            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
             sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
             sum.a += (1.0 - sum.a) * val_color.a;
         }
-        t += val_color.a > 0.01? sample_step_inverse: sample_step_inverse * 4.0;
+        t += val_color.a > 0.01? usample_step_inverse: usample_step_inverse * 4.0;
         steps++;
         pd = sum.a;
     }
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
-//void main(void){
-//    fragColor =  vec4(fs_in.TexCoords, 1.0);
-//}
+// void main(void){
+//    fragColor =  vec4(1.0, .0, .0, 1.0);
+// }
 void main(void){
-    vec3 ray_origin = uCamposObjSpace;
-    vec3 ray_dir = normalize(fs_in.raydir);
+    vec3 ro = uCamposObjSpace;
+    vec3 rd = normalize(fs_in.raydir);
 
-    vec2 intersect = RayCube(ray_origin, ray_dir, vec3(0.5));
+    vec2 intersect = RayCube(ro, rd, vec3(0.5));
     intersect.x = max(.0, intersect.x);
-    #ifdef CUTTING_PLANE
-        //Ray-plane
-        if(dot(uPlane.normal, -uCamposObjSpace) > .0)
-            intersect.x = max(intersect.x, RayPlane(ray_origin, ray_dir, uPlane.p, uPlane.normal ));
-        else
-            intersect.y = min(RayPlane(ray_origin, ray_dir, uPlane.p, -uPlane.normal), intersect.y);
-    #endif
+    bool blocked_by_plane=false;
+    // plane
+    // #ifdef CUTTING_PLANE
+    // float t;
+    // if(dot(uPlane.normal, -uCamposObjSpace) > .0){
+    //     t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
+    //     blocked_by_plane = (t <= intersect.x);
+    //     intersect.x = max(intersect.x, t);
+    // }
+    // else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-    if (intersect.y < intersect.x)
-        discard;
-    fragColor = Volume(ray_origin+0.5, ray_dir, intersect.x, intersect.y);
+    // if(blocked_by_plane && intersect.x <= intersect.y){
+    //     vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    //     fragColor = mix(traced_color, vec4(.0f, .0f, .0f, 1.0f), 1.0-traced_color.a);
+    // }
+    // #endif
+
+
+    if(intersect.y < intersect.x || blocked_by_plane) discard;
+    fragColor = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    // fragColor = vec4(1.0, 1.0, .0, 0.7);
 }

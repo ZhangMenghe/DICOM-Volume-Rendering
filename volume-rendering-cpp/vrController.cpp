@@ -87,9 +87,15 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
 }
 //1-baldder, 2-kidn 4 color 8 spleen
 void vrController::onViewCreated(){
-    texvrRenderer_ = new texvrRenderer;
-    raycastRenderer_ = new raycastRenderer;
+    onViewCreated(pre_draw_);
 }
+
+void vrController::onViewCreated(bool pre_draw){
+    pre_draw_ = pre_draw;
+    texvrRenderer_ = new texvrRenderer(pre_draw);
+    raycastRenderer_ = new raycastRenderer(pre_draw);
+}
+
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -99,7 +105,7 @@ void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
 
     if(isRayCasting())  raycastRenderer_->Draw();

@@ -35,17 +35,19 @@ void raycastRenderer::draw_scene(){
     glActiveTexture(GL_TEXTURE0 + dvr::BAKED_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
     Shader::Uniform(sp, "uSampler", dvr::BAKED_TEX_ID);
+    Shader::Uniform(sp, "uVPMat", Manager::camera->getProjMat()*Manager::camera->getViewMat());
 
-    Shader::Uniform(sp, "uProjMat", Manager::camera->getProjMat());
-    Shader::Uniform(sp, "uViewMat", Manager::camera->getViewMat());
-    Shader::Uniform(sp, "uModelMat", vrController::instance()->getModelMatrix());
+    // glm::mat4 modelmat = vrController::instance()->getModelMatrix()* dim_scale_mat;
+    glm::mat4 modelmat =glm::translate(glm::mat4(1.0f), glm::vec3(.0,.0,1.0f)) 
+      * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f))
+      *  dim_scale_mat;
+    glm::mat4 model_inv = glm::inverse(modelmat);
 
-    glm::mat4 modelmat = vrController::instance()->getModelMatrix();
-    glm::mat4 model_inv = glm::inverse(modelmat * dim_scale_mat);
+    Shader::Uniform(sp, "uModelMat", modelmat);
     Shader::Uniform(sp, "uCamposObjSpace",
             glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
 //    Shader::Uniform(sp,"sample_step_inverse", 1.0f / Manager::param_ray[dvr::TR_DENSITY]);
-    Shader::Uniform(sp,"sample_step_inverse", 1.0f/400);
+    Shader::Uniform(sp,"usample_step_inverse", 1.0f/600.0f);
     if(Manager::param_bool[dvr::CHECK_CUTTING])shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
 
@@ -85,7 +87,6 @@ void raycastRenderer::draw_baked(){
            ||!cshader_->CompileAndLink())
             LOGE("Raycast=====Failed to create raycast geometry shader");
         Manager::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL]="";
-
     }
 
     if(Manager::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
