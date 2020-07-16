@@ -162,6 +162,7 @@ void onCreated(){
 	}
 }
 void onDraw(){
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	controller_.onDraw();
 	if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	if(new_data_available){

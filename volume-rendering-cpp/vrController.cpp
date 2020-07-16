@@ -105,7 +105,6 @@ void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     precompute();
 
     if(isRayCasting())  raycastRenderer_->Draw();
@@ -168,7 +167,7 @@ void vrController::precompute(){
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[Manager::color_scheme_id]);
     //todo!!!! add flip stuff
-    bakeShader_->EnableKeyword("FLIPY");
+    if(pre_draw_)bakeShader_->EnableKeyword("FLIPY");
     if(Manager::param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
 
