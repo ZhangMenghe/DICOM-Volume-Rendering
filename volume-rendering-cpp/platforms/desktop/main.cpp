@@ -6,28 +6,11 @@
 #include "utils/uiController.h"
 #include "utils/fileLoader.h"
 
-#include <grpc/grpc.h>
-#include <grpcpp/channel.h>
-#include <grpcpp/client_context.h>
-#include <grpcpp/create_channel.h>
-#include <grpcpp/security/credentials.h>
 
-#include <proto/common.grpc.pb.h>
-#include <proto/common.pb.h>
-#include <proto/inspectorSync.grpc.pb.h>
-#include <proto/inspectorSync.pb.h>
-#include <proto/transManager.grpc.pb.h>
-#include <proto/transManager.pb.h>
 #include <chrono>
 #include <iomanip>
 #include <cstdio>
-using grpc::Channel;
-using grpc::ClientContext;
-using grpc::ClientReader;
-using grpc::ClientReaderWriter;
-using grpc::ClientWriter;
-using grpc::Status;
-using namespace helmsley;
+
 using namespace std::chrono;
 #include <mutex>
 #include <condition_variable>
@@ -35,79 +18,6 @@ using namespace std::chrono;
 #include <thread>
 #include <unistd.h>
 using namespace std;
-using namespace helmsley;
-template<class T>
-using RPCVector = google::protobuf::RepeatedPtrField<T>;
-//todo: try to implement operation merge
-class semaphore{
-public:
-
-  semaphore(int count_ = 0) : count{count_}
-  {}
-
-  void notify()
-  {
-    unique_lock<mutex> lck(mtx);
-    ++count;
-    cv.notify_one();
-  }
-
-  void wait()
-  {
-	// std::cout<<"count "<< count<<std::endl;
-    // unique_lock<mutex> lck(mtx);
-    // while(count == 0)
-    // {
-    //   cv.wait(lck);
-    // }
-	count = 0;
-    // --count;
-  }
-
-private:
-
-  mutex mtx;
-  condition_variable cv;
-  int count;
-};
-class syncClient{
-public:
-	syncClient(std::shared_ptr<Channel> channel)
-      : stub_(inspectorSync::NewStub(channel)) {
-		//   mc = &controller;//std::unique_ptr<vrController>(controller);
-	  }
-	
-	FrameUpdateMsg getUpdates(){
-	ClientContext context;
-		stub_->getUpdates(&context, req, &update_msg);
-		return update_msg;
-	}
-	const RPCVector<GestureOp> getOperations(){
-	ClientContext context;
-
-		std::vector<GestureOp> op_pool;
-
-		OperationBatch op_batch;
-		stub_->getOperations(&context,req, &op_batch);
-		// std::cout<<op_batch.bid()<<std::endl;
-		// for(auto op: op_batch.gesture_op())
-		// 	op_pool.push_back(op);
-		return op_batch.gesture_op();
-
-	// 	OperationResponse feature;
-
-	// 	std::unique_ptr<ClientReader<OperationResponse> > reader(
-    //     stub_->getOperations(&context, req));
-    // while (reader->Read(&feature))
-	// 	op_pool.push_back(feature.gesture_op());
-	// 	return op_pool;
-		// return feature.gesture_op();
-	}  
-private:
-  	std::unique_ptr<inspectorSync::Stub> stub_;
-	Request req;
-	FrameUpdateMsg update_msg;
-};
 
 GLFWwindow* window;
 dicomLoader loader_;
@@ -115,11 +25,12 @@ uiController ui_;
 //order matters
 Manager manager_;
 vrController controller_;
-syncClient* rpc_manager;
-// semaphore sp;
+#ifdef RPC_ENABLED
+#include <RPCs/rpcHandler.h>
+rpcHandler* rpc_handler;
+std::thread* rpc_thread;
+#endif
 // std::mutex mtx;
-std::string DATA_PATH = "helmsley_cached/";
-bool new_data_available = false;
 
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
@@ -165,8 +76,8 @@ void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	controller_.onDraw();
 	if(controller_.isDrawing()) overlayController::instance()->onDraw();
-	if(new_data_available){
-		new_data_available = false;
+	if(Manager::new_data_available){
+		Manager::new_data_available = false;
 		loader_.startToAssemble(&controller_);
 		loader_.reset();
 	}
@@ -224,143 +135,21 @@ void setupApplication(){
 	loader_.setupDCMIConfig(512,512,dims,-1,-1,-1,true);
 }
 
-void tackle_gesture_msg(const RPCVector<GestureOp> ops){
-		// auto ops = rpc_manager->getOperations();
-	for(auto op:ops){
-		switch (op.type()){
-		case GestureOp_OPType_TOUCH_DOWN:
-			controller_.onSingleTouchDown(op.x(), op.y());
-			// sp.notify();
-			break;
-		case GestureOp_OPType_TOUCH_MOVE:
-			controller_.onTouchMove(op.x(), op.y());
-			// sp.notify();
-			break;
-		case GestureOp_OPType_SCALE:
-			controller_.onScale(op.x(), op.y());
-			// sp.notify();
-			break;
-		case GestureOp_OPType_PAN:
-			controller_.onPan(op.x(), op.y());
-			// sp.notify();
-			break;
-		default:
-			break;
-		}
-	}
-}
-void tack_tune_msg(TuneMsg msg){
-	google::protobuf::RepeatedField<float> f;
-	switch (msg.type()){
-		case TuneMsg_TuneType_ADD_ONE:
-			f = msg.values();
-			ui_.addTuneParams(std::vector<float> (f.begin(), f.end()));
-			break;
-		case TuneMsg_TuneType_REMOVE_ONE:
-			ui_.removeTuneWidgetById(msg.target());
-			break;
-		case TuneMsg_TuneType_REMOTE_ALL:
-			ui_.removeAllTuneWidget();
-			break;
-		case TuneMsg_TuneType_SET_ONE:
-			ui_.setTuneParamById(msg.target(), msg.sub_target(), msg.value());
-			break;
-		case TuneMsg_TuneType_SET_ALL:
-			f = msg.values();
-			ui_.setAllTuneParamById(msg.target(), std::vector<float> (f.begin(), f.end()));
-			break;
-		case TuneMsg_TuneType_SET_VISIBLE:
-			ui_.setTuneWidgetVisibility(msg.target(), (msg.value()>0)?true:false);
-			break;
-		case TuneMsg_TuneType_SET_TARGET:
-			ui_.setTuneWidgetById(msg.target());
-			break;
-		case TuneMsg_TuneType_CUT_PLANE:
-			ui_.setCuttingPlane(msg.target(), msg.value());
-			break;
-		case TuneMsg_TuneType_COLOR_SCHEME:
-			ui_.setColorScheme(msg.target());
-			break;
-		default:
-			break;
-	}
-}
-void tackle_volume_msg(volumeConcise msg){
-	//reset data
-	auto dims = msg.dims();
-	auto ss = msg.size();
-	loader_.setupDCMIConfig(dims[0], dims[1], dims[2],ss[0],ss[1],ss[2], msg.with_mask());
-
-	std::cout<<msg.vol_path()<<std::endl;
-	if(!loader_.loadData(DATA_PATH + msg.vol_path()+"/data", DATA_PATH + msg.vol_path()+"/mask")){
-		std::cout<<"file not exist"<<std::endl;
-		return;
-	}
-		//todo: request from server
-	new_data_available = true;
-}
-void tackle_reset_msg(ResetMsg msg){
-	manager_.onReset();
-	ui_.onReset(msg);
-}
-void tackle_update_msg(){
-	auto msg = rpc_manager->getUpdates();
-	int gid = 0, tid = 0, cid = 0;
-	bool gesture_finished = false;
-
-	for(auto type: msg.types()){
-		switch(type){
-			case FrameUpdateMsg_MsgType_GESTURE:
-				if(!gesture_finished){
-					tackle_gesture_msg(msg.gestures());
-					gesture_finished = true;
-				}
-				break;
-			case FrameUpdateMsg_MsgType_TUNE:
-				tack_tune_msg(msg.tunes().Get(tid++));
-				break;
-			case FrameUpdateMsg_MsgType_CHECK:
-				ui_.setCheck(msg.checks().Get(cid++));
-				break;
-			case FrameUpdateMsg_MsgType_MASK:
-				ui_.setMaskBits(msg.mask_value());
-				break;
-			case FrameUpdateMsg_MsgType_RESET:
-				tackle_reset_msg(msg.reset_value());
-				break;
-			case FrameUpdateMsg_MsgType_DATA:
-				tackle_volume_msg(msg.data_value());
-				break;
-			default:
-				std::cout<<"UNKNOWN TYPE"<<std::endl;
-				break;
-		}
-	}
-}
-void rpc_thread(){
-	// auto last_ts = std::chrono::system_clock::now();
-	// size_t ops_count = 0;
-	rpc_manager = new syncClient(grpc::CreateChannel(
-      "localhost:23333", grpc::InsecureChannelCredentials()));
-	while(true) tackle_update_msg();
-
-		// auto duration = std::chrono::system_clock::now() - last_ts;
-		// auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
-		// if (seconds > 2) {
-		// 	// std::cerr << "ops: " << ops_count << std::endl;
-		// 	last_ts = std::chrono::system_clock::now();
-		// 	ops_count = 0;
-		// }
-		// std::this_thread::sleep_for(std::chrono::milliseconds(500));
-	}
-void main_thread(){
+int main(int argc, char** argv){
 	setupShaderContents(&controller_);
 	
-	if(!InitWindow()) return;
+	if(!InitWindow()) return -1;
 
 	setupApplication();
 	onCreated();
-
+	#ifdef RPC_ENABLED
+	rpc_handler = new rpcHandler("localhost:23333");
+    rpc_thread = new thread(&rpcHandler::Run, rpc_handler);
+	rpc_handler->setManager(&manager_);
+	rpc_handler->setUIController(&ui_);
+	rpc_handler->setVRController(&controller_);
+	rpc_handler->setDataLoader(&loader_);
+	#endif
 	do{
 		// sp.wait();
 		// std::cout<<"draw"<<std::endl;
@@ -379,13 +168,5 @@ void main_thread(){
 	glfwDestroyWindow(window);
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();
-}
-
-int main(int argc, char** argv){
-	std::thread t1(&main_thread);
-	std::thread t2(&rpc_thread);
-
-	t1.join();
-	t2.join();
 	return 0;
 }
