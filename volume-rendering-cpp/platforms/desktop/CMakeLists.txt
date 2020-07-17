@@ -11,6 +11,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_definitions(-DRESOURCE_DESKTOP_DIR="${ASSET_DIRECTORY}/")
 
 if(WITH_GRPC)
+	add_definitions(-DRPC_ENABLED)
 	include(${CMAKE_CURRENT_SOURCE_DIR}/RPCs/CMakeLists.txt)
 	
 	add_executable(

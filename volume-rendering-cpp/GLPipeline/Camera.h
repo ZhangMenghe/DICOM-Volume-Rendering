@@ -58,7 +58,7 @@ public:
     void updateCameraPose(glm::mat4 pose) {
         //pose is in column major
         _eyePos = glm::vec3(pose[3][0], pose[3][1], pose[3][2]);
-        _front = glm::vec3(pose[2][0], pose[2][1], pose[2][2]);
+        _front = -glm::vec3(pose[2][0], pose[2][1], pose[2][2]);
         pose_mat = pose;
     }
 
@@ -67,15 +67,19 @@ public:
     glm::mat4 getProjMat(){return _projMat;}
     glm::mat4 getViewMat(){return _viewMat;}
     glm::mat4 getVPMat(){return _projMat * _viewMat;}
-    glm::vec3 getCameraPosition(){
-        //todo:DON'T KNOW WHY BUT WORKS FOR RAYCASTING MODE TO STAY THE SAME SIZE
-        return _eyePos;// + glm::vec3(.0,.0,1.0);
-    }
+    glm::vec3 getCameraPosition(){return _eyePos;}
     glm::vec3 getViewCenter(){return _center;}
     glm::vec3 getViewDirection(){return _front;}
     glm::vec3 getViewUpDirection(){return _up;}
     glm::mat4 getCameraPose(){return pose_mat;}
-
+    glm::mat4 getRotationMatrixOfCameraDirection(){
+        //a is the vector you want to translate to and b is where you are
+        const glm::vec3 a = -_front;//src_dir;
+        const glm::vec3 b = glm::vec3(0,0,1);//dest_dir;
+        glm::vec3 v = glm::cross(b, a);
+        float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
+        return glm::rotate(angle, v);
+    }
     void rotateCamera(int axis, glm::vec4 center, float offset){
         glm::vec3 rotateAxis = (axis==3)?glm::vec3(0,1,0):glm::vec3(1,0,0);
         glm::mat4 modelMat = glm::mat4(1.0);

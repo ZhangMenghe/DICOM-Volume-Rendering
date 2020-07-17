@@ -80,16 +80,11 @@ void uiController::setMaskBits(int num, unsigned int mbits){
     vrController::instance()->mask_bits_ = (unsigned int)mbits;
     Manager::baked_dirty_ = true;
 }
+#ifdef RPC_ENABLED
 void uiController::setMaskBits(helmsley::MaskMsg msg){
     setMaskBits(msg.num(), (unsigned int)msg.mbits());
 }
-void uiController::setCheck(std::string key, bool value){
-    auto it = std::find (param_checks.begin(), param_checks.end(), key);
-    if (it != param_checks.end()){
-        Manager::param_bool[it - param_checks.begin()] = value;
-        Manager::baked_dirty_ = true;
-    }
-}
+
 void uiController::setCheck(helmsley::CheckMsg msg){
     setCheck(msg.key(), msg.value());
 }
@@ -118,6 +113,14 @@ void uiController::onReset(helmsley::ResetMsg msg){
                 glm::vec3(cps[3], cps[4], cps[5]),
                 glm::vec3(cps[6], cps[7], cps[8])
         ));
+}
+#endif
+void uiController::setCheck(std::string key, bool value){
+    auto it = std::find (param_checks.begin(), param_checks.end(), key);
+    if (it != param_checks.end()){
+        Manager::param_bool[it - param_checks.begin()] = value;
+        Manager::baked_dirty_ = true;
+    }
 }
 void uiController::addTuneParams(std::vector<float> values){
     overlayController::instance()->addWidget(values);

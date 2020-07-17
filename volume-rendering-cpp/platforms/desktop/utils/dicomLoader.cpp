@@ -19,7 +19,12 @@ bool dicomLoader::loadData(std::string dicom_path, std::string mask_path, int da
 
 bool dicomLoader::loadData(std::string filename, mLoadTarget target, int unit_size){
     char buffer[1024];
+    #ifdef RESOURCE_DESKTOP_DIR
     std::ifstream inFile (PATH(filename), std::ios::in | std::ios::binary);
+    #else
+    std::ifstream inFile (filename, std::ios::in | std::ios::binary);
+    #endif
+
     if(!inFile.is_open()) return false;
 
     for(int id = 0; !inFile.eof(); id++){

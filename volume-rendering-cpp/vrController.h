@@ -21,6 +21,7 @@ public:
     void assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num = 4);
     /*Override*/
     void onViewCreated();
+    void onViewCreated(bool pre_draw);
     void onViewChange(int width, int height);
     void onDraw();
     void onReset();
@@ -77,6 +78,7 @@ private:
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
     float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
+    bool pre_draw_ = true;
 
     //ui
     glm::fvec2 Mouse_old;

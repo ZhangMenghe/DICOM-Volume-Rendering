@@ -8,7 +8,7 @@ uniform vec2 u_opacity[60];
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 
-out vec4 gl_FragColor;
+out vec4 fragColor;
 in vec2 vTexcoord;
 // All components are in the range [0…1], including hue.
 vec3 hsv2rgb(vec3 c){
@@ -46,8 +46,8 @@ void main(){
         intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);
         intensity= max(.0, min(1.0, intensity));
 
-        if(uScheme == 0) gl_FragColor = vec4(vec3(intensity), 1.0);
-        else gl_FragColor = vec4(hsv2rgb(transfer_scheme_hsv((vTexcoord.x > u_contrast_high)? 1.0:intensity)), 1.0);
+        if(uScheme == 0) fragColor = vec4(vec3(intensity), 1.0);
+        else fragColor = vec4(hsv2rgb(transfer_scheme_hsv((vTexcoord.x > u_contrast_high)? 1.0:intensity)), 1.0);
     }else{
 //        if(intensity > u_contrast_high||intensity < u_contrast_low) intensity = .0;
 //        intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);
@@ -56,12 +56,12 @@ void main(){
         for(int i=0; i<u_widget_num; i++){
             if(((u_visible_bits >> i) & 1) == 1) gray = max(gray, get_intensity(6*i, intensity));
         }
-        if(vTexcoord.y<0.33) gl_FragColor = vec4(vec3(gray), 1.0);
+        if(vTexcoord.y<0.33) fragColor = vec4(vec3(gray), 1.0);
         else{
             intensity = smoothstep(u_contrast_low, u_contrast_high, intensity);
             intensity= max(.0, min(1.0, intensity));
 
-            gl_FragColor = get_mixture(intensity, vec3(gray));
+            fragColor = get_mixture(intensity, vec3(gray));
         }
     }
 }

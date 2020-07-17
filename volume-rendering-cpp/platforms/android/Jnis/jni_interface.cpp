@@ -83,6 +83,7 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint w, jint h){
 }
 
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     nativeApp(nativeAddr)->onDraw();
     if(vrController::instance()->isDrawing()) overlayController::instance()->onDraw();
 }
