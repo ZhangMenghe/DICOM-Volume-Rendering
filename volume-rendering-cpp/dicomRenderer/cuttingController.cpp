@@ -81,7 +81,7 @@ void cuttingController::draw_plane(){
            ||!pshader->AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_CPLANE_FRAG])
            ||!pshader->CompileAndLink())
             LOGE("Raycast===Failed to create cutting plane shader program===");
-        Manager::shader_contents[dvr::SHADER_CPLANE_VERT] = "";Manager::shader_contents[dvr::SHADER_CPLANE_FRAG]="";
+        // Manager::shader_contents[dvr::SHADER_CPLANE_VERT] = "";Manager::shader_contents[dvr::SHADER_CPLANE_FRAG]="";
 
     }
     GLuint sp = pshader->Use();

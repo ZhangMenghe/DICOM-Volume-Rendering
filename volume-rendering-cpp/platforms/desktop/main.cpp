@@ -1,7 +1,7 @@
 #include <platforms/platform.h>
 #include <vrController.h>
 #include <overlayController.h>
-
+#include <dicomRenderer/centerLineRenderer.h>
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
 #include "utils/fileLoader.h"
@@ -25,6 +25,8 @@ uiController ui_;
 //order matters
 Manager manager_;
 vrController controller_;
+centerLineRenderer* lineRenderer_;
+
 #ifdef RPC_ENABLED
 #include <RPCs/rpcHandler.h>
 rpcHandler* rpc_handler;
@@ -57,8 +59,16 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated();
+	controller_.onViewCreated(false);
 	overlayController::instance()->onViewCreated();
+    lineRenderer_ = new centerLineRenderer(false);
+
+	float data[6] = {
+		-0.5f,-0.5f,0.5,
+		0.5, 0.5f, -0.5,
+	};
+	lineRenderer_->updateVertices(2, data);
+
 	ui_.AddTuneParams();
 
 	// 430, 768,
@@ -74,8 +84,9 @@ void onCreated(){
 }
 void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	lineRenderer_->onDraw(controller_.getModelMatrix());
 	controller_.onDraw();
-	if(controller_.isDrawing()) overlayController::instance()->onDraw();
+	// if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	if(Manager::new_data_available){
 		Manager::new_data_available = false;
 		loader_.startToAssemble(&controller_);

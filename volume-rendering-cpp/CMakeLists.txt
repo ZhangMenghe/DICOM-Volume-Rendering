@@ -33,6 +33,7 @@ SET(GL_PIPELINE_FILES
 SET(DICOM_RENDERERS
         dicomRenderer/raycastRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp
+        dicomRenderer/centerLineRenderer.cpp
         dicomRenderer/cuttingController.cpp
         dicomRenderer/colorbarRenderer.cpp
         dicomRenderer/graphRenderer.cpp
