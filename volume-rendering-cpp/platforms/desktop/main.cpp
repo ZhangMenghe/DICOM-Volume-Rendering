@@ -25,7 +25,7 @@ uiController ui_;
 //order matters
 Manager manager_;
 vrController controller_;
-centerLineRenderer* lineRenderer_;
+std::vector<centerLineRenderer*> line_renderers_;
 
 #ifdef RPC_ENABLED
 #include <RPCs/rpcHandler.h>
@@ -33,6 +33,9 @@ rpcHandler* rpc_handler;
 std::thread* rpc_thread;
 #endif
 // std::mutex mtx;
+#include <platforms/desktop/common.h>
+std::string ds_path = "dicom-data/IRB01/2100_FATPOSTCORLAVAFLEX20secs/";
+glm::vec3 vol_dims = glm::vec3(512,512,164);
 
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
@@ -56,18 +59,52 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			}
     }
 }
+void get_center_line_points(){
+	std::string filename = ds_path + "IRB01.txt";	
+	float data[4000 * 3];
+    std::ifstream ShaderStream(PATH(filename), std::ios::in);
 
+	if(ShaderStream.is_open()){
+		std::string line = "", substr;
+		int idx;
+		while(getline(ShaderStream, line)){
+			if(line.length() < 3){
+				if(!line_renderers_.empty()){
+					for(int i=0;i<4000;i++){
+						data[3*i] = -(data[3*i]* 0.0020325-0.5);
+						data[3*i+1] =-(data[3*i+1]*0.001953125f - 0.5f);
+						data[3*i+2] =data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
+						// swap(data[3*i], data[3*i+2]);
+					}
+					for(int i=0;i<4000;i++)swap(data[3*i], data[3*i+2]);
+					line_renderers_.back()->updateVertices(4000, data);
+					std::cout<<"vertices updated: "<<line<<" "<<idx<<std::endl;
+				}
+    			line_renderers_.push_back(new centerLineRenderer(std::stoi(line), false));
+				idx = 0;
+				continue;
+			}
+			std::stringstream ss(line);
+			while(ss.good()){
+				getline(ss,substr,',');
+				data[idx++] = std::stof(substr);
+			}
+		}
+		ShaderStream.close();
+	}else{
+		LOGE("====Failed to load file: %s", filename);
+	}
+
+	line_renderers_.back()->updateVertices(4000, data);
+	std::cout<<"vertices updated: "<<std::endl;
+
+	std::cout<<"line render num: "<<line_renderers_.size()<<std::endl;
+}
 void onCreated(){
 	ui_.InitAll();
 	controller_.onViewCreated(false);
 	overlayController::instance()->onViewCreated();
-    lineRenderer_ = new centerLineRenderer(false);
-
-	float data[6] = {
-		-0.5f,-0.5f,0.5,
-		0.5, 0.5f, -0.5,
-	};
-	lineRenderer_->updateVertices(2, data);
+	get_center_line_points();
 
 	ui_.AddTuneParams();
 
@@ -76,15 +113,18 @@ void onCreated(){
     overlayController::instance()->setOverlayRect(1, 430, 36, 0, 295);
 
 	//load data
-	if(loader_.loadData("helmsley_cached/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/data", "helmsley_cached/Larry_Smarr_2016/series_23_Cor_LAVA_PRE-Amira/mask")){
+	if(loader_.loadData(ds_path +"data", ds_path+"mask")){
 	// if(loader_.loadData("dicom-images/sample_data_2bytes_2012", LOAD_DICOM)){
-        controller_.assembleTexture(2, 512,512,144, -1, -1, -1, loader_.getVolumeData(), loader_.getChannelNum());
+        controller_.assembleTexture(2, vol_dims.x, vol_dims.y, vol_dims.z, -1, -1, -1, loader_.getVolumeData(), loader_.getChannelNum());
 		loader_.reset();
 	}
+	controller_.onScale(1.5,1.5);
 }
 void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	lineRenderer_->onDraw(controller_.getModelMatrix());
+	auto dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 164.0 / 300.f));
+	for(auto lineRenderer_:line_renderers_)
+	lineRenderer_->onDraw(controller_.getModelMatrix() * dim_scale_mat);
 	controller_.onDraw();
 	// if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	if(Manager::new_data_available){
@@ -142,8 +182,7 @@ bool InitWindow(){
 }
 
 void setupApplication(){
-	int dims = 144;
-	loader_.setupDCMIConfig(512,512,dims,-1,-1,-1,true);
+	loader_.setupDCMIConfig(vol_dims.x, vol_dims.y, vol_dims.z, -1,-1,-1,true);
 }
 
 int main(int argc, char** argv){

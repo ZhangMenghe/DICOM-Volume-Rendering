@@ -52,4 +52,4 @@ Thumbs.db
 */.externalNativeBuild/
 
 #Other data files
-*dicom-images*
+*dicom-data*

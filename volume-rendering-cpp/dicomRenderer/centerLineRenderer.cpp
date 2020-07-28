@@ -3,8 +3,8 @@
 #include <dicomRenderer/Constants.h>
 #include <dicomRenderer/screenQuad.h>
 
-centerLineRenderer::centerLineRenderer(bool screen_baked)
-:DRAW_BAKED(screen_baked){
+centerLineRenderer::centerLineRenderer(int id, bool screen_baked)
+:DRAW_BAKED(screen_baked),uid(id){
     glGenVertexArrays(1, &vao_);
     glGenBuffers(1, &vbo_);
 
@@ -38,7 +38,9 @@ void centerLineRenderer::onDraw(glm::mat4 model_mat){
 }
 void centerLineRenderer::draw_scene(glm::mat4 model_mat){
     GLuint sp = shader_.Use();
-    glLineWidth(10.0f);
+    glLineWidth(20.0f);
+    // glm::mat4 rot_mat = glm::rotate(model_mat, 3.14f*0.5f, glm::vec3(0,1,0));
+    // glm::mat4 mm = glm::translate(rot_mat, glm::vec3(0.3,0,0));
     Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat() * model_mat);
     glBindVertexArray(vao_);
     glDrawArrays(GL_LINES, 0, draw_point_num);
