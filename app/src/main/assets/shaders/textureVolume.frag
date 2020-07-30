@@ -17,4 +17,5 @@ void main(){
 	}
 	if(u_front)fragColor = texture(uSampler_baked, vTexcoord);
 	else fragColor = texture(uSampler_baked, vec3(vTexcoord.xy, 1.0-vTexcoord.z));
+	// discard;
 }

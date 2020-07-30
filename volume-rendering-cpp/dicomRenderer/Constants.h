@@ -63,7 +63,7 @@ namespace dvr{
 
     //TRS
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);
-    const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f, 1.0f,0.5f);
+    const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f);
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
 
     //color scheme

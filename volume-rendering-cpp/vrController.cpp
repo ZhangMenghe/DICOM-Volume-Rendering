@@ -106,7 +106,7 @@ void vrController::onDraw() {
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     precompute();
-
+    // std::cout<<"scale "<<ScaleVec3_.x<<" "<<ScaleVec3_.y<<" "<<ScaleVec3_.z<<std::endl;
     if(isRayCasting())  raycastRenderer_->Draw();
     else texvrRenderer_->Draw();
 }

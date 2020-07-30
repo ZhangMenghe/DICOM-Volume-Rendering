@@ -60,7 +60,7 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
     }
 }
 void get_center_line_points(){
-	std::string filename = ds_path + "IRB01.txt";	
+	std::string filename = ds_path + "IRB1.txt";	
 	float data[4000 * 3];
     std::ifstream ShaderStream(PATH(filename), std::ios::in);
 
@@ -71,12 +71,16 @@ void get_center_line_points(){
 			if(line.length() < 3){
 				if(!line_renderers_.empty()){
 					for(int i=0;i<4000;i++){
-						data[3*i] = -(data[3*i]* 0.0020325-0.5);
-						data[3*i+1] =-(data[3*i+1]*0.001953125f - 0.5f);
-						data[3*i+2] =data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
-						// swap(data[3*i], data[3*i+2]);
+						float fx = data[3*i], fy = data[3*i+1], fz = data[3*i+2];
+						data[3*i]=fy;
+						data[3*i+1]=fz;
+						data[3*i+2]= fx*3.0 - 0.15;
+					// 	data[3*i] = -(data[3*i]* 0.0020325-0.5);
+						// data[3*i+1] =-data[3*i+1];
+						// data[3*i+2] *=2.0f;//data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
+					// 	// swap(data[3*i], data[3*i+2]);
 					}
-					for(int i=0;i<4000;i++)swap(data[3*i], data[3*i+2]);
+					// for(int i=0;i<4000;i++)swap(data[3*i], data[3*i+1]);
 					line_renderers_.back()->updateVertices(4000, data);
 					std::cout<<"vertices updated: "<<line<<" "<<idx<<std::endl;
 				}
@@ -95,6 +99,16 @@ void get_center_line_points(){
 		LOGE("====Failed to load file: %s", filename);
 	}
 
+					for(int i=0;i<4000;i++){
+						float fx = data[3*i], fy = data[3*i+1], fz = data[3*i+2];
+						data[3*i]=fy;
+						data[3*i+1]=fz;
+						data[3*i+2]= fx*3.0 - 0.15;
+					// 	data[3*i] = -(data[3*i]* 0.0020325-0.5);
+						// data[3*i+1] =-data[3*i+1];
+						// data[3*i+2] *=2.0f;//data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
+					// 	// swap(data[3*i], data[3*i+2]);
+					}
 	line_renderers_.back()->updateVertices(4000, data);
 	std::cout<<"vertices updated: "<<std::endl;
 
@@ -102,7 +116,7 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(false);
+	controller_.onViewCreated(true);
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 
@@ -118,14 +132,15 @@ void onCreated(){
         controller_.assembleTexture(2, vol_dims.x, vol_dims.y, vol_dims.z, -1, -1, -1, loader_.getVolumeData(), loader_.getChannelNum());
 		loader_.reset();
 	}
-	controller_.onScale(1.5,1.5);
+	controller_.onScale(2.0,2.0);
 }
 void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	auto dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 164.0 / 300.f));
+	auto dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 164.0/300.f));
+	controller_.onDraw();
+	
 	for(auto lineRenderer_:line_renderers_)
 	lineRenderer_->onDraw(controller_.getModelMatrix() * dim_scale_mat);
-	controller_.onDraw();
 	// if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	if(Manager::new_data_available){
 		Manager::new_data_available = false;

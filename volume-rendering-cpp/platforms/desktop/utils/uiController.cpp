@@ -8,7 +8,7 @@ void uiController::InitAll(){
     // AddTuneParams();
     InitAllTuneParam();
     InitCheckParam();
-    setMaskBits(4,8);
+    setMaskBits(7,8+32);
 
     vrController::instance()->onReset(
         glm::vec3(.0f),
@@ -23,7 +23,7 @@ void uiController::InitAll(){
 
 void uiController::AddTuneParams(){
     float opa_values[5] = {
-        1.0f,
+        0.1f,
         .0f,
         2.0f,
         0.0f,
@@ -36,8 +36,8 @@ void uiController::AddTuneParams(){
 void uiController::InitAllTuneParam(){
     float contrast_values[3] = {
         .0f,
-        .5f,
-        0.7f
+        .8f,
+        1.0f
     };
     vrController::instance()->setRenderParam(contrast_values);
 }
@@ -53,7 +53,7 @@ void uiController::InitCheckParam(){
         "Recolor"
     };
     bool values[7] = {
-        false,
+        true,
         true,
         false,
         false,

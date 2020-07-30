@@ -2,6 +2,7 @@
 #include "raycastRenderer.h"
 #include "screenQuad.h"
 #include <GLPipeline/Primitive.h>
+#include <glm/gtx/string_cast.hpp>
 raycastRenderer::raycastRenderer(bool screen_baked):
 DRAW_BAKED(screen_baked){
     //geometry
@@ -37,10 +38,13 @@ void raycastRenderer::draw_scene(){
     Shader::Uniform(sp, "uSampler", dvr::BAKED_TEX_ID);
     Shader::Uniform(sp, "uVPMat", Manager::camera->getProjMat()*Manager::camera->getViewMat());
 
-    // glm::mat4 modelmat = vrController::instance()->getModelMatrix()* dim_scale_mat;
-    glm::mat4 modelmat =glm::translate(glm::mat4(1.0f), glm::vec3(.0,.0,1.0f)) 
-      * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f))
-      *  dim_scale_mat;
+	// dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 164.0*3.0f/512.f));
+
+    glm::mat4 modelmat = vrController::instance()->getModelMatrix()* dim_scale_mat;
+    // glm::mat4 modelmat =glm::translate(glm::mat4(1.0f), glm::vec3(.0,.0,1.0f)) 
+    //   * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f))
+    //   *  dim_scale_mat;
+
     glm::mat4 model_inv = glm::inverse(modelmat);
 
     Shader::Uniform(sp, "uModelMat", modelmat);
