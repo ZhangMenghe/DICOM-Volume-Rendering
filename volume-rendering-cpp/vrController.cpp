@@ -112,11 +112,12 @@ void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    precompute();
-    // std::cout<<"scale "<<ScaleVec3_.x<<" "<<ScaleVec3_.y<<" "<<ScaleVec3_.z<<std::endl;
-    meshRenderer_->Draw();
-    // if(isRayCasting())  raycastRenderer_->Draw();
-    // else texvrRenderer_->Draw();
+    if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON])meshRenderer_->Draw();
+    else{
+        precompute();
+        if(isRayCasting())  raycastRenderer_->Draw();
+        else texvrRenderer_->Draw();
+    }
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;

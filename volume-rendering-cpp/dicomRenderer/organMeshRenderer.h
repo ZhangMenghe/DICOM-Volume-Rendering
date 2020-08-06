@@ -8,7 +8,6 @@ class organMeshRenderer{
 private:
     Shader* shader_= nullptr, *shader_draw_, *shader_clear;
     GLuint vao_= 0, vao_test;
-    bool wireframe = true;
 
     uint32_t buffer_vertices;
     uint32_t buffer_normals;

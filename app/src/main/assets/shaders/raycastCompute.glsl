@@ -144,6 +144,5 @@ void main(){
     for(int i=0; i<u_widget_num; i++)
     if(((u_visible_bits >> i) & 1) == 1) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity));
 
-    imageStore(destTex, storePos, vec4(TransferColor(intensity, ORGAN_BIT), ORGAN_BIT));
+    imageStore(destTex, storePos, vec4(TransferColor(intensity, ORGAN_BIT), alpha));
 }
-

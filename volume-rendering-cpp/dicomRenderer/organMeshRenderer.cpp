@@ -83,7 +83,7 @@ void organMeshRenderer::Draw() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-    if(wireframe)glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    if(Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME])glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
 
@@ -103,6 +103,7 @@ void organMeshRenderer::Draw() {
     glBindVertexArray(0);
 
     shader_draw_->UnUse();
-        glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }

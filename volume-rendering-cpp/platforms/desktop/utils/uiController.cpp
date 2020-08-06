@@ -43,25 +43,30 @@ void uiController::InitAllTuneParam(){
 }
 
 void uiController::InitCheckParam(){
-    const char* keys[7] = {
+    const int pnum = 9;
+    const char* keys[pnum] = {
         "Raycasting",
         "Overlays",
         "Cutting",
         "Freeze Volume",
         "Freeze Plane",
         "Show",
-        "Recolor"
+        "Recolor",
+        "Polygon",
+        "Wireframe Mode"
     };
-    bool values[7] = {
-        false,
+    bool values[pnum] = {
+        true,
         true,
         false,
         false,
         false,
         true,
+        true,
+        false,
         true
     };
-    InitCheckParam(7, keys, values);
+    InitCheckParam(pnum, keys, values);
 }
 
 void uiController::InitCheckParam(int num, const char*keys[], bool values[]){

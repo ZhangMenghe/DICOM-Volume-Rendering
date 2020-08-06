@@ -63,6 +63,20 @@ void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 	float f = 1.0 + yoffset * 0.1f;
 	controller_.onScale(f, f);
 }
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
+	if(action!=GLFW_PRESS) return;
+	switch (key)
+	{
+	case GLFW_KEY_W:
+		ui_.setCheck("Wireframe Mode", !Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME]);
+		break;
+	case GLFW_KEY_P:
+		ui_.setCheck("Polygon", !Manager::param_bool[dvr::CHECK_DRAW_POLYGON]);
+		break;
+	default:
+		break;
+	}
+}
 void get_center_line_points(){
 	std::string filename = ds_path + "IRB1.txt";	
 	float data[4000 * 3];
@@ -202,6 +216,8 @@ bool InitWindow(){
 	glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetScrollCallback(window, mouse_scroll_callback);
+	glfwSetKeyCallback(window, key_callback);
+
 	onViewChange(430,768);
 	return true;
 }
