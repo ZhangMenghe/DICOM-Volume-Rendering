@@ -64,21 +64,29 @@ void organMeshRenderer::init_buffer(){
     if(!shader_clear->AddShader(GL_COMPUTE_SHADER,Manager::shader_contents[dvr::SHADER_MARCHING_CUBE_CLEAR_GLSL])
             ||!shader_clear->CompileAndLink())
         LOGE("OrganMesh Clear===Failed to create mesh shader program===");
-}
-void organMeshRenderer::Draw() {
+    
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buffer_vertices);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffer_normals);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, buffer_triangle_table);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, buffer_configuration_table);
-    glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
+}
+void organMeshRenderer::Draw() {
+    if(!initialized){
+        glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
+        
+        //do clear
+        // a debug sphere
+        //     GLuint spc = shader_clear->Use();
+        //     glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
+        //     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+        // shader_clear->UnUse();
 
-    //do clear
-    // a debug sphere
-//     GLuint spc = shader_clear->Use();
-//     glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
-//     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-// shader_clear->UnUse();
-
+        GLuint sp = shader_->Use();
+        glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
+        glMemoryBarrier(GL_ALL_BARRIER_BITS);
+        shader_->UnUse();
+        initialized = true;
+    }
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -86,13 +94,6 @@ void organMeshRenderer::Draw() {
     if(Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME])glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
-
-    GLuint sp = shader_->Use();
-    
-    glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
-    glMemoryBarrier(GL_ALL_BARRIER_BITS);
-    shader_->UnUse();
-
     GLuint dsp = shader_draw_->Use();
     Shader::Uniform(dsp, "uMVP", 
     Manager::camera->getProjMat() * Manager::camera->getViewMat() *vrController::instance()->getModelMatrix(true)
