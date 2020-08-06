@@ -14,6 +14,7 @@ vrController* vrController::instance(){
 vrController::~vrController(){
     if(texvrRenderer_) delete texvrRenderer_;
     if(raycastRenderer_) delete raycastRenderer_;
+    if(meshRenderer_) delete meshRenderer_;
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
@@ -43,6 +44,11 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
     if(Manager::screen_w != 0)rStates_[cst_name].vcam->setProjMat(Manager::screen_w, Manager::screen_h);
     ModelMat_=mm; RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv; Manager::camera=rStates_[cst_name].vcam;
     volume_model_dirty = false;
+}
+void vrController::setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data){
+    if(tex_mask!= nullptr){delete tex_mask; tex_mask= nullptr;}
+    tex_mask = new Texture(GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, data);
+    delete[]data;
 }
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
@@ -94,6 +100,7 @@ void vrController::onViewCreated(bool pre_draw){
     pre_draw_ = pre_draw;
     texvrRenderer_ = new texvrRenderer(pre_draw);
     raycastRenderer_ = new raycastRenderer(pre_draw);
+    meshRenderer_ = new organMeshRenderer;
 }
 
 void vrController::onViewChange(int width, int height){
@@ -107,8 +114,9 @@ void vrController::onDraw() {
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     precompute();
     // std::cout<<"scale "<<ScaleVec3_.x<<" "<<ScaleVec3_.y<<" "<<ScaleVec3_.z<<std::endl;
-    if(isRayCasting())  raycastRenderer_->Draw();
-    else texvrRenderer_->Draw();
+    meshRenderer_->Draw();
+    // if(isRayCasting())  raycastRenderer_->Draw();
+    // else texvrRenderer_->Draw();
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;

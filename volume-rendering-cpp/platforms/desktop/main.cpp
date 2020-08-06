@@ -59,6 +59,10 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 			}
     }
 }
+void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
+	float f = 1.0 + yoffset * 0.1f;
+	controller_.onScale(f, f);
+}
 void get_center_line_points(){
 	std::string filename = ds_path + "IRB1.txt";	
 	float data[4000 * 3];
@@ -82,7 +86,7 @@ void get_center_line_points(){
 					}
 					// for(int i=0;i<4000;i++)swap(data[3*i], data[3*i+1]);
 					line_renderers_.back()->updateVertices(4000, data);
-					std::cout<<"vertices updated: "<<line<<" "<<idx<<std::endl;
+					// std::cout<<"vertices updated: "<<line<<" "<<idx<<std::endl;
 				}
     			line_renderers_.push_back(new centerLineRenderer(std::stoi(line), false));
 				idx = 0;
@@ -116,7 +120,7 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(true);
+	controller_.onViewCreated(false);
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 
@@ -132,7 +136,12 @@ void onCreated(){
         controller_.assembleTexture(2, vol_dims.x, vol_dims.y, vol_dims.z, -1, -1, -1, loader_.getVolumeData(), loader_.getChannelNum());
 		loader_.reset();
 	}
-	controller_.onScale(2.0,2.0);
+
+		//load data
+	if(loader_.loadData(ds_path+"mask_simple",128,128,41)){
+        controller_.setupSimpleMaskTexture(128,128,41, loader_.getSimpleMask());
+		loader_.reset();
+	}
 }
 void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -141,12 +150,12 @@ void onDraw(){
 	
 	for(auto lineRenderer_:line_renderers_)
 	lineRenderer_->onDraw(controller_.getModelMatrix() * dim_scale_mat);
-	// if(controller_.isDrawing()) overlayController::instance()->onDraw();
-	if(Manager::new_data_available){
-		Manager::new_data_available = false;
-		loader_.startToAssemble(&controller_);
-		loader_.reset();
-	}
+	// // if(controller_.isDrawing()) overlayController::instance()->onDraw();
+	// if(Manager::new_data_available){
+	// 	Manager::new_data_available = false;
+	// 	loader_.startToAssemble(&controller_);
+	// 	loader_.reset();
+	// }
 }
 void onViewChange(int width, int height){
 	manager_.onViewChange(width, height);
@@ -192,6 +201,7 @@ bool InitWindow(){
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
+	glfwSetScrollCallback(window, mouse_scroll_callback);
 	onViewChange(430,768);
 	return true;
 }

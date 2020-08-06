@@ -3,6 +3,7 @@
 
 #include <dicomRenderer/texturebasedRenderer.h>
 #include <dicomRenderer/raycastRenderer.h>
+#include <dicomRenderer/organMeshRenderer.h>
 #include <GLPipeline/Texture.h>
 #include "nEntrance.h"
 #include "dicomRenderer/Constants.h"
@@ -18,6 +19,7 @@ public:
 
     vrController();
     ~vrController();
+    void setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data);
     void assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num = 4);
     /*Override*/
     void onViewCreated();
@@ -43,7 +45,9 @@ public:
 
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
-    glm::mat4 getModelMatrix(){return ModelMat_;}
+    GLuint getMaskTex(){return tex_mask->GLTexture();}
+    glm::mat4 getModelMatrix(bool dim_scaled = false){
+        return dim_scaled?ModelMat_ * raycastRenderer_->getDimScaleMat():ModelMat_;}
     glm::mat4 getRotationMatrix(){return RotateMat_;}
     float* getCurrentReservedStates();
     float* getCuttingPlane();
@@ -53,12 +57,13 @@ private:
     //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
+    organMeshRenderer* meshRenderer_ = nullptr;
 
     //Shader
     Shader* bakeShader_ = nullptr;
 
     //Textures
-    Texture *tex_volume = nullptr, *tex_baked = nullptr;
+    Texture *tex_volume = nullptr, *tex_baked = nullptr, *tex_mask = nullptr;
 
     struct reservedStatus{
         glm::mat4 model_mat, rot_mat;

@@ -9,7 +9,7 @@ void uiController::InitAll(){
     InitAllTuneParam();
     InitCheckParam();
     setMaskBits(7,8+32);
-
+    // setMaskBits(7,8);
     vrController::instance()->onReset(
         glm::vec3(.0f),
         glm::vec3(1.0f),
@@ -53,7 +53,7 @@ void uiController::InitCheckParam(){
         "Recolor"
     };
     bool values[7] = {
-        true,
+        false,
         true,
         false,
         false,

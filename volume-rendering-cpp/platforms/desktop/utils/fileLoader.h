@@ -26,7 +26,7 @@ inline std::string LoadTextFile(const char* filename){
        return content;
 }
 inline void setupShaderContents(vrController* vrc){
-        const char* shader_file_names[14] = {
+        const char* shader_file_names[18] = {
                 "shaders/textureVolume.vert",
                 "shaders/textureVolume.frag",
                 "shaders/raycastVolume.vert",
@@ -40,7 +40,11 @@ inline void setupShaderContents(vrController* vrc){
                 "shaders/colorViz.vert",
                 "shaders/colorViz.frag",
                 "shaders/opaViz.vert",
-                "shaders/opaViz.frag"
+                "shaders/opaViz.frag",
+                "shaders/marching_cube.glsl",
+                "shaders/marching_cube_clear.glsl",
+                "shaders/marching_cube_draw.vert",
+                "shaders/marching_cube_draw.frag"
         };
         for(int i = 0; i<int(dvr::SHADER_END); i++)
             vrc->setShaderContents(dvr::SHADER_FILES (i), LoadTextFile(shader_file_names[i]));        

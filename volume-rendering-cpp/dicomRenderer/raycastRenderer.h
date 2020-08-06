@@ -26,5 +26,8 @@ public:
     void Draw();
     void dirtyPrecompute(){baked_dirty_ = true;}
     void setDimension(int dims, float thickness);
+    glm::mat4 getDimScaleMat(){
+        return dim_scale_mat;
+    }
 };
 #endif

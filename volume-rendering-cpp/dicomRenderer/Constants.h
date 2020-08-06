@@ -46,6 +46,10 @@ namespace dvr{
         SHADER_COLOR_VIZ_FRAG,
         SHADER_OPA_VIZ_VERT,
         SHADER_OPA_VIZ_FRAG,
+        SHADER_MARCHING_CUBE_GLSL,
+        SHADER_MARCHING_CUBE_CLEAR_GLSL,
+        SHADER_MC_VERT,
+        SHADER_MC_FRAG,
         SHADER_END
     };
     enum TEX_IDS{

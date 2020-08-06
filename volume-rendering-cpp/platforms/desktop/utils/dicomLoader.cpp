@@ -12,6 +12,32 @@ void dicomLoader:: setupDCMIConfig(int height, int width, int dims, float sh, fl
     g_VolumeTexData = new GLubyte[ g_vol_len];
     memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
 }
+bool dicomLoader::loadData(std::string filename, int h, int w, int d){
+    if(g_maskTexData!=nullptr){delete[]g_maskTexData;g_maskTexData=nullptr;}
+    g_maskTexData = new GLubyte[h*w*d];
+
+    char buffer[1024];
+    #ifdef RESOURCE_DESKTOP_DIR
+    std::ifstream inFile (PATH(filename), std::ios::in | std::ios::binary);
+    #else
+    std::ifstream inFile (filename, std::ios::in | std::ios::binary);
+    #endif
+
+    if(!inFile.is_open()) return false;
+
+    int offset = 0;
+
+    for(int id = 0; !inFile.eof(); id++){
+        inFile.read(buffer, 1024);
+        std::streamsize len = inFile.gcount();
+        if(len == 0) continue;
+
+        GLubyte* tb = g_maskTexData+offset;
+        memcpy(tb, buffer, len);
+        offset+=len;
+    }
+    return true;
+}
 bool dicomLoader::loadData(std::string dicom_path, std::string mask_path, int data_unit_size, int mask_unit_size){
     return (loadData(dicom_path, LOAD_DICOM, data_unit_size)
     && loadData(mask_path, LOAD_MASK, mask_unit_size));
@@ -26,7 +52,7 @@ bool dicomLoader::loadData(std::string filename, mLoadTarget target, int unit_si
     #endif
 
     if(!inFile.is_open()) return false;
-
+    
     for(int id = 0; !inFile.eof(); id++){
         inFile.read(buffer, 1024);
         std::streamsize len = inFile.gcount();

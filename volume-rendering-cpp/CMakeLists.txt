@@ -31,6 +31,7 @@ SET(GL_PIPELINE_FILES
 #        Utils/perfMonitor.cpp
 #        )
 SET(DICOM_RENDERERS
+        dicomRenderer/organMeshRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp
         dicomRenderer/centerLineRenderer.cpp
