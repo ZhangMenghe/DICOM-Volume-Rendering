@@ -3,7 +3,7 @@
 
 precision mediump float;
 layout (location = 0) in vec4 aPos;
-// layout (location = 1) in vec4 aNormal;
+layout (location = 1) in vec4 aNormal;
 out VS_OUT
 {
 	vec3 position;
@@ -12,7 +12,6 @@ out VS_OUT
 uniform mat4 uMVP;
 
 void main(){
-    vec4 aNormal = aPos;
     vec3 pos = vec3(aPos.x, -aPos.y, aPos.z);
     gl_Position = uMVP * vec4(pos,1.0);
     
