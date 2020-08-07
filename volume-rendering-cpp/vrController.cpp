@@ -113,7 +113,7 @@ void vrController::onDraw() {
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON])meshRenderer_->Draw();
-    else{
+    if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
         precompute();
         if(isRayCasting())  raycastRenderer_->Draw();
         else texvrRenderer_->Draw();

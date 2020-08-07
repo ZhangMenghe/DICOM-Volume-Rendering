@@ -11,6 +11,7 @@ namespace dvr{
         CHECK_FREEZE_CPLANE,
         CHECK_MASKON,
         CHECK_MASK_RECOLOR,
+        CHECK_DRAW_VOLUME,
         CHECK_DRAW_POLYGON,
         CHECK_POLYGON_WIREFRAME
     };

@@ -32,8 +32,11 @@ void organMeshRenderer::init_buffer(){
         glCreateBuffers(1, &buffer_vertices);
         glNamedBufferStorage(buffer_vertices, buffer_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
 
-        glCreateBuffers(1, &buffer_normals);
-        glNamedBufferStorage(buffer_normals, buffer_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+        // glCreateBuffers(1, &buffer_normals);
+        // glNamedBufferStorage(buffer_normals, buffer_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+
+        // glCreateBuffers(1, &buffer_indices);
+        // glNamedBufferStorage(buffer_indices, buffer_size * 3, )
     }
     {
 
@@ -50,7 +53,7 @@ void organMeshRenderer::init_buffer(){
         glEnableVertexArrayAttrib(vao_, 1);
 
         glVertexArrayVertexBuffer(vao_, 0, buffer_vertices, 0, sizeof(glm::vec4));
-        glVertexArrayVertexBuffer(vao_, 1, buffer_normals, 0, sizeof(glm::vec4));
+        // glVertexArrayVertexBuffer(vao_, 1, buffer_normals, 0, sizeof(glm::vec4));
       
         glVertexArrayAttribFormat(vao_, 0, 4, GL_FLOAT, false, 0);
         glVertexArrayAttribFormat(vao_, 1, 4, GL_FLOAT, false, 0);
@@ -66,7 +69,7 @@ void organMeshRenderer::init_buffer(){
         LOGE("OrganMesh Clear===Failed to create mesh shader program===");
     
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buffer_vertices);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffer_normals);
+    // glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffer_normals);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, buffer_triangle_table);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, buffer_configuration_table);
 }

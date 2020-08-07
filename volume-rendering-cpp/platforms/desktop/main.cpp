@@ -36,6 +36,10 @@ std::thread* rpc_thread;
 #include <platforms/desktop/common.h>
 std::string ds_path = "dicom-data/IRB01/2100_FATPOSTCORLAVAFLEX20secs/";
 glm::vec3 vol_dims = glm::vec3(512,512,164);
+std::vector<float> cutting_value(6, .0f);
+float cline_data[2][4000 * 3] = {.0f};
+int ccid = 2;
+
 
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
@@ -64,7 +68,10 @@ void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 	controller_.onScale(f, f);
 }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
-	if(action!=GLFW_PRESS) return;
+	if(action==GLFW_RELEASE) return;
+	float* cd = cline_data[0];
+	int id = 3*ccid;
+	const int gap = 2;
 	switch (key)
 	{
 	case GLFW_KEY_W:
@@ -73,13 +80,27 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	case GLFW_KEY_P:
 		ui_.setCheck("Polygon", !Manager::param_bool[dvr::CHECK_DRAW_POLYGON]);
 		break;
+	case GLFW_KEY_V:
+		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_DRAW_VOLUME]);
+		break;
+	case GLFW_KEY_N:
+		cutting_value[0] = cd[id];cutting_value[1] = cd[id+1];cutting_value[2] = cd[id+2]*0.5;
+		if(ccid > 100 && ccid < 3900){
+			cutting_value[3] = cd[3*(ccid +gap)] - cd[3*(ccid -gap)];cutting_value[4] = cd[3*(ccid +gap)+1] - cd[3*(ccid -gap)+1];cutting_value[5] = cd[3*(ccid +gap)+2] - cd[3*(ccid -gap)+2];;
+		}
+		ccid+=20;
+		if(ccid > 3997) ccid = 2;
+		ui_.setAllTuneParamById(2, cutting_value);
+		break;
 	default:
 		break;
 	}
 }
 void get_center_line_points(){
 	std::string filename = ds_path + "IRB1.txt";	
-	float data[4000 * 3];
+	// float data[4000 * 3];
+	int cidx = 0;
+	float* data = &cline_data[cidx][0];
     std::ifstream ShaderStream(PATH(filename), std::ios::in);
 
 	if(ShaderStream.is_open()){
@@ -99,7 +120,8 @@ void get_center_line_points(){
 					// 	// swap(data[3*i], data[3*i+2]);
 					}
 					// for(int i=0;i<4000;i++)swap(data[3*i], data[3*i+1]);
-					line_renderers_.back()->updateVertices(4000, data);
+					line_renderers_.back()->updateVertices(4000, cline_data[cidx]);
+					data = &cline_data[++cidx][0];
 					// std::cout<<"vertices updated: "<<line<<" "<<idx<<std::endl;
 				}
     			line_renderers_.push_back(new centerLineRenderer(std::stoi(line), false));
@@ -117,16 +139,16 @@ void get_center_line_points(){
 		LOGE("====Failed to load file: %s", filename);
 	}
 
-					for(int i=0;i<4000;i++){
-						float fx = data[3*i], fy = data[3*i+1], fz = data[3*i+2];
-						data[3*i]=fy;
-						data[3*i+1]=fz;
-						data[3*i+2]= fx*3.0 - 0.15;
-					// 	data[3*i] = -(data[3*i]* 0.0020325-0.5);
-						// data[3*i+1] =-data[3*i+1];
-						// data[3*i+2] *=2.0f;//data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
-					// 	// swap(data[3*i], data[3*i+2]);
-					}
+	for(int i=0;i<4000;i++){
+		float fx = data[3*i], fy = data[3*i+1], fz = data[3*i+2];
+		data[3*i]=fy;
+		data[3*i+1]=fz;
+		data[3*i+2]= fx*3.0 - 0.15;
+	// 	data[3*i] = -(data[3*i]* 0.0020325-0.5);
+		// data[3*i+1] =-data[3*i+1];
+		// data[3*i+2] *=2.0f;//data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
+	// 	// swap(data[3*i], data[3*i+2]);
+	}
 	line_renderers_.back()->updateVertices(4000, data);
 	std::cout<<"vertices updated: "<<std::endl;
 

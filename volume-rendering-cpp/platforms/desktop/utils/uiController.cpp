@@ -23,7 +23,7 @@ void uiController::InitAll(){
 
 void uiController::AddTuneParams(){
     float opa_values[5] = {
-        0.1f,
+        1.0f,
         .0f,
         2.0f,
         0.0f,
@@ -43,7 +43,7 @@ void uiController::InitAllTuneParam(){
 }
 
 void uiController::InitCheckParam(){
-    const int pnum = 9;
+    const int pnum = 10;
     const char* keys[pnum] = {
         "Raycasting",
         "Overlays",
@@ -52,15 +52,17 @@ void uiController::InitCheckParam(){
         "Freeze Plane",
         "Show",
         "Recolor",
+        "Volume",
         "Polygon",
         "Wireframe Mode"
     };
     bool values[pnum] = {
+        false,
         true,
+        false,
+        false,
+        false,
         true,
-        false,
-        false,
-        false,
         true,
         true,
         false,

@@ -14,6 +14,8 @@ private:
     uint32_t buffer_normals;
     uint32_t buffer_triangle_table;
     uint32_t buffer_configuration_table;
+    GLuint buffer_indices;
+    
     size_t buffer_size;
     size_t max_number_of_vertices;
     const size_t max_triangles_per_cell = 5;

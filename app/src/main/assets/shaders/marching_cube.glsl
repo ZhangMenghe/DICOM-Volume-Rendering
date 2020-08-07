@@ -19,10 +19,10 @@ layout(std140, binding = 0) writeonly buffer u_buffer_vertices
     vec4 output_vertices[];
 };
 
-layout(std140, binding = 1) writeonly buffer u_buffer_normals
-{
-    vec4 output_normals[];
-};
+// layout(std140, binding = 1) writeonly buffer u_buffer_normals
+// {
+//     vec4 output_normals[];
+// };
 
 layout(std430, binding = 2) readonly buffer u_buffer_triangle_table 
 {
@@ -154,7 +154,7 @@ void march(in ivec3 cell_index)
 	for (int i = 0; i < 8; ++i)
 	{
         uint sc = uint(imageLoad(u_volume, neighbors[i]).r);
-		if(sc == uint(4))values[i] = -1.0;// sc.a;
+		if(sc == 4)values[i] = -1.0;// sc.a;
 		else values[i] = 1.0;
 		if(values[i] < .0) configuration |= 1 << i;
 	}
@@ -164,6 +164,7 @@ void march(in ivec3 cell_index)
 	// wonky...
 	if (configuration_table[configuration] == 0) 
 	{		
+		return;
 	}
 
 	// Grab all of the (interpolated) vertices along each of the 12 edges of this cell
@@ -201,19 +202,19 @@ void march(in ivec3 cell_index)
 			position = vertex.position * inv_volume_size;
 			position = position * 2.0 - 1.0;
 			output_vertices[cell_start_memory +  3 * i + 0] = vec4(position, 1.0);
-			output_normals[cell_start_memory +  3 * i + 0] = vec4(vertex.normal, 1.0);
+			// output_normals[cell_start_memory +  3 * i + 0] = vec4(vertex.normal, 1.0);
 
 			vertex = vertex_list[triangle_table[triangle_start_memory + (3 * i + 1)]];
 			position = vertex.position * inv_volume_size;
 			position = position * 2.0 - 1.0;
 			output_vertices[cell_start_memory +  3 * i + 1] = vec4(position, 1.0);
-			output_normals[cell_start_memory +  3 * i + 1] = vec4(vertex.normal, 1.0);
+			// output_normals[cell_start_memory +  3 * i + 1] = vec4(vertex.normal, 1.0);
 
 			vertex = vertex_list[triangle_table[triangle_start_memory + (3 * i + 2)]];
 			position = vertex.position * inv_volume_size;
 			position = position * 2.0 - 1.0;
 			output_vertices[cell_start_memory +  3 * i + 2] = vec4(position, 1.0);
-			output_normals[cell_start_memory +  3 * i + 2] = vec4(vertex.normal, 1.0);
+			// output_normals[cell_start_memory +  3 * i + 2] = vec4(vertex.normal, 1.0);
 		}
 		else
 		{
@@ -222,16 +223,6 @@ void march(in ivec3 cell_index)
 			output_vertices[cell_start_memory + (3 * i + 2)] = empty;
 		}
 	} 
-
-	
-// #ifdef DEBUG
-// 	for (int i = 0; i < 5; i++)
-// 	{
-// 		output_vertices[cell_start_memory + (3 * i + 0)] = vec4(vec3(cell_index), 1.0);
-// 		output_vertices[cell_start_memory + (3 * i + 1)] = vec4(vec3(cell_index) + vec3(0.5, 0, 0), 1.0);
-// 		output_vertices[cell_start_memory + (3 * i + 2)] = vec4(vec3(cell_index) + vec3(0, 0.5, 0), 1.0);
-// 	}
-// #endif
 }
 
 void main()
@@ -241,10 +232,5 @@ void main()
 
     // The 3D coordinates of this compute shader thread
     ivec3 cell_index = ivec3(gl_GlobalInvocationID.xyz);
-	// cell_index = cell_index * 2;
-	// if(cell_index.x %2 != 0 || cell_index.y %2 != 0 ||cell_index.z %2 != 0)
-	// 	return;
-	// else
-    // Perform marching cubes
     march(cell_index);
 }

@@ -85,7 +85,18 @@ void cuttingController::draw_plane(){
 
     }
     GLuint sp = pshader->Use();
-    Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat()* p_p2w_mat);
+
+    const glm::vec3 a = p_norm_;
+const glm::vec3 b = vec3(0,1,0);  // in my case (1, 0, 0)
+glm::vec3 v = glm::cross(b, a);
+float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
+glm::mat4 rotmat = glm::rotate(angle, v);
+
+
+    Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat()
+    * p_p2w_mat 
+    * rotmat
+    * glm::scale(mat4(1.0f), vec3(.2f)));
     Shader::Uniform(sp,"uBaseColor", plane_color_);
     if (!pVAO_) {
         float vertices[] = {
@@ -126,7 +137,7 @@ bool cuttingController::keep_cutting_position(){
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){
-    p_norm_ = normal; p_point_=startPoint;
+    p_norm_ = glm::normalize(normal); p_point_=startPoint;
     cmove_value = .0f;
     p_p2o_dirty = true;
 }

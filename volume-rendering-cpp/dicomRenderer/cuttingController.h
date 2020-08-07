@@ -41,7 +41,7 @@ private:
     glm::mat4 p_p2w_mat, p_p2o_mat;
     bool p_p2o_dirty = true;
     float cmove_value = .0f;
-    glm::vec4 plane_color_ = glm::vec4(0.8, 0.8,.0, 0.3);
+    glm::vec4 plane_color_ = glm::vec4(1.0, .0, .0, 0.6);
     const float CUTTING_FACTOR = 0.00002f;
     mTarget current_target = VOLUME;
 
