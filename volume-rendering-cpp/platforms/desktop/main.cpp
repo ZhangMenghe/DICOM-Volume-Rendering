@@ -173,11 +173,11 @@ void onCreated(){
 		loader_.reset();
 	}
 
-		//load data
-	if(loader_.loadData(ds_path+"mask_simple",128,128,41)){
-        controller_.setupSimpleMaskTexture(128,128,41, loader_.getSimpleMask());
-		loader_.reset();
-	}
+	// 	//load data
+	// if(loader_.loadData(ds_path+"mask_simple",128,128,41)){
+    //     controller_.setupSimpleMaskTexture(128,128,41, loader_.getSimpleMask());
+	// 	loader_.reset();
+	// }
 }
 void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

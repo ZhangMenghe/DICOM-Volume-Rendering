@@ -50,6 +50,29 @@ void vrController::setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data
     tex_mask = new Texture(GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, data);
     delete[]data;
 }
+void vrController::assemble_mask_texture(GLubyte* data, int ph, int pw, int pd){
+    int skip_num = 4;
+    float shrink_factor = 1.0f / skip_num;
+
+    int h = int(ph * shrink_factor),  w = int(pw * shrink_factor),  d = int(pd * shrink_factor);
+    GLubyte* mask = new GLubyte[h*w*d];
+    GLubyte* mbuff = mask;
+    GLubyte* obuff = data;
+    int skip_size = 4* skip_num;
+    int ori_size = ph*pw*skip_size, n_size = w * h;
+
+    for(int di = 0; di < d; di++){
+        int idx = 0;
+        for(int yi = 0, idx_o = 0; yi < h; yi++, idx_o+=pw * skip_size)
+            for(int xi =0, xi_o=0; xi < w; xi++,xi_o+=skip_size)
+                mbuff[idx++] = obuff[idx_o + xi_o + 2];
+            
+        mbuff += n_size;
+        obuff += ori_size;
+    }
+    setupSimpleMaskTexture(w, h, d, mask);
+}
+
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
         if(sh<=0 || sw<=0 || sd<=0){
@@ -90,6 +113,7 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
     delete[]tb_data;
     delete[]vol_data;
     Manager::baked_dirty_ = true;
+    assemble_mask_texture(data, ph, pw, pd);
 }
 //1-baldder, 2-kidn 4 color 8 spleen
 void vrController::onViewCreated(){
