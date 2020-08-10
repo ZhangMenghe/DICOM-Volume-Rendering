@@ -91,7 +91,7 @@ private:
     //flags
     bool volume_model_dirty;
 
-    void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd);
+    void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd, int skipy, int skipx, int skipz, int offy, int offx, int offz, int nh, int nw, int nd, int mask_id);
     void updateVolumeModelMat();
     void precompute();
     bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}

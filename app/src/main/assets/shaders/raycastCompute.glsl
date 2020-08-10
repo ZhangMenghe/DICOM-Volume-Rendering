@@ -75,7 +75,7 @@ int getMaskBit(uint mask_value){
     int CHECK_BIT = int(-1);
     //check if organ
     for(uint i=uint(0); i<u_organ_num; i++){
-        if(((u_maskbits>> uint(i + uint(1))) & uint(1)) == uint(0)) continue;
+        // if(((u_maskbits>> uint(i + uint(1))) & uint(1)) == uint(0)) continue;
         uint cbit = (mask_value>> i) & uint(1);
         if(cbit == uint(1)){
             CHECK_BIT = int(i) + 1;

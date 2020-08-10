@@ -50,21 +50,35 @@ void vrController::setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data
     tex_mask = new Texture(GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, data);
     delete[]data;
 }
-void vrController::assemble_mask_texture(GLubyte* data, int ph, int pw, int pd){
-    int skip_num = 4;
-    float shrink_factor = 1.0f / skip_num;
+void vrController::assemble_mask_texture(GLubyte* data, 
+                                        int ph, int pw, int pd, 
+                                        int skipy, int skipx, int skipz,
+                                        int offy, int offx, int offz,
+                                        int nh, int nw, int nd,
+                                        int mask_id){
+    glm::vec3 skip_num = glm::vec3(skipx, skipy, skipz);
+    glm::vec3 shrink_factor = glm::vec3(1.0f/skipx, 1.0f/skipy, 1.0f/skipz);
+    glm::vec3 skip_size = skip_num*4.0f;
+    meshRenderer_ = new organMeshRenderer;
+    int h,w,d;
+    if((offx|offy|offz) == 0){
+        h = int(ph * shrink_factor.y); w = int(pw * shrink_factor.x); d = int(pd * shrink_factor.z);
+    }else{
+        h = int(nh * shrink_factor.y); w = int(nw * shrink_factor.x); d = int(nd * shrink_factor.z);
+        meshRenderer_->SetOffsetScale(ph,pw,pd,nh,nw,nd,offy,offx,offz);
+    }
+    std::cout<<"size: "<<h<<" "<<w<<" "<<d<<std::endl;
+    meshRenderer_->Setup(h,w,d,mask_id);
 
-    int h = int(ph * shrink_factor),  w = int(pw * shrink_factor),  d = int(pd * shrink_factor);
     GLubyte* mask = new GLubyte[h*w*d];
     GLubyte* mbuff = mask;
-    GLubyte* obuff = data;
-    int skip_size = 4* skip_num;
-    int ori_size = ph*pw*skip_size, n_size = w * h;
+    GLubyte* obuff = data + ph*pw*offz*4;
+    int ori_size = ph*pw*skip_size.z, n_size = w * h;
 
     for(int di = 0; di < d; di++){
         int idx = 0;
-        for(int yi = 0, idx_o = 0; yi < h; yi++, idx_o+=pw * skip_size)
-            for(int xi =0, xi_o=0; xi < w; xi++,xi_o+=skip_size)
+        for(int yi = 0, idx_o = offy*pw*4; yi < h; yi++, idx_o+=pw*skip_size.y)
+            for(int xi =0, xi_o=offx*4; xi < w; xi++,xi_o+=skip_size.x)
                 mbuff[idx++] = obuff[idx_o + xi_o + 2];
             
         mbuff += n_size;
@@ -113,7 +127,21 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
     delete[]tb_data;
     delete[]vol_data;
     Manager::baked_dirty_ = true;
-    assemble_mask_texture(data, ph, pw, pd);
+    // 4:colon&all
+    // assemble_mask_texture(data, ph, pw, pd, glm::vec3(4), 0,0,0,0,0,0,4);
+    // 2:kidney
+    // assemble_mask_texture(data, ph, pw, pd, 2,2,2,0,136,0,256,512,74,2);
+
+    //1:bladder
+    // assemble_mask_texture(data, ph, pw, pd, 4,4,2,0,0,68,512,512,86, 1);
+    //8:spleen
+    //  assemble_mask_texture(data, ph, pw, pd, 1,1,2,8,310,1,128,128,91,8);
+    //16:ileum
+    //  assemble_mask_texture(data, ph, pw, pd, 2,2,2,176,93,59,256,256,97,16);
+
+    //32 aorta
+     assemble_mask_texture(data, ph, pw, pd, 8,4,2,0,147,27,512,256,116,32);
+
 }
 //1-baldder, 2-kidn 4 color 8 spleen
 void vrController::onViewCreated(){
@@ -124,7 +152,6 @@ void vrController::onViewCreated(bool pre_draw){
     pre_draw_ = pre_draw;
     texvrRenderer_ = new texvrRenderer(pre_draw);
     raycastRenderer_ = new raycastRenderer(pre_draw);
-    meshRenderer_ = new organMeshRenderer;
 }
 
 void vrController::onViewChange(int width, int height){

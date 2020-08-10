@@ -56,8 +56,7 @@ struct Vertex
 	vec3 position;
 	vec3 normal;
 };
-uint u_maskbits = uint(31);
-uint u_organ_num = uint(7);
+uniform uint u_mask_id;
 
 // float SampleLinear(vec3 p){
 // 	// need to mitigate the offset in p[x], so +float3(0.5) to be in [0;1] range
@@ -65,7 +64,7 @@ uint u_organ_num = uint(7);
 // }
 float map(ivec3 p){
 	uint sc = uint(imageLoad(u_volume, p).r);
-	return (sc == 4)? -1.0:1.0;
+	return (sc == u_mask_id)? -1.0:1.0;
 	// if(sc == 4)values[i] = -1.0;// sc.a;
 	// else values[i] = 1.0;
 	// if(values[i] < .0) configuration |= 1 << i;
@@ -128,22 +127,6 @@ const ivec2 edge_table[12] =
 	{ 2, 6 },
 	{ 3, 7 }
 };
-int getMaskBit(uint mask_value){
-    //check body
-    if(mask_value == uint(0)) return ((u_maskbits & uint(1)) == uint(1))? 0:-1;
-
-    int CHECK_BIT = int(-1);
-    //check if organ
-    for(uint i=uint(0); i<u_organ_num; i++){
-        if(((u_maskbits>> uint(i + uint(1))) & uint(1)) == uint(0)) continue;
-        uint cbit = (mask_value>> i) & uint(1);
-        if(cbit == uint(1)){
-            CHECK_BIT = int(i) + 1;
-            break;
-        }
-    }
-    return CHECK_BIT;
-}
 void march(in ivec3 cell_index)
 {
 	ivec3 volume_size = imageSize(u_volume);
@@ -176,7 +159,7 @@ void march(in ivec3 cell_index)
 	for (int i = 0; i < 8; ++i)
 	{
         uint sc = uint(imageLoad(u_volume, neighbors[i]).r);
-		if(sc == 4)values[i] = -1.0;// sc.a;
+		if(sc == u_mask_id)values[i] = -1.0;// sc.a;
 		else values[i] = 1.0;
 		if(values[i] < .0) configuration |= 1 << i;
 	}

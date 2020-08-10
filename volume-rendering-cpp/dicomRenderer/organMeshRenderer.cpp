@@ -12,9 +12,10 @@ organMeshRenderer::organMeshRenderer(){
             ||!shader_draw_->AddShader(GL_FRAGMENT_SHADER,  Manager::shader_contents[dvr::SHADER_MC_FRAG])
             ||!shader_draw_->CompileAndLink())
         LOGE("OrganMesh===Failed to create marching cube drawing shader===");
-    init_buffer();
 }
-void organMeshRenderer::init_buffer(){
+void organMeshRenderer::Setup(int h, int w, int d, int mask_id){
+    volume_size = glm::vec3(h,w,d);
+    mask_id_ = mask_id;
     shader_ = new Shader();
     if(!shader_->AddShader(GL_COMPUTE_SHADER,Manager::shader_contents[dvr::SHADER_MARCHING_CUBE_GLSL])
             ||!shader_->CompileAndLink())
@@ -82,6 +83,7 @@ void organMeshRenderer::Draw() {
         // shader_clear->UnUse();
 
         GLuint sp = shader_->Use();
+        Shader::Uniform(sp, "u_mask_id", (unsigned int) mask_id_);
         glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
         shader_->UnUse();
@@ -96,8 +98,12 @@ void organMeshRenderer::Draw() {
     
     GLuint dsp = shader_draw_->Use();
     Shader::Uniform(dsp, "uMVP", 
-    Manager::camera->getProjMat() * Manager::camera->getViewMat() *vrController::instance()->getModelMatrix(true)
-    * glm::scale(glm::mat4(1.0), glm::vec3(0.5f)));
+    Manager::camera->getProjMat() * Manager::camera->getViewMat() 
+    
+    * vrController::instance()->getModelMatrix(true)
+    * offset_mat
+    * glm::scale(glm::mat4(1.0), glm::vec3(0.5f))
+    * sscale);
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, max_number_of_vertices);
@@ -107,4 +113,8 @@ void organMeshRenderer::Draw() {
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+}
+void organMeshRenderer::SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, int nw, int nd, int offy, int offx, int offz){
+    sscale = glm::scale(glm::mat4(1.0), glm::vec3((float)nw/ori_w,(float)nh/ori_h,(float)nd/ori_d));
+    offset_mat = glm::translate(glm::mat4(1.0), glm::vec3((float)offx/ori_w, (float)offy/ori_h, (float)offz/ori_d)*0.125f);
 }

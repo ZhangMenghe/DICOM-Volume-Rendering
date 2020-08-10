@@ -18,11 +18,21 @@ private:
     size_t max_number_of_vertices;
     const size_t max_triangles_per_cell = 5;
     const size_t max_vertices_per_triangle = 3;
-    glm::vec3 volume_size = glm::vec3(128,128,41);
+    // glm::vec3 volume_size = glm::vec3(128,128,41);
+    // glm::vec3 volume_size = glm::vec3(74,120,81);
+    glm::vec3 volume_size = glm::vec3(512,512,164);
+    int mask_id_;
+    glm::mat4 sscale = glm::mat4(1.0f);
+    glm::mat4 offset_mat = glm::mat4(1.0f);
+
   
-    void init_buffer();
 public:
     organMeshRenderer();
+    void Setup(int h, int w, int d, int mask_id);
+    void SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, int nw, int nd, int offy, int offx, int offz);
+    //     sscale = glm::scale(glm::mat4(1.0), glm::vec3(volume_size.x/ori_w,volume_size.y/ori_h,volume_size.z/ori_d));
+    //     offset_mat = glm::translate(glm::mat4(1.0), glm::vec3(offx/ori_w, offy/ori_h, offz/ori_d)*0.125f);
+    // }
     void Draw();
 };
 #endif
