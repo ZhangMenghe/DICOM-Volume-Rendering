@@ -63,6 +63,15 @@ namespace dvr{
         OVERLAY_GRAPH=0,
         OVERLAY_COLOR_BARS
     };
+    enum ORGAN_IDS{
+        ORGAN_BALDDER=0,
+        ORGAN_KIDNEY,
+        ORGAN_COLON,
+        ORGAN_SPLEEN,
+        ORGAN_ILEUM,
+        ORGAN_AROTA,
+        ORGAN_END
+    };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;

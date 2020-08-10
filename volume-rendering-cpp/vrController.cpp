@@ -3,6 +3,7 @@
 #include <Utils/mathUtils.h>
 #include <dicomRenderer/screenQuad.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <math.h>
 
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
@@ -14,7 +15,7 @@ vrController* vrController::instance(){
 vrController::~vrController(){
     if(texvrRenderer_) delete texvrRenderer_;
     if(raycastRenderer_) delete raycastRenderer_;
-    if(meshRenderer_) delete meshRenderer_;
+    // if(meshRenderer_) delete meshRenderer_;
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
@@ -22,6 +23,8 @@ vrController::~vrController(){
 }
 vrController::vrController(){
     onReset();
+    mesh_renders = std::vector<organMeshRenderer*>(dvr::ORGAN_END, nullptr);
+    tex_masks = std::vector<Texture*>(dvr::ORGAN_END, nullptr);
     myPtr_ = this;
 }
 void vrController::onReset() {
@@ -55,20 +58,21 @@ void vrController::assemble_mask_texture(GLubyte* data,
                                         int skipy, int skipx, int skipz,
                                         int offy, int offx, int offz,
                                         int nh, int nw, int nd,
-                                        int mask_id){
+                                        dvr::ORGAN_IDS mask_id){
     glm::vec3 skip_num = glm::vec3(skipx, skipy, skipz);
     glm::vec3 shrink_factor = glm::vec3(1.0f/skipx, 1.0f/skipy, 1.0f/skipz);
     glm::vec3 skip_size = skip_num*4.0f;
-    meshRenderer_ = new organMeshRenderer;
+    // meshRenderer_ = new organMeshRenderer;
+    mesh_renders[mask_id] = new organMeshRenderer;
     int h,w,d;
     if((offx|offy|offz) == 0){
         h = int(ph * shrink_factor.y); w = int(pw * shrink_factor.x); d = int(pd * shrink_factor.z);
     }else{
         h = int(nh * shrink_factor.y); w = int(nw * shrink_factor.x); d = int(nd * shrink_factor.z);
-        meshRenderer_->SetOffsetScale(ph,pw,pd,nh,nw,nd,offy,offx,offz);
+        mesh_renders[mask_id]->SetOffsetScale(ph,pw,pd,nh,nw,nd,offy,offx,offz);
     }
     std::cout<<"size: "<<h<<" "<<w<<" "<<d<<std::endl;
-    meshRenderer_->Setup(h,w,d,mask_id);
+    mesh_renders[mask_id]->Setup(h,w,d,mask_id);
 
     GLubyte* mask = new GLubyte[h*w*d];
     GLubyte* mbuff = mask;
@@ -84,7 +88,11 @@ void vrController::assemble_mask_texture(GLubyte* data,
         mbuff += n_size;
         obuff += ori_size;
     }
-    setupSimpleMaskTexture(w, h, d, mask);
+    // setupSimpleMaskTexture(w, h, d, mask);
+
+    if(tex_masks[mask_id]!= nullptr){delete tex_masks[mask_id]; tex_masks[mask_id]= nullptr;}
+    tex_masks[mask_id] = new Texture(GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, w, h, d, mask);
+    delete[]mask;
 }
 
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
@@ -127,21 +135,23 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
     delete[]tb_data;
     delete[]vol_data;
     Manager::baked_dirty_ = true;
-    // 4:colon&all
-    // assemble_mask_texture(data, ph, pw, pd, glm::vec3(4), 0,0,0,0,0,0,4);
-    // 2:kidney
-    // assemble_mask_texture(data, ph, pw, pd, 2,2,2,0,136,0,256,512,74,2);
-
     //1:bladder
-    // assemble_mask_texture(data, ph, pw, pd, 4,4,2,0,0,68,512,512,86, 1);
-    //8:spleen
-    //  assemble_mask_texture(data, ph, pw, pd, 1,1,2,8,310,1,128,128,91,8);
-    //16:ileum
-    //  assemble_mask_texture(data, ph, pw, pd, 2,2,2,176,93,59,256,256,97,16);
+    // assemble_mask_texture(data, ph, pw, pd, 4,4,2,0,0,68,512,512,86,dvr::ORGAN_BALDDER);
 
-    //32 aorta
-     assemble_mask_texture(data, ph, pw, pd, 8,4,2,0,147,27,512,256,116,32);
+    // 2:kidney
+    // assemble_mask_texture(data, ph, pw, pd, 2,4,2,0,0,0,256,512,84, dvr::ORGAN_KIDNEY);
+    
+    // // 4:colon&all
+    // assemble_mask_texture(data, ph, pw, pd, 4,4,4,0,0,0,0,0,0,dvr::ORGAN_COLON);
+    // //8:spleen
+    //wronog
+     assemble_mask_texture(data, ph, pw, pd, 1,1,2,8,310,1,128,128,91,dvr::ORGAN_SPLEEN);
 
+    // //16:ileum
+    //  assemble_mask_texture(data, ph, pw, pd, 2,2,2,176,93,59,256,256,97,dvr::ORGAN_ILEUM);
+    // //32 aorta
+    //wronog
+     assemble_mask_texture(data, ph, pw, pd, 4,2,2,0,147,27,512,256,116,dvr::ORGAN_AROTA);
 }
 //1-baldder, 2-kidn 4 color 8 spleen
 void vrController::onViewCreated(){
@@ -163,7 +173,10 @@ void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON])meshRenderer_->Draw();
+    if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]){
+        for(auto meshRenderer_:mesh_renders)
+            if(meshRenderer_!=nullptr) meshRenderer_->Draw();
+    }
     if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
         precompute();
         if(isRayCasting())  raycastRenderer_->Draw();

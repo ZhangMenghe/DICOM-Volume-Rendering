@@ -22,9 +22,8 @@ private:
     // glm::vec3 volume_size = glm::vec3(74,120,81);
     glm::vec3 volume_size = glm::vec3(512,512,164);
     int mask_id_;
-    glm::mat4 sscale = glm::mat4(1.0f);
-    glm::mat4 offset_mat = glm::mat4(1.0f);
 
+    glm::mat4 tex2mesh_model = glm::mat4(1.0f);
   
 public:
     organMeshRenderer();

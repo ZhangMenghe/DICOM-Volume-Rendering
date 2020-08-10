@@ -46,6 +46,7 @@ public:
     //getter funcs
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     GLuint getMaskTex(){return tex_mask->GLTexture();}
+    GLuint getMaskTex(int mask_id){return tex_masks[mask_id]->GLTexture();}
     glm::mat4 getModelMatrix(bool dim_scaled = false){
         return dim_scaled?ModelMat_ * raycastRenderer_->getDimScaleMat():ModelMat_;}
     glm::mat4 getRotationMatrix(){return RotateMat_;}
@@ -57,13 +58,14 @@ private:
     //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
-    organMeshRenderer* meshRenderer_ = nullptr;
-
+    // organMeshRenderer* meshRenderer_ = nullptr;
+    std::vector<organMeshRenderer*> mesh_renders;
     //Shader
     Shader* bakeShader_ = nullptr;
 
     //Textures
     Texture *tex_volume = nullptr, *tex_baked = nullptr, *tex_mask = nullptr;
+    std::vector<Texture*> tex_masks;
 
     struct reservedStatus{
         glm::mat4 model_mat, rot_mat;
@@ -91,7 +93,7 @@ private:
     //flags
     bool volume_model_dirty;
 
-    void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd, int skipy, int skipx, int skipz, int offy, int offx, int offz, int nh, int nw, int nd, int mask_id);
+    void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd, int skipy, int skipx, int skipz, int offy, int offx, int offz, int nh, int nw, int nd, dvr::ORGAN_IDS mask_id);
     void updateVolumeModelMat();
     void precompute();
     bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
