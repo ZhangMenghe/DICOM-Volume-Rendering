@@ -9,7 +9,7 @@ void uiController::InitAll(){
     InitAllTuneParam();
     InitCheckParam();
     // setMaskBits(7,8+32);
-    setMaskBits(7,64+16);
+    setMaskBits(7,2+4+8+16+32+64);
     vrController::instance()->onReset(
         glm::vec3(.0f),
         glm::vec3(1.0f),

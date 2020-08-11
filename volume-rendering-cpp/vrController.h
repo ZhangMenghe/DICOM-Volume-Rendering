@@ -58,7 +58,7 @@ private:
     //renderers
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
-    // organMeshRenderer* meshRenderer_ = nullptr;
+    organMeshRenderer* meshRenderer_ = nullptr;
     std::vector<organMeshRenderer*> mesh_renders;
     //Shader
     Shader* bakeShader_ = nullptr;
@@ -93,7 +93,7 @@ private:
     //flags
     bool volume_model_dirty;
 
-    void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd, int skipy, int skipx, int skipz, int offy, int offx, int offz, int nh, int nw, int nd, dvr::ORGAN_IDS mask_id);
+    void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd, int skipy, int skipx, int skipz, int offy, int offx, int offz, int nh, int nw, int nd, dvr::ORGAN_IDS mask_id=dvr::ORGAN_END);
     void updateVolumeModelMat();
     void precompute();
     bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}

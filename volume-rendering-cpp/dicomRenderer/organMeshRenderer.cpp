@@ -14,7 +14,6 @@ organMeshRenderer::organMeshRenderer(){
         LOGE("OrganMesh===Failed to create marching cube drawing shader===");
 }
 void organMeshRenderer::Setup(int h, int w, int d, int mask_id){
-    
     volume_size = glm::vec3(h,w,d);
     mask_id_ = mask_id;
     shader_ = new Shader();
@@ -72,8 +71,8 @@ void organMeshRenderer::Draw() {
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffer_normals);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, buffer_triangle_table);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, buffer_configuration_table);
-
-        glBindImageTexture(0, vrController::instance()->getMaskTex(mask_id_), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
+        if(mask_id_>=dvr::ORGAN_END) glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
+        else glBindImageTexture(0, vrController::instance()->getMaskTex(mask_id_), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
         
         //do clear
         // a debug sphere
@@ -83,6 +82,9 @@ void organMeshRenderer::Draw() {
         // shader_clear->UnUse();
 
         GLuint sp = shader_->Use();
+        Shader::Uniform(sp, "u_multiple", mask_id_>=dvr::ORGAN_END);
+        Shader::Uniform(sp, "u_maskbits", vrController::instance()->mask_bits_);
+        Shader::Uniform(sp, "u_organ_num", vrController::instance()->mask_num_-1);
         Shader::Uniform(sp, "u_mask_id", (unsigned int)pow(2.0f, (int)mask_id_));
         glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -108,8 +110,7 @@ void organMeshRenderer::Draw() {
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void organMeshRenderer::SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, int nw, int nd, int offy, int offx, int offz){
-    float sf = (float)nw/nh;
-
+    float dfy = 128/nh;
     glm::vec3 ss = glm::vec3((float)nw/ori_w,(float)nh/ori_h,(float)nd/ori_d);
     glm::mat4 sscale = glm::scale(glm::mat4(1.0),ss);
 
@@ -126,16 +127,16 @@ void organMeshRenderer::SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, 
     float fz = (coffz - 0.5*ori_d) / ori_d;
     int fz_s = (fz>0)?1:-1;
 
-    std::cout<<"offset "<<offx<<" "<<offy<<" "<<offz<<std::endl;
+    std::cout<<"offset "<<offx<<" "<<fx<<std::endl;
     glm::mat4 offset_matb=glm::mat4(1.0);
-    offset_matb = glm::translate(glm::mat4(1.0), glm::vec3(-fx, fy, -fz));
+    offset_matb = glm::translate(glm::mat4(1.0), glm::vec3(-fx, -fy_s*fy, -fz));
 
     glm::mat4 offset_mat=glm::mat4(1.0);
     offset_mat = glm::translate(glm::mat4(1.0), glm::vec3(
-        fx_s*((float)offx/ori_w+fx *ss.x*0.5f),
+        fx_s*((float)offx/ori_w+fx *ss.x*1.0f),
         fy_s*((float)offy/ori_h+fy *ss.y*0.5f),
         fz_s*((float)offz/ori_d+fz *ss.z*0.5f)
     ));
         
-    tex2mesh_model =  offset_mat*sscale*offset_matb;
+    tex2mesh_model = offset_mat*sscale*offset_matb;
 }
