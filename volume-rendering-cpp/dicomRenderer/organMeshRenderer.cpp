@@ -2,7 +2,6 @@
 #include "organMeshRenderer.h"
 #include "screenQuad.h"
 #include <GLPipeline/Primitive.h>
-#include <Utils/fileUtils.h>
 organMeshRenderer::organMeshRenderer(){
     // //geometry
     // Mesh::InitQuadWithTex(vao_cube_, cuboid_with_texture, 8, cuboid_indices, 36);
@@ -25,55 +24,53 @@ void organMeshRenderer::Setup(int h, int w, int d, int mask_id){
                                           static_cast<size_t>(volume_size.y) * 
                                           static_cast<size_t>(volume_size.z) * max_triangles_per_cell * max_vertices_per_triangle;
 
-    const size_t buffer_size = max_number_of_vertices * sizeof(glm::vec4);
-    std::cout << "Max number of vertices: " << max_number_of_vertices << std::endl;
-    std::cout << "Buffer size (in bytes): " << buffer_size << std::endl;
+    const size_t buffer_size = 2*max_number_of_vertices * sizeof(glm::vec4);
+    LOGI("Max number of vertices: %d", max_number_of_vertices);
+    LOGI("Buffer size (in bytes): ", buffer_size);
 
     {
-        glCreateBuffers(1, &buffer_vertices);
-        glNamedBufferStorage(buffer_vertices, buffer_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+        glGenBuffers(1, &buffer_triangle_table);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffer_triangle_table);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * 256 * 16, triangle_table, GL_STATIC_DRAW);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 
-        glCreateBuffers(1, &buffer_normals);
-        glNamedBufferStorage(buffer_normals, buffer_size, nullptr, GL_DYNAMIC_STORAGE_BIT);
+        glGenBuffers(1, &buffer_configuration_table);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffer_configuration_table);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * 256, edge_table, GL_STATIC_DRAW);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
     }
     {
+        glGenVertexArrays(1, &vao_);
+        glBindVertexArray(vao_);
+        glGenBuffers(1, &buffer_vertices);
 
-        glCreateBuffers(1, &buffer_triangle_table);
-        glNamedBufferStorage(buffer_triangle_table, sizeof(int) * 256 * 16, triangle_table, GL_DYNAMIC_STORAGE_BIT);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer_vertices);
+        glBufferData(GL_ARRAY_BUFFER, buffer_size, nullptr, GL_DYNAMIC_DRAW);
 
-        glCreateBuffers(1, &buffer_configuration_table);
-        glNamedBufferStorage(buffer_configuration_table, sizeof(int) * 256, edge_table, GL_DYNAMIC_STORAGE_BIT);
-    }
-        {
-        glCreateVertexArrays(1, &vao_);
-
-        glEnableVertexArrayAttrib(vao_, 0);
-        glEnableVertexArrayAttrib(vao_, 1);
-
-        glVertexArrayVertexBuffer(vao_, 0, buffer_vertices, 0, sizeof(glm::vec4));
-        glVertexArrayVertexBuffer(vao_, 1, buffer_normals, 0, sizeof(glm::vec4));
-      
-        glVertexArrayAttribFormat(vao_, 0, 4, GL_FLOAT, false, 0);
-        glVertexArrayAttribFormat(vao_, 1, 4, GL_FLOAT, false, 0);
-       
-        glVertexArrayAttribBinding(vao_, 0, 0);
-        glVertexArrayAttribBinding(vao_, 1, 1);
+        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 2*sizeof(glm::vec4), (void*)0);
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 2 * sizeof(glm::vec4), (void*)sizeof(glm::vec4));
+        glEnableVertexAttribArray(1);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
     }
     //init shader clear
-    shader_clear= new Shader();
-    if(!shader_clear->AddShader(GL_COMPUTE_SHADER,Manager::shader_contents[dvr::SHADER_MARCHING_CUBE_CLEAR_GLSL])
-            ||!shader_clear->CompileAndLink())
-        LOGE("OrganMesh Clear===Failed to create mesh shader program===");
+//    shader_clear= new Shader();
+//    if(!shader_clear->AddShader(GL_COMPUTE_SHADER,Manager::shader_contents[dvr::SHADER_MARCHING_CUBE_CLEAR_GLSL])
+//            ||!shader_clear->CompileAndLink())
+//        LOGE("OrganMesh Clear===Failed to create mesh shader program===");
 }
 void organMeshRenderer::Draw() {
     if(!initialized){
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buffer_vertices);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffer_normals);
+//        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, buffer_normals);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, buffer_triangle_table);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, buffer_configuration_table);
-        if(mask_id_>=dvr::ORGAN_END) glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
-        else glBindImageTexture(0, vrController::instance()->getMaskTex(mask_id_), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
-        
+//        if(mask_id_>=dvr::ORGAN_END) glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
+//        else glBindImageTexture(0, vrController::instance()->getMaskTex(mask_id_), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
+        glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8UI);
+
         //do clear
         // a debug sphere
         //     GLuint spc = shader_clear->Use();
@@ -88,12 +85,13 @@ void organMeshRenderer::Draw() {
         Shader::Uniform(sp, "u_mask_id", (unsigned int)pow(2.0f, (int)mask_id_));
         glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
         shader_->UnUse();
         initialized = true;
     }
 
-    if(Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME])glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//    if(Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME])glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
     GLuint dsp = shader_draw_->Use();
     Shader::Uniform(dsp, "uMVP", 
@@ -107,7 +105,7 @@ void organMeshRenderer::Draw() {
     glBindVertexArray(0);
 
     shader_draw_->UnUse();
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void organMeshRenderer::SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, int nw, int nd, int offy, int offx, int offz){
     float dfy = 128/nh;
@@ -127,7 +125,7 @@ void organMeshRenderer::SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, 
     float fz = (coffz - 0.5*ori_d) / ori_d;
     int fz_s = (fz>0)?1:-1;
 
-    std::cout<<"offset "<<offx<<" "<<fx<<std::endl;
+//    std::cout<<"offset "<<offx<<" "<<fx<<std::endl;
     glm::mat4 offset_matb=glm::mat4(1.0);
     offset_matb = glm::translate(glm::mat4(1.0), glm::vec3(-fx, -fy_s*fy, -fz));
 

@@ -34,8 +34,20 @@ std::thread* rpc_thread;
 #endif
 // std::mutex mtx;
 #include <platforms/desktop/common.h>
+// std::string ds_path = "dicom-data/IRB02/21_WATERPOSTCORLAVAFLEX20secs/";
+// std::string ds_path = "dicom-data/IRB03/22_WATERPOSTCORLAVAFLEX20secs/";
+// std::string ds_path = "dicom-data/IRB04/21_WATERPOSTCORLAVAFLEX20secs/";
+// std::string ds_path = "dicom-data/IRB05/17_WATERPOSTCORLAVAFLEX20secs/";
+// std::string ds_path = "dicom-data/IRB06/19_WATERPOSTCORLAVAFLEX20secs/";
+
+std::string cline_fname ="centerline.txt";
 std::string ds_path = "dicom-data/IRB01/2100_FATPOSTCORLAVAFLEX20secs/";
+// glm::vec3 vol_dims = glm::vec3(512,512,224);
+// glm::vec3 vol_dims = glm::vec3(512,512,172);
+
+// glm::vec3 vol_dims = glm::vec3(512,512,216);
 glm::vec3 vol_dims = glm::vec3(512,512,164);
+
 std::vector<float> cutting_value(6, .0f);
 float cline_data[2][4000 * 3] = {.0f};
 int ccid = 2;
@@ -97,7 +109,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 void get_center_line_points(){
-	std::string filename = ds_path + "IRB1.txt";	
+	std::string filename = ds_path + cline_fname;	
 	// float data[4000 * 3];
 	int cidx = 0;
 	float* data = &cline_data[cidx][0];
@@ -109,20 +121,8 @@ void get_center_line_points(){
 		while(getline(ShaderStream, line)){
 			if(line.length() < 3){
 				if(!line_renderers_.empty()){
-					for(int i=0;i<4000;i++){
-						float fx = data[3*i], fy = data[3*i+1], fz = data[3*i+2];
-						data[3*i]=fy;
-						data[3*i+1]=fz;
-						data[3*i+2]= fx*3.0 - 0.15;
-					// 	data[3*i] = -(data[3*i]* 0.0020325-0.5);
-						// data[3*i+1] =-data[3*i+1];
-						// data[3*i+2] *=2.0f;//data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
-					// 	// swap(data[3*i], data[3*i+2]);
-					}
-					// for(int i=0;i<4000;i++)swap(data[3*i], data[3*i+1]);
 					line_renderers_.back()->updateVertices(4000, cline_data[cidx]);
 					data = &cline_data[++cidx][0];
-					// std::cout<<"vertices updated: "<<line<<" "<<idx<<std::endl;
 				}
     			line_renderers_.push_back(new centerLineRenderer(std::stoi(line), false));
 				idx = 0;
@@ -137,17 +137,6 @@ void get_center_line_points(){
 		ShaderStream.close();
 	}else{
 		LOGE("====Failed to load file: %s", filename);
-	}
-
-	for(int i=0;i<4000;i++){
-		float fx = data[3*i], fy = data[3*i+1], fz = data[3*i+2];
-		data[3*i]=fy;
-		data[3*i+1]=fz;
-		data[3*i+2]= fx*3.0 - 0.15;
-	// 	data[3*i] = -(data[3*i]* 0.0020325-0.5);
-		// data[3*i+1] =-data[3*i+1];
-		// data[3*i+2] *=2.0f;//data[3*i+2]*  0.001953125f- 0.5f;//*= 0.001953125f;// data[3*i+2];//*0.0020325-0.5;
-	// 	// swap(data[3*i], data[3*i+2]);
 	}
 	line_renderers_.back()->updateVertices(4000, data);
 	std::cout<<"vertices updated: "<<std::endl;
@@ -181,7 +170,12 @@ void onCreated(){
 }
 void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	auto dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 164.0/300.f));
+	glm::mat4 dim_scale_mat;
+	if(vol_dims.z < 200.0f)
+	dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, vol_dims.z/300.f));
+	else
+	dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 0.5f));
+
 	controller_.onDraw();
 	
 	for(auto lineRenderer_:line_renderers_)

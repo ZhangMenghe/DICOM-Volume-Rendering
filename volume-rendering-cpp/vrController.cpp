@@ -50,8 +50,17 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
 }
 void vrController::setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data){
     if(tex_mask!= nullptr){delete tex_mask; tex_mask= nullptr;}
-    tex_mask = new Texture(GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, data);
+    auto vsize = ph*pw*pd;
+    GLubyte * edata = new GLubyte[4*vsize];
+    for(auto i=0;i<vsize;i++){
+        edata[4*i] = data[i];
+        edata[4*i+1] = data[i];
+        edata[4*i+2] = data[i];
+        edata[4*i+3] = data[i];
+    }
+    tex_mask = new Texture(GL_RGBA8UI, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, edata);
     delete[]data;
+    delete[]edata;
 }
 void vrController::assemble_mask_texture(GLubyte* data, 
                                         int ph, int pw, int pd, 
@@ -78,7 +87,7 @@ void vrController::assemble_mask_texture(GLubyte* data,
         h = int(nh * shrink_factor.y); w = int(nw * shrink_factor.x); d = int(nd * shrink_factor.z);
         mrenderer_->SetOffsetScale(ph,pw,pd,nh,nw,nd,offy,offx,offz);
     }
-    std::cout<<"size: "<<h<<" "<<w<<" "<<d<<std::endl;
+//    std::cout<<"size: "<<h<<" "<<w<<" "<<d<<std::endl;
     mrenderer_->Setup(h,w,d,mask_id);
 
     GLubyte* mask = new GLubyte[h*w*d];
@@ -144,7 +153,7 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
     delete[]vol_data;
     Manager::baked_dirty_ = true;
 
-    assemble_mask_texture(data, ph, pw, pd, 4,4,4,0,0,0,0,0,0);
+     assemble_mask_texture(data, ph, pw, pd, 4,4,4,0,0,0,0,0,0);
 
     // //1:bladder
     // assemble_mask_texture(data, ph, pw, pd, 4,4,2,0,0,68,512,512,86,dvr::ORGAN_BALDDER);
@@ -185,16 +194,16 @@ void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]){
-        meshRenderer_->Draw();
-        for(auto mrenderer_:mesh_renders)
-            if(mrenderer_!=nullptr) mrenderer_->Draw();
-    }
-    if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
-        precompute();
-        if(isRayCasting())  raycastRenderer_->Draw();
-        else texvrRenderer_->Draw();
-    }
+// //    if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]){
+         meshRenderer_->Draw();
+//        for(auto mrenderer_:mesh_renders)
+//            if(mrenderer_!=nullptr) mrenderer_->Draw();
+//    }
+   if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
+      precompute();
+      if(isRayCasting())  raycastRenderer_->Draw();
+      else texvrRenderer_->Draw();
+   }
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;

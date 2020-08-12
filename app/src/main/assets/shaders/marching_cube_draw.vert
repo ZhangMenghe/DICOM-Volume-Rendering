@@ -1,5 +1,5 @@
 #version 310 es
-// #extension GL_EXT_shader_io_blocks:require
+#extension GL_EXT_shader_io_blocks:require
 
 precision mediump float;
 layout (location = 0) in vec4 aPos;
