@@ -4,6 +4,7 @@
 #include <dicomRenderer/texturebasedRenderer.h>
 #include <dicomRenderer/raycastRenderer.h>
 #include <dicomRenderer/organMeshRenderer.h>
+#include <dicomRenderer/centerLineRenderer.h>
 #include <GLPipeline/Texture.h>
 #include "nEntrance.h"
 #include "dicomRenderer/Constants.h"
@@ -21,6 +22,7 @@ public:
     ~vrController();
     void setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data);
     void assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num = 4);
+    void setupCenterLine(int id, float* data);
     /*Override*/
     void onViewCreated();
     void onViewCreated(bool pre_draw);
@@ -60,6 +62,7 @@ private:
     raycastRenderer* raycastRenderer_ = nullptr;
     organMeshRenderer* meshRenderer_ = nullptr;
     std::vector<organMeshRenderer*> mesh_renders;
+    std::unordered_map<int, centerLineRenderer*> line_renderers_;
     //Shader
     Shader* bakeShader_ = nullptr;
 

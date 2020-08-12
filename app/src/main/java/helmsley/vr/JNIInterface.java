@@ -20,6 +20,7 @@ public class JNIInterface {
         operateClient.setDisplayVolume(target_vol, ph, pw, pd, sh, sw, sd, b_mask);
     }
     public static native void JNIsendData(int target, int idx, int chunk_size, int unit_size, byte[] data);
+    public static native void JNIsendDataFloats(int target, int chunk_size, float[] data);
     public static native void JNIsendDataDone();
     public static native void JNIreleaseBuffer();
     public static native byte[] JNIgetVolumeData();

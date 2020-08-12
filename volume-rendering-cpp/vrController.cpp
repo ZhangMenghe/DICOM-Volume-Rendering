@@ -16,6 +16,8 @@ vrController::~vrController(){
     if(texvrRenderer_) delete texvrRenderer_;
     if(raycastRenderer_) delete raycastRenderer_;
     // if(meshRenderer_) delete meshRenderer_;
+    for(auto inst:line_renderers_)delete inst.second;
+    line_renderers_.clear();
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
@@ -174,6 +176,12 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
     //  assemble_mask_texture(data, ph, pw, pd, 4,2,4,0,93,15,512,256,125,dvr::ORGAN_AROTA);
 
 }
+void vrController::setupCenterLine(int id, float* data){
+    line_renderers_[id] = new centerLineRenderer(id, pre_draw_);
+    line_renderers_[id]->updateVertices(4000, data);
+    delete[]data;
+}
+
 //1-baldder, 2-kidn 4 color 8 spleen
 void vrController::onViewCreated(){
     onViewCreated(pre_draw_);
@@ -199,11 +207,16 @@ void vrController::onDraw() {
 //        for(auto mrenderer_:mesh_renders)
 //            if(mrenderer_!=nullptr) mrenderer_->Draw();
 //    }
-   if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
-      precompute();
-      if(isRayCasting())  raycastRenderer_->Draw();
-      else texvrRenderer_->Draw();
-   }
+    //draw centerline
+    for(auto line:line_renderers_)
+        line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
+
+//   if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
+     precompute();
+     if(isRayCasting())  raycastRenderer_->Draw();
+     else texvrRenderer_->Draw();
+//   }
+
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;

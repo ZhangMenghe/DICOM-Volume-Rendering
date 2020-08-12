@@ -39,14 +39,9 @@ void centerLineRenderer::onDraw(glm::mat4 model_mat){
 }
 void centerLineRenderer::draw_scene(glm::mat4 model_mat){
     GLuint sp = shader_.Use();
-    glLineWidth(20.0f);
-    glm::mat4 rot_mat = glm::rotate(glm::mat4(1.0f), -3.14f*0.5f, glm::vec3(0,0,1));
-    glm::mat4 rot_mat2 = glm::rotate(glm::mat4(1.0f), -3.14f*0.5f, glm::vec3(1,0,0));
-
-    // glm::mat4 mm = glm::translate(rot_mat, glm::vec3(0.3,0,0));
-    Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat()*model_mat);//*rot_mat2*rot_mat);
+    Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat()*model_mat);
     glBindVertexArray(vao_);
-    glDrawArrays(GL_LINES, 0, draw_point_num);
+    glDrawArrays(GL_POINTS, 0, draw_point_num);
     glBindVertexArray(0);
     shader_.UnUse();
 }

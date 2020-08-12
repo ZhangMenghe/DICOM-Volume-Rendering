@@ -11,9 +11,12 @@
 using namespace dvr;
 namespace {
     const int LOAD_DCMI_ID = 0, LOAD_MASK_ID = 1;
+    const int LOAD_CENTERLINE_ID=0;
     int CHANEL_NUM = 4;
     //globally
     GLubyte* g_VolumeTexData = nullptr;
+    std::unordered_map<int, float*> centerline_map;
+
     int g_img_h=0, g_img_w=0, g_img_d=0;
     float g_vol_h, g_vol_w, g_vol_depth = 0;
     size_t g_ssize = 0, g_vol_len;
@@ -76,7 +79,7 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    nativeApp(nativeAddr)->onViewCreated();
+    vrController::instance()->onViewCreated();
     overlayController::instance()->onViewCreated();
 }
 
@@ -117,6 +120,17 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
     env->ReleaseByteArrayElements(jdata, data, 0);
 }
 
+JNI_METHOD(void, JNIsendDataFloats)(JNIEnv* env, jclass, jint target, jint chunk_size, jfloatArray arr){
+    LOGE("====CHUNK SIZE: %d", chunk_size);
+    chunk_size = 12001;
+    if(target!=LOAD_CENTERLINE_ID) return;
+    jfloat *data = env->GetFloatArrayElements(arr,0);
+    float* cdata = new float[chunk_size-1];
+    memcpy(cdata, &data[1], (chunk_size-1)* sizeof(float));
+    centerline_map[(int)data[0]] = cdata;
+    env->ReleaseFloatArrayElements(arr,data,0);
+}
+
 JNI_METHOD(void, JNIsendDataPrepareNative)(JNIEnv*, jclass, jint height, jint width, jint dims,jfloat sh,jfloat sw, jfloat sd, jboolean b_mask){
     CHANEL_NUM = b_mask? 4:2;
     g_img_h = height; g_img_w = width; g_img_d = dims;
@@ -135,6 +149,11 @@ JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
             n_data_offset[i] = 0;
             break;
         }
+    }
+    if(!centerline_map.empty()){
+        for(auto inst:centerline_map)
+            vrController::instance()->setupCenterLine(inst.first, inst.second);
+        centerline_map.clear();
     }
 }
 

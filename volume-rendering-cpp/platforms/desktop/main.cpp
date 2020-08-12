@@ -2,6 +2,8 @@
 #include <vrController.h>
 #include <overlayController.h>
 #include <dicomRenderer/centerLineRenderer.h>
+#include <dicomRenderer/screenQuad.h>
+
 #include "utils/dicomLoader.h"
 #include "utils/uiController.h"
 #include "utils/fileLoader.h"
@@ -25,7 +27,7 @@ uiController ui_;
 //order matters
 Manager manager_;
 vrController controller_;
-std::vector<centerLineRenderer*> line_renderers_;
+
 
 #ifdef RPC_ENABLED
 #include <RPCs/rpcHandler.h>
@@ -49,8 +51,8 @@ std::string ds_path = "dicom-data/IRB01/2100_FATPOSTCORLAVAFLEX20secs/";
 glm::vec3 vol_dims = glm::vec3(512,512,164);
 
 std::vector<float> cutting_value(6, .0f);
-float cline_data[2][4000 * 3] = {.0f};
-int ccid = 2;
+// float cline_data[2][4000 * 3] = {.0f};
+std::vector<float*> cline_data;
 
 
 bool is_pressed = false;
@@ -81,9 +83,6 @@ void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
 	if(action==GLFW_RELEASE) return;
-	float* cd = cline_data[0];
-	int id = 3*ccid;
-	const int gap = 2;
 	switch (key)
 	{
 	case GLFW_KEY_W:
@@ -95,24 +94,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	case GLFW_KEY_V:
 		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_DRAW_VOLUME]);
 		break;
-	case GLFW_KEY_N:
-		cutting_value[0] = cd[id];cutting_value[1] = cd[id+1];cutting_value[2] = cd[id+2]*0.5;
-		if(ccid > 100 && ccid < 3900){
-			cutting_value[3] = cd[3*(ccid +gap)] - cd[3*(ccid -gap)];cutting_value[4] = cd[3*(ccid +gap)+1] - cd[3*(ccid -gap)+1];cutting_value[5] = cd[3*(ccid +gap)+2] - cd[3*(ccid -gap)+2];;
-		}
-		ccid+=20;
-		if(ccid > 3997) ccid = 2;
-		ui_.setAllTuneParamById(2, cutting_value);
-		break;
 	default:
 		break;
 	}
 }
 void get_center_line_points(){
+	std::vector<int>ids;
+
 	std::string filename = ds_path + cline_fname;	
-	// float data[4000 * 3];
 	int cidx = 0;
-	float* data = &cline_data[cidx][0];
+	float* data;// = &cline_data[cidx][0];
     std::ifstream ShaderStream(PATH(filename), std::ios::in);
 
 	if(ShaderStream.is_open()){
@@ -120,11 +111,9 @@ void get_center_line_points(){
 		int idx;
 		while(getline(ShaderStream, line)){
 			if(line.length() < 3){
-				if(!line_renderers_.empty()){
-					line_renderers_.back()->updateVertices(4000, cline_data[cidx]);
-					data = &cline_data[++cidx][0];
-				}
-    			line_renderers_.push_back(new centerLineRenderer(std::stoi(line), false));
+				cline_data.push_back(new float[4000*3]);
+				data = cline_data.back();
+				ids.push_back(std::stoi(line));
 				idx = 0;
 				continue;
 			}
@@ -135,17 +124,17 @@ void get_center_line_points(){
 			}
 		}
 		ShaderStream.close();
+
+		for(int i=0;i<2;i++){
+			controller_.setupCenterLine(ids[i], cline_data[i]);
+		}
 	}else{
 		LOGE("====Failed to load file: %s", filename);
 	}
-	line_renderers_.back()->updateVertices(4000, data);
-	std::cout<<"vertices updated: "<<std::endl;
-
-	std::cout<<"line render num: "<<line_renderers_.size()<<std::endl;
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(false);
+	controller_.onViewCreated();
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 
@@ -178,8 +167,6 @@ void onDraw(){
 
 	controller_.onDraw();
 	
-	for(auto lineRenderer_:line_renderers_)
-	lineRenderer_->onDraw(controller_.getModelMatrix() * dim_scale_mat);
 	// // if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	// if(Manager::new_data_available){
 	// 	Manager::new_data_available = false;

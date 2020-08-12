@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import com.google.common.primitives.Floats;
 import com.google.protobuf.ByteString;
 
 public class fileTransferClient {
@@ -29,7 +31,7 @@ public class fileTransferClient {
     private final WeakReference<Activity> activityReference;
     private final WeakReference<dialogUIs> duiRef;
     private static WeakReference<fileTransferClient> selfReference;
-    private static boolean finished = false, finished_mask=false;
+    private static boolean finished = false, finished_mask=false, finished_centerline=false;
 
     private datasetInfo target_ds;
     private volumeInfo target_vol;
@@ -261,7 +263,6 @@ public class fileTransferClient {
                 @Override
                 public void onError(Throwable t) {
                     Log.i(TAG, "==============error========= " );
-
                 }
 
                 @Override
@@ -273,6 +274,29 @@ public class fileTransferClient {
                 }
             };
             asyncStub.downloadMasksVolume(req, mask_observer);
+
+            StreamObserver<centerlineData> centerline_observer = new StreamObserver<centerlineData>() {
+                int id = 0;
+                @Override
+                public void onNext(centerlineData value) {
+                    JNIInterface.JNIsendDataFloats(0, value.getDataCount(), Floats.toArray(value.getDataList()));
+//                    JNIInterface.JNIsendData(3, id, value.getData().size(), 2, value.getData().toByteArray());
+                }
+
+                @Override
+                public void onError(Throwable t) {
+                    Log.i(TAG, "==============error========= " );
+                }
+
+                @Override
+                public void onCompleted() {
+                    Log.i(TAG, "==============Finish Loading centerline========= " );
+//                    selfReference.get().SaveCenterLines();
+//                    finished_mask = true;
+                    finished_centerline = true;
+                }
+            };
+            asyncStub.downloadCenterLineData(req, centerline_observer);
         }
         private void loadMaskAsDCMIImage(String folder_name, dataTransferGrpc.dataTransferStub asyncStub){
             Request req = Request.newBuilder().setClientId(1).setReqMsg(folder_name).build();
@@ -468,6 +492,10 @@ public class fileTransferClient {
     public boolean isDownloadingMaskProcessFinished(){
         return finished_mask;
     }
+    public boolean isDownloadingCenterlineFinished(){
+        return finished_centerline;
+    }
+    public void ResetCenterline(){finished_centerline=false;}
     public void ResetMast(){
         finished_mask = false;
     }

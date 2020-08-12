@@ -26,7 +26,7 @@ void main() {
 //	color *= intensity;
 //	color += ambient;
 
-	 fragColor = vec4(fs_in.normal, 1.0);
-//	fragColor = vec4(1.0,1.0,.0,1.0);
+//	 fragColor = vec4(fs_in.normal, 1.0);
+	fragColor = vec4(1.0,1.0,.0,1.0);
 //    fragColor = vec4(color, 1.0);
 }

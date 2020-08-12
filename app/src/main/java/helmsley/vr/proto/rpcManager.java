@@ -63,6 +63,10 @@ public class rpcManager {
             data_manager.ResetMast();
             JNIInterface.JNIsendDataDone();
         }
+        if(data_manager.isDownloadingCenterlineFinished()){
+            data_manager.ResetCenterline();
+            JNIInterface.JNIsendDataDone();
+        }
         return false;
     }
     public fileTransferClient getDataManager(){return data_manager;}

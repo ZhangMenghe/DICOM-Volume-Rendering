@@ -60,16 +60,15 @@ message volumeWholeResponse{
     bytes data = 1;
 }
 
+message centerlineData{
+    repeated float data = 1;
+}
+
 message dcmImage{
     int32 dcmID = 1;
     float position = 2;
     bytes data = 3;
 }
-
-//message Request{
-//    int32 client_id = 1;
-//    string req_msg = 2;
-//}
 
 message RequestWholeVolume{
     int32 client_id = 1;
@@ -77,10 +76,6 @@ message RequestWholeVolume{
     int32 unit_size = 3;
 }
 
-// message Response{
-//     bool success = 1;
-//     string res_msg = 2;
-// }
 service dataTransfer{
     rpc getAvailableConfigs(Request) returns(configResponse);
     rpc exportConfigs(Request) returns(commonResponse);
@@ -90,4 +85,5 @@ service dataTransfer{
     rpc DownloadVolume(RequestWholeVolume) returns(stream volumeWholeResponse);
     rpc DownloadMasks(Request) returns(stream dcmImage);
     rpc DownloadMasksVolume(Request) returns(stream volumeWholeResponse);
+    rpc DownloadCenterLineData(Request) returns(stream centerlineData);
 }

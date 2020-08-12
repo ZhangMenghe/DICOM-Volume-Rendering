@@ -55,6 +55,10 @@ message volumeWholeResponse{
     bytes data = 1;
 }
 
+message centerlineData{
+    repeated float data = 1;
+}
+
 message dcmImage{
     int32 dcmID = 1;
     float position = 2;
@@ -76,5 +80,5 @@ service dataTransfer{
     rpc DownloadVolume(RequestWholeVolume) returns(stream volumeWholeResponse);
     rpc DownloadMasks(Request) returns(stream dcmImage);
     rpc DownloadMasksVolume(Request) returns(stream volumeWholeResponse);
-
+    rpc DownloadCenterLineData(Request) returns(stream centerlineData);
 }
