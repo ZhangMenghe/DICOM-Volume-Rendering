@@ -62,16 +62,25 @@ uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
 // uint u_organ_num = 6;
 // uint u_maskbits = 1+2+4+8+16+32;
-// float SampleLinear(vec3 p){
-// 	// need to mitigate the offset in p[x], so +float3(0.5) to be in [0;1] range
-// 	return DensityTexture.SampleLevel(myLinearClampSampler, p + vec3(0.5), 0).x;
-// }
+
+bool check_mask_bit(uint value){
+	for(uint i=uint(0); i<u_organ_num; i++){
+		if(((u_maskbits>> uint(i+uint(1))) & uint(1)) == uint(0)) continue;
+		uint cv = uint(pow(float(2), float(i)));
+		if(value == cv) return true;
+	}
+	return false;
+}
+
 float map(ivec3 p){
 	uint sc = uint(imageLoad(u_volume, p).r);
-	return (sc == u_mask_id)? -1.0:1.0;
-	// if(sc == 4)values[i] = -1.0;// sc.a;
-	// else values[i] = 1.0;
-	// if(values[i] < .0) configuration |= 1 << i;
+	if(u_multiple){
+		if(check_mask_bit(sc)) return -float(sc);
+		return 1.0;
+	}else{
+		if(sc == u_mask_id)return -1.0;// sc.a;
+		return 1.0;
+	}
 }
 vec3 CalculateGradient(ivec3 p){
     const ivec3 e = ivec3(1, 0, 0);
@@ -115,17 +124,7 @@ Vertex find_vertex(float isolevel, ivec3 p1, ivec3 p2, float value_1, float valu
 
 	return Vertex(p, normalize(n));
 }
-
-bool check_mask_bit(uint value){
-	for(uint i=uint(0); i<u_organ_num; i++){
-        if(((u_maskbits>> uint(i+uint(1))) & uint(1)) == uint(0)) continue;
-		uint cv = uint(pow(float(2), float(i)));
-		if(value == cv) return true;
-    }
-	return false;
-}
-void march(in ivec3 cell_index)
-{
+void march(in ivec3 cell_index){
 	ivec3 volume_size = imageSize(u_volume);
 	vec3 inv_volume_size = 1.0 / vec3(volume_size);
 
@@ -153,14 +152,8 @@ void march(in ivec3 cell_index)
 	float values[8];
 	int configuration = 0;
 	for (int i = 0; i < 8; ++i){
-        uint sc = uint(imageLoad(u_volume, neighbors[i]).r);
-		if(u_multiple){
-			if(check_mask_bit(sc)) values[i] = -float(sc);
-			else values[i] = 1.0;
-		}else{
-			if(sc == u_mask_id)values[i] = -1.0;// sc.a;
-			else values[i] = 1.0;
-		}
+
+		values[i] = map(neighbors[i]);
 
 		if(values[i] < .0) configuration |= 1 << i;
 	}

@@ -22,7 +22,7 @@ private:
     // glm::vec3 volume_size = glm::vec3(74,120,81);
     glm::vec3 volume_size = glm::vec3(512,512,164);
     int mask_id_;
-
+    bool baked_dirty = true;
     glm::mat4 tex2mesh_model = glm::mat4(1.0f);
   
 public:
@@ -33,5 +33,6 @@ public:
     //     offset_mat = glm::translate(glm::mat4(1.0), glm::vec3(offx/ori_w, offy/ori_h, offz/ori_d)*0.125f);
     // }
     void Draw();
+    void DirtyBaked(){baked_dirty = true;}
 };
 #endif

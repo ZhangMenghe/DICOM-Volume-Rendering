@@ -77,7 +77,9 @@ void organMeshRenderer::Draw() {
         //     glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);
         //     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
         // shader_clear->UnUse();
-
+        initialized = true;
+    }
+    if(Manager::baked_dirty_){
         GLuint sp = shader_->Use();
         Shader::Uniform(sp, "u_multiple", mask_id_>=dvr::ORGAN_END);
         Shader::Uniform(sp, "u_maskbits", vrController::instance()->mask_bits_);
@@ -87,8 +89,12 @@ void organMeshRenderer::Draw() {
         glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
         shader_->UnUse();
-        initialized = true;
+        Manager::baked_dirty_ = false;
     }
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
 //    if(Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME])glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 //    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -105,6 +111,8 @@ void organMeshRenderer::Draw() {
     glBindVertexArray(0);
 
     shader_draw_->UnUse();
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
 //    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void organMeshRenderer::SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, int nw, int nd, int offy, int offx, int offz){
