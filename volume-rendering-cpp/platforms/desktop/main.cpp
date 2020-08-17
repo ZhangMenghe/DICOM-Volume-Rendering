@@ -134,7 +134,7 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(false);
+	controller_.onViewCreated(Manager::param_bool[dvr::CHECK_PRE_DRAW]);
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 
@@ -142,7 +142,7 @@ void onCreated(){
 
 	// 430, 768,
 	overlayController::instance()->setOverlayRect(0, 430, 85, 0, 310);
-    overlayController::instance()->setOverlayRect(1, 430, 36, 0, 295);
+    overlayController::instance()->setOverlayRect(1, 430, 36, 0, 275);
 
 	//load data
 	if(loader_.loadData(ds_path +"data", ds_path+"mask")){
@@ -159,15 +159,9 @@ void onCreated(){
 }
 void onDraw(){
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glm::mat4 dim_scale_mat;
-	if(vol_dims.z < 200.0f)
-	dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, vol_dims.z/300.f));
-	else
-	dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 0.5f));
-
 	controller_.onDraw();
+	if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	
-	// // if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	// if(Manager::new_data_available){
 	// 	Manager::new_data_available = false;
 	// 	loader_.startToAssemble(&controller_);

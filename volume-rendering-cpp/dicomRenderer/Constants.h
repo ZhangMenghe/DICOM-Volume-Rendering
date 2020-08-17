@@ -13,7 +13,8 @@ namespace dvr{
         CHECK_MASK_RECOLOR,
         CHECK_DRAW_VOLUME,
         CHECK_DRAW_POLYGON,
-        CHECK_POLYGON_WIREFRAME
+        CHECK_POLYGON_WIREFRAME,
+        CHECK_PRE_DRAW
     };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
