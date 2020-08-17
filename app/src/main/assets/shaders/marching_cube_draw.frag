@@ -6,11 +6,16 @@ in VS_OUT
 {
 	vec3 position;
 	vec3 normal;
+    vec3 vbc;
 } fs_in;
 out vec4 fragColor;
+uniform bool uDrawWire;
 
 void main() {
-    	// Some very basic diffuse lighting...
+	if(uDrawWire && fs_in.vbc.x > 0.02 && fs_in.vbc.y > 0.02 && fs_in.vbc.z > 0.02)
+		discard;
+    
+	// Some very basic diffuse lighting...
 	vec3 light_position = vec3(1.0, 5.0, 0.0);
 	vec3 to_light = normalize(light_position - fs_in.position);
 	float intensity = max(0.5, dot(to_light, fs_in.normal));

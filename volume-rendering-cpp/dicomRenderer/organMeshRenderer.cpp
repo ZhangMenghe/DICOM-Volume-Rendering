@@ -105,6 +105,7 @@ void organMeshRenderer::Draw() {
     * vrController::instance()->getModelMatrix(true)
     * glm::scale(glm::mat4(1.0), glm::vec3(0.5f))
     * tex2mesh_model);
+    Shader::Uniform(dsp, "uDrawWire", Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME]);
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, max_number_of_vertices);

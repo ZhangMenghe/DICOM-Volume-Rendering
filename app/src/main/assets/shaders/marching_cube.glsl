@@ -203,7 +203,7 @@ void march(in ivec3 cell_index){
 			vertex = vertex_list[triangle_table[triangle_start_memory + (3 * i + 0)]];
 			position = vertex.position * inv_volume_size;
 			position = position * 2.0 - 1.0;
-			output_vertices[2*(idx + 0)] = vec4(position, 1.0);
+			output_vertices[2*(idx + 0)] = vec4(position, .0);
 			output_vertices[2*(idx + 0)+1] = vec4(vertex.normal, 1.0);
 
 			//			output_normals[cell_start_memory +  3 * i + 0] = vec4(vertex.normal, 1.0);
@@ -220,7 +220,7 @@ void march(in ivec3 cell_index){
 			vertex = vertex_list[triangle_table[triangle_start_memory + (3 * i + 2)]];
 			position = vertex.position * inv_volume_size;
 			position = position * 2.0 - 1.0;
-			output_vertices[2*(idx + 2)] = vec4(position, 1.0);
+			output_vertices[2*(idx + 2)] = vec4(position, 2.0);
 			output_vertices[2*(idx + 2)+1] = vec4(vertex.normal, 1.0);
 
 			//output_vertices[cell_start_memory +  3 * i + 2] = vec4(position, 1.0);
