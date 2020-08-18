@@ -7,7 +7,7 @@ precision mediump float;
 
 layout (local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 
-layout(binding = 0, rgba8ui) readonly uniform mediump uimage3D u_volume;
+layout(binding = 2, rgba8ui) readonly uniform mediump uimage3D u_volume;
 // layout(binding = 0, r8) readonly uniform mediump image3D u_volume;
 //layout(binding = 0, r8ui)readonly uniform mediump uimage3D u_volume;
 

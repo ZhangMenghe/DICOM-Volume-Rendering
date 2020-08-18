@@ -199,14 +199,14 @@ void vrController::onDraw() {
         //     if(mrenderer_!=nullptr) mrenderer_->Draw();
     }
 
-    // if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
-    //     precompute();
-    //     if(isRayCasting())  raycastRenderer_->Draw();
-    //     else texvrRenderer_->Draw();
-    // }
-    // //draw centerline
-    // for(auto line:line_renderers_)
-    //     line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
+    if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
+        precompute();
+        if(isRayCasting())  raycastRenderer_->Draw();
+        else texvrRenderer_->Draw();
+    }
+    //draw centerline
+    for(auto line:line_renderers_)
+        line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;

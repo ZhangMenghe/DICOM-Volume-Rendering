@@ -69,7 +69,7 @@ void organMeshRenderer::Draw() {
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, buffer_configuration_table);
 //        if(mask_id_>=dvr::ORGAN_END) glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
 //        else glBindImageTexture(0, vrController::instance()->getMaskTex(mask_id_), 0, GL_TRUE, 0, GL_READ_WRITE, GL_R8UI);
-        glBindImageTexture(0, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8UI);
+        glBindImageTexture(2, vrController::instance()->getMaskTex(), 0, GL_TRUE, 0, GL_READ_WRITE, GL_RGBA8UI);
 
         //do clear
         // a debug sphere
