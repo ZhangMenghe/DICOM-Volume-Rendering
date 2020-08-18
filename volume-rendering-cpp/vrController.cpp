@@ -52,17 +52,8 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
 }
 void vrController::setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data){
     if(tex_mask!= nullptr){delete tex_mask; tex_mask= nullptr;}
-    auto vsize = ph*pw*pd;
-    GLubyte * edata = new GLubyte[4*vsize];
-    for(auto i=0;i<vsize;i++){
-        edata[4*i] = data[i];
-        edata[4*i+1] = data[i];
-        edata[4*i+2] = data[i];
-        edata[4*i+3] = data[i];
-    }
-    tex_mask = new Texture(GL_RGBA8UI, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, edata);
+    tex_mask = new Texture(GL_RGBA8UI, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, data);
     delete[]data;
-    delete[]edata;
 }
 void vrController::assemble_mask_texture(GLubyte* data, 
                                         int ph, int pw, int pd, 
@@ -91,18 +82,18 @@ void vrController::assemble_mask_texture(GLubyte* data,
     }
 //    std::cout<<"size: "<<h<<" "<<w<<" "<<d<<std::endl;
     mrenderer_->Setup(h,w,d,mask_id);
-
-    GLubyte* mask = new GLubyte[h*w*d];
+    GLubyte* mask = new GLubyte[4*h*w*d];
     GLubyte* mbuff = mask;
     GLubyte* obuff = data + ph*pw*offz*4;
-    int ori_size = ph*pw*skip_size.z, n_size = w * h;
+    int ori_size = ph*pw*skip_size.z, n_size = w * h * 4;
 
     for(int di = 0; di < d; di++){
         int idx = 0;
         for(int yi = 0, idx_o = offy*pw*4; yi < h; yi++, idx_o+=pw*skip_size.y)
-            for(int xi =0, xi_o=offx*4; xi < w; xi++,xi_o+=skip_size.x)
-                mbuff[idx++] = obuff[idx_o + xi_o + 2];
-            
+            for(int xi =0, xi_o=offx*4; xi < w; xi++,xi_o+=skip_size.x){
+                mbuff[4*idx] = obuff[idx_o + xi_o + 2];
+                idx++;
+            }
         mbuff += n_size;
         obuff += ori_size;
     }
