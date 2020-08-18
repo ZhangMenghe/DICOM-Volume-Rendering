@@ -38,7 +38,6 @@ void organMeshRenderer::Setup(int h, int w, int d, int mask_id){
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, buffer_configuration_table);
         glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(int) * 256, edge_table, GL_STATIC_DRAW);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
-
     }
     {
         glGenVertexArrays(1, &vao_);
@@ -96,9 +95,6 @@ void organMeshRenderer::Draw() {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-//    if(Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME])glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-//    else glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    
     GLuint dsp = shader_draw_->Use();
     Shader::Uniform(dsp, "uMVP", 
     Manager::camera->getProjMat() * Manager::camera->getViewMat() 
@@ -114,7 +110,6 @@ void organMeshRenderer::Draw() {
     shader_draw_->UnUse();
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
-//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 void organMeshRenderer::SetOffsetScale(int ori_h, int ori_w, int ori_d, int nh, int nw, int nd, int offy, int offx, int offz){
     float dfy = 128/nh;

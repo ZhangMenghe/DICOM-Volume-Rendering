@@ -88,7 +88,7 @@ private:
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
     float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
-    bool pre_draw_ = true;
+    bool pre_draw_ = false;
 
     //ui
     glm::fvec2 Mouse_old;

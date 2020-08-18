@@ -41,7 +41,7 @@ public class fileTransferClient {
     private Map<String, List<volumeInfo>> local_dv_map = new HashMap<>();
 
     private boolean local_initialized = false;
-    private static String DCM_FILE_NAME, DCM_MASK_FILE_NAME, DCM_WMASK_FILE_NAME;
+    private static String DCM_FILE_NAME, DCM_MASK_FILE_NAME, DCM_WMASK_FILE_NAME, DCM_CENTERLINE_FILE_NAME;
     private static String TARGET_ROOT_DIR, LOCAL_INDEX_FILE_PATH;
     fileTransferClient(Activity activity, dialogUIs dui){
         activityReference = new WeakReference<Activity>(activity);
@@ -52,6 +52,7 @@ public class fileTransferClient {
         DCM_FILE_NAME = activity.getString(R.string.cf_dcm_name);
         DCM_MASK_FILE_NAME = activity.getString(R.string.cf_dcmmask_name);
         DCM_WMASK_FILE_NAME = activity.getString(R.string.cf_dcmwmask_name);
+        DCM_CENTERLINE_FILE_NAME = activity.getString(R.string.cf_centerline_name);
     }
     void Setup(){
         //init availables
@@ -276,11 +277,13 @@ public class fileTransferClient {
             asyncStub.downloadMasksVolume(req, mask_observer);
 
             StreamObserver<centerlineData> centerline_observer = new StreamObserver<centerlineData>() {
-                int id = 0;
+                boolean initialized = false;
                 @Override
                 public void onNext(centerlineData value) {
+
                     JNIInterface.JNIsendDataFloats(0, value.getDataCount(), Floats.toArray(value.getDataList()));
-//                    JNIInterface.JNIsendData(3, id, value.getData().size(), 2, value.getData().toByteArray());
+                    selfReference.get().SaveCenterLines(value.getDataCount(), value.getDataList(), initialized);
+                    initialized = true;
                 }
 
                 @Override
@@ -291,8 +294,6 @@ public class fileTransferClient {
                 @Override
                 public void onCompleted() {
                     Log.i(TAG, "==============Finish Loading centerline========= " );
-//                    selfReference.get().SaveCenterLines();
-//                    finished_mask = true;
                     finished_centerline = true;
                 }
             };
@@ -343,6 +344,23 @@ public class fileTransferClient {
         return tar_vol_dir;
     }
 
+    private void SaveCenterLines(int num, List<Float> values, boolean initialized){
+        if(num != 12001) return;
+        try{
+            File data_f = new File(get_tar_vol_dir(TARGET_ROOT_DIR, target_ds.getFolderName(), target_vol.getFolderName()), DCM_CENTERLINE_FILE_NAME);
+            boolean b_n_append = (!initialized && data_f.exists());
+            FileOutputStream fos = new FileOutputStream(data_f, !b_n_append);
+
+            fos.write((values.get(0) + "\n").getBytes());
+            for(int i=0;i<4000;i++){
+                String con = values.get(3*i+1) +" " + values.get(3*i+2)+" "+values.get(3*i+3)+"\n";
+                fos.write(con.getBytes());
+            }
+            fos.close();
+        }catch (Exception e){
+            Log.e(TAG, "====Fail to save center line data to file====");
+        }
+    }
     //save after download complete
     private void SaveMasks(){
         dialogUIs.FinishMaskLoading();
@@ -350,7 +368,6 @@ public class fileTransferClient {
         if(!Boolean.parseBoolean(activity.getString(R.string.cf_b_cache))) return;
 
         try {
-//            tvol.getWithMask()?DCM_WMASK_FILE_NAME:
             File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, target_ds.getFolderName(), target_vol.getFolderName()), DCM_WMASK_FILE_NAME);
             fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
         } catch (Exception e) {
@@ -464,6 +481,29 @@ public class fileTransferClient {
             }
         }
         finished_mask = true;
+
+        //load center line
+        try{
+            File cline_file = new File(destDir, DCM_CENTERLINE_FILE_NAME);
+            if(cline_file.exists()){
+                List<String> lines = fileUtils.readLines(cline_file.toString());
+                int record_num = lines.size() % 4000;
+                float[] data = new float[12001];
+                for(int i=0; i<record_num; i++){
+                    int llid = 4000* i + i;
+                    int idx = 0;
+                    data[idx++] = Float.parseFloat(lines.get(llid++));
+                    for(int k=0;k<4000;k++){
+                        String line = lines.get(llid++);
+                        String[] nums = line.split(" ");
+                        data[idx++] = Float.parseFloat(nums[0]);data[idx++] = Float.parseFloat(nums[1]);data[idx++] = Float.parseFloat(nums[2]);
+                    }
+                    JNIInterface.JNIsendDataFloats(0, 12001, data);
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
         return true;
     }
 

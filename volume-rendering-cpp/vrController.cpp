@@ -193,18 +193,18 @@ void vrController::onDraw() {
     if(!tex_volume) return;
 
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]){
+//    if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]){
         meshRenderer_->Draw();
         // for(auto mrenderer_:mesh_renders)
         //     if(mrenderer_!=nullptr) mrenderer_->Draw();
-    }
+//    }
 
-    if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
-        precompute();
-        if(isRayCasting())  raycastRenderer_->Draw();
-        else texvrRenderer_->Draw();
-    }
-    //draw centerline
+//    if(Manager::param_bool[dvr::CHECK_DRAW_VOLUME]){
+//        precompute();
+//        if(isRayCasting())  raycastRenderer_->Draw();
+//        else texvrRenderer_->Draw();
+//    }
+//    //draw centerline
     for(auto line:line_renderers_)
         line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
 }
