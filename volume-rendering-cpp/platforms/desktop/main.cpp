@@ -92,7 +92,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		ui_.setCheck("Polygon", !Manager::param_bool[dvr::CHECK_DRAW_POLYGON]);
 		break;
 	case GLFW_KEY_V:
-		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_DRAW_VOLUME]);
+		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_VOLUME_ON]);
 		break;
 	default:
 		break;
@@ -134,7 +134,7 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(Manager::param_bool[dvr::CHECK_PRE_DRAW]);
+	controller_.onViewCreated(false);
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 

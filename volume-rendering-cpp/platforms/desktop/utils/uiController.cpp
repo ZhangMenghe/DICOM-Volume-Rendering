@@ -50,12 +50,12 @@ void uiController::InitCheckParam(){
         "Cutting",
         "Freeze Volume",
         "Freeze Plane",
-        "Show",
+        "Apply",
         "Recolor",
         "Volume",
-        "Polygon",
-        "Wireframe Mode",
-        "pre draw"
+        "Mesh",
+        "Wireframe",
+        "Center Line"
     };
     bool values[pnum] = {
         false,
