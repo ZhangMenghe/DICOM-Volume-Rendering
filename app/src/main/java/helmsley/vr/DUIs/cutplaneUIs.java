@@ -114,7 +114,7 @@ public class cutplaneUIs extends BasePanel{
 
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         int max_seek_value = Integer.valueOf(params[1]);
-        float percent = (Float) cutmap.getOrDefault("percentage", Float.valueOf(params[0]));
+        double percent = (Double) cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
         seek_bar_.setProgress((int)(percent * max_seek_value));
 
         //todo:jui send cutting plane status(pos/ori)

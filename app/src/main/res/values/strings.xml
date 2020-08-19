@@ -40,7 +40,6 @@
 
 <!--    mask panel subs-->
     <string name="mask_check_name">Show</string>
-    <string name="mask_color_name">Recolor</string>
 
     <!--    cut panel subs-->
     <string name="cutting_check_name">Cutting</string>

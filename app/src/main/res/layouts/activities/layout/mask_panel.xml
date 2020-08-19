@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--debug:review the style-->
-<android.support.constraint.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<!--<android.support.constraint.ConstraintLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent">-->
 
     <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -21,17 +21,7 @@
         app:layout_constraintHeight_percent="0.15"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topPanel">
-        <CheckBox
-            android:id="@+id/check_mask_show"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:text="@string/mask_check_name"
-            android:theme="@style/CommonCheckBox"
-            android:textColor="@color/brightBlue"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+
         <Spinner
             android:id="@+id/spinner_check_mask_control"
             android:layout_width="0dp"
@@ -39,21 +29,12 @@
             android:gravity="center"
             android:spinnerMode="dropdown"
             app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toEndOf="@+id/check_mask_show"
+            app:layout_constraintHeight_percent="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+
             app:layout_constraintTop_toTopOf="parent"
             style="@style/Spinner"/>
-        <CheckBox
-            android:id="@+id/check_mask_color"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:text="@string/mask_color_name"
-            android:theme="@style/CommonCheckBox"
-            android:textColor="@color/brightBlue"
-            app:layout_constraintHeight_percent="0.4"
-            app:layout_constraintStart_toEndOf="@+id/spinner_check_mask_control"
-            app:layout_constraintTop_toTopOf="parent"/>
+
         <android.support.v7.widget.RecyclerView
             android:id="@+id/mask_recycle"
             android:scrollbars="horizontal"
@@ -61,7 +42,7 @@
             android:layout_height="0dp"
             android:layout_centerInParent="true"
             app:layout_constraintWidth_percent="0.9"
-            app:layout_constraintHeight_percent="0.6"
+            app:layout_constraintHeight_percent="0.5"
 
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,4 +50,4 @@
 
     </android.support.constraint.ConstraintLayout>
 
-</android.support.constraint.ConstraintLayout>
+<!--</android.support.constraint.ConstraintLayout>-->

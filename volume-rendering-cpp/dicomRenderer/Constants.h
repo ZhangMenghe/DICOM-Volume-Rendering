@@ -11,10 +11,10 @@ namespace dvr{
         CHECK_FREEZE_CPLANE,
         CHECK_MASKON,
         CHECK_MASK_RECOLOR,
-        CHECK_DRAW_VOLUME,
+        CHECK_VOLUME_ON,
         CHECK_DRAW_POLYGON,
         CHECK_POLYGON_WIREFRAME,
-        CHECK_PRE_DRAW
+        CHECK_CENTER_LINE
     };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
