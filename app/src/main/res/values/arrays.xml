@@ -43,10 +43,16 @@
     <string-array name="mask_check_params">
         <item>@string/mask_check_name</item>
         <item>@string/mask_color_name</item>
+<!--        <item>Polygons</item>-->
+<!--        <item>Wireframe</item>-->
+<!--        <item>Center Line</item>-->
     </string-array>
     <string-array name="mask_check_values">
         <item>false</item>
         <item>true</item>
+<!--        <item>true</item>-->
+<!--        <item>false</item>-->
+<!--        <item>false</item>-->
     </string-array>
 
 <!--    cutting panel-->
