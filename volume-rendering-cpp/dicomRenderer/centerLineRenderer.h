@@ -20,12 +20,12 @@ private:
 
 
     //for screen baking
-    bool baked_dirty_ = true;
+    bool baked_dirty_;
     void draw_scene(glm::mat4 model_mat);
     void draw_baked(glm::mat4 model_mat);
 
 public:
-    centerLineRenderer(int id, bool screen_baked = true);
+    centerLineRenderer(int id, bool screen_baked = false);
     void updateVertices(int point_num, const float * data);
     void onDraw(glm::mat4 model_mat);
     void dirtyPrecompute(){baked_dirty_ = true;}

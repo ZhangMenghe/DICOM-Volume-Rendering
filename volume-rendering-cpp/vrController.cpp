@@ -168,8 +168,10 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
 
 }
 void vrController::setupCenterLine(int id, float* data){
-    line_renderers_[id] = new centerLineRenderer(id, pre_draw_);
-    line_renderers_[id]->updateVertices(4000, data);
+    int oid = 0;
+    while(id/=2)oid++;
+    line_renderers_[oid] = new centerLineRenderer(oid);
+    line_renderers_[oid]->updateVertices(4000, data);
     delete[]data;
 }
 
@@ -192,7 +194,6 @@ void vrController::onViewChange(int width, int height){
 void vrController::onDraw() {
     if(!tex_volume) return;
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-        // for(auto mrenderer_:mesh_renders)if(mrenderer_!=nullptr) mrenderer_->Draw();
 
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
@@ -205,11 +206,10 @@ void vrController::onDraw() {
         //draw centerline
         if(Manager::param_bool[dvr::CHECK_CENTER_LINE]){
             for(auto line:line_renderers_)
-                line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
+                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
         }
     }
-
-
+    // LOGE("===FPS: %.2f==\n", pm_.Update());
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;

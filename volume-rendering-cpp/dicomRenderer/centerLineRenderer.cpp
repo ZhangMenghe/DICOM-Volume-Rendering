@@ -22,6 +22,7 @@ centerLineRenderer::centerLineRenderer(int id, bool screen_baked)
        ||!shader_.CompileAndLink())
         LOGE("Center Line===Failed to create shader program===");
     GLuint sp = shader_.Use();
+
     Shader::Uniform(sp, "uBaseColor", (id==4)?glm::vec4(1.0f, .0f, .0f, 1.0f):glm::vec4(1.0f, 1.0f, .0f, 1.0f));
     shader_.UnUse();
 }
@@ -31,22 +32,21 @@ void centerLineRenderer::updateVertices(int point_num, const float * data){
         glBufferSubData(GL_ARRAY_BUFFER, 0, point_num * 3 * sizeof(float), data);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-
 void centerLineRenderer::onDraw(glm::mat4 model_mat){
-    // if(uid !=4) return;
     if(DRAW_BAKED) draw_baked(model_mat);
     else draw_scene(model_mat);
 }
-void centerLineRenderer::draw_scene(glm::mat4 model_mat){
+void centerLineRenderer::draw_scene(glm::mat4 model_mat){   
     GLuint sp = shader_.Use();
     Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat()*model_mat);
     glBindVertexArray(vao_);
-    glDrawArrays(GL_POINTS, 0, draw_point_num);
+
+    glDrawArrays(GL_LINE_STRIP, 0, draw_point_num);
     glBindVertexArray(0);
     shader_.UnUse();
 }
 void centerLineRenderer::draw_baked(glm::mat4 model_mat){
-    // if(!baked_dirty_) return;
+    if(!baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);
@@ -54,5 +54,5 @@ void centerLineRenderer::draw_baked(glm::mat4 model_mat){
     glClear(GL_DEPTH_BUFFER_BIT);
     draw_scene(model_mat);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    // baked_dirty_ = false;
+    baked_dirty_ = false;
 }

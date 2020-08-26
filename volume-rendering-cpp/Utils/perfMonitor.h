@@ -20,13 +20,6 @@ private:
 public:
     perfMonitor();
     float Update();
-
-    static double GetCurrentTime() {
-        struct timeval time;
-        gettimeofday(&time, NULL);
-        double ret = time.tv_sec + time.tv_usec * 1.0 / 1000000.0;
-        return ret;
-    }
 };
 
 

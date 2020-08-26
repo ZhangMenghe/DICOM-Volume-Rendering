@@ -86,10 +86,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	switch (key)
 	{
 	case GLFW_KEY_W:
-		ui_.setCheck("Wireframe Mode", !Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME]);
+		ui_.setCheck("Wireframe", !Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME]);
 		break;
 	case GLFW_KEY_P:
-		ui_.setCheck("Polygon", !Manager::param_bool[dvr::CHECK_DRAW_POLYGON]);
+		ui_.setCheck("Mesh", !Manager::param_bool[dvr::CHECK_DRAW_POLYGON]);
 		break;
 	case GLFW_KEY_V:
 		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_VOLUME_ON]);
@@ -134,7 +134,7 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(false);
+	controller_.onViewCreated();
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 

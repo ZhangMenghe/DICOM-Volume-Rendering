@@ -5,6 +5,7 @@
 #include <dicomRenderer/raycastRenderer.h>
 #include <dicomRenderer/organMeshRenderer.h>
 #include <dicomRenderer/centerLineRenderer.h>
+#include <Utils/perfMonitor.h>
 #include <GLPipeline/Texture.h>
 #include "nEntrance.h"
 #include "dicomRenderer/Constants.h"
@@ -88,13 +89,16 @@ private:
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
     float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
-    bool pre_draw_ = false;
+    bool pre_draw_ = true;
 
     //ui
     glm::fvec2 Mouse_old;
 
     //flags
     bool volume_model_dirty;
+    
+    //performance 
+    perfMonitor pm_;
 
     void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd, int skipy, int skipx, int skipz, int offy, int offx, int offz, int nh, int nw, int nd, dvr::ORGAN_IDS mask_id=dvr::ORGAN_END);
     void updateVolumeModelMat();

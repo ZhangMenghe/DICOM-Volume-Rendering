@@ -27,9 +27,8 @@ SET(GL_PIPELINE_FILES
         GLPipeline/Shader.cpp
         GLPipeline/Mesh.cpp
         GLPipeline/Texture.cpp)
-#SET(UTILS_FILES
-#        Utils/perfMonitor.cpp
-#        )
+SET(UTILS_FILES
+        Utils/perfMonitor.cpp)
 SET(DICOM_RENDERERS
         dicomRenderer/organMeshRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
@@ -50,17 +49,14 @@ add_library(vrNative
         Manager.cpp
         ${DICOM_RENDERERS}
         ${GL_PIPELINE_FILES}
-#        ${UTILS_FILES}
-        )
+        ${UTILS_FILES})
 
 target_link_libraries(
         vrNative
-        ${OpenGL_LIBS}
-)
+        ${OpenGL_LIBS})
 
 if(CMAKE_SYSTEM_NAME STREQUAL Linux)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/platforms/desktop)
 elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/platforms/android)
 endif()
-
