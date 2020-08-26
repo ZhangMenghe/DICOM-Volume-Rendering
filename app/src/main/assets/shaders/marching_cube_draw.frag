@@ -24,7 +24,7 @@ void main() {
 	// Quantize position
 //	const int steps = 10;
 	float steps = 10.0;
-	vec3 position = fs_in.position * 0.5 + 0.5;
+	vec3 position = fs_in.position + 0.5;
 	vec3 quantized = floor(position * steps + 0.5) / steps;
 
 	vec3 color = quantized;

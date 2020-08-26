@@ -47,6 +47,7 @@ public:
     void setRenderParam(float* values){memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));Manager::baked_dirty_=true;}
 
     //getter funcs
+    GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     GLuint getMaskTex(){return tex_mask->GLTexture();}
     GLuint getMaskTex(int mask_id){return tex_masks[mask_id]->GLTexture();}
@@ -100,7 +101,6 @@ private:
     //performance 
     perfMonitor pm_;
 
-    void assemble_mask_texture(GLubyte* data, int ph, int pw, int pd, int skipy, int skipx, int skipz, int offy, int offx, int offz, int nh, int nw, int nd, dvr::ORGAN_IDS mask_id=dvr::ORGAN_END);
     void updateVolumeModelMat();
     void precompute();
     bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}

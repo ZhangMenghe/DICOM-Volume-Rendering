@@ -55,56 +55,6 @@ void vrController::setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data
     tex_mask = new Texture(GL_RGBA8UI, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, data);
     delete[]data;
 }
-void vrController::assemble_mask_texture(GLubyte* data, 
-                                        int ph, int pw, int pd, 
-                                        int skipy, int skipx, int skipz,
-                                        int offy, int offx, int offz,
-                                        int nh, int nw, int nd,
-                                        dvr::ORGAN_IDS mask_id){
-    glm::vec3 skip_num = glm::vec3(skipx, skipy, skipz);
-    glm::vec3 shrink_factor = glm::vec3(1.0f/skipx, 1.0f/skipy, 1.0f/skipz);
-    glm::vec3 skip_size = skip_num*4.0f;
-    organMeshRenderer* mrenderer_;
-    if(mask_id >=dvr::ORGAN_END){
-        meshRenderer_ = new organMeshRenderer;
-        mrenderer_ = meshRenderer_;
-    }
-    else{
-        mesh_renders[mask_id] = new organMeshRenderer;
-        mrenderer_ = mesh_renders[mask_id];
-    }
-    int h,w,d;
-    if((offx|offy|offz) == 0){
-        h = int(ph * shrink_factor.y); w = int(pw * shrink_factor.x); d = int(pd * shrink_factor.z);
-    }else{
-        h = int(nh * shrink_factor.y); w = int(nw * shrink_factor.x); d = int(nd * shrink_factor.z);
-        mrenderer_->SetOffsetScale(ph,pw,pd,nh,nw,nd,offy,offx,offz);
-    }
-//    std::cout<<"size: "<<h<<" "<<w<<" "<<d<<std::endl;
-    mrenderer_->Setup(h,w,d,mask_id);
-    GLubyte* mask = new GLubyte[4*h*w*d];
-    GLubyte* mbuff = mask;
-    GLubyte* obuff = data + ph*pw*offz*4;
-    int ori_size = ph*pw*skip_size.z, n_size = w * h * 4;
-
-    for(int di = 0; di < d; di++){
-        int idx = 0;
-        for(int yi = 0, idx_o = offy*pw*4; yi < h; yi++, idx_o+=pw*skip_size.y)
-            for(int xi =0, xi_o=offx*4; xi < w; xi++,xi_o+=skip_size.x){
-                mbuff[4*idx] = obuff[idx_o + xi_o + 2];
-                idx++;
-            }
-        mbuff += n_size;
-        obuff += ori_size;
-    }
-    if(mask_id >=dvr::ORGAN_END)setupSimpleMaskTexture(h,w,d,mask);
-    else{
-        if(tex_masks[mask_id]!= nullptr){delete tex_masks[mask_id]; tex_masks[mask_id]= nullptr;}
-        tex_masks[mask_id] = new Texture(GL_R8UI, GL_RED_INTEGER, GL_UNSIGNED_BYTE, w, h, d, mask);
-        delete[]mask;
-    }
-}
-
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
         if(sh<=0 || sw<=0 || sd<=0){
@@ -145,27 +95,7 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
     delete[]tb_data;
     delete[]vol_data;
     Manager::baked_dirty_ = true;
-
-     assemble_mask_texture(data, ph, pw, pd, 4,4,4,0,0,0,0,0,0);
-
-    // //1:bladder
-    // assemble_mask_texture(data, ph, pw, pd, 4,4,2,0,0,68,512,512,86,dvr::ORGAN_BALDDER);
-
-    // // 2:kidney
-    // assemble_mask_texture(data, ph, pw, pd, 2,4,2,0,0,0,256,512,84, dvr::ORGAN_KIDNEY);
-    
-    // // 4:colon&all
-    // assemble_mask_texture(data, ph, pw, pd, 4,4,4,0,0,0,0,0,0,dvr::ORGAN_COLON);
-    // //8:spleen
-    // //todo:still wrong...
-    //  assemble_mask_texture(data, ph, pw, pd, 1,4,4,0,0,0,128,512,164,dvr::ORGAN_SPLEEN);
-    // //  assemble_mask_texture(data, ph, pw, pd, 4,1,4,0,305,0,512,128,164,dvr::ORGAN_SPLEEN);
-
-    // //16:ileum
-    //  assemble_mask_texture(data, ph, pw, pd, 2,2,2,176,93,59,256,256,97,dvr::ORGAN_ILEUM);
-    // //32 aorta
-    //  assemble_mask_texture(data, ph, pw, pd, 4,2,4,0,93,15,512,256,125,dvr::ORGAN_AROTA);
-
+    meshRenderer_->Setup(ph,pw,pd);
 }
 void vrController::setupCenterLine(int id, float* data){
     int oid = 0;
@@ -184,6 +114,7 @@ void vrController::onViewCreated(bool pre_draw){
     pre_draw_ = pre_draw;
     texvrRenderer_ = new texvrRenderer(pre_draw);
     raycastRenderer_ = new raycastRenderer(pre_draw);
+    meshRenderer_ = new organMeshRenderer;
 }
 
 void vrController::onViewChange(int width, int height){
@@ -209,7 +140,8 @@ void vrController::onDraw() {
                 if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
         }
     }
-    // LOGE("===FPS: %.2f==\n", pm_.Update());
+    Manager::baked_dirty_ = false;
+    //  LOGE("===FPS: %.2f==\n", pm_.Update());
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
@@ -268,7 +200,6 @@ void vrController::precompute(){
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[Manager::color_scheme_id]);
     //todo!!!! add flip stuff
-    // if(pre_draw_)
     bakeShader_->EnableKeyword("FLIPY");
     if(Manager::param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
@@ -304,7 +235,6 @@ void vrController::precompute(){
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     bakeShader_->UnUse();
-    Manager::baked_dirty_ = false;
     isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
 
