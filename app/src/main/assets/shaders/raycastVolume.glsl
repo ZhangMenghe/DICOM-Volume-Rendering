@@ -47,8 +47,11 @@ bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
     vec3 ds21 = s2 - s1; vec3 ds31 = s3 - s1; //should be perpendicular to each other
     float u = dot(dms1, ds21);
     float v = dot(dms1, ds31);
-    return (u >= 0.0 && u <= dot(ds21, ds21)
-    && v >= 0.0 && v <= dot(ds31,ds31));
+    return (u >= 0.0 && v >= 0.0 
+    && u <= dot(ds21, ds21) && v <= dot(ds31,ds31)
+    && length(dms1)<=length(s3-s2));
+    //     return (u >= 0.0 && u <= dot(ds21, ds21)
+    // && v >= 0.0 && v <= dot(ds31,ds31));
 }
 
 vec4 Sample(vec3 p){

@@ -54,7 +54,7 @@ std::vector<float> cutting_value(6, .0f);
 // float cline_data[2][4000 * 3] = {.0f};
 std::vector<float*> cline_data;
 
-
+bool pre_draw = true;
 bool is_pressed = false;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
 	if(is_pressed){
@@ -93,6 +93,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		break;
 	case GLFW_KEY_V:
 		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_VOLUME_ON]);
+		break;
+	case GLFW_KEY_B:
+		ui_.setCheck("Cutting", !Manager::param_bool[dvr::CHECK_CUTTING]);
 		break;
 	default:
 		break;
@@ -134,7 +137,7 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated();
+	controller_.onViewCreated(true);
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 

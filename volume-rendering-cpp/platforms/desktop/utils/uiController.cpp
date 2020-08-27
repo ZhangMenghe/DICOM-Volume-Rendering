@@ -58,14 +58,14 @@ void uiController::InitCheckParam(){
         "Center Line"
     };
     bool values[pnum] = {
+        true,
         false,
-        false,
-        false,
+        true,
         false,
         false,
         true,
         true,
-        false,
+        true,
         false,
         false,
         true

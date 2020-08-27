@@ -19,6 +19,7 @@ DRAW_BAKED(screen_baked){
     cutter_ = new cuttingController;
 }
 void raycastRenderer::Draw() {
+    // if(Manager::param_bool[dvr::CHECK_CUTTING]){draw_scene();return;}
     if (DRAW_BAKED) draw_baked();
     else draw_scene();
 }
@@ -84,7 +85,7 @@ float* raycastRenderer::getCuttingPlane(){
     return cutter_->getCutPlane();
 }
 void raycastRenderer::draw_baked(){
-    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
+    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}//cutter_->Draw();return;}
     if(!cshader_){
         cshader_ = new Shader;
         if(!cshader_->AddShader(GL_COMPUTE_SHADER, Manager::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
@@ -123,6 +124,7 @@ void raycastRenderer::draw_baked(){
 
     //todo: draw screen quad
     screenQuad::instance()->Draw();
+    // cutter_->Draw();
 }
 void raycastRenderer::setDimension(int dims, float thickness){
     if(thickness > 0 ){

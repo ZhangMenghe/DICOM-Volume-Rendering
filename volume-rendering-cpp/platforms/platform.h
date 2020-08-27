@@ -34,7 +34,7 @@
     #include <stdio.h>
     #include <cstring>
     #include <iostream>
-
+    #include <glm/gtx/string_cast.hpp>
 
     #define LOGE(...) printf(__VA_ARGS__)
     #define LOGI(...) printf(__VA_ARGS__)

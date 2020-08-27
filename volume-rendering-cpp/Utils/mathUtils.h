@@ -20,6 +20,16 @@ inline float shortest_distance(float x1, float y1,
 inline glm::vec3 vec3MatNorm(glm::mat4 lmat, glm::vec3 v){
     return glm::normalize(glm::vec3(lmat * glm::vec4(v, 1.0f)));
 }
+    // glm::mat4 rotmat;
+
+    // const glm::vec3 a = p_norm_;
+    // const glm::vec3 b = vec3(0,0,-1.f);
+    // glm::vec3 v = glm::cross(b, a);
+    // if(v == vec3(.0f))rotmat = mat4(1.0f);
+    // else{
+    //     float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
+    //     rotmat = glm::rotate(angle, v);
+    // }
 inline glm::mat4 rotMatFromDir(glm::vec3 dir){
     glm::vec3 rotationZ = dir;
     glm::vec3 rotationX = glm::normalize( glm::cross( glm::vec3( 0, 1, 0 ), rotationZ ) );

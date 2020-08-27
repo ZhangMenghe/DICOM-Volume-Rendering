@@ -114,21 +114,21 @@ void main(void){
     intersect.x = max(.0, intersect.x);
     bool blocked_by_plane=false;
     // plane
-    // #ifdef CUTTING_PLANE
-    // float t;
-    // if(dot(uPlane.normal, -uCamposObjSpace) > .0){
-    //     t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
-    //     blocked_by_plane = (t <= intersect.x);
-    //     intersect.x = max(intersect.x, t);
-    // }
-    // else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
+    #ifdef CUTTING_PLANE
+        float t;
+        if(dot(uPlane.normal, -uCamposObjSpace) > .0){
+            t = RayPlane(ro, rd, uPlane.p, uPlane.normal);
+            blocked_by_plane = (t <= intersect.x);
+            intersect.x = max(intersect.x, t);
+        }
+        else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-    // if(blocked_by_plane && intersect.x <= intersect.y){
-    //     vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
-    //     fragColor = mix(traced_color, vec4(.0f, .0f, .0f, 1.0f), 1.0-traced_color.a);
-    // }
-    // #endif
-
+        if(blocked_by_plane && intersect.x <= intersect.y){
+            vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+            fragColor = mix(traced_color, vec4(.0f, .0f, .0f, 1.0f), 1.0-traced_color.a);
+            return;
+        }
+    #endif
 
     if(intersect.y < intersect.x || blocked_by_plane) discard;
     fragColor = Volume(ro + 0.5, rd, intersect.x, intersect.y);
