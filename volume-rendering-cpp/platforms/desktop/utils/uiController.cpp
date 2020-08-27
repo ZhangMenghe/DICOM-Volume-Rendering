@@ -60,7 +60,7 @@ void uiController::InitCheckParam(){
     bool values[pnum] = {
         true,
         false,
-        true,
+        false,
         false,
         false,
         true,

@@ -28,9 +28,9 @@ private:
     GLuint pVAO_ = 0;
 
     const glm::vec4 P_Points[3] = {
-        glm::vec4(-1.0f,1.0f,.0f,1.0f),
-                glm::vec4(1.0f,1.0f,.0f,1.0f),
-                glm::vec4(-1.0f,-1.0f,.0f,1.0f)
+        glm::vec4(-0.5f,0.5f,.0f,1.0f),
+                glm::vec4(0.5f,0.5f,.0f,1.0f),
+                glm::vec4(-0.5f,-0.5f,.0f,1.0f)
     };
     //in object coordinate
     glm::vec3 p_start_, p_norm_, p_point_;

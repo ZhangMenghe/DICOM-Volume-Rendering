@@ -64,7 +64,7 @@ void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
 //    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
-    if(includePoints){
+    // if(includePoints){
         // mat4 p2m_mat = inverse(vrController::instance()->getModelMatrix())*p_p2w_mat;
         vec3 pms[3];int i=0;
         for(vec4 p: P_Points)
@@ -74,7 +74,7 @@ void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
         Shader::Uniform(sp,"uPlane.s2", pms[1]);
         Shader::Uniform(sp,"uPlane.s3", pms[2]);
         Shader::Uniform(sp, "u_plane_color", plane_color_);
-    }
+    // }
 }
 
 void cuttingController::draw_plane(){
@@ -94,13 +94,13 @@ void cuttingController::draw_plane(){
     Shader::Uniform(sp,"uBaseColor", vec4(1.0,1.0,.0,1.0));//plane_color_);
     if (!pVAO_) {
         float vertices[] = {
-                1.0f,1.0f,.0f,
-                -1.0f,1.0f,.0f,
-                -1.0f,-1.0f,.0f,
+                0.5f,0.5f,.0f,
+                -0.5f,0.5f,.0f,
+                -0.5f,-0.5f,.0f,
 
-                -1.0f,-1.0f,.0f,
-                1.0f,-1.0f,.0f,
-                1.0f,1.0f,.0f,
+                -0.5f,-0.5f,.0f,
+                0.5f,-0.5f,.0f,
+                0.5f,0.5f,.0f,
         };
         unsigned int VBO = 0;
         glGenVertexArrays(1, &pVAO_);
@@ -178,8 +178,7 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
     p_rotate_mat_ = rotMatFromDir(pNorm);
     glm::vec3 vp_obj = vec3MatNorm(vm_inv, Manager::camera->getCameraPosition());
     //cloest point
-    p_start_ = cloestVertexToPlane(pNorm, vp_obj);
-    // std::cout<<"p start"<<glm::to_string(p_start_)<<std::endl;
-
-    // p_start_ = glm::vec3(.0f);
+    p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
+    //debug
+    // p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
 }

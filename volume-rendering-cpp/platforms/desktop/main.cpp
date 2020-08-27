@@ -137,7 +137,7 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(true);
+	controller_.onViewCreated(false);
 	overlayController::instance()->onViewCreated();
 	get_center_line_points();
 
