@@ -97,7 +97,7 @@ void vrController::setupCenterLine(int id, float* data){
     while(id/=2)oid++;
     line_renderers_[oid] = new centerLineRenderer(oid);
     line_renderers_[oid]->updateVertices(4000, data);
-    // delete[]data;
+    cutter_->setupCenterLine((dvr::ORGAN_IDS)oid, data);
 }
 
 //1-baldder, 2-kidn 4 color 8 spleen
@@ -121,8 +121,10 @@ void vrController::onViewChange(int width, int height){
 void vrController::onDraw() {
     if(!tex_volume) return;
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
+    //ORDER REALLY MATTERS!!!!
 
-    cutter_->UpdateAndDraw();
+    cutter_->Update();
+    if(Manager::param_bool[dvr::CHECK_CUTTING])cutter_->Draw();
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
         if(isRayCasting())  raycastRenderer_->Draw();
@@ -137,7 +139,7 @@ void vrController::onDraw() {
                 if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
         }
     }
-
+    if(Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL])cutter_->Draw();
     Manager::baked_dirty_ = false;
     //  LOGE("===FPS: %.2f==\n", pm_.Update());
 }
@@ -281,6 +283,9 @@ float* vrController::getCuttingPlane(){
 void vrController::setCuttingParams(GLuint sp, bool includePoints){
     cutter_->setCuttingParams(sp, includePoints);
 }
+void vrController::SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id){
+    cutter_->SwitchCuttingPlane(cut_plane_id);
+}
 
 void vrController::setDualParameter(int id, float lv, float rv){
 //    if(id == CONTRAST_LIMIT){contrast_low=lv; contrast_high=rv;baked_dirty_=true;}
@@ -298,4 +303,3 @@ float* vrController::getCurrentReservedStates(){
     memcpy(data+28, glm::value_ptr(Manager::camera->getViewCenter()), 3* sizeof(float));
     return data;
 }
-

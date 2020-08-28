@@ -17,20 +17,21 @@ cuttingController::cuttingController(){
     auto model_mat = vrController::instance()->getModelMatrix();
     mat4 vm_inv = transpose(inverse(model_mat));
     update_plane_(vec3MatNorm(vm_inv, Manager::camera->getViewDirection()));
-
-    p_point_ = p_start_;
-    p_point_world = glm::vec3(model_mat* glm::vec4(p_point_,1.0f));
-
-    update_modelMat_o();
-
+    onReset();
     _mptr = this;
 }
 cuttingController::cuttingController(glm::vec3 ps, glm::vec3 pn):
 p_start_(ps), p_norm_(pn){
-    p_point_ = p_start_;
     p_rotate_mat_ = rotMatFromDir(pn);
-    update_modelMat_o();
+    onReset();
     _mptr = this;
+}
+void cuttingController::onReset(){
+    p_point_ = p_start_;
+    // p_point_world = glm::vec3(model_mat* glm::vec4(p_point_,1.0f));
+    update_modelMat_o();
+    p_scale = glm::vec3(1.0);
+    rc.norm=p_norm_;rc.point=p_point_;rc.scale=p_scale;
 }
 void cuttingController::Update(){
     update_modelMat_o();
@@ -53,11 +54,11 @@ void cuttingController::Update(){
     }
 }
 void cuttingController::Draw(){
-    if(Manager::param_bool[dvr::CHECK_CUTTING]) draw_plane();
+    if(Manager::param_bool[dvr::CHECK_CUTTING] || Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]) draw_plane();
 }
 void cuttingController::UpdateAndDraw(){
     Update();
-    if(Manager::param_bool[dvr::CHECK_CUTTING]) draw_plane();
+    if(Manager::param_bool[dvr::CHECK_CUTTING] || Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]) draw_plane();
 }
 void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
 //    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
@@ -80,8 +81,8 @@ void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
 void cuttingController::draw_plane(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    // glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LESS);
     if(!pshader){
         pshader = new Shader();
         if(!pshader->AddShader(GL_VERTEX_SHADER,Manager::shader_contents[dvr::SHADER_CPLANE_VERT])
@@ -123,7 +124,7 @@ void cuttingController::draw_plane(){
     glDrawArrays(GL_TRIANGLES, 0, 6);
     pshader->UnUse();
         glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
+    // glDisable(GL_DEPTH_TEST);
 }
 
 void cuttingController::setCutPlane(float value){
@@ -188,4 +189,46 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
     // p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
     //debug
     p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
+}
+void cuttingController::SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id){
+    if(cut_plane_id == dvr::CHECK_CUTTING && last_mode==dvr::CHECK_CENTER_LINE_TRAVEL){
+        rt.norm=p_norm_;rt.point=p_point_;rt.scale=p_scale;
+        p_scale = rc.scale;
+        setCutPlane(rc.point,rc.norm);
+        last_mode = dvr::CHECK_CUTTING;
+    }else if(cut_plane_id == dvr::CHECK_CENTER_LINE_TRAVEL && last_mode == dvr::CHECK_CUTTING){
+        rc.norm=p_norm_;rc.point=p_point_;rc.scale=p_scale;
+        p_scale = rt.scale;
+        setCutPlane(rt.point,rt.norm);
+        last_mode = dvr::CHECK_CENTER_LINE_TRAVEL;
+    }
+}
+void cuttingController::set_centerline_cutting(int& id, glm::vec3& pp, glm::vec3& pn){
+	id = fmax(id, center_sample_gap);
+	id = fmin(id,3999-center_sample_gap);
+
+	float * data = pmap[dvr::ORGAN_COLON];
+	pp = glm::vec3(data[3*id],data[3*id+1],data[3*id+2]);
+	pn = glm::vec3(data[3*(id+center_sample_gap)], data[3*(id+center_sample_gap)+1], data[3*(id+center_sample_gap)+2]) 
+        - glm::vec3(data[3*(id-center_sample_gap)], data[3*(id-center_sample_gap)+1], data[3*(id-center_sample_gap)+2]);
+	if(glm::dot(pn,glm::vec3(0,0,-1)) < .0f) pn=-pn;
+	// setCutPlane(pp, pn);
+}
+void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
+    pmap[id] = data;
+    if(id == dvr::ORGAN_COLON){
+        clp_id_ = 0;
+        glm::vec3 pp, pn;
+        set_centerline_cutting(clp_id_,pp,pn);
+        rt.norm=pn;rt.point=pp;rt.scale=glm::vec3(0.1f);
+    }
+}
+void cuttingController::setCenterLinePos(int id, int delta_id){
+    if(delta_id == 0){
+        clp_id_ = id%4000;
+    }else{
+        clp_id_=(clp_id_+delta_id)%4000;
+    }
+    set_centerline_cutting(clp_id_, p_point_, p_norm_);
+    setCutPlane(p_point_, p_norm_);
 }

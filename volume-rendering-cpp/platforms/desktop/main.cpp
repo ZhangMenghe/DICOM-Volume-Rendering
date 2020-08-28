@@ -81,16 +81,16 @@ void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 	float f = 1.0 + yoffset * 0.1f;
 	controller_.onScale(f, f);
 }
-void set_centerline_cutting(int id, int gap){
-	id = fmax(id, gap);
-	id = fmin(id,3999-gap);
+// void set_centerline_cutting(int id, int gap){
+// 	id = fmax(id, gap);
+// 	id = fmin(id,3999-gap);
 
-	float * data = cline_data[0];
-	glm::vec3 pp = glm::vec3(data[3*id],data[3*id+1],data[3*id+2]);
-	glm::vec3 pn = glm::vec3(data[3*(id+gap)], data[3*(id+gap)+1], data[3*(id+gap)+2]) - glm::vec3(data[3*(id-gap)], data[3*(id-gap)+1], data[3*(id-gap)+2]);
-	if(glm::dot(pn,glm::vec3(0,0,-1)) < .0f)pn=-pn;
-	controller_.setCuttingPlane(pp, pn);
-}
+// 	float * data = cline_data[0];
+// 	glm::vec3 pp = glm::vec3(data[3*id],data[3*id+1],data[3*id+2]);
+// 	glm::vec3 pn = glm::vec3(data[3*(id+gap)], data[3*(id+gap)+1], data[3*(id+gap)+2]) - glm::vec3(data[3*(id-gap)], data[3*(id-gap)+1], data[3*(id-gap)+2]);
+// 	if(glm::dot(pn,glm::vec3(0,0,-1)) < .0f)pn=-pn;
+// 	controller_.setCuttingPlane(pp, pn);
+// }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
 	if(action==GLFW_RELEASE) return;
 	switch (key)
@@ -104,14 +104,30 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	case GLFW_KEY_V:
 		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_VOLUME_ON]);
 		break;
-	case GLFW_KEY_T:
+	case GLFW_KEY_C:
 		ui_.setCheck("Cutting", !Manager::param_bool[dvr::CHECK_CUTTING]);
+		if(Manager::param_bool[dvr::CHECK_CUTTING]){
+			ui_.setCheck("Center Line Travel",false);
+			std::cout<<"switch to cutting plane mode"<<std::endl;
+			controller_.SwitchCuttingPlane(dvr::CHECK_CUTTING);
+		}
+		break;
+	case GLFW_KEY_T:
+		ui_.setCheck("Center Line Travel", !Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]);
 		//reset to start of 
-		if(Manager::param_bool[dvr::CHECK_CUTTING]) set_centerline_cutting(0,2);
+		if(Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+			// set_centerline_cutting(0, 2);
+			ui_.setCheck("Cutting", false);
+			std::cout<<"switch to traversal mode"<<std::endl;
+			controller_.SwitchCuttingPlane(dvr::CHECK_CENTER_LINE_TRAVEL);
+		}
 		break;
 	case GLFW_KEY_N:
-		if(Manager::param_bool[dvr::CHECK_CUTTING]) {set_centerline_cutting((cid%4000),1);cid+=5;}
-		break;		
+		if(Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]) {
+			// set_centerline_cutting((cid%4000),1);cid+=5;
+			controller_.setCenterLinePos(0, 5);
+			}
+		break;
 	default:
 		break;
 	}

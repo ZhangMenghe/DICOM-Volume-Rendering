@@ -17,7 +17,6 @@ DRAW_BAKED(screen_baked){
     Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
 }
 void raycastRenderer::Draw() {
-    // if(Manager::param_bool[dvr::CHECK_CUTTING]){draw_scene();return;}
     if (DRAW_BAKED) draw_baked();
     else draw_scene();
 }
