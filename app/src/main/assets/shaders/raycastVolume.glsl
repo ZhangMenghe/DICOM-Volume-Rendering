@@ -161,10 +161,14 @@ vec4 tracing(float u, float v){
 
     drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
 
-    if(blocked_by_plane && intersect.x <= intersect.y) return drawed_square?mix(u_plane_color, Volume(ro + 0.5, rd, intersect.x, intersect.y), u_plane_color.a): Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    if(blocked_by_plane && intersect.x <= intersect.y || abs(intersect.x - t) < 0.01) {
+        vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+        if(traced_color.a > 1e-5) return traced_color;
+        return drawed_square?mix(u_plane_color, traced_color , u_plane_color.a): traced_color;
+    }
+
     #endif
     if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);
-
     return Volume(ro + 0.5, rd, intersect.x, intersect.y);
 }
 void main() {
