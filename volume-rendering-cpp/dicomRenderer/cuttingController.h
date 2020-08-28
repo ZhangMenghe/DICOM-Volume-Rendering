@@ -48,9 +48,10 @@ private:
 
     //reserved params
     struct reservedVec{
-        glm::vec3 norm, point, scale;
+        glm::vec3 point, scale;
+        glm::mat4 rotate_mat;
+        float move_value;
         reservedVec(){}
-        reservedVec(glm::vec3 n, glm::vec3 p, glm::vec3 s){norm=n;point=p;scale=s;}
     };
 
     int clp_id_;

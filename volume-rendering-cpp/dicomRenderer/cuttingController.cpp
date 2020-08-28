@@ -31,7 +31,7 @@ void cuttingController::onReset(){
     // p_point_world = glm::vec3(model_mat* glm::vec4(p_point_,1.0f));
     update_modelMat_o();
     p_scale = glm::vec3(1.0);
-    rc.norm=p_norm_;rc.point=p_point_;rc.scale=p_scale;
+    rc.point=p_point_;rc.scale=p_scale;rc.rotate_mat=p_rotate_mat_;rc.move_value=cmove_value;
 }
 void cuttingController::Update(){
     update_modelMat_o();
@@ -192,14 +192,24 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
 }
 void cuttingController::SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id){
     if(cut_plane_id == dvr::CHECK_CUTTING && last_mode==dvr::CHECK_CENTER_LINE_TRAVEL){
-        rt.norm=p_norm_;rt.point=p_point_;rt.scale=p_scale;
+        rt.point=p_point_;rt.scale=p_scale;rt.rotate_mat=p_rotate_mat_;rt.move_value=cmove_value;
         p_scale = rc.scale;
-        setCutPlane(rc.point,rc.norm);
+        // setCutPlane(rc.point,rc.norm);
+        p_point_ = rc.point;
+        cmove_value = rc.move_value;
+        p_p2o_dirty = true;
+        update_plane_(rc.rotate_mat);
+
         last_mode = dvr::CHECK_CUTTING;
     }else if(cut_plane_id == dvr::CHECK_CENTER_LINE_TRAVEL && last_mode == dvr::CHECK_CUTTING){
-        rc.norm=p_norm_;rc.point=p_point_;rc.scale=p_scale;
+        rc.point=p_point_;rc.scale=p_scale;rc.rotate_mat=p_rotate_mat_;rc.move_value=cmove_value;
         p_scale = rt.scale;
-        setCutPlane(rt.point,rt.norm);
+        // setCutPlane(rt.point,rt.norm);
+        p_point_ = rt.point;
+        cmove_value = rt.move_value;
+        p_p2o_dirty = true;
+        update_plane_(rt.rotate_mat);
+
         last_mode = dvr::CHECK_CENTER_LINE_TRAVEL;
     }
 }
@@ -220,7 +230,7 @@ void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
         clp_id_ = 0;
         glm::vec3 pp, pn;
         set_centerline_cutting(clp_id_,pp,pn);
-        rt.norm=pn;rt.point=pp;rt.scale=glm::vec3(0.1f);
+        rt.point=pp;rt.scale=glm::vec3(0.1f);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
     }
 }
 void cuttingController::setCenterLinePos(int id, int delta_id){
