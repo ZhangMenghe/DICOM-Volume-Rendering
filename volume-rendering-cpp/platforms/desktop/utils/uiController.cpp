@@ -43,7 +43,7 @@ void uiController::InitAllTuneParam(){
 }
 
 void uiController::InitCheckParam(){
-    const int pnum = 11;
+    const int pnum = 12;
     const char* keys[pnum] = {
         "Raycasting",
         "Overlays",
@@ -55,19 +55,21 @@ void uiController::InitCheckParam(){
         "Volume",
         "Mesh",
         "Wireframe",
-        "Center Line"
+        "Center Line",
+        "Center Line Travel"
     };
     bool values[pnum] = {
         true,
         false,
         false,
-        false,
+        true,
         false,
         true,
         true,
         true,
         false,
         false,
+        true,
         true
     };
     InitCheckParam(pnum, keys, values);

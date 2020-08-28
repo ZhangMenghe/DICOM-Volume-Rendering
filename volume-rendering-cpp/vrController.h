@@ -5,6 +5,7 @@
 #include <dicomRenderer/raycastRenderer.h>
 #include <dicomRenderer/organMeshRenderer.h>
 #include <dicomRenderer/centerLineRenderer.h>
+#include <dicomRenderer/cuttingController.h>
 #include <Utils/perfMonitor.h>
 #include <GLPipeline/Texture.h>
 #include "nEntrance.h"
@@ -21,7 +22,6 @@ public:
 
     vrController();
     ~vrController();
-    void setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data);
     void assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num = 4);
     void setupCenterLine(int id, float* data);
     /*Override*/
@@ -49,13 +49,12 @@ public:
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}
-    GLuint getMaskTex(){return tex_mask->GLTexture();}
-    GLuint getMaskTex(int mask_id){return tex_masks[mask_id]->GLTexture();}
     glm::mat4 getModelMatrix(bool dim_scaled = false){
         return dim_scaled?ModelMat_ * raycastRenderer_->getDimScaleMat():ModelMat_;}
     glm::mat4 getRotationMatrix(){return RotateMat_;}
     float* getCurrentReservedStates();
     float* getCuttingPlane();
+    void setCuttingParams(GLuint sp, bool includePoints = false);
 private:
     static vrController* myPtr_;
 
@@ -65,12 +64,13 @@ private:
     organMeshRenderer* meshRenderer_ = nullptr;
     std::vector<organMeshRenderer*> mesh_renders;
     std::unordered_map<int, centerLineRenderer*> line_renderers_;
+    cuttingController* cutter_;
+
     //Shader
     Shader* bakeShader_ = nullptr;
 
     //Textures
-    Texture *tex_volume = nullptr, *tex_baked = nullptr, *tex_mask = nullptr;
-    std::vector<Texture*> tex_masks;
+    Texture *tex_volume = nullptr, *tex_baked = nullptr;
 
     struct reservedStatus{
         glm::mat4 model_mat, rot_mat;

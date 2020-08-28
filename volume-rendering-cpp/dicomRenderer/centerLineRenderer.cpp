@@ -38,7 +38,7 @@ void centerLineRenderer::onDraw(glm::mat4 model_mat){
 }
 void centerLineRenderer::draw_scene(glm::mat4 model_mat){   
     GLuint sp = shader_.Use();
-    Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat()*model_mat);
+    Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat()*model_mat);
     glBindVertexArray(vao_);
 
     glDrawArrays(GL_LINE_STRIP, 0, draw_point_num);

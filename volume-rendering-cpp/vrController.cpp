@@ -26,7 +26,6 @@ vrController::~vrController(){
 vrController::vrController(){
     onReset();
     mesh_renders = std::vector<organMeshRenderer*>(dvr::ORGAN_END, nullptr);
-    tex_masks = std::vector<Texture*>(dvr::ORGAN_END, nullptr);
     myPtr_ = this;
 }
 void vrController::onReset() {
@@ -50,11 +49,7 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
     ModelMat_=mm; RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv; Manager::camera=rStates_[cst_name].vcam;
     volume_model_dirty = false;
 }
-void vrController::setupSimpleMaskTexture(int ph, int pw, int pd, GLubyte * data){
-    if(tex_mask!= nullptr){delete tex_mask; tex_mask= nullptr;}
-    tex_mask = new Texture(GL_RGBA8UI, GL_RGBA_INTEGER, GL_UNSIGNED_BYTE, pw, ph, pd, data);
-    delete[]data;
-}
+
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
         if(sh<=0 || sw<=0 || sd<=0){
@@ -102,7 +97,7 @@ void vrController::setupCenterLine(int id, float* data){
     while(id/=2)oid++;
     line_renderers_[oid] = new centerLineRenderer(oid);
     line_renderers_[oid]->updateVertices(4000, data);
-    delete[]data;
+    // delete[]data;
 }
 
 //1-baldder, 2-kidn 4 color 8 spleen
@@ -115,6 +110,7 @@ void vrController::onViewCreated(bool pre_draw){
     texvrRenderer_ = new texvrRenderer(pre_draw);
     raycastRenderer_ = new raycastRenderer(pre_draw);
     meshRenderer_ = new organMeshRenderer;
+    cutter_ = new cuttingController;
 }
 
 void vrController::onViewChange(int width, int height){
@@ -126,6 +122,7 @@ void vrController::onDraw() {
     if(!tex_volume) return;
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
 
+    cutter_->UpdateAndDraw();
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
         if(isRayCasting())  raycastRenderer_->Draw();
@@ -140,6 +137,7 @@ void vrController::onDraw() {
                 if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
         }
     }
+
     Manager::baked_dirty_ = false;
     //  LOGE("===FPS: %.2f==\n", pm_.Update());
 }
@@ -271,14 +269,17 @@ void vrController::setMVPStatus(std::string status_name){
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
 void vrController::setCuttingPlane(float value){
-    if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);
+    if(isRayCasting()) cutter_->setCutPlane(value);
     else texvrRenderer_->setCuttingPlane(value);
 }
 void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
-    if(isRayCasting()) raycastRenderer_->setCuttingPlane(pp, pn);
+    cutter_->setCutPlane(pp, pn);
 }
 float* vrController::getCuttingPlane(){
-    return raycastRenderer_->getCuttingPlane();
+    return cutter_->getCutPlane();
+}
+void vrController::setCuttingParams(GLuint sp, bool includePoints){
+    cutter_->setCuttingParams(sp, includePoints);
 }
 
 void vrController::setDualParameter(int id, float lv, float rv){

@@ -50,12 +50,12 @@ std::string ds_path = "dicom-data/IRB01/2100_FATPOSTCORLAVAFLEX20secs/";
 // glm::vec3 vol_dims = glm::vec3(512,512,216);
 glm::vec3 vol_dims = glm::vec3(512,512,164);
 
-std::vector<float> cutting_value(6, .0f);
 // float cline_data[2][4000 * 3] = {.0f};
 std::vector<float*> cline_data;
 
 bool pre_draw = true;
 bool is_pressed = false;
+int cid = 2;
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos){
 	if(is_pressed){
 		controller_.onTouchMove(float(xpos), float(ypos));
@@ -81,6 +81,16 @@ void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 	float f = 1.0 + yoffset * 0.1f;
 	controller_.onScale(f, f);
 }
+void set_centerline_cutting(int id, int gap){
+	id = fmax(id, gap);
+	id = fmin(id,3999-gap);
+
+	float * data = cline_data[0];
+	glm::vec3 pp = glm::vec3(data[3*id],data[3*id+1],data[3*id+2]);
+	glm::vec3 pn = glm::vec3(data[3*(id+gap)], data[3*(id+gap)+1], data[3*(id+gap)+2]) - glm::vec3(data[3*(id-gap)], data[3*(id-gap)+1], data[3*(id-gap)+2]);
+	if(glm::dot(pn,glm::vec3(0,0,-1)) < .0f)pn=-pn;
+	controller_.setCuttingPlane(pp, pn);
+}
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
 	if(action==GLFW_RELEASE) return;
 	switch (key)
@@ -94,9 +104,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	case GLFW_KEY_V:
 		ui_.setCheck("Volume", !Manager::param_bool[dvr::CHECK_VOLUME_ON]);
 		break;
-	case GLFW_KEY_B:
+	case GLFW_KEY_T:
 		ui_.setCheck("Cutting", !Manager::param_bool[dvr::CHECK_CUTTING]);
+		//reset to start of 
+		if(Manager::param_bool[dvr::CHECK_CUTTING]) set_centerline_cutting(0,2);
 		break;
+	case GLFW_KEY_N:
+		if(Manager::param_bool[dvr::CHECK_CUTTING]) {set_centerline_cutting((cid%4000),1);cid+=5;}
+		break;		
 	default:
 		break;
 	}

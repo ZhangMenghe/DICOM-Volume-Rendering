@@ -4,10 +4,8 @@
 #include <GLPipeline/Mesh.h>
 #include <GLPipeline/Shader.h>
 #include <GLPipeline/Texture.h>
-#include "cuttingController.h"
 class raycastRenderer{
 private:
-    cuttingController* cutter_;
     Shader* shader_= nullptr, *cshader_ = nullptr;
     GLuint vao_cube_= 0;
     GLuint frame_buff_ = 0;

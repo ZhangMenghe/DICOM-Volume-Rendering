@@ -64,7 +64,7 @@ void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
 //    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
-    // if(includePoints){
+    if(includePoints){
         // mat4 p2m_mat = inverse(vrController::instance()->getModelMatrix())*p_p2w_mat;
         vec3 pms[3];int i=0;
         for(vec4 p: P_Points)
@@ -74,10 +74,14 @@ void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
         Shader::Uniform(sp,"uPlane.s2", pms[1]);
         Shader::Uniform(sp,"uPlane.s3", pms[2]);
         Shader::Uniform(sp, "u_plane_color", plane_color_);
-    // }
+    }
 }
 
 void cuttingController::draw_plane(){
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
     if(!pshader){
         pshader = new Shader();
         if(!pshader->AddShader(GL_VERTEX_SHADER,Manager::shader_contents[dvr::SHADER_CPLANE_VERT])
@@ -91,7 +95,7 @@ void cuttingController::draw_plane(){
 
     Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat()* p_p2w_mat);
     
-    Shader::Uniform(sp,"uBaseColor", vec4(1.0,1.0,.0,1.0));//plane_color_);
+    Shader::Uniform(sp,"uBaseColor", plane_color_);
     if (!pVAO_) {
         float vertices[] = {
                 0.5f,0.5f,.0f,
@@ -118,6 +122,8 @@ void cuttingController::draw_plane(){
     glBindVertexArray(pVAO_);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     pshader->UnUse();
+        glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
 }
 
 void cuttingController::setCutPlane(float value){
@@ -130,8 +136,9 @@ bool cuttingController::keep_cutting_position(){
     return Manager::param_bool[dvr::CHECK_FREEZE_CPLANE];
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
-void cuttingController::setCutPlane(glm::vec3 startPoint, glm::vec3 normal){
-    p_norm_ = glm::normalize(normal); p_point_=startPoint;
+void cuttingController::setCutPlane(glm::vec3 pp, glm::vec3 normal){
+    p_norm_ = glm::normalize(normal); p_point_=pp;
+
     p_rotate_mat_ = rotMatFromDir(p_norm_);
     cmove_value = .0f;
     p_p2o_dirty = true;
@@ -178,7 +185,7 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
     p_rotate_mat_ = rotMatFromDir(pNorm);
     glm::vec3 vp_obj = vec3MatNorm(vm_inv, Manager::camera->getCameraPosition());
     //cloest point
-    p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
+    // p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
     //debug
-    // p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
+    p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
 }

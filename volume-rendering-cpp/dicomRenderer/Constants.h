@@ -14,7 +14,8 @@ namespace dvr{
         CHECK_VOLUME_ON,
         CHECK_DRAW_POLYGON,
         CHECK_POLYGON_WIREFRAME,
-        CHECK_CENTER_LINE
+        CHECK_CENTER_LINE,
+        CHECK_CENTER_LINE_TRAVEL
     };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
