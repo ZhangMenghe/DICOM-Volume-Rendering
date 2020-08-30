@@ -41,6 +41,7 @@ public:
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
     void setCuttingPlane(float value);
+    void setCuttingPlane(int id, int delta);
     void setCuttingPlane(glm::vec3 pp, glm::vec3 pn);
     void setDualParameter(int id, float lv, float rv);
     void setRenderParam(int id, float value);

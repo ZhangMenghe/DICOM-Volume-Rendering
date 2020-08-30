@@ -65,6 +65,11 @@ public class JUIInterface {
         JUIsetCuttingPlaneNative(id, value);
         if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, id, value);
     }
+    static void JUIsetCuttingPlaneDelta(int id, int delta){
+        JUIsetCuttingPlaneDeltaNative(id, delta);
+        //todo :
+        //        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, id, value);
+    }
 
     static float[] JUIgetCuttingPlaneStatus(){
         return JUIgetCuttingPlaneStatusNative();
@@ -113,6 +118,7 @@ public class JUIInterface {
 
     public static native float[] JUIgetVCStatesNative();
     public static native void JUIsetCuttingPlaneNative(int id, float value);
+    public static native void JUIsetCuttingPlaneDeltaNative(int id, int delta);
     public static native float[] JUIgetCuttingPlaneStatusNative();
     public static native void JUIsetMaskBitsNative(int num, int mbits);
     public static native void JUIsetColorSchemeNative(int id);

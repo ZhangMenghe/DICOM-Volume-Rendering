@@ -153,3 +153,10 @@ void texvrRenderer::setCuttingPlane(float percent){
     cut_id = int(dimensions * percent);
     baked_dirty_ = true;
 }
+void texvrRenderer::setCuttingPlaneDelta(int delta){
+    LOGE("====PREV: %d, %d==", cut_id, delta);
+    cut_id = ((int)fmax(0, cut_id + delta))%dimensions;
+    LOGE("====after: %d==", cut_id);
+
+    baked_dirty_ = true;
+}

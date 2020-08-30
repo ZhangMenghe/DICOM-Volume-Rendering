@@ -4,17 +4,16 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.support.design.widget.FloatingActionButton;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.common.primitives.Floats;
 
@@ -32,7 +31,7 @@ public class cutplaneUIs extends BasePanel{
 
     //widgets
     private SeekBar seek_bar_;
-    private FloatingActionButton button_;
+    private Button btn_next, btn_prev;
 
     private ctCheckboxListAdapter cbAdapter_;
     private final static float[]default_cut_pose={0,0,0,0,0,-1};
@@ -66,35 +65,22 @@ public class cutplaneUIs extends BasePanel{
         });
 
         //setup button
-        button_ = panel_.findViewById(R.id.cutting_button);
-        button_.setOnTouchListener(new View.OnTouchListener(){
-            float down_v_x, down_e_x;
-            float e_v_offset;
+        btn_next = panel_.findViewById(R.id.cut_next_button);
+        btn_next.setOnTouchListener(new View.OnTouchListener(){
             public boolean onTouch(View view, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        down_v_x = view.getX();
-                        down_e_x = event.getRawX();
-                        e_v_offset = down_v_x - down_e_x;
-                        break;
-
-                    case MotionEvent.ACTION_MOVE:
-                        JUIInterface.JUIsetCuttingPlane(UIsManager.raycast_id, event.getRawX() - down_e_x);
-                        view.setX(e_v_offset + event.getRawX());
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        view.setX(down_v_x);
-                        break;
-                    case MotionEvent.ACTION_BUTTON_PRESS:
-
-                    default:
-                        return false;
-                }
+                JUIInterface.JUIsetCuttingPlaneDelta(0, 1);
                 return true;
             }
-
         });
+
+        btn_prev = panel_.findViewById(R.id.cut_prev_button);
+        btn_prev.setOnTouchListener(new View.OnTouchListener(){
+            public boolean onTouch(View view, MotionEvent event) {
+                JUIInterface.JUIsetCuttingPlaneDelta(0, -1);
+                return true;
+            }
+        });
+
         sub_panels_.add(panel_);
 
         setup_checks(
@@ -154,13 +140,9 @@ public class cutplaneUIs extends BasePanel{
         super.showHidePanel(show_panel);
 
         if(isRaycast){
-            button_.show();
             seek_bar_.setVisibility(View.INVISIBLE);
-            if(panel_visible)Toast.makeText(actRef.get(), "Drag Bottom Button to Change", Toast.LENGTH_LONG).show();
         }else{
-            button_.hide();
             seek_bar_.setVisibility(View.VISIBLE);
-            if(panel_visible)Toast.makeText(actRef.get(), "Use Bottom SeekBar to Cut", Toast.LENGTH_LONG).show();
         }
     }
     public void onTexRayChange(boolean isRaycast){

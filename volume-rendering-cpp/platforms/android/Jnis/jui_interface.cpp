@@ -83,6 +83,9 @@ JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv *, jclass, jint id, jfloat val
 //    vrController::baked_dirty_ = true;
     vrController::instance()->setCuttingPlane(value);
 }
+JUI_METHOD(void, JUIsetCuttingPlaneDeltaNative)(JNIEnv * env, jclass, jint id, jint delta){
+    vrController::instance()->setCuttingPlane(id, delta);
+}
 JUI_METHOD(void, JUIsetMaskBitsNative)(JNIEnv * env, jclass, jint num, jint mbits){
     vrController::instance()->mask_num_ = (unsigned int)num;
     vrController::instance()->mask_bits_ = (unsigned int)mbits;

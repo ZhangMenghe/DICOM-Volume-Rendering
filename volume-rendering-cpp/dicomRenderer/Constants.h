@@ -25,6 +25,10 @@ namespace dvr{
         TUNE_CENTER,
         TUNE_END
     };
+    enum PARAM_CUT_ID{
+        CUT_CUTTING_PLANE=0,
+        CUT_TRAVERSAL
+    };
     enum PARAM_DUAL{
         CONTRAST_LIMIT=0,
         DUAL_END

@@ -22,7 +22,7 @@ typedef enum{
 class cuttingController {
 private:
     const int center_sample_gap = 1;
-    
+    float CMOVE_UNIT_SIZE = 0.05f;
     cPlane cplane_;
     cSphere csphere_;
 
@@ -83,8 +83,10 @@ public:
     void SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id);
     void setupCenterLine(dvr::ORGAN_IDS id, float* data);
     void setCenterLinePos(int id, int delta_id = 0);
+    void setDimension(int pd){CMOVE_UNIT_SIZE = 1.0f / (float)pd;}
 
     void setCutPlane(float value);
+    void setCuttingPlaneDelta(int delta);
     void setCutPlane(glm::vec3 normal);
     void setCutPlane(glm::vec3 startPoint, glm::vec3 normal);
     float* getCutPlane();

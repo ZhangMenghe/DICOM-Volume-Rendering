@@ -144,6 +144,13 @@ void cuttingController::setCutPlane(glm::vec3 pp, glm::vec3 normal){
     cmove_value = .0f;
     p_p2o_dirty = true;
 }
+void cuttingController::setCuttingPlaneDelta(int delta){
+    float value = delta * CMOVE_UNIT_SIZE;
+    if(keep_cutting_position()) {cmove_value =  value; return;}
+    p_point_ += p_norm_ * value;
+    cmove_value = .0f;
+    p_p2o_dirty = true;
+}
 float* cuttingController::getCutPlane(){
     float* data = new float[6];
     memcpy(data, glm::value_ptr(p_point_), 3* sizeof(float));

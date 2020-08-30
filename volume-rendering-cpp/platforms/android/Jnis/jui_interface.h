@@ -22,6 +22,7 @@ extern "C"{
 
     JUI_METHOD(jfloatArray, JUIgetVCStatesNative)(JNIEnv * env, jclass);
     JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv * env, jclass, jint, jfloat);
+    JUI_METHOD(void, JUIsetCuttingPlaneDeltaNative)(JNIEnv * env, jclass, jint, jint);
     JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatusNative)(JNIEnv * env, jclass);
     JUI_METHOD(void, JUIsetMaskBitsNative)(JNIEnv * env, jclass, jint, jint);
     JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint);
