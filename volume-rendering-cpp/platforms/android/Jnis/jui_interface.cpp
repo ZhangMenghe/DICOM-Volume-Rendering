@@ -27,7 +27,7 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
         std::string key = dvr::jstring2string(env,jkey);
         param_checks.push_back(key);
         Manager::param_bool.push_back(values[i]);
-//        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
+        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
     }
     env->ReleaseBooleanArrayElements(jvalues,values,0);
     Manager::baked_dirty_ = true;
@@ -63,6 +63,9 @@ JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolea
         Manager::baked_dirty_ = true;
     }
 }
+JUI_METHOD(void, JUISwitchCuttingPlaneNative)(JNIEnv * env, jclass, jint id){
+    vrController::instance()->SwitchCuttingPlane((PARAM_CUT_ID)id);
+}
 JUI_METHOD(jfloatArray, JUIgetVCStatesNative)(JNIEnv * env, jclass){
     jfloatArray res = env->NewFloatArray(31);
     env->SetFloatArrayRegion(res,0,31, reinterpret_cast<jfloat *>(vrController::instance()->getCurrentReservedStates()));
@@ -73,7 +76,7 @@ JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatusNative)(JNIEnv * env, jclass){
     env->SetFloatArrayRegion(res,0,7, reinterpret_cast<jfloat *>(vrController::instance()->getCuttingPlane()));
     return res;
 }
-JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv *, jclass, jint id, jfloat value){
+JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv *, jclass, jfloat value){
 //    auto vec = (id==TEX_ID)? &param_tex_names: &param_ray_names;
 //    auto tvec = (id==TEX_ID)? &vrController::param_tex : &vrController::param_ray;
 ////    LOGE("======CUTTING %d, %f, %d", id, value, freeze_plane?1:0);

@@ -62,6 +62,8 @@
         <item>@string/cutting_check_name</item>
         <item>@string/freezeVolume_check_name</item>
         <item>@string/freezeplane_check_name</item>
+        <item>Center Line Travel</item>
+
     </string-array>
     <string-array name="cut_freeze_params">
         <item>@string/freezeVolume_check_name</item>
@@ -71,6 +73,7 @@
         <item>false</item><!-- is cutting-->
         <item>false</item>
         <item>false</item>
+        <item>false</item><!-- is center traversal-->
     </string-array>
 
     <string-array name="raycast_density">
@@ -174,7 +177,7 @@
 
     <string-array name="cutting_plane">
         <item>0.0</item>
-        <item>50</item>
+        <item>4000</item>
     </string-array>
 
 <!--    order matters for mask bit order!-->

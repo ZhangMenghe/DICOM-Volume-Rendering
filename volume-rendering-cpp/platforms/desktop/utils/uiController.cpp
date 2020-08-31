@@ -50,13 +50,13 @@ void uiController::InitCheckParam(){
         "Cutting",
         "Freeze Volume",
         "Freeze Plane",
+        "Center Line Travel",
         "Apply",
         "Recolor",
         "Volume",
         "Mesh",
         "Wireframe",
         "Center Line",
-        "Center Line Travel"
     };
     bool values[pnum] = {
         true,
@@ -64,13 +64,13 @@ void uiController::InitCheckParam(){
         false,
         true,
         false,
+        false,
         true,
         true,
         true,
         false,
         false,
         true,
-        false
     };
     InitCheckParam(pnum, keys, values);
 }

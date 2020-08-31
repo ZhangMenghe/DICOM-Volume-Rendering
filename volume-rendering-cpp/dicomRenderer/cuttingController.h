@@ -56,7 +56,7 @@ private:
 
     int clp_id_;
     reservedVec rc, rt;
-    dvr::PARAM_BOOL last_mode = dvr::CHECK_CUTTING;
+    dvr::PARAM_CUT_ID last_mode = dvr::CUT_CUTTING_PLANE;
     float cmove_value = .0f;
     glm::vec4 plane_color_ = glm::vec4(1.0, .0, .0, 0.4f);
     const float CUTTING_FACTOR = 0.00002f;
@@ -80,7 +80,7 @@ public:
     void UpdateAndDraw();
     void Draw();
     void setCuttingParams(GLuint sp, bool includePoints = false);
-    void SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id);
+    void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setupCenterLine(dvr::ORGAN_IDS id, float* data);
     void setCenterLinePos(int id, int delta_id = 0);
     void setDimension(int pd){CMOVE_UNIT_SIZE = 1.0f / (float)pd;}

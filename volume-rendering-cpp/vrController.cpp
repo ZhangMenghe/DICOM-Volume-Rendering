@@ -272,17 +272,23 @@ void vrController::setMVPStatus(std::string status_name){
 //    LOGE("===current status %s, pos: %f, %f, %f, camera: %f, %f, %f", cst_name.c_str(), PosVec3_.x, PosVec3_.y, PosVec3_.z, cpos.x, cpos.y, cpos.z);
 }
 void vrController::setCuttingPlane(float value){
-    if(isRayCasting()) {cutter_->setCutPlane(value);raycastRenderer_->dirtyPrecompute();}
-    else texvrRenderer_->setCuttingPlane(value);
+    if(Manager::param_bool[dvr::CHECK_CUTTING]) {
+        if (isRayCasting()) {
+            cutter_->setCutPlane(value);
+            raycastRenderer_->dirtyPrecompute();
+        }
+        else texvrRenderer_->setCuttingPlane(value);
+    }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        cutter_->setCenterLinePos((int)(value * 4000.0f));
+    }
 }
 void vrController::setCuttingPlane(int id, int delta){
-    if(id == (int)dvr::CUT_CUTTING_PLANE){
+    if(Manager::param_bool[dvr::CHECK_CUTTING]){
         if(isRayCasting()) {cutter_->setCuttingPlaneDelta(delta);raycastRenderer_->dirtyPrecompute();}
         else texvrRenderer_->setCuttingPlaneDelta(delta);
+    }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        cutter_->setCenterLinePos(id, delta);
     }
-//    else if( id == (int)dvr::CUT_TRAVERSAL){
-////        std::cout<<"todo"
-//    }
 }
 void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
     cutter_->setCutPlane(pp, pn);
@@ -294,7 +300,7 @@ float* vrController::getCuttingPlane(){
 void vrController::setCuttingParams(GLuint sp, bool includePoints){
     cutter_->setCuttingParams(sp, includePoints);
 }
-void vrController::SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id){
+void vrController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     cutter_->SwitchCuttingPlane(cut_plane_id);
     raycastRenderer_->dirtyPrecompute();
 }

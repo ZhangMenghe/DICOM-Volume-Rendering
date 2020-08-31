@@ -33,8 +33,17 @@ public class cutplaneUIs extends BasePanel{
     private SeekBar seek_bar_;
     private Button btn_next, btn_prev;
 
+    CheckBox traversal_check_box;
     private ctCheckboxListAdapter cbAdapter_;
+    private final static int TRAVERSAL_CHECK_ID = 3;
+    private static boolean default_traversal_check;
+    private View primary_panel, traversal_panel;
     private final static float[]default_cut_pose={0,0,0,0,0,-1};
+    private static float initial_progress;
+    private static int max_progress_value;
+
+    private int cutting_status = 0;//0 for none, 1 for cutting, 2 for traversal
+
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
 
@@ -46,23 +55,6 @@ public class cutplaneUIs extends BasePanel{
         Spinner spinner_check =  (Spinner)panel_.findViewById(R.id.spinner_check_cutting_control);
         cbAdapter_ = new ctCheckboxListAdapter(activity);
         spinner_check.setAdapter(cbAdapter_);
-
-        //setup seekbar
-        seek_bar_ = (SeekBar)panel_.findViewById(R.id.cutting_seekbar);
-        String params[] = activity.getResources().getStringArray(R.array.cutting_plane);
-        int max_seek_value = Integer.valueOf(params[1]);
-        seek_bar_.setMax(max_seek_value);
-        seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                JUIInterface.JUIsetCuttingPlane(UIsManager.tex_id, 1.0f * i / max_seek_value);
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
 
         //setup button
         btn_next = panel_.findViewById(R.id.cut_next_button);
@@ -80,19 +72,95 @@ public class cutplaneUIs extends BasePanel{
                 return true;
             }
         });
+        Resources res = activity.getResources();
+
+        String[] check_names = res.getStringArray(R.array.cut_check_params);
+        String[] check_values = res.getStringArray(R.array.cut_check_values);
+
+        String main_check_name = check_names[0];
+        default_primary_check = Boolean.parseBoolean(check_values[0]);
+
+        primary_checkbox = (CheckBox)panel_.findViewById(R.id.check_cutting_show);
+        primary_checkbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                JUIInterface.JUIsetChecks(main_check_name, isChecked);
+                if(isChecked){
+                    traversal_check_box.setChecked(false);
+                    JUIInterface.JUISwitchCuttingPlane(0);
+                    primary_panel.setVisibility(View.VISIBLE);
+                    traversal_panel.setVisibility(View.INVISIBLE);
+                }else{
+                    primary_panel.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        String default_traversal_name = check_names[TRAVERSAL_CHECK_ID];
+        default_traversal_check = Boolean.parseBoolean(check_values[TRAVERSAL_CHECK_ID]);
+
+        traversal_check_box = panel_.findViewById(R.id.check_traversal_show);
+        traversal_check_box.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView,
+                                         boolean isChecked) {
+                JUIInterface.JUIsetChecks(default_traversal_name, isChecked);
+                if(isChecked){
+                    primary_checkbox.setChecked(false);
+                    primary_panel.setVisibility(View.INVISIBLE);
+                    JUIInterface.JUISwitchCuttingPlane(1);
+                    traversal_panel.setVisibility(View.VISIBLE);
+                }else{
+                    traversal_panel.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        primary_panel = panel_.findViewById(R.id.layout_cutting_plane);
+        traversal_panel = panel_.findViewById(R.id.layout_traversal_plane);
+        reset_checkbox_and_panel();
+
+
+        //setup seekbar
+        seek_bar_ = (SeekBar)panel_.findViewById(R.id.cutting_seekbar);
+        String params[] = activity.getResources().getStringArray(R.array.cutting_plane);
+        initial_progress = Float.parseFloat(params[0]);
+        max_progress_value = Integer.parseInt(params[1]);
+        seek_bar_.setMax(max_progress_value);
+        seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                JUIInterface.JUIsetCuttingPlane(1.0f * i / max_progress_value);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
         sub_panels_.add(panel_);
+        setup_checks(R.array.cut_check_params, R.array.cut_check_values);
+    }
 
-        setup_checks(
-                panel_,
-                R.array.cut_check_params, R.array.cut_check_values,
-                R.id.check_cutting_show, 0);
+    private void reset_checkbox_and_panel(){
+        if(default_primary_check)cutting_status = 1;
+        else if(default_traversal_check)cutting_status=2;
+
+        primary_checkbox.setChecked(default_primary_check);
+        traversal_check_box.setChecked(default_traversal_check);
+
+        if(default_primary_check)primary_panel.setVisibility(View.VISIBLE);
+        else primary_panel.setVisibility(View.INVISIBLE);
+        if(default_traversal_check)traversal_panel.setVisibility(View.VISIBLE);
+        else traversal_panel.setVisibility(View.INVISIBLE);
     }
     public void Reset(){
         String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         int max_seek_value = Integer.valueOf(params[1]);
         seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
-        primary_checkbox.setChecked(default_primary_check);
+        reset_checkbox_and_panel();
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
         LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);

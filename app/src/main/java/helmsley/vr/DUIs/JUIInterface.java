@@ -56,14 +56,17 @@ public class JUIInterface {
         JUIsetChecksNative(key, value);
         if(on_broadcast) operateClient.setCheckParams(key, value);
     }
-
+    static void JUISwitchCuttingPlane(int id){
+        JUISwitchCuttingPlaneNative(id);
+        //todo:onbroadcast
+    }
     public static float[] JUIgetVCStates(){
         return JUIgetVCStatesNative();
     }
 
-    static void JUIsetCuttingPlane(int id, float value){
-        JUIsetCuttingPlaneNative(id, value);
-        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, id, value);
+    static void JUIsetCuttingPlane(float value){
+        JUIsetCuttingPlaneNative(value);
+        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, 0, value);
     }
     static void JUIsetCuttingPlaneDelta(int id, int delta){
         JUIsetCuttingPlaneDeltaNative(id, delta);
@@ -115,9 +118,10 @@ public class JUIInterface {
     public static native void JUIsetDualParamByIdNative(int pid, float minValue, float maxValue);
 
     public static native void JUIsetChecksNative(String key, boolean value);
+    public static native void JUISwitchCuttingPlaneNative(int id);
 
     public static native float[] JUIgetVCStatesNative();
-    public static native void JUIsetCuttingPlaneNative(int id, float value);
+    public static native void JUIsetCuttingPlaneNative(float value);
     public static native void JUIsetCuttingPlaneDeltaNative(int id, int delta);
     public static native float[] JUIgetCuttingPlaneStatusNative();
     public static native void JUIsetMaskBitsNative(int num, int mbits);

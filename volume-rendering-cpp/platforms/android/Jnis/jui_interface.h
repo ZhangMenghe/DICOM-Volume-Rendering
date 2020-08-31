@@ -19,9 +19,10 @@ extern "C"{
     JUI_METHOD(void, JUIsetTuneParamByIdNative)(JNIEnv *, jclass, jint, jint, jfloat);
     JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint, jfloat, jfloat);
     JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring, jboolean);
+    JUI_METHOD(void, JUISwitchCuttingPlaneNative)(JNIEnv * env, jclass, jint);
 
     JUI_METHOD(jfloatArray, JUIgetVCStatesNative)(JNIEnv * env, jclass);
-    JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv * env, jclass, jint, jfloat);
+    JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv * env, jclass, jfloat);
     JUI_METHOD(void, JUIsetCuttingPlaneDeltaNative)(JNIEnv * env, jclass, jint, jint);
     JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatusNative)(JNIEnv * env, jclass);
     JUI_METHOD(void, JUIsetMaskBitsNative)(JNIEnv * env, jclass, jint, jint);

@@ -46,8 +46,8 @@ public:
     void setDualParameter(int id, float lv, float rv);
     void setRenderParam(int id, float value);
     void setRenderParam(float* values){memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));Manager::baked_dirty_=true;}
-    void SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id);
-    void setCenterLinePos(int id, int delta_id = 0){cutter_->setCenterLinePos(id, delta_id);}
+    void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
+//    void setCenterLinePos(int id, int delta_id = 0){cutter_->setCenterLinePos(id, delta_id);}
     
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}

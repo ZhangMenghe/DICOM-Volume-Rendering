@@ -109,7 +109,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		if(Manager::param_bool[dvr::CHECK_CUTTING]){
 			ui_.setCheck("Center Line Travel",false);
 			std::cout<<"switch to cutting plane mode"<<std::endl;
-			controller_.SwitchCuttingPlane(dvr::CHECK_CUTTING);
+			controller_.SwitchCuttingPlane(dvr::CUT_CUTTING_PLANE);
 		}
 		break;
 	case GLFW_KEY_T:
@@ -119,13 +119,13 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			// set_centerline_cutting(0, 2);
 			ui_.setCheck("Cutting", false);
 			std::cout<<"switch to traversal mode"<<std::endl;
-			controller_.SwitchCuttingPlane(dvr::CHECK_CENTER_LINE_TRAVEL);
+			controller_.SwitchCuttingPlane(dvr::CUT_TRAVERSAL);
 		}
 		break;
 	case GLFW_KEY_N:
 		if(Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]) {
 			// set_centerline_cutting((cid%4000),1);cid+=5;
-			controller_.setCenterLinePos(0, 5);
+			controller_.setCuttingPlane(0, 5);
 			}
 		break;
 	default:

@@ -197,8 +197,8 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
     //debug
     p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
 }
-void cuttingController::SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id){
-    if(cut_plane_id == dvr::CHECK_CUTTING && last_mode==dvr::CHECK_CENTER_LINE_TRAVEL){
+void cuttingController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
+    if(cut_plane_id == dvr::CUT_CUTTING_PLANE && last_mode==dvr::CUT_TRAVERSAL){
         rt.point=p_point_;rt.scale=p_scale;rt.rotate_mat=p_rotate_mat_;rt.move_value=cmove_value;
         p_scale = rc.scale;
         // setCutPlane(rc.point,rc.norm);
@@ -207,8 +207,8 @@ void cuttingController::SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id){
         p_p2o_dirty = true;
         update_plane_(rc.rotate_mat);
 
-        last_mode = dvr::CHECK_CUTTING;
-    }else if(cut_plane_id == dvr::CHECK_CENTER_LINE_TRAVEL && last_mode == dvr::CHECK_CUTTING){
+        last_mode = dvr::CUT_CUTTING_PLANE;
+    }else if(cut_plane_id == dvr::CUT_TRAVERSAL && last_mode == dvr::CUT_CUTTING_PLANE){
         rc.point=p_point_;rc.scale=p_scale;rc.rotate_mat=p_rotate_mat_;rc.move_value=cmove_value;
         p_scale = rt.scale;
         // setCutPlane(rt.point,rt.norm);
@@ -217,7 +217,7 @@ void cuttingController::SwitchCuttingPlane(dvr::PARAM_BOOL cut_plane_id){
         p_p2o_dirty = true;
         update_plane_(rt.rotate_mat);
 
-        last_mode = dvr::CHECK_CENTER_LINE_TRAVEL;
+        last_mode = dvr::CUT_TRAVERSAL;
     }
 }
 void cuttingController::set_centerline_cutting(int& id, glm::vec3& pp, glm::vec3& pn){
