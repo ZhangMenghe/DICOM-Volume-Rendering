@@ -13,6 +13,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.google.common.primitives.Floats;
@@ -41,8 +42,10 @@ public class cutplaneUIs extends BasePanel{
     private final static float[]default_cut_pose={0,0,0,0,0,-1};
     private static float initial_progress;
     private static int max_progress_value;
+    private Switch view_switch;
 
     private int cutting_status = 0;//0 for none, 1 for cutting, 2 for traversal
+    private final static int VIEW_SWITCH_ID = 4;
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
@@ -140,6 +143,16 @@ public class cutplaneUIs extends BasePanel{
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        //setup switch
+        view_switch = (Switch)panel_.findViewById(R.id.toggle_view_switch);
+        view_switch.setChecked(Boolean.parseBoolean(check_values[VIEW_SWITCH_ID]));
+        view_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                JUIInterface.JUIsetChecks(check_names[VIEW_SWITCH_ID], isChecked);
+            }
+        });
+
         sub_panels_.add(panel_);
         setup_checks(R.array.cut_check_params, R.array.cut_check_values);
     }
@@ -161,6 +174,7 @@ public class cutplaneUIs extends BasePanel{
         int max_seek_value = Integer.valueOf(params[1]);
         seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
         reset_checkbox_and_panel();
+        view_switch.setChecked(false);
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
         LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
@@ -206,12 +220,6 @@ public class cutplaneUIs extends BasePanel{
     }
     public void showHidePanel(boolean show_panel, boolean isRaycast){
         super.showHidePanel(show_panel);
-
-        if(isRaycast){
-            seek_bar_.setVisibility(View.INVISIBLE);
-        }else{
-            seek_bar_.setVisibility(View.VISIBLE);
-        }
     }
     public void onTexRayChange(boolean isRaycast){
         showHidePanel(panel_visible, isRaycast);

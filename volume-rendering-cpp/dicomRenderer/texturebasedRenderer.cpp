@@ -136,18 +136,11 @@ void texvrRenderer::draw_baked() {
     baked_dirty_ = false;
 }
 
-void texvrRenderer::setDimension(int dims, float thickness){
-    dimensions = int(dims * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
-    if(thickness > 0){
-        vol_thickness_factor = thickness;
-    }else{
-        if(dims > 200) vol_thickness_factor = 0.5;
-        else if(dims > 100) vol_thickness_factor = dims / 300.f;
-        else vol_thickness_factor = dims / 200.f;
-    }
+void texvrRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale){
+    dimensions = int(vol_dim.z * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
+    vol_thickness_factor = vol_scale.z;
     update_instance_data(vbo_front, true);
     update_instance_data(vbo_back, false);
-
 }
 void texvrRenderer::setCuttingPlane(float percent){
     cut_id = int(dimensions * percent);

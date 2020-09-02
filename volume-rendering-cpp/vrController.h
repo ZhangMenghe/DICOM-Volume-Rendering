@@ -31,6 +31,7 @@ public:
     void onDraw();
     void onReset();
     void onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam);
+    void AlignModelMatToTraversalPlane();
 
     void onSingleTouchDown(float x, float y){ Mouse_old = glm::fvec2(x, y);}
     void onTouchMove(float x, float y);
@@ -53,7 +54,7 @@ public:
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(bool dim_scaled = false){
-        return dim_scaled?ModelMat_ * raycastRenderer_->getDimScaleMat():ModelMat_;}
+        return dim_scaled?ModelMat_ * vol_dim_scale_mat_:ModelMat_;}
     glm::mat4 getRotationMatrix(){return RotateMat_;}
     float* getCurrentReservedStates();
     float* getCuttingPlane();
@@ -95,6 +96,10 @@ private:
     float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
     bool pre_draw_ = true;
 
+    //volume
+    glm::vec3 vol_dimension_, vol_dim_scale_;
+    glm::mat4 vol_dim_scale_mat_;
+
     //ui
     glm::fvec2 Mouse_old;
 
@@ -107,5 +112,12 @@ private:
     void updateVolumeModelMat();
     void precompute();
     bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
+
+
+    // glm::vec3 tnorms[3] = {
+    //     glm::vec3(1,1,1),
+    //     glm::vec3(1,1,1),
+    //     glm::vec3(1,1,1)
+    // };
 };
 #endif

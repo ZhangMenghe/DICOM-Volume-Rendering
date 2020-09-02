@@ -63,6 +63,7 @@
         <item>@string/freezeVolume_check_name</item>
         <item>@string/freezeplane_check_name</item>
         <item>Center Line Travel</item>
+        <item>Traversal View</item>
 
     </string-array>
     <string-array name="cut_freeze_params">
@@ -74,6 +75,7 @@
         <item>false</item>
         <item>false</item>
         <item>false</item><!-- is center traversal-->
+        <item>false</item>
     </string-array>
 
     <string-array name="raycast_density">

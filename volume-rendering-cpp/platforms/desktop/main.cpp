@@ -168,9 +168,8 @@ void get_center_line_points(){
 }
 void onCreated(){
 	ui_.InitAll();
-	controller_.onViewCreated(true);
+	controller_.onViewCreated(false);
 	overlayController::instance()->onViewCreated();
-	get_center_line_points();
 
 	ui_.AddTuneParams();
 
@@ -184,6 +183,7 @@ void onCreated(){
         controller_.assembleTexture(2, vol_dims.x, vol_dims.y, vol_dims.z, -1, -1, -1, loader_.getVolumeData(), loader_.getChannelNum());
 		loader_.reset();
 	}
+	get_center_line_points();
 
 	// 	//load data
 	// if(loader_.loadData(ds_path+"mask_simple",128,128,41)){

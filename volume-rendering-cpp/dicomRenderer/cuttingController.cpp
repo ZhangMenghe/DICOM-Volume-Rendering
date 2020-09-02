@@ -5,7 +5,9 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <Utils/mathUtils.h>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/glm.hpp>
 using namespace glm;
 
 cuttingController* cuttingController::_mptr = nullptr;
@@ -93,26 +95,25 @@ void cuttingController::draw_plane(){
 
     }
     GLuint sp = pshader->Use();
-
-    Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat()* p_p2w_mat);
+    Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat() * p_p2w_mat);
     
     Shader::Uniform(sp,"uBaseColor", plane_color_);
     if (!pVAO_) {
-        float vertices[] = {
-                0.5f,0.5f,.0f,
-                -0.5f,0.5f,.0f,
-                -0.5f,-0.5f,.0f,
+        float* vertices = new float[60];
 
-                -0.5f,-0.5f,.0f,
-                0.5f,-0.5f,.0f,
-                0.5f,0.5f,.0f,
-        };
+         for (int a = 0,i=0; a < 360; a += 360 / 20,i++){
+            double heading = a * 3.1415926535897932384626433832795 / 180;
+            vertices[3*i] = cos(heading) * 0.5f;
+            vertices[3*i+1] = sin(heading) * 0.5f;
+            vertices[3*i+2] = .0f;
+
+        }
         unsigned int VBO = 0;
         glGenVertexArrays(1, &pVAO_);
         glGenBuffers(1, &VBO);
         // fill buffer
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), vertices, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 60 * sizeof(float), vertices, GL_STATIC_DRAW);
         // link vertex attributes
         glBindVertexArray(pVAO_);
         glEnableVertexAttribArray(0);
@@ -121,7 +122,7 @@ void cuttingController::draw_plane(){
         glBindVertexArray(0);
     }
     glBindVertexArray(pVAO_);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 20);
     pshader->UnUse();
         glDisable(GL_BLEND);
     // glDisable(GL_DEPTH_TEST);
@@ -228,7 +229,8 @@ void cuttingController::set_centerline_cutting(int& id, glm::vec3& pp, glm::vec3
 	pp = glm::vec3(data[3*id],data[3*id+1],data[3*id+2]);
 	pn = glm::vec3(data[3*(id+center_sample_gap)], data[3*(id+center_sample_gap)+1], data[3*(id+center_sample_gap)+2]) 
         - glm::vec3(data[3*(id-center_sample_gap)], data[3*(id-center_sample_gap)+1], data[3*(id-center_sample_gap)+2]);
-	if(glm::dot(pn,glm::vec3(0,0,-1)) < .0f) pn=-pn;
+	// if(glm::dot(pn,glm::vec3(0,0,-1)) < .0f) pn=-pn;
+    pn = glm::vec3(pn.x, pn.y, pn.z * thick_scale);
 	// setCutPlane(pp, pn);
 }
 void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
@@ -237,15 +239,20 @@ void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
         clp_id_ = 0;
         glm::vec3 pp, pn;
         set_centerline_cutting(clp_id_,pp,pn);
+
         rt.point=pp;rt.scale=glm::vec3(0.1f);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
+        centerline_available = true;
     }
 }
 void cuttingController::setCenterLinePos(int id, int delta_id){
     if(delta_id == 0){
-        clp_id_ = id%4000;
+        clp_id_ = id%(4000-center_sample_gap);
     }else{
-        clp_id_=(clp_id_+delta_id)%4000;
+        clp_id_=(clp_id_+delta_id)%(4000-center_sample_gap);
     }
     set_centerline_cutting(clp_id_, p_point_, p_norm_);
     setCutPlane(p_point_, p_norm_);
+}
+void cuttingController::getCurrentTraversalInfo(glm::vec3& pp, glm::vec3& pn){
+    set_centerline_cutting(clp_id_, pp, pn);
 }

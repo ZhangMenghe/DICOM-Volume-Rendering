@@ -43,7 +43,7 @@ void uiController::InitAllTuneParam(){
 }
 
 void uiController::InitCheckParam(){
-    const int pnum = 12;
+    const int pnum = 13;
     const char* keys[pnum] = {
         "Raycasting",
         "Overlays",
@@ -51,6 +51,7 @@ void uiController::InitCheckParam(){
         "Freeze Volume",
         "Freeze Plane",
         "Center Line Travel",
+        "Traversal View",
         "Apply",
         "Recolor",
         "Volume",
@@ -59,12 +60,16 @@ void uiController::InitCheckParam(){
         "Center Line",
     };
     bool values[pnum] = {
+        //overall
         true,
         false,
+        //cutting
         false,
-        true,
         false,
         false,
+        false,
+        false,
+        //mask
         true,
         true,
         true,

@@ -32,7 +32,7 @@ private:
 
 public:
     texvrRenderer(bool screen_baked = true);
-    void setDimension(int dims, float thickness);
+    void setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale);
     void setCuttingPlane(float percent);
     void setCuttingPlaneDelta(int delta);
     void Draw();

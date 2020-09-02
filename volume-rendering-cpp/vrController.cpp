@@ -4,7 +4,9 @@
 #include <dicomRenderer/screenQuad.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <math.h>
-
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/glm.hpp>
 using namespace dvr;
 vrController* vrController::myPtr_ = nullptr;
 
@@ -52,16 +54,15 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
 
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
+        vol_dimension_ = glm::vec3(ph,pw,pd);
         if(sh<=0 || sw<=0 || sd<=0){
-            texvrRenderer_->setDimension(pd, -1);
-            raycastRenderer_->setDimension(pd, -1);
+            if(pd > 200) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, 0.5f);
+            else if(pd > 100) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, pd / 300.f);
+            else vol_dim_scale_ = glm::vec3(1.0f, 1.0f, pd / 200.f);
         }else if(abs(sh - sw) < 1){
-            texvrRenderer_->setDimension(pd, sd / sh);
-            raycastRenderer_->setDimension(pd, sd / sh);
+             vol_dim_scale_ = glm::vec3(1.0f, 1.0f, sd / sh);
         }else{
-            float ls = fmax(sw,sh);
-            texvrRenderer_->setDimension(pd, sd / ls);
-            raycastRenderer_->setDimension(pd, sd / ls);
+             vol_dim_scale_ = glm::vec3(1.0f, 1.0f, sd / fmax(sw,sh));
             if(sw > sh){
                 ScaleVec3_ = ScaleVec3_* glm::vec3(1.0, sh / sw, 1.0);
             }else{
@@ -69,9 +70,10 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
             }
             volume_model_dirty = true;
         }
-        cutter_->setDimension(pd);
+        vol_dim_scale_mat_=glm::scale(glm::mat4(1.0f), vol_dim_scale_);
+        texvrRenderer_->setDimension(vol_dimension_, vol_dim_scale_);
+        cutter_->setDimension(pd, vol_dim_scale_.z);
     }
-
     auto vsize= ph*pw*pd;
     uint32_t* vol_data  = new uint32_t[vsize];
     uint16_t tm;
@@ -97,6 +99,12 @@ void vrController::setupCenterLine(int id, float* data){
     int oid = 0;
     while(id/=2)oid++;
     line_renderers_[oid] = new centerLineRenderer(oid);
+    // for(int i=0;i<4000;i++){
+    //     data[3*i] = i / 4000.0f - 0.5;
+    //     data[3*i+1] = i / 4000.0f - 0.5;
+    //     data[3*i+2] = .0f;
+
+    // }
     line_renderers_[oid]->updateVertices(4000, data);
     cutter_->setupCenterLine((dvr::ORGAN_IDS)oid, data);
 }
@@ -124,11 +132,12 @@ void vrController::onDraw() {
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     //ORDER REALLY MATTERS!!!!
 
+    glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
     cutter_->Update();
     if(Manager::param_bool[dvr::CHECK_CUTTING])cutter_->Draw();
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
-        if(isRayCasting())  raycastRenderer_->Draw();
+        if(isRayCasting())  raycastRenderer_->Draw(model_mat);
         else texvrRenderer_->Draw();
     }
 
@@ -137,7 +146,7 @@ void vrController::onDraw() {
         //draw centerline
         if(Manager::param_bool[dvr::CHECK_CENTER_LINE]){
             for(auto line:line_renderers_)
-                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(ModelMat_ * raycastRenderer_->getDimScaleMat());
+                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(model_mat);
         }
     }
     if(Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL])cutter_->Draw();
@@ -279,7 +288,9 @@ void vrController::setCuttingPlane(float value){
         }
         else texvrRenderer_->setCuttingPlane(value);
     }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        if(!cutter_->IsCenterLineAvailable())return;
         cutter_->setCenterLinePos((int)(value * 4000.0f));
+        if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) {AlignModelMatToTraversalPlane();raycastRenderer_->dirtyPrecompute();}
     }
 }
 void vrController::setCuttingPlane(int id, int delta){
@@ -287,7 +298,9 @@ void vrController::setCuttingPlane(int id, int delta){
         if(isRayCasting()) {cutter_->setCuttingPlaneDelta(delta);raycastRenderer_->dirtyPrecompute();}
         else texvrRenderer_->setCuttingPlaneDelta(delta);
     }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        if(!cutter_->IsCenterLineAvailable())return;
         cutter_->setCenterLinePos(id, delta);
+        if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) {AlignModelMatToTraversalPlane();raycastRenderer_->dirtyPrecompute();}
     }
 }
 void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
@@ -302,6 +315,17 @@ void vrController::setCuttingParams(GLuint sp, bool includePoints){
 }
 void vrController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     cutter_->SwitchCuttingPlane(cut_plane_id);
+    if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) AlignModelMatToTraversalPlane();
+    raycastRenderer_->dirtyPrecompute();
+}
+void vrController::AlignModelMatToTraversalPlane(){
+    glm::vec3 pp, pn;
+    cutter_->getCurrentTraversalInfo(pp, pn);
+    pn = glm::normalize(pn);
+
+    RotateMat_ = glm::toMat4(glm::rotation(pn, glm::vec3(.0,.0,-1.0f)));
+                
+    volume_model_dirty = true;
     raycastRenderer_->dirtyPrecompute();
 }
 

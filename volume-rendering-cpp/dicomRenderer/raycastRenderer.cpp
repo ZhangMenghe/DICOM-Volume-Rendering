@@ -16,12 +16,12 @@ DRAW_BAKED(screen_baked){
         LOGE("Raycast===Failed to create raycast shader program===");
     Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
 }
-void raycastRenderer::Draw() {
-    if (DRAW_BAKED) draw_baked();
-    else draw_scene();
+void raycastRenderer::Draw(glm::mat4 model_mat) {
+    if (DRAW_BAKED) draw_baked(model_mat);
+    else draw_scene(model_mat);
 }
 
-void raycastRenderer::draw_scene(){
+void raycastRenderer::draw_scene(glm::mat4 model_mat){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
@@ -37,20 +37,20 @@ void raycastRenderer::draw_scene(){
 
 	// dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 164.0*3.0f/512.f));
 
-    glm::mat4 modelmat = vrController::instance()->getModelMatrix()* dim_scale_mat;
+    // glm::mat4 modelmat = vrController::instance()->getModelMatrix()* dim_scale_mat;
     // glm::mat4 modelmat =glm::translate(glm::mat4(1.0f), glm::vec3(.0,.0,1.0f)) 
     //   * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f))
     //   *  dim_scale_mat;
 
-    glm::mat4 model_inv = glm::inverse(modelmat);
+    glm::mat4 model_inv = glm::inverse(model_mat);
 
-    Shader::Uniform(sp, "uModelMat", modelmat);
+    Shader::Uniform(sp, "uModelMat", model_mat);
     Shader::Uniform(sp, "uCamposObjSpace",
             glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
 //    Shader::Uniform(sp,"sample_step_inverse", 1.0f / Manager::param_ray[dvr::TR_DENSITY]);
     Shader::Uniform(sp,"usample_step_inverse", 1.0f/600.0f);
     
-    if(Manager::param_bool[dvr::CHECK_CUTTING])shader_->EnableKeyword("CUTTING_PLANE");
+    if(Manager::IsCuttingEnabled())shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
 
     vrController::instance()->setCuttingParams(sp, false);
@@ -71,7 +71,7 @@ void raycastRenderer::draw_scene(){
     glDisable(GL_DEPTH_TEST);
 }
 
-void raycastRenderer::draw_baked(){
+void raycastRenderer::draw_baked(glm::mat4 model_mat){
     if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
     if(!cshader_){
         cshader_ = new Shader;
@@ -81,7 +81,7 @@ void raycastRenderer::draw_baked(){
         Manager::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL]="";
     }
 
-    if(Manager::param_bool[dvr::CHECK_CUTTING])cshader_->EnableKeyword("CUTTING_PLANE");
+    if(Manager::IsCuttingEnabled())cshader_->EnableKeyword("CUTTING_PLANE");
     else cshader_->DisableKeyword("CUTTING_PLANE");
 
     GLuint sp = cshader_->Use();
@@ -92,7 +92,7 @@ void raycastRenderer::draw_baked(){
     Shader::Uniform(sp, "u_con_size", screenQuad::instance()->getTexSize());
     Shader::Uniform(sp, "u_fov", Manager::camera->getFOV());
 
-    glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrix() * dim_scale_mat);
+    glm::mat4 model_inv = glm::inverse(model_mat);
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
     Shader::Uniform(sp, "u_CamToWorld", glm::translate(glm::mat4(1.0), Manager::camera->getCameraPosition()));
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
@@ -111,13 +111,4 @@ void raycastRenderer::draw_baked(){
 
     //todo: draw screen quad
     screenQuad::instance()->Draw();
-}
-void raycastRenderer::setDimension(int dims, float thickness){
-    if(thickness > 0 ){
-        dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, thickness));
-    }else{
-        if(dims > 200) dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 0.5f));
-        else if(dims > 100) dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, dims / 300.f));
-        else dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, dims / 200.f));
-    }
 }
