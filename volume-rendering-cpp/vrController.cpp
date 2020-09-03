@@ -133,8 +133,12 @@ void vrController::onDraw() {
     //ORDER REALLY MATTERS!!!!
 
     glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
-    cutter_->Update();
-    if(Manager::param_bool[dvr::CHECK_CUTTING])cutter_->Draw();
+    bool cp_update = Manager::param_bool[dvr::CHECK_CUTTING]||Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];
+    bool draw_finished =false;
+    if(cp_update){
+        cutter_->Update();
+        if(Manager::param_bool[dvr::CHECK_CUTTING] && !Manager::param_bool[dvr::CHECK_FREEZE_CPLANE]){cutter_->Draw();draw_finished=true;}
+    }
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
         if(isRayCasting())  raycastRenderer_->Draw(model_mat);
@@ -149,7 +153,7 @@ void vrController::onDraw() {
                 if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(model_mat);
         }
     }
-    if(Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL])cutter_->Draw();
+    if(cp_update&&!draw_finished)cutter_->Draw();
     Manager::baked_dirty_ = false;
     //  LOGE("===FPS: %.2f==\n", pm_.Update());
 }

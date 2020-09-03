@@ -114,6 +114,7 @@ public class cutplaneUIs extends BasePanel{
                     primary_panel.setVisibility(View.INVISIBLE);
                     JUIInterface.JUISwitchCuttingPlane(1);
                     traversal_panel.setVisibility(View.VISIBLE);
+                    cbAdapter_.ResetAll();
                 }else{
                     traversal_panel.setVisibility(View.INVISIBLE);
                 }
@@ -243,6 +244,17 @@ public class cutplaneUIs extends BasePanel{
                 item_values.set(id, value);
                 notifyDataSetChanged();
             }
+        }
+        void ResetAll(){
+            boolean data_changed = false;
+            for(int i=0; i<item_values.size();i++){
+                if(item_values.get(i)){
+                    item_values.set(i, false);
+                    JUIInterface.JUIsetChecks(item_names.get(i),false);
+                    data_changed = true;
+                }
+            }
+            if(data_changed)notifyDataSetChanged();
         }
         boolean getValue(int id){return (id<item_values.size())?item_values.get(id):false;}
         public View getDropDownView(int position, View convertView, ViewGroup parent){

@@ -8,7 +8,7 @@ void uiController::InitAll(){
     // AddTuneParams();
     InitAllTuneParam();
     InitCheckParam();
-    setMaskBits(7,8);
+    setMaskBits(7,9);
     // setMaskBits(7,2+4+8+16+32+64);
     vrController::instance()->onReset(
         glm::vec3(.0f),
@@ -66,7 +66,7 @@ void uiController::InitCheckParam(){
         //cutting
         false,
         false,
-        false,
+        true,
         false,
         false,
         //mask

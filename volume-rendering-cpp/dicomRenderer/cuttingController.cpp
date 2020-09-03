@@ -40,15 +40,13 @@ void cuttingController::Update(){
     auto model_mat = vrController::instance()->getModelMatrix(true);
 
     if(keep_cutting_position()){//keep it static
-        p_p2o_mat = glm::inverse(model_mat) * p_p2w_mat;
-        update_plane_(rotateNormal(p_p2o_mat, glm::vec3(.0,.0,1.0)));
-        p_point_ = glm::vec3(glm::inverse(model_mat) * glm::vec4(p_point_world,1.0f));
-        if(cmove_value){
-            p_point_ += cmove_value * p_norm_;
-            p_p2o_mat = glm::translate(glm::mat4(1.0), cmove_value * p_norm_)*p_p2o_mat;
-            p_p2w_mat = model_mat * p_p2o_mat;
-            p_point_world = glm::vec3(model_mat * glm::vec4(p_point_,1.0f));
-        }
+        glm::vec3 vdir_w = Manager::camera->getViewDirection();
+        p_norm_ = vec3MatNorm(glm::inverse(model_mat), vdir_w);
+        
+        p_rotate_mat_ = rotMatFromDir(p_norm_);
+        p_p2o_mat = glm::translate(glm::mat4(1.0), p_point_)* p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
+        p_p2w_mat =  glm::mat4(1.0);//p_p2o_mat;
+        p_point_world = glm::vec3(p_p2w_mat * glm::vec4(p_point_,1.0f));
     }
     else{
         p_point_world = glm::vec3(model_mat * glm::vec4(p_point_,1.0f));
@@ -63,12 +61,9 @@ void cuttingController::UpdateAndDraw(){
     if(Manager::param_bool[dvr::CHECK_CUTTING] || Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]) draw_plane();
 }
 void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
-//    Shader::Uniform(sp,"uSphere.center", glm::vec3(vrController::csphere_c));
-//    Shader::Uniform(sp,"uSphere.radius", vrController::csphere_radius);
     Shader::Uniform(sp,"uPlane.p", p_point_);
-    Shader::Uniform(sp,"uPlane.normal", p_norm_);//* glm::vec3(1.0,1.0,0.5));
+    Shader::Uniform(sp,"uPlane.normal", p_norm_);
     if(includePoints){
-        // mat4 p2m_mat = inverse(vrController::instance()->getModelMatrix())*p_p2w_mat;
         vec3 pms[3];int i=0;
         for(vec4 p: P_Points)
             pms[i++] = vec3(p_p2o_mat * p);
