@@ -96,7 +96,7 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
 // void main(void){
-//    fragColor =  vec4(fs_in.TexCoords,1.0);//vec4(.5, .5, .0, 1.0);
+//    fragColor =  vec4(texture(uSampler, fs_in.TexCoords).xyz, 1.0);//vec4(fs_in.TexCoords,1.0);//vec4(.5, .5, .0, 1.0);
 // }
 void main(void){
     vec3 ro = uCamposObjSpace;
@@ -124,5 +124,4 @@ void main(void){
 
     if(intersect.y < intersect.x || blocked_by_plane) discard;
     fragColor = Volume(ro + 0.5, rd, intersect.x, intersect.y);
-    // fragColor = vec4(1.0, 1.0, .0, 0.7);
 }

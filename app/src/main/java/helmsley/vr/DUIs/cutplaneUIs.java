@@ -46,6 +46,7 @@ public class cutplaneUIs extends BasePanel{
     private Switch view_switch;
     private ColorStateList normal_color, highlight_color;
     private int cutting_status = 0;//0 for none, 1 for cutting, 2 for traversal
+    private boolean is_current_raycast;
     private final static int VIEW_SWITCH_ID = 4;
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
@@ -106,7 +107,7 @@ public class cutplaneUIs extends BasePanel{
                 if(isChecked){
                     traversal_check_box.setChecked(false);
                     JUIInterface.JUISwitchCuttingPlane(0);
-                    primary_panel.setVisibility(View.VISIBLE);
+                    if(is_current_raycast)primary_panel.setVisibility(View.VISIBLE);
                     traversal_panel.setVisibility(View.INVISIBLE);
                 }else{
                     primary_panel.setVisibility(View.INVISIBLE);
@@ -185,9 +186,9 @@ public class cutplaneUIs extends BasePanel{
         else traversal_panel.setVisibility(View.INVISIBLE);
     }
     public void Reset(){
-        String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
-        int max_seek_value = Integer.valueOf(params[1]);
-        seek_bar_.setProgress((int)(Float.valueOf(params[0]) * max_seek_value));
+        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
+        int max_seek_value = Integer.parseInt(params[1]);
+        seek_bar_.setProgress((int)(Float.parseFloat(params[0]) * max_seek_value));
         reset_checkbox_and_panel();
         view_switch.setChecked(false);
     }
@@ -195,8 +196,8 @@ public class cutplaneUIs extends BasePanel{
         LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
         if(cutmap == null) return;
 
-        String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
-        int max_seek_value = Integer.valueOf(params[1]);
+        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
+        int max_seek_value = Integer.parseInt(params[1]);
         double percent = (Double) cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
         seek_bar_.setProgress((int)(percent * max_seek_value));
 
@@ -222,7 +223,7 @@ public class cutplaneUIs extends BasePanel{
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
-        String params[] = actRef.get().getResources().getStringArray(R.array.cutting_plane);
+        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         float[] cpv = JUIInterface.JUIgetCuttingPlaneStatus();
         map.put("status", primary_checkbox.isChecked());
         map.put("freeze volume", cbAdapter_.getValue(0));
@@ -238,6 +239,11 @@ public class cutplaneUIs extends BasePanel{
     }
     public void onTexRayChange(boolean isRaycast){
         showHidePanel(panel_visible, isRaycast);
+        is_current_raycast = isRaycast;
+        if(primary_checkbox.isChecked()){
+            if(isRaycast)primary_panel.setVisibility(View.VISIBLE);
+            else primary_panel.setVisibility(View.INVISIBLE);
+        }
     }
     private static class ctCheckboxListAdapter extends ListAdapter {
         List<Boolean> item_values;

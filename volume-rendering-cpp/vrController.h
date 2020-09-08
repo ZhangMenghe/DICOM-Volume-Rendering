@@ -26,7 +26,6 @@ public:
     void setupCenterLine(int id, float* data);
     /*Override*/
     void onViewCreated();
-    void onViewCreated(bool pre_draw);
     void onViewChange(int width, int height);
     void onDraw();
     void onReset();
@@ -39,6 +38,7 @@ public:
     void onPan(float x, float y);
 
     //setter funcs
+    void setPredrawOption(bool pre_draw){pre_draw_=pre_draw;}
     void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
     void setCuttingPlane(float value);
@@ -94,7 +94,7 @@ private:
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
     float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
-    bool pre_draw_ = true;
+    bool pre_draw_ = false;
 
     //volume
     glm::vec3 vol_dimension_, vol_dim_scale_;
@@ -111,7 +111,7 @@ private:
 
     void updateVolumeModelMat();
     void precompute();
-    bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
+    static bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
 
 
     // glm::vec3 tnorms[3] = {

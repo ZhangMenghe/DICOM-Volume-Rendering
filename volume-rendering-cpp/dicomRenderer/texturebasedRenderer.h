@@ -19,7 +19,6 @@ private:
     GLuint vao_front = 0, vbo_front;
     GLuint vao_back = 0, vbo_back;
 
-    bool DRAW_BAKED;
     bool b_init_successful = false;
     int cut_id = 0;
 
@@ -31,11 +30,11 @@ private:
     void update_instance_data(GLuint& vbo_instance,bool is_front);
 
 public:
-    texvrRenderer(bool screen_baked = true);
+    texvrRenderer();
     void setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale);
     void setCuttingPlane(float percent);
     void setCuttingPlaneDelta(int delta);
-    void Draw();
+    void Draw(bool pre_draw);
     void dirtyPrecompute(){baked_dirty_ = true;}
 };
 #endif

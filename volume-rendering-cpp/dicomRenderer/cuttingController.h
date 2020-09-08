@@ -59,6 +59,7 @@ private:
         reservedVec(){}
     };
 
+    //Center Line Traversal cutting position, range[0,4000]
     int clp_id_;
     reservedVec rc, rt;
     dvr::PARAM_CUT_ID last_mode = dvr::CUT_CUTTING_PLANE;

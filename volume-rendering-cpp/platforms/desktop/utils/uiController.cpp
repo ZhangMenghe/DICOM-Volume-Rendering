@@ -61,7 +61,7 @@ void uiController::InitCheckParam(){
     };
     bool values[pnum] = {
         //overall
-        true,
+            true,
         false,
         //cutting
         false,

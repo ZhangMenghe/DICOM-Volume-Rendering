@@ -79,7 +79,7 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    vrController::instance()->onViewCreated(true);
+    vrController::instance()->onViewCreated();
     overlayController::instance()->onViewCreated();
 }
 

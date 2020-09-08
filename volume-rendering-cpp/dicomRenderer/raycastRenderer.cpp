@@ -3,8 +3,7 @@
 #include "screenQuad.h"
 #include <GLPipeline/Primitive.h>
 #include <glm/gtx/string_cast.hpp>
-raycastRenderer::raycastRenderer(bool screen_baked):
-DRAW_BAKED(screen_baked){
+raycastRenderer::raycastRenderer(){
     //geometry
     Mesh::InitQuadWithTex(vao_cube_, cuboid_with_texture, 8, cuboid_indices, 36);
 
@@ -16,9 +15,8 @@ DRAW_BAKED(screen_baked){
         LOGE("Raycast===Failed to create raycast shader program===");
     Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
 }
-void raycastRenderer::Draw(glm::mat4 model_mat) {
-    if (DRAW_BAKED)//&&!Manager::param_bool[dvr::CUT_CUTTING_PLANE])
-        draw_baked(model_mat);
+void raycastRenderer::Draw(bool pre_draw, glm::mat4 model_mat) {
+    if (pre_draw)draw_baked(model_mat);
     else draw_scene(model_mat);
 }
 

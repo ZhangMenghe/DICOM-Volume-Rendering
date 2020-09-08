@@ -111,13 +111,13 @@ void cuttingController::draw_plane(){
     glBindVertexArray(pVAO_);
     glDrawArrays(GL_TRIANGLE_FAN, 0, 20);
     pshader->UnUse();
-        glDisable(GL_BLEND);
+    glDisable(GL_BLEND);
     // glDisable(GL_DEPTH_TEST);
 }
 
+//for texture based only
 void cuttingController::setCutPlane(float value){
-    if(keep_cutting_position()) {cmove_value =  value * CUTTING_FACTOR; return;}
-    p_point_ += p_norm_ * value * CUTTING_FACTOR;
+    p_point_ = p_start_+p_norm_*value;
     cmove_value = .0f;
     p_p2o_dirty = true;
 }

@@ -3,8 +3,7 @@
 #include "texturebasedRenderer.h"
 #include "screenQuad.h"
 
-texvrRenderer::texvrRenderer(bool screen_baked)
-        :DRAW_BAKED(screen_baked){
+texvrRenderer::texvrRenderer(){
     //program
     shader_ = new Shader();
     if(!shader_->AddShader(GL_VERTEX_SHADER, Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT])
@@ -116,9 +115,9 @@ void texvrRenderer::draw_scene(){
     glDisable(GL_CULL_FACE);
 }
 
-void texvrRenderer::Draw(){
+void texvrRenderer::Draw(bool pre_draw){
     if(!b_init_successful) {init_vertices(vao_front,vbo_front,true);init_vertices(vao_back,vbo_back,false);}
-    if(DRAW_BAKED) {draw_baked(); return;}
+    if(pre_draw) {draw_baked(); return;}
     draw_scene();
 }
 
@@ -147,9 +146,6 @@ void texvrRenderer::setCuttingPlane(float percent){
     baked_dirty_ = true;
 }
 void texvrRenderer::setCuttingPlaneDelta(int delta){
-    LOGE("====PREV: %d, %d==", cut_id, delta);
     cut_id = ((int)fmax(0, cut_id + delta))%dimensions;
-    LOGE("====after: %d==", cut_id);
-
     baked_dirty_ = true;
 }
