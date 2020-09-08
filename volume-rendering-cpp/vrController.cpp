@@ -137,7 +137,8 @@ void vrController::onDraw() {
     bool draw_finished =false;
     if(cp_update){
         cutter_->Update();
-        if(Manager::param_bool[dvr::CHECK_CUTTING] && !Manager::param_bool[dvr::CHECK_FREEZE_CPLANE]){cutter_->Draw();draw_finished=true;}
+         if(Manager::param_bool[dvr::CHECK_CUTTING])// && !Manager::param_bool[dvr::CHECK_FREEZE_CPLANE])
+         {cutter_->Draw();draw_finished=true;}
     }
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
@@ -153,7 +154,7 @@ void vrController::onDraw() {
                 if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(model_mat);
         }
     }
-    if(cp_update&&!draw_finished)cutter_->Draw();
+     if(cp_update&&!draw_finished)cutter_->Draw();
     Manager::baked_dirty_ = false;
     //  LOGE("===FPS: %.2f==\n", pm_.Update());
 }
@@ -170,7 +171,7 @@ void vrController::onTouchMove(float x, float y) {
     yoffset *= -MOUSE_ROTATE_SENSITIVITY;
 
     if(Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]){
-        cuttingController::instance()->onRotate(xoffset, yoffset);
+        cutter_->onRotate(xoffset, yoffset);
         return;
     }
 

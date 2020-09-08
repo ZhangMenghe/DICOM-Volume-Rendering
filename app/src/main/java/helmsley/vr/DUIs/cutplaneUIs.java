@@ -2,8 +2,10 @@ package helmsley.vr.DUIs;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -25,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import helmsley.vr.R;
-import helmsley.vr.UIsManager;
 
 public class cutplaneUIs extends BasePanel{
     final static String TAG = "cutplaneUIs";
@@ -43,12 +44,13 @@ public class cutplaneUIs extends BasePanel{
     private static float initial_progress;
     private static int max_progress_value;
     private Switch view_switch;
-
+    private ColorStateList normal_color, highlight_color;
     private int cutting_status = 0;//0 for none, 1 for cutting, 2 for traversal
     private final static int VIEW_SWITCH_ID = 4;
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
+        Resources res = activity.getResources();
 
         final LayoutInflater mInflater = LayoutInflater.from(activity);
 
@@ -60,9 +62,17 @@ public class cutplaneUIs extends BasePanel{
         spinner_check.setAdapter(cbAdapter_);
 
         //setup button
+        highlight_color = ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.yellowOrange));
+        normal_color = ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.brightBlue));
+
         btn_next = panel_.findViewById(R.id.cut_next_button);
         btn_next.setOnTouchListener(new View.OnTouchListener(){
             public boolean onTouch(View view, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    btn_next.setBackgroundTintList(highlight_color);
+                }else if(event.getAction()==MotionEvent.ACTION_UP){
+                    btn_next.setBackgroundTintList(normal_color);
+                }
                 JUIInterface.JUIsetCuttingPlaneDelta(0, 1);
                 return true;
             }
@@ -71,11 +81,15 @@ public class cutplaneUIs extends BasePanel{
         btn_prev = panel_.findViewById(R.id.cut_prev_button);
         btn_prev.setOnTouchListener(new View.OnTouchListener(){
             public boolean onTouch(View view, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN){
+                    btn_prev.setBackgroundTintList(highlight_color);//ColorStateList.valueOf(resources.getColor(R.id.blue_100)));
+                }else if(event.getAction()==MotionEvent.ACTION_UP){
+                    btn_prev.setBackgroundTintList(normal_color);
+                }
                 JUIInterface.JUIsetCuttingPlaneDelta(0, -1);
                 return true;
             }
         });
-        Resources res = activity.getResources();
 
         String[] check_names = res.getStringArray(R.array.cut_check_params);
         String[] check_values = res.getStringArray(R.array.cut_check_values);

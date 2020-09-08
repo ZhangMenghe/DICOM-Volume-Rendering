@@ -22,7 +22,7 @@ uniform float usample_step_inverse;
 struct Plane{
     vec3 p;
     vec3 normal;
-    vec3 s1, s2, s3;
+    float r;
 };
 uniform Plane uPlane;
 const float constantNCP = 1.0;
@@ -42,6 +42,9 @@ float RayPlane(vec3 ro, vec3 rd, vec3 planep, vec3 planen) {
     return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
 
+bool intersectRayWithCircle(vec3 M, float r){
+    return (M.x*M.x+M.y*M.y+M.z*M.z)<(r*r);
+}
 bool intersectRayWithSquare(vec3 M, vec3 s1, vec3 s2, vec3 s3){
     vec3 dms1 = M-s1;
     vec3 ds21 = s2 - s1; vec3 ds31 = s3 - s1; //should be perpendicular to each other
@@ -159,12 +162,13 @@ vec4 tracing(float u, float v){
     }
     else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-    drawed_square = (abs(t) < 1000.0)?intersectRayWithSquare(ro+rd*t, uPlane.s1, uPlane.s2, uPlane.s3):false;
+    drawed_square = (abs(t) < 1000.0)?intersectRayWithCircle(ro+rd*t, uPlane.r):false;
 
     if(blocked_by_plane && intersect.x <= intersect.y || abs(intersect.x - t) < 0.01) {
         vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
-        if(traced_color.a > 1e-5) return traced_color;
-        return drawed_square?mix(u_plane_color, traced_color , u_plane_color.a): traced_color;
+//        if(traced_color.a > 1e-5) return traced_color;
+        float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
+        return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
     }
 
     #endif

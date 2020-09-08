@@ -21,8 +21,13 @@ typedef enum{
 
 class cuttingController {
 private:
+    const float CUTTING_RADIUS = 0.5f;
+    const float DEFAULT_CUTTING_SCALE = 1.5f;
+    const float DEFAULT_TRAVERSAL_SCALE = 0.1f;
+
     const int center_sample_gap = 5;
-    float CMOVE_UNIT_SIZE = 0.05f;
+    float CMOVE_UNIT_SIZE = 0.02f;
+
     cPlane cplane_;
     cSphere csphere_;
 

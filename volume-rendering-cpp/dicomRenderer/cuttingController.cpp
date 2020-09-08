@@ -31,24 +31,24 @@ p_start_(ps), p_norm_(pn){
 void cuttingController::onReset(){
     p_point_ = p_start_;
     // p_point_world = glm::vec3(model_mat* glm::vec4(p_point_,1.0f));
+    p_scale = glm::vec3(DEFAULT_CUTTING_SCALE);
     update_modelMat_o();
-    p_scale = glm::vec3(1.0);
     rc.point=p_point_;rc.scale=p_scale;rc.rotate_mat=p_rotate_mat_;rc.move_value=cmove_value;
 }
 void cuttingController::Update(){
-    update_modelMat_o();
     auto model_mat = vrController::instance()->getModelMatrix(true);
-
     if(keep_cutting_position()){//keep it static
         glm::vec3 vdir_w = Manager::camera->getViewDirection();
         p_norm_ = vec3MatNorm(glm::inverse(model_mat), vdir_w);
-        
-        p_rotate_mat_ = rotMatFromDir(p_norm_);
-        p_p2o_mat = glm::translate(glm::mat4(1.0), p_point_)* p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
-        p_p2w_mat =  glm::mat4(1.0);//p_p2o_mat;
-        p_point_world = glm::vec3(p_p2w_mat * glm::vec4(p_point_,1.0f));
+        p_point_ += p_norm_ * cmove_value;
+
+       p_rotate_mat_ = rotMatFromDir(p_norm_);
+       p_p2o_mat = glm::translate(glm::mat4(1.0), p_point_)* p_rotate_mat_ * glm::scale(glm::mat4(1.0), p_scale);
+       p_p2w_mat =  glm::mat4(1.0);//p_p2o_mat;
+       p_point_world = glm::vec3(p_p2w_mat * glm::vec4(p_point_,1.0f));
     }
     else{
+        update_modelMat_o();
         p_point_world = glm::vec3(model_mat * glm::vec4(p_point_,1.0f));
         p_p2w_mat = model_mat * p_p2o_mat;
     }
@@ -63,16 +63,8 @@ void cuttingController::UpdateAndDraw(){
 void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);
-    if(includePoints){
-        vec3 pms[3];int i=0;
-        for(vec4 p: P_Points)
-            pms[i++] = vec3(p_p2o_mat * p);
-
-        Shader::Uniform(sp,"uPlane.s1", pms[0]);
-        Shader::Uniform(sp,"uPlane.s2", pms[1]);
-        Shader::Uniform(sp,"uPlane.s3", pms[2]);
-        Shader::Uniform(sp, "u_plane_color", plane_color_);
-    }
+    Shader::Uniform(sp,"uPlane.r", CUTTING_RADIUS * p_scale.x);
+    Shader::Uniform(sp, "u_plane_color", plane_color_);
 }
 
 void cuttingController::draw_plane(){
@@ -98,8 +90,8 @@ void cuttingController::draw_plane(){
 
          for (int a = 0,i=0; a < 360; a += 360 / 20,i++){
             double heading = a * 3.1415926535897932384626433832795 / 180;
-            vertices[3*i] = cos(heading) * 0.5f;
-            vertices[3*i+1] = sin(heading) * 0.5f;
+            vertices[3*i] = cos(heading) * CUTTING_RADIUS;
+            vertices[3*i+1] = sin(heading) * CUTTING_RADIUS;
             vertices[3*i+2] = .0f;
 
         }
@@ -176,7 +168,7 @@ void cuttingController::update_modelMat_o(){
 }
 void cuttingController::update_plane_(glm::mat4 rotMat){
     p_rotate_mat_ = rotMat;
-    p_norm_ = rotateNormal(p_rotate_mat_, glm::vec3(.0f, .0f, 1.0f));
+    p_norm_ = rotateNormal(p_rotate_mat_, glm::vec3(.0f, .0f, -1.0f));
 //    mat4 vm_inv = transpose(inverse(vrController::ModelMat_));
 //    glm::vec3 vp_obj = vec3MatNorm(vm_inv, vrController::camera->getCameraPosition());
 //    //cloest point
@@ -189,9 +181,9 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
     p_rotate_mat_ = rotMatFromDir(pNorm);
     glm::vec3 vp_obj = vec3MatNorm(vm_inv, Manager::camera->getCameraPosition());
     //cloest point
-    // p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
+     p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
     //debug
-    p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
+//    p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
 }
 void cuttingController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     if(cut_plane_id == dvr::CUT_CUTTING_PLANE && last_mode==dvr::CUT_TRAVERSAL){
@@ -235,7 +227,7 @@ void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
         glm::vec3 pp, pn;
         set_centerline_cutting(clp_id_,pp,pn);
 
-        rt.point=pp;rt.scale=glm::vec3(0.1f);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
+        rt.point=pp;rt.scale=glm::vec3(DEFAULT_TRAVERSAL_SCALE);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
         centerline_available = true;
     }
 }

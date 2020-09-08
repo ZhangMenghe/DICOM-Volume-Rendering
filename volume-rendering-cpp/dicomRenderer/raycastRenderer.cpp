@@ -17,7 +17,8 @@ DRAW_BAKED(screen_baked){
     Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
 }
 void raycastRenderer::Draw(glm::mat4 model_mat) {
-    if (DRAW_BAKED&&!Manager::param_bool[dvr::CUT_CUTTING_PLANE]) draw_baked(model_mat);
+    if (DRAW_BAKED)//&&!Manager::param_bool[dvr::CUT_CUTTING_PLANE])
+        draw_baked(model_mat);
     else draw_scene(model_mat);
 }
 
@@ -34,13 +35,6 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
     Shader::Uniform(sp, "uSampler", dvr::BAKED_TEX_ID);
     Shader::Uniform(sp, "uVPMat", Manager::camera->getProjMat()*Manager::camera->getViewMat());
-
-	// dim_scale_mat = glm::scale(glm::mat4(1.0), glm::vec3(1.0f, 1.0f, 164.0*3.0f/512.f));
-
-    // glm::mat4 modelmat = vrController::instance()->getModelMatrix()* dim_scale_mat;
-    // glm::mat4 modelmat =glm::translate(glm::mat4(1.0f), glm::vec3(.0,.0,1.0f)) 
-    //   * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f))
-    //   *  dim_scale_mat;
 
     glm::mat4 model_inv = glm::inverse(model_mat);
 
