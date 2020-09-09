@@ -95,7 +95,7 @@ private:
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
     float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
-    bool pre_draw_ = true;
+    bool pre_draw_ = false;
 
     //volume
     glm::vec3 vol_dimension_, vol_dim_scale_;

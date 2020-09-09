@@ -142,6 +142,11 @@ public class operateClient {
         for(float vp:values)tune_builder.addValues(vp);
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).build(), observer);
     }
+    public static void setTuneParams(TuneMsg.TuneType type, int tar, int sub_tar){
+        if(!initialized) return;
+        tune_builder.clear();
+        operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setSubTarget(sub_tar).build(), observer);
+    }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, int sub_tar, float value){
         if(!initialized) return;
         tune_builder.clear();

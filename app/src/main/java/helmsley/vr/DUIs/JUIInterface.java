@@ -26,7 +26,7 @@ public class JUIInterface {
     }
     static void JUIsetTuneWidgetById(int wid){
         JUIsetTuneWidgetByIdNative(wid);
-        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.SET_TARGET, wid);
+        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.SET_TARGET, wid, 0);
     }
     static void JUIremoveTuneWidgetById(int wid){
         JUIremoveTuneWidgetByIdNative(wid);
@@ -58,7 +58,7 @@ public class JUIInterface {
     }
     static void JUISwitchCuttingPlane(int id){
         JUISwitchCuttingPlaneNative(id);
-        //todo:onbroadcast
+        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.SET_TARGET, id, 1);
     }
     public static float[] JUIgetVCStates(){
         return JUIgetVCStatesNative();
@@ -66,12 +66,11 @@ public class JUIInterface {
 
     static void JUIsetCuttingPlane(float value){
         JUIsetCuttingPlaneNative(value);
-        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, 0, value);
+        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, -1, value);
     }
     static void JUIsetCuttingPlaneDelta(int id, int delta){
         JUIsetCuttingPlaneDeltaNative(id, delta);
-        //todo :
-        //        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, id, value);
+        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.CUT_PLANE, id, (float)delta);
     }
 
     static float[] JUIgetCuttingPlaneStatus(){

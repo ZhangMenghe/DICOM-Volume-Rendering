@@ -198,19 +198,23 @@ public class cutplaneUIs extends BasePanel{
 
         String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         int max_seek_value = Integer.parseInt(params[1]);
-        double percent = (Double) cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
+        Float percent = (Float)cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
         seek_bar_.setProgress((int)(percent * max_seek_value));
 
         //todo:jui send cutting plane status(pos/ori)
         boolean cut_status = (Boolean) cutmap.getOrDefault("status", default_primary_check);
         boolean freeze_volume = (Boolean) cutmap.getOrDefault("freeze volume", default_check_vales[1]);
         boolean freeze_plane = (Boolean) cutmap.getOrDefault("freeze plane", default_check_vales[2]);
-        primary_checkbox.setChecked(cut_status);
+        boolean center_line_traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_traversal_check);
+        boolean b_traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", false);
 
+        primary_checkbox.setChecked(cut_status);
         cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);
+        traversal_check_box.setChecked(center_line_traversal);
+        view_switch.setChecked(b_traversal_view);
+
         Collections.addAll(names, check_names_);
-        values.add(cut_status);
-        values.add(freeze_volume);values.add(freeze_plane);
+        values.add(cut_status);values.add(freeze_volume);values.add(freeze_plane);values.add(center_line_traversal);values.add(b_traversal_view);
 
 
         float[] cut_pose = default_cut_pose.clone();
@@ -228,6 +232,9 @@ public class cutplaneUIs extends BasePanel{
         map.put("status", primary_checkbox.isChecked());
         map.put("freeze volume", cbAdapter_.getValue(0));
         map.put("freeze plane", cbAdapter_.getValue(1));
+        map.put("Center Line Travel", traversal_check_box.isChecked());
+        map.put("Traversal View", view_switch.isChecked());
+
         map.put("percentage", (float)seek_bar_.getProgress() / Integer.parseInt(params[1]));
 
         map.put("ppoint", new ArrayList<Float>(Arrays.asList(cpv[0], cpv[1], cpv[2])));

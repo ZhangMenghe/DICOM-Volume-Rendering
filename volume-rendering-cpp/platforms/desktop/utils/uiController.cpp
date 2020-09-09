@@ -61,7 +61,7 @@ void uiController::InitCheckParam(){
     };
     bool values[pnum] = {
         //overall
-        true,
+        false,
         false,
         //cutting
         false,
@@ -70,12 +70,12 @@ void uiController::InitCheckParam(){
         false,
         false,
         //mask
+        false,
         true,
         true,
-        true,
-        true,
-        true,
-        true,
+        false,
+        false,
+        false,
     };
     InitCheckParam(pnum, keys, values);
 }
@@ -118,7 +118,6 @@ void uiController::onReset(helmsley::ResetMsg msg){
 
     auto vps = msg.volume_pose();
     auto cps = msg.camera_pose();
-    std::cout<<"size: "<<vps.size()<<" "<<cps.size()<<std::endl;
 
     vrController::instance()->onReset(
         glm::vec3(vps[0], vps[1], vps[2]),
@@ -163,7 +162,8 @@ void uiController::setTuneWidgetById(int id){
     overlayController::instance()->setWidgetId(id);
 }
 void uiController::setCuttingPlane(int id, float value){
-    vrController::instance()->setCuttingPlane(value);
+    if(id<0)vrController::instance()->setCuttingPlane(value);
+    else vrController::instance()->setCuttingPlane(id, value);
 }
 void uiController::setColorScheme(int id){
     Manager::color_scheme_id = id;

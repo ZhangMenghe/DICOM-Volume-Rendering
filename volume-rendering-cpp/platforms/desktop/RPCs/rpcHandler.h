@@ -24,7 +24,7 @@ using RPCVector = google::protobuf::RepeatedPtrField<T>;
 
 class rpcHandler{
 private:
-    std::string DATA_PATH = "helmsley_cached/";
+    std::string DATA_PATH = "dicom-data/";
     std::unique_ptr<helmsley::inspectorSync::Stub> stub_;
 	Request req;
 	helmsley::FrameUpdateMsg update_msg;

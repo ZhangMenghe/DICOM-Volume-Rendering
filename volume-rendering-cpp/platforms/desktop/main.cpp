@@ -81,16 +81,7 @@ void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset){
 	float f = 1.0 + yoffset * 0.1f;
 	controller_.onScale(f, f);
 }
-// void set_centerline_cutting(int id, int gap){
-// 	id = fmax(id, gap);
-// 	id = fmin(id,3999-gap);
 
-// 	float * data = cline_data[0];
-// 	glm::vec3 pp = glm::vec3(data[3*id],data[3*id+1],data[3*id+2]);
-// 	glm::vec3 pn = glm::vec3(data[3*(id+gap)], data[3*(id+gap)+1], data[3*(id+gap)+2]) - glm::vec3(data[3*(id-gap)], data[3*(id-gap)+1], data[3*(id-gap)+2]);
-// 	if(glm::dot(pn,glm::vec3(0,0,-1)) < .0f)pn=-pn;
-// 	controller_.setCuttingPlane(pp, pn);
-// }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods){
 	if(action==GLFW_RELEASE) return;
 	switch (key)
@@ -185,22 +176,17 @@ void onCreated(){
 		loader_.reset();
 	}
 	get_center_line_points();
-	// 	//load data
-	// if(loader_.loadData(ds_path+"mask_simple",128,128,41)){
-    //     controller_.setupSimpleMaskTexture(128,128,41, loader_.getSimpleMask());
-	// 	loader_.reset();
-	// }
 }
 void onDraw(){
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	controller_.onDraw();
 	if(controller_.isDrawing()) overlayController::instance()->onDraw();
 	
-	// if(Manager::new_data_available){
-	// 	Manager::new_data_available = false;
-	// 	loader_.startToAssemble(&controller_);
-	// 	loader_.reset();
-	// }
+	if(Manager::new_data_available){
+		Manager::new_data_available = false;
+		loader_.startToAssemble(&controller_);
+		loader_.reset();
+	}
 }
 void onViewChange(int width, int height){
 	manager_.onViewChange(width, height);

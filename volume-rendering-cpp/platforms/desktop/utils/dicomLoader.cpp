@@ -85,8 +85,6 @@ void dicomLoader::send_dicom_data(mLoadTarget target, int id, int chunk_size, in
    n_data_offset[target] += CHANEL_NUM / unit_size * chunk_size;   
 }
 void dicomLoader::startToAssemble(vrController* controller){
-    std::cout<<g_img_h<<" "<<g_img_w<< " "<< g_img_d<< " "<< g_vol_h<<" "<< g_vol_w<<" "<< g_vol_depth<<std::endl;
+    // std::cout<<g_img_h<<" "<<g_img_w<< " "<< g_img_d<< " "<< g_vol_h<<" "<< g_vol_w<<" "<< g_vol_depth<<std::endl;
     controller->assembleTexture(2, g_img_h, g_img_w, g_img_d, g_vol_h, g_vol_w, g_vol_depth, g_VolumeTexData, CHANEL_NUM);
-
-	// controller->assembleTexture(2, dims[0], dims[1], dims[2],-1,-1,-1, loader_.getVolumeData(), 4);
 }

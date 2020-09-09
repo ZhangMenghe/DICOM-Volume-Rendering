@@ -108,7 +108,8 @@ void rpcHandler::tack_tune_msg(helmsley::TuneMsg msg){
             ui_->setTuneWidgetVisibility(msg.target(), (msg.value()>0)?true:false);
             break;
         case TuneMsg_TuneType_SET_TARGET:
-            ui_->setTuneWidgetById(msg.target());
+            if(msg.sub_target() == 0) ui_->setTuneWidgetById(msg.target());
+            else if(msg.sub_target() == 1)vr_->SwitchCuttingPlane((dvr::PARAM_CUT_ID)msg.target());
             break;
         case TuneMsg_TuneType_CUT_PLANE:
             ui_->setCuttingPlane(msg.target(), msg.value());
@@ -126,12 +127,12 @@ void rpcHandler::tackle_volume_msg(helmsley::volumeConcise msg){
 	auto ss = msg.size();
 	loader_->setupDCMIConfig(dims[0], dims[1], dims[2],ss[0],ss[1],ss[2], msg.with_mask());
 
-	std::cout<<msg.vol_path()<<std::endl;
+	std::cout<<"Try to load from "<<DATA_PATH + msg.vol_path()<<std::endl;
 	if(!loader_->loadData(DATA_PATH + msg.vol_path()+"/data", DATA_PATH + msg.vol_path()+"/mask")){
-		std::cout<<"file not exist"<<std::endl;
+		std::cout<<"===ERROR==file not exist"<<std::endl;
 		return;
 	}
-		//todo: request from server
+	//todo: request from server
 	Manager::new_data_available = true;
 }
 void rpcHandler::tackle_reset_msg(helmsley::ResetMsg msg){
