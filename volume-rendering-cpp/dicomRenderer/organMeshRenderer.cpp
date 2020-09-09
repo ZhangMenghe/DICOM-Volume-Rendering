@@ -81,7 +81,7 @@ void organMeshRenderer::draw_scene(){
     glDisable(GL_DEPTH_TEST);
 }
 void organMeshRenderer::draw_baked(){
-//    if(!baked_dirty_) return;
+    if(!baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);

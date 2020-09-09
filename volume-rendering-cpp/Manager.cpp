@@ -28,6 +28,9 @@ void Manager::onViewChange(int w, int h){
     camera->setProjMat(w, h);
     screen_w = w; screen_h = h;
 }
+bool Manager::IsCuttingNeedUpdate(){
+    return param_bool[dvr::CHECK_CUTTING] || param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];
+}
 bool Manager::IsCuttingEnabled(){
     return param_bool[dvr::CHECK_CUTTING] ||(param_bool[dvr::CHECK_CENTER_LINE_TRAVEL] && param_bool[dvr::CHECK_TRAVERSAL_VIEW]);
 }

@@ -70,11 +70,11 @@ void uiController::InitCheckParam(){
         false,
         false,
         //mask
-        false,
         true,
         true,
-        false,
-        false,
+        true,
+        true,
+        true,
         false,
     };
     InitCheckParam(pnum, keys, values);

@@ -123,8 +123,9 @@ void vrController::onViewChange(int width, int height){
 }
 
 void vrController::draw_scene(){
+    if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
-    bool cp_update = Manager::param_bool[dvr::CHECK_CUTTING]||Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];
+    bool cp_update = Manager::IsCuttingNeedUpdate();
     bool draw_finished =false;
     if(cp_update){
         cutter_->Update();
@@ -150,11 +151,11 @@ void vrController::draw_scene(){
 }
 void vrController::onDraw() {
     if(!tex_volume) return;
-    if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     glClearColor(.0f,.0f,.0f,.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     if(!pre_draw_){draw_scene();return;}
 
+    //for pre-draw option
     if(isDirty()){
         screenQuad::instance()->Clear();
         draw_scene();
@@ -359,13 +360,19 @@ float* vrController::getCurrentReservedStates(){
 }
 bool vrController::isDirty() {
     if(!tex_volume) return false;
-    if(!pre_draw_||volume_model_dirty||Manager::baked_dirty_) return true;
-    if(cutter_->isPrecomputeDirty()){
+    if(!pre_draw_||volume_model_dirty||Manager::baked_dirty_){
+        meshRenderer_->dirtyPrecompute();
+        return true;
+    }
+    if(Manager::IsCuttingNeedUpdate()&&cutter_->isPrecomputeDirty()){
+        meshRenderer_->dirtyPrecompute();
         if(isRayCasting())raycastRenderer_->dirtyPrecompute();
         else texvrRenderer_->dirtyPrecompute();
         return true;
     }
-
-    if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
-    return texvrRenderer_->isPrecomputeDirty();
+    if(Manager::param_bool[dvr::CHECK_VOLUME_ON]){
+        if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
+        return texvrRenderer_->isPrecomputeDirty();
+    }
+    return false;
 }

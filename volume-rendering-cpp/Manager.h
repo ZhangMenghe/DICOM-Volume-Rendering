@@ -20,6 +20,7 @@ public:
     void onReset();
     void onViewChange(int w, int h);
     static bool IsCuttingEnabled();
+    static bool IsCuttingNeedUpdate();
 };
 
 
