@@ -49,7 +49,7 @@ struct TableStruct_proto_2ftransManager_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxillaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[10]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[11]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -60,6 +60,9 @@ namespace helmsley {
 class RequestWholeVolume;
 class RequestWholeVolumeDefaultTypeInternal;
 extern RequestWholeVolumeDefaultTypeInternal _RequestWholeVolume_default_instance_;
+class centerlineData;
+class centerlineDataDefaultTypeInternal;
+extern centerlineDataDefaultTypeInternal _centerlineData_default_instance_;
 class configResponse;
 class configResponseDefaultTypeInternal;
 extern configResponseDefaultTypeInternal _configResponse_default_instance_;
@@ -90,6 +93,7 @@ extern volumeWholeResponseDefaultTypeInternal _volumeWholeResponse_default_insta
 }  // namespace helmsley
 PROTOBUF_NAMESPACE_OPEN
 template<> ::helmsley::RequestWholeVolume* Arena::CreateMaybeMessage<::helmsley::RequestWholeVolume>(Arena*);
+template<> ::helmsley::centerlineData* Arena::CreateMaybeMessage<::helmsley::centerlineData>(Arena*);
 template<> ::helmsley::configResponse* Arena::CreateMaybeMessage<::helmsley::configResponse>(Arena*);
 template<> ::helmsley::configResponse_configInfo* Arena::CreateMaybeMessage<::helmsley::configResponse_configInfo>(Arena*);
 template<> ::helmsley::datasetResponse* Arena::CreateMaybeMessage<::helmsley::datasetResponse>(Arena*);
@@ -1744,6 +1748,157 @@ class volumeWholeResponse PROTOBUF_FINAL :
 };
 // -------------------------------------------------------------------
 
+class centerlineData PROTOBUF_FINAL :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.centerlineData) */ {
+ public:
+  inline centerlineData() : centerlineData(nullptr) {};
+  virtual ~centerlineData();
+
+  centerlineData(const centerlineData& from);
+  centerlineData(centerlineData&& from) noexcept
+    : centerlineData() {
+    *this = ::std::move(from);
+  }
+
+  inline centerlineData& operator=(const centerlineData& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline centerlineData& operator=(centerlineData&& from) noexcept {
+    if (GetArena() == from.GetArena()) {
+      if (this != &from) InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return GetMetadataStatic().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return GetMetadataStatic().reflection;
+  }
+  static const centerlineData& default_instance();
+
+  static void InitAsDefaultInstance();  // FOR INTERNAL USE ONLY
+  static inline const centerlineData* internal_default_instance() {
+    return reinterpret_cast<const centerlineData*>(
+               &_centerlineData_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    8;
+
+  friend void swap(centerlineData& a, centerlineData& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(centerlineData* other) {
+    if (other == this) return;
+    if (GetArena() == other->GetArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(centerlineData* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetArena() == other->GetArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline centerlineData* New() const final {
+    return CreateMaybeMessage<centerlineData>(nullptr);
+  }
+
+  centerlineData* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<centerlineData>(arena);
+  }
+  void CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) final;
+  void CopyFrom(const centerlineData& from);
+  void MergeFrom(const centerlineData& from);
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  inline void SharedCtor();
+  inline void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(centerlineData* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "helmsley.centerlineData";
+  }
+  protected:
+  explicit centerlineData(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+  private:
+  static ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadataStatic() {
+    ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&::descriptor_table_proto_2ftransManager_2eproto);
+    return ::descriptor_table_proto_2ftransManager_2eproto.file_level_metadata[kIndexInFileMessages];
+  }
+
+  public:
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kDataFieldNumber = 1,
+  };
+  // repeated float data = 1;
+  int data_size() const;
+  private:
+  int _internal_data_size() const;
+  public:
+  void clear_data();
+  private:
+  float _internal_data(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      _internal_data() const;
+  void _internal_add_data(float value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      _internal_mutable_data();
+  public:
+  float data(int index) const;
+  void set_data(int index, float value);
+  void add_data(float value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+      data() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+      mutable_data();
+
+  // @@protoc_insertion_point(class_scope:helmsley.centerlineData)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< float > data_;
+  mutable std::atomic<int> _data_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_proto_2ftransManager_2eproto;
+};
+// -------------------------------------------------------------------
+
 class dcmImage PROTOBUF_FINAL :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:helmsley.dcmImage) */ {
  public:
@@ -1786,7 +1941,7 @@ class dcmImage PROTOBUF_FINAL :
                &_dcmImage_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    8;
+    9;
 
   friend void swap(dcmImage& a, dcmImage& b) {
     a.Swap(&b);
@@ -1961,7 +2116,7 @@ class RequestWholeVolume PROTOBUF_FINAL :
                &_RequestWholeVolume_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    9;
+    10;
 
   friend void swap(RequestWholeVolume& a, RequestWholeVolume& b) {
     a.Swap(&b);
@@ -3570,6 +3725,57 @@ inline void volumeWholeResponse::unsafe_arena_set_allocated_data(
 
 // -------------------------------------------------------------------
 
+// centerlineData
+
+// repeated float data = 1;
+inline int centerlineData::_internal_data_size() const {
+  return data_.size();
+}
+inline int centerlineData::data_size() const {
+  return _internal_data_size();
+}
+inline void centerlineData::clear_data() {
+  data_.Clear();
+}
+inline float centerlineData::_internal_data(int index) const {
+  return data_.Get(index);
+}
+inline float centerlineData::data(int index) const {
+  // @@protoc_insertion_point(field_get:helmsley.centerlineData.data)
+  return _internal_data(index);
+}
+inline void centerlineData::set_data(int index, float value) {
+  data_.Set(index, value);
+  // @@protoc_insertion_point(field_set:helmsley.centerlineData.data)
+}
+inline void centerlineData::_internal_add_data(float value) {
+  data_.Add(value);
+}
+inline void centerlineData::add_data(float value) {
+  _internal_add_data(value);
+  // @@protoc_insertion_point(field_add:helmsley.centerlineData.data)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+centerlineData::_internal_data() const {
+  return data_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >&
+centerlineData::data() const {
+  // @@protoc_insertion_point(field_list:helmsley.centerlineData.data)
+  return _internal_data();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+centerlineData::_internal_mutable_data() {
+  return &data_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< float >*
+centerlineData::mutable_data() {
+  // @@protoc_insertion_point(field_mutable_list:helmsley.centerlineData.data)
+  return _internal_mutable_data();
+}
+
+// -------------------------------------------------------------------
+
 // dcmImage
 
 // int32 dcmID = 1;
@@ -3821,6 +4027,8 @@ inline void RequestWholeVolume::set_unit_size(::PROTOBUF_NAMESPACE_ID::int32 val
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

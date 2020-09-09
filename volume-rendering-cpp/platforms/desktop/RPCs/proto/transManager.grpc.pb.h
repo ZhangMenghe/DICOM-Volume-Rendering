@@ -102,6 +102,15 @@ class dataTransfer final {
     std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::helmsley::volumeWholeResponse>> PrepareAsyncDownloadMasksVolume(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::helmsley::volumeWholeResponse>>(PrepareAsyncDownloadMasksVolumeRaw(context, request, cq));
     }
+    std::unique_ptr< ::grpc::ClientReaderInterface< ::helmsley::centerlineData>> DownloadCenterLineData(::grpc::ClientContext* context, const ::Request& request) {
+      return std::unique_ptr< ::grpc::ClientReaderInterface< ::helmsley::centerlineData>>(DownloadCenterLineDataRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::helmsley::centerlineData>> AsyncDownloadCenterLineData(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::helmsley::centerlineData>>(AsyncDownloadCenterLineDataRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::helmsley::centerlineData>> PrepareAsyncDownloadCenterLineData(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReaderInterface< ::helmsley::centerlineData>>(PrepareAsyncDownloadCenterLineDataRaw(context, request, cq));
+    }
     class experimental_async_interface {
      public:
       virtual ~experimental_async_interface() {}
@@ -166,6 +175,11 @@ class dataTransfer final {
       #else
       virtual void DownloadMasksVolume(::grpc::ClientContext* context, ::Request* request, ::grpc::experimental::ClientReadReactor< ::helmsley::volumeWholeResponse>* reactor) = 0;
       #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      virtual void DownloadCenterLineData(::grpc::ClientContext* context, ::Request* request, ::grpc::ClientReadReactor< ::helmsley::centerlineData>* reactor) = 0;
+      #else
+      virtual void DownloadCenterLineData(::grpc::ClientContext* context, ::Request* request, ::grpc::experimental::ClientReadReactor< ::helmsley::centerlineData>* reactor) = 0;
+      #endif
     };
     #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
     typedef class experimental_async_interface async_interface;
@@ -196,6 +210,9 @@ class dataTransfer final {
     virtual ::grpc::ClientReaderInterface< ::helmsley::volumeWholeResponse>* DownloadMasksVolumeRaw(::grpc::ClientContext* context, const ::Request& request) = 0;
     virtual ::grpc::ClientAsyncReaderInterface< ::helmsley::volumeWholeResponse>* AsyncDownloadMasksVolumeRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
     virtual ::grpc::ClientAsyncReaderInterface< ::helmsley::volumeWholeResponse>* PrepareAsyncDownloadMasksVolumeRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) = 0;
+    virtual ::grpc::ClientReaderInterface< ::helmsley::centerlineData>* DownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::helmsley::centerlineData>* AsyncDownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) = 0;
+    virtual ::grpc::ClientAsyncReaderInterface< ::helmsley::centerlineData>* PrepareAsyncDownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) = 0;
   };
   class Stub final : public StubInterface {
    public:
@@ -266,6 +283,15 @@ class dataTransfer final {
     std::unique_ptr< ::grpc::ClientAsyncReader< ::helmsley::volumeWholeResponse>> PrepareAsyncDownloadMasksVolume(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncReader< ::helmsley::volumeWholeResponse>>(PrepareAsyncDownloadMasksVolumeRaw(context, request, cq));
     }
+    std::unique_ptr< ::grpc::ClientReader< ::helmsley::centerlineData>> DownloadCenterLineData(::grpc::ClientContext* context, const ::Request& request) {
+      return std::unique_ptr< ::grpc::ClientReader< ::helmsley::centerlineData>>(DownloadCenterLineDataRaw(context, request));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::helmsley::centerlineData>> AsyncDownloadCenterLineData(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::helmsley::centerlineData>>(AsyncDownloadCenterLineDataRaw(context, request, cq, tag));
+    }
+    std::unique_ptr< ::grpc::ClientAsyncReader< ::helmsley::centerlineData>> PrepareAsyncDownloadCenterLineData(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
+      return std::unique_ptr< ::grpc::ClientAsyncReader< ::helmsley::centerlineData>>(PrepareAsyncDownloadCenterLineDataRaw(context, request, cq));
+    }
     class experimental_async final :
       public StubInterface::experimental_async_interface {
      public:
@@ -330,6 +356,11 @@ class dataTransfer final {
       #else
       void DownloadMasksVolume(::grpc::ClientContext* context, ::Request* request, ::grpc::experimental::ClientReadReactor< ::helmsley::volumeWholeResponse>* reactor) override;
       #endif
+      #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      void DownloadCenterLineData(::grpc::ClientContext* context, ::Request* request, ::grpc::ClientReadReactor< ::helmsley::centerlineData>* reactor) override;
+      #else
+      void DownloadCenterLineData(::grpc::ClientContext* context, ::Request* request, ::grpc::experimental::ClientReadReactor< ::helmsley::centerlineData>* reactor) override;
+      #endif
      private:
       friend class Stub;
       explicit experimental_async(Stub* stub): stub_(stub) { }
@@ -362,6 +393,9 @@ class dataTransfer final {
     ::grpc::ClientReader< ::helmsley::volumeWholeResponse>* DownloadMasksVolumeRaw(::grpc::ClientContext* context, const ::Request& request) override;
     ::grpc::ClientAsyncReader< ::helmsley::volumeWholeResponse>* AsyncDownloadMasksVolumeRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) override;
     ::grpc::ClientAsyncReader< ::helmsley::volumeWholeResponse>* PrepareAsyncDownloadMasksVolumeRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) override;
+    ::grpc::ClientReader< ::helmsley::centerlineData>* DownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request) override;
+    ::grpc::ClientAsyncReader< ::helmsley::centerlineData>* AsyncDownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) override;
+    ::grpc::ClientAsyncReader< ::helmsley::centerlineData>* PrepareAsyncDownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) override;
     const ::grpc::internal::RpcMethod rpcmethod_getAvailableConfigs_;
     const ::grpc::internal::RpcMethod rpcmethod_exportConfigs_;
     const ::grpc::internal::RpcMethod rpcmethod_getAvailableDatasets_;
@@ -370,6 +404,7 @@ class dataTransfer final {
     const ::grpc::internal::RpcMethod rpcmethod_DownloadVolume_;
     const ::grpc::internal::RpcMethod rpcmethod_DownloadMasks_;
     const ::grpc::internal::RpcMethod rpcmethod_DownloadMasksVolume_;
+    const ::grpc::internal::RpcMethod rpcmethod_DownloadCenterLineData_;
   };
   static std::unique_ptr<Stub> NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
 
@@ -385,6 +420,7 @@ class dataTransfer final {
     virtual ::grpc::Status DownloadVolume(::grpc::ServerContext* context, const ::helmsley::RequestWholeVolume* request, ::grpc::ServerWriter< ::helmsley::volumeWholeResponse>* writer);
     virtual ::grpc::Status DownloadMasks(::grpc::ServerContext* context, const ::Request* request, ::grpc::ServerWriter< ::helmsley::dcmImage>* writer);
     virtual ::grpc::Status DownloadMasksVolume(::grpc::ServerContext* context, const ::Request* request, ::grpc::ServerWriter< ::helmsley::volumeWholeResponse>* writer);
+    virtual ::grpc::Status DownloadCenterLineData(::grpc::ServerContext* context, const ::Request* request, ::grpc::ServerWriter< ::helmsley::centerlineData>* writer);
   };
   template <class BaseClass>
   class WithAsyncMethod_getAvailableConfigs : public BaseClass {
@@ -546,7 +582,27 @@ class dataTransfer final {
       ::grpc::Service::RequestAsyncServerStreaming(7, context, request, writer, new_call_cq, notification_cq, tag);
     }
   };
-  typedef WithAsyncMethod_getAvailableConfigs<WithAsyncMethod_exportConfigs<WithAsyncMethod_getAvailableDatasets<WithAsyncMethod_getVolumeFromDataset<WithAsyncMethod_Download<WithAsyncMethod_DownloadVolume<WithAsyncMethod_DownloadMasks<WithAsyncMethod_DownloadMasksVolume<Service > > > > > > > > AsyncService;
+  template <class BaseClass>
+  class WithAsyncMethod_DownloadCenterLineData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithAsyncMethod_DownloadCenterLineData() {
+      ::grpc::Service::MarkMethodAsync(8);
+    }
+    ~WithAsyncMethod_DownloadCenterLineData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DownloadCenterLineData(::grpc::ServerContext* /*context*/, const ::Request* /*request*/, ::grpc::ServerWriter< ::helmsley::centerlineData>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestDownloadCenterLineData(::grpc::ServerContext* context, ::Request* request, ::grpc::ServerAsyncWriter< ::helmsley::centerlineData>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(8, context, request, writer, new_call_cq, notification_cq, tag);
+    }
+  };
+  typedef WithAsyncMethod_getAvailableConfigs<WithAsyncMethod_exportConfigs<WithAsyncMethod_getAvailableDatasets<WithAsyncMethod_getVolumeFromDataset<WithAsyncMethod_Download<WithAsyncMethod_DownloadVolume<WithAsyncMethod_DownloadMasks<WithAsyncMethod_DownloadMasksVolume<WithAsyncMethod_DownloadCenterLineData<Service > > > > > > > > > AsyncService;
   template <class BaseClass>
   class ExperimentalWithCallbackMethod_getAvailableConfigs : public BaseClass {
    private:
@@ -878,11 +934,49 @@ class dataTransfer final {
     #endif
       { return nullptr; }
   };
+  template <class BaseClass>
+  class ExperimentalWithCallbackMethod_DownloadCenterLineData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithCallbackMethod_DownloadCenterLineData() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodCallback(8,
+          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::Request, ::helmsley::centerlineData>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const ::Request* request) { return this->DownloadCenterLineData(context, request); }));
+    }
+    ~ExperimentalWithCallbackMethod_DownloadCenterLineData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DownloadCenterLineData(::grpc::ServerContext* /*context*/, const ::Request* /*request*/, ::grpc::ServerWriter< ::helmsley::centerlineData>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerWriteReactor< ::helmsley::centerlineData>* DownloadCenterLineData(
+      ::grpc::CallbackServerContext* /*context*/, const ::Request* /*request*/)
+    #else
+    virtual ::grpc::experimental::ServerWriteReactor< ::helmsley::centerlineData>* DownloadCenterLineData(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::Request* /*request*/)
+    #endif
+      { return nullptr; }
+  };
   #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
-  typedef ExperimentalWithCallbackMethod_getAvailableConfigs<ExperimentalWithCallbackMethod_exportConfigs<ExperimentalWithCallbackMethod_getAvailableDatasets<ExperimentalWithCallbackMethod_getVolumeFromDataset<ExperimentalWithCallbackMethod_Download<ExperimentalWithCallbackMethod_DownloadVolume<ExperimentalWithCallbackMethod_DownloadMasks<ExperimentalWithCallbackMethod_DownloadMasksVolume<Service > > > > > > > > CallbackService;
+  typedef ExperimentalWithCallbackMethod_getAvailableConfigs<ExperimentalWithCallbackMethod_exportConfigs<ExperimentalWithCallbackMethod_getAvailableDatasets<ExperimentalWithCallbackMethod_getVolumeFromDataset<ExperimentalWithCallbackMethod_Download<ExperimentalWithCallbackMethod_DownloadVolume<ExperimentalWithCallbackMethod_DownloadMasks<ExperimentalWithCallbackMethod_DownloadMasksVolume<ExperimentalWithCallbackMethod_DownloadCenterLineData<Service > > > > > > > > > CallbackService;
   #endif
 
-  typedef ExperimentalWithCallbackMethod_getAvailableConfigs<ExperimentalWithCallbackMethod_exportConfigs<ExperimentalWithCallbackMethod_getAvailableDatasets<ExperimentalWithCallbackMethod_getVolumeFromDataset<ExperimentalWithCallbackMethod_Download<ExperimentalWithCallbackMethod_DownloadVolume<ExperimentalWithCallbackMethod_DownloadMasks<ExperimentalWithCallbackMethod_DownloadMasksVolume<Service > > > > > > > > ExperimentalCallbackService;
+  typedef ExperimentalWithCallbackMethod_getAvailableConfigs<ExperimentalWithCallbackMethod_exportConfigs<ExperimentalWithCallbackMethod_getAvailableDatasets<ExperimentalWithCallbackMethod_getVolumeFromDataset<ExperimentalWithCallbackMethod_Download<ExperimentalWithCallbackMethod_DownloadVolume<ExperimentalWithCallbackMethod_DownloadMasks<ExperimentalWithCallbackMethod_DownloadMasksVolume<ExperimentalWithCallbackMethod_DownloadCenterLineData<Service > > > > > > > > > ExperimentalCallbackService;
   template <class BaseClass>
   class WithGenericMethod_getAvailableConfigs : public BaseClass {
    private:
@@ -1015,6 +1109,23 @@ class dataTransfer final {
     }
     // disable synchronous version of this method
     ::grpc::Status DownloadMasksVolume(::grpc::ServerContext* /*context*/, const ::Request* /*request*/, ::grpc::ServerWriter< ::helmsley::volumeWholeResponse>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+  };
+  template <class BaseClass>
+  class WithGenericMethod_DownloadCenterLineData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithGenericMethod_DownloadCenterLineData() {
+      ::grpc::Service::MarkMethodGeneric(8);
+    }
+    ~WithGenericMethod_DownloadCenterLineData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DownloadCenterLineData(::grpc::ServerContext* /*context*/, const ::Request* /*request*/, ::grpc::ServerWriter< ::helmsley::centerlineData>* /*writer*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -1177,6 +1288,26 @@ class dataTransfer final {
     }
     void RequestDownloadMasksVolume(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
       ::grpc::Service::RequestAsyncServerStreaming(7, context, request, writer, new_call_cq, notification_cq, tag);
+    }
+  };
+  template <class BaseClass>
+  class WithRawMethod_DownloadCenterLineData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawMethod_DownloadCenterLineData() {
+      ::grpc::Service::MarkMethodRaw(8);
+    }
+    ~WithRawMethod_DownloadCenterLineData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DownloadCenterLineData(::grpc::ServerContext* /*context*/, const ::Request* /*request*/, ::grpc::ServerWriter< ::helmsley::centerlineData>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    void RequestDownloadCenterLineData(::grpc::ServerContext* context, ::grpc::ByteBuffer* request, ::grpc::ServerAsyncWriter< ::grpc::ByteBuffer>* writer, ::grpc::CompletionQueue* new_call_cq, ::grpc::ServerCompletionQueue* notification_cq, void *tag) {
+      ::grpc::Service::RequestAsyncServerStreaming(8, context, request, writer, new_call_cq, notification_cq, tag);
     }
   };
   template <class BaseClass>
@@ -1484,6 +1615,44 @@ class dataTransfer final {
       { return nullptr; }
   };
   template <class BaseClass>
+  class ExperimentalWithRawCallbackMethod_DownloadCenterLineData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    ExperimentalWithRawCallbackMethod_DownloadCenterLineData() {
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+      ::grpc::Service::
+    #else
+      ::grpc::Service::experimental().
+    #endif
+        MarkMethodRawCallback(8,
+          new ::grpc_impl::internal::CallbackServerStreamingHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+                   ::grpc::CallbackServerContext*
+    #else
+                   ::grpc::experimental::CallbackServerContext*
+    #endif
+                     context, const::grpc::ByteBuffer* request) { return this->DownloadCenterLineData(context, request); }));
+    }
+    ~ExperimentalWithRawCallbackMethod_DownloadCenterLineData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status DownloadCenterLineData(::grpc::ServerContext* /*context*/, const ::Request* /*request*/, ::grpc::ServerWriter< ::helmsley::centerlineData>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    #ifdef GRPC_CALLBACK_API_NONEXPERIMENTAL
+    virtual ::grpc::ServerWriteReactor< ::grpc::ByteBuffer>* DownloadCenterLineData(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
+    #else
+    virtual ::grpc::experimental::ServerWriteReactor< ::grpc::ByteBuffer>* DownloadCenterLineData(
+      ::grpc::experimental::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/)
+    #endif
+      { return nullptr; }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_getAvailableConfigs : public BaseClass {
    private:
     void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
@@ -1700,8 +1869,35 @@ class dataTransfer final {
     // replace default version of method with split streamed
     virtual ::grpc::Status StreamedDownloadMasksVolume(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::Request,::helmsley::volumeWholeResponse>* server_split_streamer) = 0;
   };
-  typedef WithSplitStreamingMethod_getVolumeFromDataset<WithSplitStreamingMethod_Download<WithSplitStreamingMethod_DownloadVolume<WithSplitStreamingMethod_DownloadMasks<WithSplitStreamingMethod_DownloadMasksVolume<Service > > > > > SplitStreamedService;
-  typedef WithStreamedUnaryMethod_getAvailableConfigs<WithStreamedUnaryMethod_exportConfigs<WithStreamedUnaryMethod_getAvailableDatasets<WithSplitStreamingMethod_getVolumeFromDataset<WithSplitStreamingMethod_Download<WithSplitStreamingMethod_DownloadVolume<WithSplitStreamingMethod_DownloadMasks<WithSplitStreamingMethod_DownloadMasksVolume<Service > > > > > > > > StreamedService;
+  template <class BaseClass>
+  class WithSplitStreamingMethod_DownloadCenterLineData : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithSplitStreamingMethod_DownloadCenterLineData() {
+      ::grpc::Service::MarkMethodStreamed(8,
+        new ::grpc::internal::SplitServerStreamingHandler<
+          ::Request, ::helmsley::centerlineData>(
+            [this](::grpc_impl::ServerContext* context,
+                   ::grpc_impl::ServerSplitStreamer<
+                     ::Request, ::helmsley::centerlineData>* streamer) {
+                       return this->StreamedDownloadCenterLineData(context,
+                         streamer);
+                  }));
+    }
+    ~WithSplitStreamingMethod_DownloadCenterLineData() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable regular version of this method
+    ::grpc::Status DownloadCenterLineData(::grpc::ServerContext* /*context*/, const ::Request* /*request*/, ::grpc::ServerWriter< ::helmsley::centerlineData>* /*writer*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    // replace default version of method with split streamed
+    virtual ::grpc::Status StreamedDownloadCenterLineData(::grpc::ServerContext* context, ::grpc::ServerSplitStreamer< ::Request,::helmsley::centerlineData>* server_split_streamer) = 0;
+  };
+  typedef WithSplitStreamingMethod_getVolumeFromDataset<WithSplitStreamingMethod_Download<WithSplitStreamingMethod_DownloadVolume<WithSplitStreamingMethod_DownloadMasks<WithSplitStreamingMethod_DownloadMasksVolume<WithSplitStreamingMethod_DownloadCenterLineData<Service > > > > > > SplitStreamedService;
+  typedef WithStreamedUnaryMethod_getAvailableConfigs<WithStreamedUnaryMethod_exportConfigs<WithStreamedUnaryMethod_getAvailableDatasets<WithSplitStreamingMethod_getVolumeFromDataset<WithSplitStreamingMethod_Download<WithSplitStreamingMethod_DownloadVolume<WithSplitStreamingMethod_DownloadMasks<WithSplitStreamingMethod_DownloadMasksVolume<WithSplitStreamingMethod_DownloadCenterLineData<Service > > > > > > > > > StreamedService;
 };
 
 }  // namespace helmsley

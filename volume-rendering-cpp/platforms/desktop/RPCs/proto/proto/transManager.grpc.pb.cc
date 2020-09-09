@@ -30,6 +30,7 @@ static const char* dataTransfer_method_names[] = {
   "/helmsley.dataTransfer/DownloadVolume",
   "/helmsley.dataTransfer/DownloadMasks",
   "/helmsley.dataTransfer/DownloadMasksVolume",
+  "/helmsley.dataTransfer/DownloadCenterLineData",
 };
 
 std::unique_ptr< dataTransfer::Stub> dataTransfer::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
@@ -47,6 +48,7 @@ dataTransfer::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& chann
   , rpcmethod_DownloadVolume_(dataTransfer_method_names[5], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   , rpcmethod_DownloadMasks_(dataTransfer_method_names[6], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   , rpcmethod_DownloadMasksVolume_(dataTransfer_method_names[7], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
+  , rpcmethod_DownloadCenterLineData_(dataTransfer_method_names[8], ::grpc::internal::RpcMethod::SERVER_STREAMING, channel)
   {}
 
 ::grpc::Status dataTransfer::Stub::getAvailableConfigs(::grpc::ClientContext* context, const ::Request& request, ::helmsley::configResponse* response) {
@@ -213,6 +215,22 @@ void dataTransfer::Stub::experimental_async::DownloadMasksVolume(::grpc::ClientC
   return ::grpc_impl::internal::ClientAsyncReaderFactory< ::helmsley::volumeWholeResponse>::Create(channel_.get(), cq, rpcmethod_DownloadMasksVolume_, context, request, false, nullptr);
 }
 
+::grpc::ClientReader< ::helmsley::centerlineData>* dataTransfer::Stub::DownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request) {
+  return ::grpc_impl::internal::ClientReaderFactory< ::helmsley::centerlineData>::Create(channel_.get(), rpcmethod_DownloadCenterLineData_, context, request);
+}
+
+void dataTransfer::Stub::experimental_async::DownloadCenterLineData(::grpc::ClientContext* context, ::Request* request, ::grpc::experimental::ClientReadReactor< ::helmsley::centerlineData>* reactor) {
+  ::grpc_impl::internal::ClientCallbackReaderFactory< ::helmsley::centerlineData>::Create(stub_->channel_.get(), stub_->rpcmethod_DownloadCenterLineData_, context, request, reactor);
+}
+
+::grpc::ClientAsyncReader< ::helmsley::centerlineData>* dataTransfer::Stub::AsyncDownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq, void* tag) {
+  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::helmsley::centerlineData>::Create(channel_.get(), cq, rpcmethod_DownloadCenterLineData_, context, request, true, tag);
+}
+
+::grpc::ClientAsyncReader< ::helmsley::centerlineData>* dataTransfer::Stub::PrepareAsyncDownloadCenterLineDataRaw(::grpc::ClientContext* context, const ::Request& request, ::grpc::CompletionQueue* cq) {
+  return ::grpc_impl::internal::ClientAsyncReaderFactory< ::helmsley::centerlineData>::Create(channel_.get(), cq, rpcmethod_DownloadCenterLineData_, context, request, false, nullptr);
+}
+
 dataTransfer::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       dataTransfer_method_names[0],
@@ -294,6 +312,16 @@ dataTransfer::Service::Service() {
              ::grpc_impl::ServerWriter<::helmsley::volumeWholeResponse>* writer) {
                return service->DownloadMasksVolume(ctx, req, writer);
              }, this)));
+  AddMethod(new ::grpc::internal::RpcServiceMethod(
+      dataTransfer_method_names[8],
+      ::grpc::internal::RpcMethod::SERVER_STREAMING,
+      new ::grpc::internal::ServerStreamingHandler< dataTransfer::Service, ::Request, ::helmsley::centerlineData>(
+          [](dataTransfer::Service* service,
+             ::grpc_impl::ServerContext* ctx,
+             const ::Request* req,
+             ::grpc_impl::ServerWriter<::helmsley::centerlineData>* writer) {
+               return service->DownloadCenterLineData(ctx, req, writer);
+             }, this)));
 }
 
 dataTransfer::Service::~Service() {
@@ -349,6 +377,13 @@ dataTransfer::Service::~Service() {
 }
 
 ::grpc::Status dataTransfer::Service::DownloadMasksVolume(::grpc::ServerContext* context, const ::Request* request, ::grpc::ServerWriter< ::helmsley::volumeWholeResponse>* writer) {
+  (void) context;
+  (void) request;
+  (void) writer;
+  return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+}
+
+::grpc::Status dataTransfer::Service::DownloadCenterLineData(::grpc::ServerContext* context, const ::Request* request, ::grpc::ServerWriter< ::helmsley::centerlineData>* writer) {
   (void) context;
   (void) request;
   (void) writer;

@@ -51,6 +51,10 @@ class volumeWholeResponseDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<volumeWholeResponse> _instance;
 } _volumeWholeResponse_default_instance_;
+class centerlineDataDefaultTypeInternal {
+ public:
+  ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<centerlineData> _instance;
+} _centerlineData_default_instance_;
 class dcmImageDefaultTypeInternal {
  public:
   ::PROTOBUF_NAMESPACE_ID::internal::ExplicitlyConstructed<dcmImage> _instance;
@@ -73,6 +77,20 @@ static void InitDefaultsscc_info_RequestWholeVolume_proto_2ftransManager_2eproto
 
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_RequestWholeVolume_proto_2ftransManager_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_RequestWholeVolume_proto_2ftransManager_2eproto}, {}};
+
+static void InitDefaultsscc_info_centerlineData_proto_2ftransManager_2eproto() {
+  GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+  {
+    void* ptr = &::helmsley::_centerlineData_default_instance_;
+    new (ptr) ::helmsley::centerlineData();
+    ::PROTOBUF_NAMESPACE_ID::internal::OnShutdownDestroyMessage(ptr);
+  }
+  ::helmsley::centerlineData::InitAsDefaultInstance();
+}
+
+::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_centerlineData_proto_2ftransManager_2eproto =
+    {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_centerlineData_proto_2ftransManager_2eproto}, {}};
 
 static void InitDefaultsscc_info_configResponse_proto_2ftransManager_2eproto() {
   GOOGLE_PROTOBUF_VERIFY_VERSION;
@@ -204,7 +222,7 @@ static void InitDefaultsscc_info_volumeWholeResponse_proto_2ftransManager_2eprot
 ::PROTOBUF_NAMESPACE_ID::internal::SCCInfo<0> scc_info_volumeWholeResponse_proto_2ftransManager_2eproto =
     {{ATOMIC_VAR_INIT(::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase::kUninitialized), 0, 0, InitDefaultsscc_info_volumeWholeResponse_proto_2ftransManager_2eproto}, {}};
 
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_proto_2ftransManager_2eproto[10];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_proto_2ftransManager_2eproto[11];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_proto_2ftransManager_2eproto[1];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_proto_2ftransManager_2eproto = nullptr;
 
@@ -276,6 +294,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_proto_2ftransManager_2eproto::
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::helmsley::volumeWholeResponse, data_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::helmsley::centerlineData, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::helmsley::centerlineData, data_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::helmsley::dcmImage, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -301,8 +325,9 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 39, -1, sizeof(::helmsley::volumeResponse_volumeInfo)},
   { 54, -1, sizeof(::helmsley::volumeResponse)},
   { 60, -1, sizeof(::helmsley::volumeWholeResponse)},
-  { 66, -1, sizeof(::helmsley::dcmImage)},
-  { 74, -1, sizeof(::helmsley::RequestWholeVolume)},
+  { 66, -1, sizeof(::helmsley::centerlineData)},
+  { 72, -1, sizeof(::helmsley::dcmImage)},
+  { 80, -1, sizeof(::helmsley::RequestWholeVolume)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -314,6 +339,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_volumeResponse_volumeInfo_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_volumeResponse_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_volumeWholeResponse_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_centerlineData_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_dcmImage_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::helmsley::_RequestWholeVolume_default_instance_),
 };
@@ -342,29 +368,32 @@ const char descriptor_table_protodef_proto_2ftransManager_2eproto[] PROTOBUF_SEC
   "\n\006scores\030\n \001(\0132\".helmsley.volumeResponse"
   ".scoreInfo\"/\n\nDataSource\022\t\n\005LOCAL\020\000\022\n\n\006S"
   "ERVER\020\001\022\n\n\006DEVICE\020\002\"#\n\023volumeWholeRespon"
-  "se\022\014\n\004data\030\001 \001(\014\"9\n\010dcmImage\022\r\n\005dcmID\030\001 "
-  "\001(\005\022\020\n\010position\030\002 \001(\002\022\014\n\004data\030\003 \001(\014\"K\n\022R"
-  "equestWholeVolume\022\021\n\tclient_id\030\001 \001(\005\022\017\n\007"
-  "req_msg\030\002 \001(\t\022\021\n\tunit_size\030\003 \001(\0052\340\003\n\014dat"
-  "aTransfer\0229\n\023getAvailableConfigs\022\010.Reque"
-  "st\032\030.helmsley.configResponse\022*\n\rexportCo"
-  "nfigs\022\010.Request\032\017.commonResponse\022;\n\024getA"
-  "vailableDatasets\022\010.Request\032\031.helmsley.da"
-  "tasetResponse\022<\n\024getVolumeFromDataset\022\010."
-  "Request\032\030.helmsley.volumeResponse0\001\022*\n\010D"
-  "ownload\022\010.Request\032\022.helmsley.dcmImage0\001\022"
-  "O\n\016DownloadVolume\022\034.helmsley.RequestWhol"
-  "eVolume\032\035.helmsley.volumeWholeResponse0\001"
-  "\022/\n\rDownloadMasks\022\010.Request\032\022.helmsley.d"
-  "cmImage0\001\022@\n\023DownloadMasksVolume\022\010.Reque"
-  "st\032\035.helmsley.volumeWholeResponse0\001b\006pro"
-  "to3"
+  "se\022\014\n\004data\030\001 \001(\014\"\036\n\016centerlineData\022\014\n\004da"
+  "ta\030\001 \003(\002\"9\n\010dcmImage\022\r\n\005dcmID\030\001 \001(\005\022\020\n\010p"
+  "osition\030\002 \001(\002\022\014\n\004data\030\003 \001(\014\"K\n\022RequestWh"
+  "oleVolume\022\021\n\tclient_id\030\001 \001(\005\022\017\n\007req_msg\030"
+  "\002 \001(\t\022\021\n\tunit_size\030\003 \001(\0052\240\004\n\014dataTransfe"
+  "r\0229\n\023getAvailableConfigs\022\010.Request\032\030.hel"
+  "msley.configResponse\022*\n\rexportConfigs\022\010."
+  "Request\032\017.commonResponse\022;\n\024getAvailable"
+  "Datasets\022\010.Request\032\031.helmsley.datasetRes"
+  "ponse\022<\n\024getVolumeFromDataset\022\010.Request\032"
+  "\030.helmsley.volumeResponse0\001\022*\n\010Download\022"
+  "\010.Request\032\022.helmsley.dcmImage0\001\022O\n\016Downl"
+  "oadVolume\022\034.helmsley.RequestWholeVolume\032"
+  "\035.helmsley.volumeWholeResponse0\001\022/\n\rDown"
+  "loadMasks\022\010.Request\032\022.helmsley.dcmImage0"
+  "\001\022@\n\023DownloadMasksVolume\022\010.Request\032\035.hel"
+  "msley.volumeWholeResponse0\001\022>\n\026DownloadC"
+  "enterLineData\022\010.Request\032\030.helmsley.cente"
+  "rlineData0\001b\006proto3"
   ;
 static const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable*const descriptor_table_proto_2ftransManager_2eproto_deps[1] = {
   &::descriptor_table_proto_2fcommon_2eproto,
 };
-static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_proto_2ftransManager_2eproto_sccs[10] = {
+static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_proto_2ftransManager_2eproto_sccs[11] = {
   &scc_info_RequestWholeVolume_proto_2ftransManager_2eproto.base,
+  &scc_info_centerlineData_proto_2ftransManager_2eproto.base,
   &scc_info_configResponse_proto_2ftransManager_2eproto.base,
   &scc_info_configResponse_configInfo_proto_2ftransManager_2eproto.base,
   &scc_info_datasetResponse_proto_2ftransManager_2eproto.base,
@@ -377,10 +406,10 @@ static ::PROTOBUF_NAMESPACE_ID::internal::SCCInfoBase*const descriptor_table_pro
 };
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_proto_2ftransManager_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_proto_2ftransManager_2eproto = {
-  false, false, descriptor_table_protodef_proto_2ftransManager_2eproto, "proto/transManager.proto", 1563,
-  &descriptor_table_proto_2ftransManager_2eproto_once, descriptor_table_proto_2ftransManager_2eproto_sccs, descriptor_table_proto_2ftransManager_2eproto_deps, 10, 1,
+  false, false, descriptor_table_protodef_proto_2ftransManager_2eproto, "proto/transManager.proto", 1659,
+  &descriptor_table_proto_2ftransManager_2eproto_once, descriptor_table_proto_2ftransManager_2eproto_sccs, descriptor_table_proto_2ftransManager_2eproto_deps, 11, 1,
   schemas, file_default_instances, TableStruct_proto_2ftransManager_2eproto::offsets,
-  file_level_metadata_proto_2ftransManager_2eproto, 10, file_level_enum_descriptors_proto_2ftransManager_2eproto, file_level_service_descriptors_proto_2ftransManager_2eproto,
+  file_level_metadata_proto_2ftransManager_2eproto, 11, file_level_enum_descriptors_proto_2ftransManager_2eproto, file_level_service_descriptors_proto_2ftransManager_2eproto,
 };
 
 // Force running AddDescriptors() at dynamic initialization time.
@@ -2666,6 +2695,211 @@ void volumeWholeResponse::InternalSwap(volumeWholeResponse* other) {
 
 // ===================================================================
 
+void centerlineData::InitAsDefaultInstance() {
+}
+class centerlineData::_Internal {
+ public:
+};
+
+centerlineData::centerlineData(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena),
+  data_(arena) {
+  SharedCtor();
+  RegisterArenaDtor(arena);
+  // @@protoc_insertion_point(arena_constructor:helmsley.centerlineData)
+}
+centerlineData::centerlineData(const centerlineData& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      data_(from.data_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:helmsley.centerlineData)
+}
+
+void centerlineData::SharedCtor() {
+}
+
+centerlineData::~centerlineData() {
+  // @@protoc_insertion_point(destructor:helmsley.centerlineData)
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+void centerlineData::SharedDtor() {
+  GOOGLE_DCHECK(GetArena() == nullptr);
+}
+
+void centerlineData::ArenaDtor(void* object) {
+  centerlineData* _this = reinterpret_cast< centerlineData* >(object);
+  (void)_this;
+}
+void centerlineData::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void centerlineData::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+const centerlineData& centerlineData::default_instance() {
+  ::PROTOBUF_NAMESPACE_ID::internal::InitSCC(&::scc_info_centerlineData_proto_2ftransManager_2eproto.base);
+  return *internal_default_instance();
+}
+
+
+void centerlineData::Clear() {
+// @@protoc_insertion_point(message_clear_start:helmsley.centerlineData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  data_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* centerlineData::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  ::PROTOBUF_NAMESPACE_ID::Arena* arena = GetArena(); (void)arena;
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    CHK_(ptr);
+    switch (tag >> 3) {
+      // repeated float data = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::PackedFloatParser(_internal_mutable_data(), ptr, ctx);
+          CHK_(ptr);
+        } else if (static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 13) {
+          _internal_add_data(::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<float>(ptr));
+          ptr += sizeof(float);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag & 7) == 4 || tag == 0) {
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* centerlineData::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:helmsley.centerlineData)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated float data = 1;
+  if (this->_internal_data_size() > 0) {
+    target = stream->WriteFixedPacked(1, _internal_data(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:helmsley.centerlineData)
+  return target;
+}
+
+size_t centerlineData::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:helmsley.centerlineData)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated float data = 1;
+  {
+    unsigned int count = static_cast<unsigned int>(this->_internal_data_size());
+    size_t data_size = 4UL * count;
+    if (data_size > 0) {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+            static_cast<::PROTOBUF_NAMESPACE_ID::int32>(data_size));
+    }
+    int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(data_size);
+    _data_cached_byte_size_.store(cached_size,
+                                    std::memory_order_relaxed);
+    total_size += data_size;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+void centerlineData::MergeFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_merge_from_start:helmsley.centerlineData)
+  GOOGLE_DCHECK_NE(&from, this);
+  const centerlineData* source =
+      ::PROTOBUF_NAMESPACE_ID::DynamicCastToGenerated<centerlineData>(
+          &from);
+  if (source == nullptr) {
+  // @@protoc_insertion_point(generalized_merge_from_cast_fail:helmsley.centerlineData)
+    ::PROTOBUF_NAMESPACE_ID::internal::ReflectionOps::Merge(from, this);
+  } else {
+  // @@protoc_insertion_point(generalized_merge_from_cast_success:helmsley.centerlineData)
+    MergeFrom(*source);
+  }
+}
+
+void centerlineData::MergeFrom(const centerlineData& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:helmsley.centerlineData)
+  GOOGLE_DCHECK_NE(&from, this);
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  data_.MergeFrom(from.data_);
+}
+
+void centerlineData::CopyFrom(const ::PROTOBUF_NAMESPACE_ID::Message& from) {
+// @@protoc_insertion_point(generalized_copy_from_start:helmsley.centerlineData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+void centerlineData::CopyFrom(const centerlineData& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:helmsley.centerlineData)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool centerlineData::IsInitialized() const {
+  return true;
+}
+
+void centerlineData::InternalSwap(centerlineData* other) {
+  using std::swap;
+  _internal_metadata_.Swap<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(&other->_internal_metadata_);
+  data_.InternalSwap(&other->data_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata centerlineData::GetMetadata() const {
+  return GetMetadataStatic();
+}
+
+
+// ===================================================================
+
 void dcmImage::InitAsDefaultInstance() {
 }
 class dcmImage::_Internal {
@@ -3223,6 +3457,9 @@ template<> PROTOBUF_NOINLINE ::helmsley::volumeResponse* Arena::CreateMaybeMessa
 }
 template<> PROTOBUF_NOINLINE ::helmsley::volumeWholeResponse* Arena::CreateMaybeMessage< ::helmsley::volumeWholeResponse >(Arena* arena) {
   return Arena::CreateMessageInternal< ::helmsley::volumeWholeResponse >(arena);
+}
+template<> PROTOBUF_NOINLINE ::helmsley::centerlineData* Arena::CreateMaybeMessage< ::helmsley::centerlineData >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::helmsley::centerlineData >(arena);
 }
 template<> PROTOBUF_NOINLINE ::helmsley::dcmImage* Arena::CreateMaybeMessage< ::helmsley::dcmImage >(Arena* arena) {
   return Arena::CreateMessageInternal< ::helmsley::dcmImage >(arena);
