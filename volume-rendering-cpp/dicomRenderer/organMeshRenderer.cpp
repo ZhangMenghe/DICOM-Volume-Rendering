@@ -71,6 +71,16 @@ void organMeshRenderer::draw_scene(){
                     Manager::camera->getProjMat() * Manager::camera->getViewMat()
                     * vrController::instance()->getModelMatrix(true));
     Shader::Uniform(dsp, "uDrawWire", Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME]);
+    
+    bool is_cut_enable = Manager::IsCuttingEnabled();
+    Shader::Uniform(dsp, "uEnableCut", is_cut_enable);
+
+    if(is_cut_enable){
+        glm::vec3 pp,pn;
+        vrController::instance()->getCuttingPlane(pp, pn);
+        float d = pp.x*pn.x+pp.y*pn.y+pp.z*pn.z;
+        Shader::Uniform(dsp, "uPlaneVec", glm::vec4(pn.x, pn.y, pn.z, -d));
+    }
 
     glBindVertexArray(vao_);
     glDrawArrays(GL_TRIANGLES, 0, max_number_of_vertices);

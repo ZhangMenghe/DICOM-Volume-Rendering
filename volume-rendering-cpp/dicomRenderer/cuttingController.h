@@ -110,6 +110,7 @@ public:
     bool IsCenterLineAvailable(){return centerline_available;}
     bool isPrecomputeDirty(){return baked_dirty;}
     void dirtyPrecompute(){baked_dirty = true;}
+    void getCuttingPlane(glm::vec3& pp, glm::vec3& pn);
 };
 
 

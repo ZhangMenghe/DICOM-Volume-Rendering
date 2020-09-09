@@ -73,6 +73,9 @@ void cuttingController::setCuttingParams(GLuint sp){
     Shader::Uniform(sp,"uPlane.r", CUTTING_RADIUS * p_scale.x);
     Shader::Uniform(sp, "u_plane_color", plane_color_);
 }
+void cuttingController::getCuttingPlane(glm::vec3& pp, glm::vec3& pn){
+    pp = p_point_; pn=p_norm_;
+}
 void cuttingController::draw_baked(){
 //    if(!baked_dirty)return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);

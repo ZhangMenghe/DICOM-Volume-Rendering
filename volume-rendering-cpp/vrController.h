@@ -58,6 +58,7 @@ public:
     glm::mat4 getRotationMatrix(){return RotateMat_;}
     float* getCurrentReservedStates();
     float* getCuttingPlane();
+    void getCuttingPlane(glm::vec3& pp, glm::vec3& pn){cutter_->getCuttingPlane(pp,pn);}
     bool isDirty();
 
 private:

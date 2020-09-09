@@ -7,11 +7,15 @@ in VS_OUT
 	vec3 position;
 	vec3 normal;
     vec3 vbc;
+    float ucut;
 } fs_in;
 out vec4 fragColor;
 uniform bool uDrawWire;
+uniform bool uEnableCut;
 
 void main() {
+	if(uEnableCut && fs_in.ucut<.0)
+		discard;
 	if(uDrawWire && fs_in.vbc.x > 0.02 && fs_in.vbc.y > 0.02 && fs_in.vbc.z > 0.02)
 		discard;
 	// Some very basic diffuse lighting...
