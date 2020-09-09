@@ -41,11 +41,11 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
             glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
 //    Shader::Uniform(sp,"sample_step_inverse", 1.0f / Manager::param_ray[dvr::TR_DENSITY]);
     Shader::Uniform(sp,"usample_step_inverse", 1.0f/600.0f);
-    
+
     if(Manager::IsCuttingEnabled())shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
 
-    vrController::instance()->setCuttingParams(sp, false);
+    vrController::instance()->setCuttingParams(sp);
 
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
@@ -64,7 +64,7 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
 }
 
 void raycastRenderer::draw_baked(glm::mat4 model_mat){
-    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
+    if(!baked_dirty_) return;
     if(!cshader_){
         cshader_ = new Shader;
         if(!cshader_->AddShader(GL_COMPUTE_SHADER, Manager::shader_contents[dvr::SHADER_RAYCASTCOMPUTE_GLSL])
@@ -90,7 +90,7 @@ void raycastRenderer::draw_baked(glm::mat4 model_mat){
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "usample_step_inverse", 1.0f / 600.0f);
     //todo
-    vrController::instance()->setCuttingParams(sp, true);
+    vrController::instance()->setCuttingParams(sp);
 
     glDispatchCompute((GLuint)(ray_baked_screen->Width() + 7) / 8, (GLuint)(ray_baked_screen->Height() + 7) / 8, 1);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -100,7 +100,4 @@ void raycastRenderer::draw_baked(glm::mat4 model_mat){
 
     cshader_->UnUse();
     baked_dirty_ = false;
-
-    //todo: draw screen quad
-    screenQuad::instance()->Draw();
 }

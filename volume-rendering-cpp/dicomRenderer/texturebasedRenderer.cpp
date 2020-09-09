@@ -72,7 +72,6 @@ void texvrRenderer::update_instance_data(GLuint& vbo_instance, bool is_front){
 
     delete[]zInfos;
 }
-//BE SUPER CAUTIOUS TO CHANGE!
 void texvrRenderer::draw_scene(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -87,15 +86,14 @@ void texvrRenderer::draw_scene(){
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
     glm::mat4 modelmat = vrController::instance()->getModelMatrix();
-    //     glm::mat4 modelmat =
-    //     glm::translate(glm::mat4(1.0f), glm::vec3(.0,.0,1.0f)) 
-    //   * glm::scale(glm::mat4(1.0f), glm::vec3(0.5f));
     Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat() * modelmat);
     Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
-    if(rotmat[2][2] > 0){
+    glm::vec3 dir = Manager::camera->getViewDirection();
+    float test = rotmat[2][2] * dir.z;
+    if(test < 0){
         Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
         Shader::Uniform(sp, "u_front", true);
         glFrontFace(GL_CCW);
@@ -106,10 +104,9 @@ void texvrRenderer::draw_scene(){
         glFrontFace(GL_CW);
         glBindVertexArray(vao_back); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
     }
-    glFrontFace(GL_CCW);
-    glBindVertexArray(0);
 
     shader_->UnUse();
+    glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_CULL_FACE);
@@ -117,21 +114,20 @@ void texvrRenderer::draw_scene(){
 
 void texvrRenderer::Draw(bool pre_draw){
     if(!b_init_successful) {init_vertices(vao_front,vbo_front,true);init_vertices(vao_back,vbo_back,false);}
-    if(pre_draw) {draw_baked(); return;}
-    draw_scene();
+    if(pre_draw) draw_baked();
+    else draw_scene();
 }
 
 void texvrRenderer::draw_baked() {
-    if(!baked_dirty_) {screenQuad::instance()->Draw(); return;}
+    if(!baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     //render to texture
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_DEPTH_BUFFER_BIT);
     draw_scene();
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    screenQuad::instance()->Draw();
     baked_dirty_ = false;
 }
 

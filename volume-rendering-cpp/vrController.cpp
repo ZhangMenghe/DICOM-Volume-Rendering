@@ -121,17 +121,14 @@ void vrController::onViewChange(int width, int height){
     glClear(GL_COLOR_BUFFER_BIT);
     screenQuad::instance()->onScreenSizeChange(width, height);
 }
-void vrController::onDraw() {
-    if(!tex_volume) return;
-    if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
-    //ORDER REALLY MATTERS!!!!
 
+void vrController::draw_scene(){
     glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
     bool cp_update = Manager::param_bool[dvr::CHECK_CUTTING]||Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];
     bool draw_finished =false;
     if(cp_update){
         cutter_->Update();
-        if(Manager::param_bool[dvr::CHECK_CUTTING]){cutter_->Draw();draw_finished=true;}
+        if(Manager::param_bool[dvr::CHECK_CUTTING]){cutter_->Draw(pre_draw_);draw_finished=true;}
     }
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
@@ -140,16 +137,29 @@ void vrController::onDraw() {
     }
 
     if(Manager::param_bool[dvr::CHECK_MASKON]){
-        if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]) meshRenderer_->Draw();
+        if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]) meshRenderer_->Draw(pre_draw_);
         //draw centerline
         if(Manager::param_bool[dvr::CHECK_CENTER_LINE]){
             for(auto line:line_renderers_)
-                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(model_mat);
+                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(pre_draw_,model_mat);
         }
     }
-     if(cp_update&&!draw_finished)cutter_->Draw();
+    if(cp_update&&!draw_finished)cutter_->Draw(pre_draw_);
     Manager::baked_dirty_ = false;
     //  LOGE("===FPS: %.2f==\n", pm_.Update());
+}
+void vrController::onDraw() {
+    if(!tex_volume) return;
+    if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
+    glClearColor(.0f,.0f,.0f,.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    if(!pre_draw_){draw_scene();return;}
+
+    if(isDirty()){
+        screenQuad::instance()->Clear();
+        draw_scene();
+    }
+    screenQuad::instance()->Draw();
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
@@ -312,8 +322,8 @@ void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
 float* vrController::getCuttingPlane(){
     return cutter_->getCutPlane();
 }
-void vrController::setCuttingParams(GLuint sp, bool includePoints){
-    cutter_->setCuttingParams(sp, includePoints);
+void vrController::setCuttingParams(GLuint sp){
+    cutter_->setCuttingParams(sp);
 }
 void vrController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     cutter_->SwitchCuttingPlane(cut_plane_id);
@@ -346,4 +356,16 @@ float* vrController::getCurrentReservedStates(){
     memcpy(data+25, glm::value_ptr(Manager::camera->getViewUpDirection()), 3* sizeof(float));
     memcpy(data+28, glm::value_ptr(Manager::camera->getViewCenter()), 3* sizeof(float));
     return data;
+}
+bool vrController::isDirty() {
+    if(!tex_volume) return false;
+    if(!pre_draw_||volume_model_dirty||Manager::baked_dirty_) return true;
+    if(cutter_->isPrecomputeDirty()){
+        if(isRayCasting())raycastRenderer_->dirtyPrecompute();
+        else texvrRenderer_->dirtyPrecompute();
+        return true;
+    }
+
+    if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
+    return texvrRenderer_->isPrecomputeDirty();
 }

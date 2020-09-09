@@ -108,8 +108,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		ui_.setCheck("Cutting", !Manager::param_bool[dvr::CHECK_CUTTING]);
 		if(Manager::param_bool[dvr::CHECK_CUTTING]){
 			ui_.setCheck("Center Line Travel",false);
-			std::cout<<"switch to cutting plane mode"<<std::endl;
+            std::cout<<"switch to cutting plane mode"<<std::endl;
 			controller_.SwitchCuttingPlane(dvr::CUT_CUTTING_PLANE);
+            controller_.setCuttingPlane(0.5f);
 		}
 		break;
 	case GLFW_KEY_T:
@@ -184,7 +185,6 @@ void onCreated(){
 		loader_.reset();
 	}
 	get_center_line_points();
-
 	// 	//load data
 	// if(loader_.loadData(ds_path+"mask_simple",128,128,41)){
     //     controller_.setupSimpleMaskTexture(128,128,41, loader_.getSimpleMask());

@@ -39,17 +39,17 @@ public:
 
     //setter funcs
     void setPredrawOption(bool pre_draw){pre_draw_=pre_draw;}
-    void setShaderContents(dvr::SHADER_FILES fid, std::string content);
+    static void setShaderContents(dvr::SHADER_FILES fid, std::string content);
     void setMVPStatus(std::string status_name);
     void setCuttingPlane(float value);
     void setCuttingPlane(int id, int delta);
     void setCuttingPlane(glm::vec3 pp, glm::vec3 pn);
+    void setCuttingParams(GLuint sp);
     void setDualParameter(int id, float lv, float rv);
     void setRenderParam(int id, float value);
     void setRenderParam(float* values){memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));Manager::baked_dirty_=true;}
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
-//    void setCenterLinePos(int id, int delta_id = 0){cutter_->setCenterLinePos(id, delta_id);}
-    
+
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}
@@ -58,7 +58,8 @@ public:
     glm::mat4 getRotationMatrix(){return RotateMat_;}
     float* getCurrentReservedStates();
     float* getCuttingPlane();
-    void setCuttingParams(GLuint sp, bool includePoints = false);
+    bool isDirty();
+
 private:
     static vrController* myPtr_;
 
@@ -112,12 +113,6 @@ private:
     void updateVolumeModelMat();
     void precompute();
     static bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
-
-
-    // glm::vec3 tnorms[3] = {
-    //     glm::vec3(1,1,1),
-    //     glm::vec3(1,1,1),
-    //     glm::vec3(1,1,1)
-    // };
+    void draw_scene();
 };
 #endif

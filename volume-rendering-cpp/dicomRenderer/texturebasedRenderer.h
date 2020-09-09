@@ -35,6 +35,7 @@ public:
     void setCuttingPlane(float percent);
     void setCuttingPlaneDelta(int delta);
     void Draw(bool pre_draw);
+    bool isPrecomputeDirty(){return baked_dirty_;}
     void dirtyPrecompute(){baked_dirty_ = true;}
 };
 #endif

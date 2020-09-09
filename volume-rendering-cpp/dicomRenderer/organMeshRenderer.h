@@ -12,6 +12,8 @@ private:
 
     Shader* shader_= nullptr, *shader_draw_;
     GLuint vao_= 0;
+    GLuint frame_buff_ = 0;
+    bool baked_dirty_;
 
     GLuint buffer_vertices=0;
     GLuint buffer_triangle_table=0;
@@ -20,12 +22,15 @@ private:
     size_t buffer_size;
     size_t max_number_of_vertices;
     glm::vec3 volume_size;
-  
+    void draw_scene();
+    void draw_baked();
 public:
     organMeshRenderer();
     ~organMeshRenderer();
 
     void Setup(int h, int w, int d);
-    void Draw();
+    void Draw(bool pre_draw);
+    void dirtyPrecompute(){baked_dirty_ = true;}
+    bool isPrecomputeDirty(){return baked_dirty_;}
 };
 #endif

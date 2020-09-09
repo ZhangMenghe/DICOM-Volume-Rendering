@@ -3,8 +3,7 @@
 #include <dicomRenderer/Constants.h>
 #include <dicomRenderer/screenQuad.h>
 #include <glm/gtx/string_cast.hpp>
-centerLineRenderer::centerLineRenderer(int id, bool screen_baked)
-:DRAW_BAKED(screen_baked),uid(id){
+centerLineRenderer::centerLineRenderer(int id):uid(id){
     glGenVertexArrays(1, &vao_);
     glGenBuffers(1, &vbo_);
 
@@ -25,15 +24,17 @@ centerLineRenderer::centerLineRenderer(int id, bool screen_baked)
 
     Shader::Uniform(sp, "uBaseColor", (id==4)?glm::vec4(1.0f, .0f, .0f, 1.0f):glm::vec4(1.0f, 1.0f, .0f, 1.0f));
     shader_.UnUse();
+    baked_dirty_ = true;
 }
 void centerLineRenderer::updateVertices(int point_num, const float * data){
-        draw_point_num = point_num;
-        glBindBuffer(GL_ARRAY_BUFFER, vbo_);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, point_num * 3 * sizeof(float), data);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    draw_point_num = point_num;
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, point_num * 3 * sizeof(float), data);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    baked_dirty_ = true;
 }
-void centerLineRenderer::onDraw(glm::mat4 model_mat){
-    if(DRAW_BAKED) draw_baked(model_mat);
+void centerLineRenderer::onDraw(bool pre_draw, glm::mat4 model_mat){
+    if(pre_draw) draw_baked(model_mat);
     else draw_scene(model_mat);
 }
 void centerLineRenderer::draw_scene(glm::mat4 model_mat){   
@@ -46,7 +47,7 @@ void centerLineRenderer::draw_scene(glm::mat4 model_mat){
     shader_.UnUse();
 }
 void centerLineRenderer::draw_baked(glm::mat4 model_mat){
-    if(!baked_dirty_) return;
+//    if(!baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);

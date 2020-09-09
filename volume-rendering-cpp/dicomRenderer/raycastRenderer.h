@@ -15,6 +15,7 @@ private:
 public:
     raycastRenderer();
     void Draw(bool pre_draw, glm::mat4 model_mat);
+    bool isPrecomputeDirty(){return baked_dirty_;}
     void dirtyPrecompute(){baked_dirty_ = true;}
 };
 #endif

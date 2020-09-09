@@ -1,4 +1,5 @@
 #include "cuttingController.h"
+#include "screenQuad.h"
 
 #include <glm/gtx/transform.hpp>
 #include <vrController.h>
@@ -34,6 +35,7 @@ void cuttingController::onReset(){
     p_scale = glm::vec3(DEFAULT_CUTTING_SCALE);
     update_modelMat_o();
     rc.point=p_point_;rc.scale=p_scale;rc.rotate_mat=p_rotate_mat_;rc.move_value=cmove_value;
+    baked_dirty=true;
 }
 void cuttingController::Update(){
     auto model_mat = vrController::instance()->getModelMatrix(true);
@@ -53,18 +55,35 @@ void cuttingController::Update(){
         p_p2w_mat = model_mat * p_p2o_mat;
     }
 }
-void cuttingController::Draw(){
-    if(Manager::param_bool[dvr::CHECK_CUTTING] || Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]) draw_plane();
+void cuttingController::Draw(bool pre_draw){
+    if(Manager::param_bool[dvr::CHECK_CUTTING] || Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        if(pre_draw)draw_baked();
+        else draw_plane();
+    }
 }
 void cuttingController::UpdateAndDraw(){
     Update();
-    if(Manager::param_bool[dvr::CHECK_CUTTING] || Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]) draw_plane();
+    if(Manager::param_bool[dvr::CHECK_CUTTING] || Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        draw_plane();
+    }
 }
-void cuttingController::setCuttingParams(GLuint sp, bool includePoints){
+void cuttingController::setCuttingParams(GLuint sp){
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);
     Shader::Uniform(sp,"uPlane.r", CUTTING_RADIUS * p_scale.x);
     Shader::Uniform(sp, "u_plane_color", plane_color_);
+}
+void cuttingController::draw_baked(){
+//    if(!baked_dirty)return;
+    if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
+    //render to texture
+    glm::vec2 tsize = screenQuad::instance()->getTexSize();
+    glViewport(0, 0, tsize.x, tsize.y);
+    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    draw_plane();
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    baked_dirty = false;
 }
 
 void cuttingController::draw_plane(){
@@ -79,7 +98,6 @@ void cuttingController::draw_plane(){
            ||!pshader->CompileAndLink())
             LOGE("Raycast===Failed to create cutting plane shader program===");
         // Manager::shader_contents[dvr::SHADER_CPLANE_VERT] = "";Manager::shader_contents[dvr::SHADER_CPLANE_FRAG]="";
-
     }
     GLuint sp = pshader->Use();
     Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat() * p_p2w_mat);
@@ -120,6 +138,7 @@ void cuttingController::setCutPlane(float value){
     p_point_ = p_start_+p_norm_*value;
     cmove_value = .0f;
     p_p2o_dirty = true;
+    baked_dirty=true;
 }
 bool cuttingController::keep_cutting_position(){
     return Manager::param_bool[dvr::CHECK_FREEZE_CPLANE];
@@ -131,6 +150,7 @@ void cuttingController::setCutPlane(glm::vec3 pp, glm::vec3 normal){
     p_rotate_mat_ = rotMatFromDir(p_norm_);
     cmove_value = .0f;
     p_p2o_dirty = true;
+    baked_dirty=true;
 }
 void cuttingController::setCuttingPlaneDelta(int delta){
     float value = delta * CMOVE_UNIT_SIZE;
@@ -138,6 +158,7 @@ void cuttingController::setCuttingPlaneDelta(int delta){
     p_point_ += p_norm_ * value;
     cmove_value = .0f;
     p_p2o_dirty = true;
+    baked_dirty=true;
 }
 float* cuttingController::getCutPlane(){
     float* data = new float[6];
@@ -151,15 +172,18 @@ void cuttingController::onRotate(float offx, float offy){
                     * glm::rotate(glm::mat4(1.0f), offy, glm::vec3(1,0,0))
                     * p_rotate_mat_);
     p_p2o_dirty = true;
+    baked_dirty=true;
 }
 
 void cuttingController::onScale(float sx, float sy, float sz){
     if(sy < .0f) p_scale = p_scale * sx;
     else p_scale = p_scale * glm::vec3(sx, sy, sz);
     p_p2o_dirty = true;
+    baked_dirty=true;
 }
 void cuttingController::onTranslate(float offx, float offy){
     //do nothing currently
+    baked_dirty=true;
 }
 void cuttingController::update_modelMat_o(){
     if(!p_p2o_dirty) return;
@@ -207,6 +231,7 @@ void cuttingController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
 
         last_mode = dvr::CUT_TRAVERSAL;
     }
+    baked_dirty=true;
 }
 void cuttingController::set_centerline_cutting(int& id, glm::vec3& pp, glm::vec3& pn){
 	id = fmax(id, center_sample_gap);
@@ -230,6 +255,7 @@ void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
         rt.point=pp;rt.scale=glm::vec3(DEFAULT_TRAVERSAL_SCALE);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
         centerline_available = true;
     }
+    baked_dirty=true;
 }
 void cuttingController::setCenterLinePos(int id, int delta_id){
     if(delta_id == 0){
@@ -239,6 +265,7 @@ void cuttingController::setCenterLinePos(int id, int delta_id){
     }
     set_centerline_cutting(clp_id_, p_point_, p_norm_);
     setCutPlane(p_point_, p_norm_);
+    baked_dirty=true;
 }
 void cuttingController::getCurrentTraversalInfo(glm::vec3& pp, glm::vec3& pn){
     set_centerline_cutting(clp_id_, pp, pn);

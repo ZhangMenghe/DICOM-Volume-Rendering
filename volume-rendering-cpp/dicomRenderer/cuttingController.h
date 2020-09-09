@@ -33,6 +33,8 @@ private:
 
     Shader* pshader = nullptr;
     GLuint pVAO_ = 0;
+    GLuint frame_buff_ = 0;
+    bool baked_dirty = true;
 
     const glm::vec4 P_Points[3] = {
         glm::vec4(-0.5f,0.5f,.0f,1.0f),
@@ -72,6 +74,7 @@ private:
     bool centerline_available;
 
     void draw_plane();
+    void draw_baked();
     bool keep_cutting_position();
     void update_modelMat_o();
     void update_plane_(glm::mat4 rotMat);
@@ -86,8 +89,8 @@ public:
     void setTarget(mTarget target){current_target = target;}
     void Update();
     void UpdateAndDraw();
-    void Draw();
-    void setCuttingParams(GLuint sp, bool includePoints = false);
+    void Draw(bool pre_draw);
+    void setCuttingParams(GLuint sp);
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setupCenterLine(dvr::ORGAN_IDS id, float* data);
     void setCenterLinePos(int id, int delta_id = 0);
@@ -105,6 +108,8 @@ public:
     void onScale(float sx, float sy=-1.0f, float sz=-1.0f);
     void onTranslate(float offx, float offy);
     bool IsCenterLineAvailable(){return centerline_available;}
+    bool isPrecomputeDirty(){return baked_dirty;}
+    void dirtyPrecompute(){baked_dirty = true;}
 };
 
 

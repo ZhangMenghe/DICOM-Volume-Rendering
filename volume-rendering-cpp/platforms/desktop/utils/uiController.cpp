@@ -73,8 +73,8 @@ void uiController::InitCheckParam(){
         true,
         true,
         true,
-        false,
-        false,
+        true,
+        true,
         true,
     };
     InitCheckParam(pnum, keys, values);
