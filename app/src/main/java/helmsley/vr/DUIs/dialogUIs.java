@@ -18,18 +18,22 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.proto.rpcManager;
+import helmsley.vr.proto.volumeResponse;
 
 public class dialogUIs {
     private static WeakReference<Activity> activityReference;
     private static WeakReference<mainUIs> muiRef;
 
     private final static String TAG = "dialogUIs";
-    private static fileTransferClient downloader;
+    private rpcManager rpc_manager;
     private TextView errText;
     private Button sendButton;
     private boolean remote_connection_success = false;
@@ -38,10 +42,11 @@ public class dialogUIs {
     public static boolean local_dirty = true;
     private final WeakReference<ViewGroup> parentRef;
     private final int DIALOG_HEIGHT_LIMIT, DIALOG_WIDTH_LIMIT;
-    private boolean b_await_data = false, b_await_config=false, b_await_config_export=false;
+    private boolean b_await_data = false, b_await_config=false, b_await_config_export=false, b_await_broadcast = false;
     private boolean b_init_pick_alert = false;
     private DSCardRecyclerViewAdapter local_card_adp;
-    private View download_progress, main_progress;
+    private ConfigCardRecyclerViewAdapter config_adp;
+    private View download_progress, main_progress, broadcast_icon;
     private boolean remote_layout_set = false, config_layout_set = false;
 
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
@@ -49,7 +54,7 @@ public class dialogUIs {
         activityReference = new WeakReference<>(activity_);
         muiRef = new WeakReference<>(mui);
         parentRef = new WeakReference<>(parent_view);
-        downloader = new fileTransferClient(activity_, this);
+        rpc_manager = new rpcManager(activity_, this);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity_.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         DIALOG_HEIGHT_LIMIT = (int)(displayMetrics.heightPixels * 0.85);
@@ -60,6 +65,7 @@ public class dialogUIs {
 
         loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL);
         main_progress = activity_.findViewById(R.id.loading_layout);
+        broadcast_icon = activity_.findViewById(R.id.broadcast_img);
     }
     void ShowDatasetRemote(){
         if(!remote_connection_success){b_await_data=true;setup_remote_connection();}
@@ -91,8 +97,23 @@ public class dialogUIs {
         muiRef.get().LoadConfig(content);
         loadconfig_dialog.dismiss();
     }
-    public void NotifyLocalCardUpdate(String ds_name){
-        local_card_adp.updateLstContent(ds_name, downloader.getAvailableVolumes(ds_name, true));
+    void StartBroadcast(){
+        if(!remote_connection_success){b_await_broadcast=true;setup_remote_connection();}
+        else on_start_broadcast();
+    }
+    void StopBroadcast(){
+        JUIInterface.setBroadcast(false);
+        broadcast_icon.setVisibility(View.GONE);
+    }
+    private void on_start_broadcast(){
+        LinkedHashMap map = new LinkedHashMap();
+        muiRef.get().mUIManagerRef.get().getCurrentStates(map);
+        broadcast_icon.setVisibility(View.VISIBLE);
+        JUIInterface.setBroadcast(true);
+        muiRef.get().mUIManagerRef.get().RequestResetWithTemplate(map, false);
+    }
+    public void NotifyLocalCardUpdate(String ds_name, List<volumeResponse.volumeInfo> info_lst){
+        local_card_adp.updateLstContent(ds_name, info_lst);
         local_card_adp.updateCardContent();
     }
     private void setup_export_dialog(){
@@ -115,7 +136,7 @@ public class dialogUIs {
                 EditText nameEdit = (EditText) dialogView.findViewById(R.id.expname_edit_text);
                 EditText commentEdit = (EditText) dialogView.findViewById(R.id.expcomment_edit_text);
                 String input_name = nameEdit.getText().toString();
-                downloader.ExportConfig(muiRef.get().getExportConfig(input_name.isEmpty()?nameEdit.getHint().toString():input_name,
+                config_adp.ExportConfig(muiRef.get().getExportConfig(input_name.isEmpty()?nameEdit.getHint().toString():input_name,
                         commentEdit.getText().toString() ));
                 saveconfig_dialog.dismiss();
             }
@@ -151,10 +172,12 @@ public class dialogUIs {
                 host_addr = host_addr.isEmpty() ? hostEdit.getHint().toString() : host_addr;
                 String port_addr = portEdit.getText().toString();
                 port_addr = port_addr.isEmpty() ? portEdit.getHint().toString() : port_addr;
-                String res_msg = downloader.Setup(host_addr, port_addr);
+                String res_msg = rpc_manager.Setup(host_addr, port_addr);
                 if (res_msg.equals("")) {
                     Log.i(TAG, "=====Connect to server successfully=====");
                     connect_dialog.dismiss();
+                    config_adp.SetupContents();
+
                     remote_connection_success = true;
                     if (b_await_data){
                         loadremote_dialog = setup_download_dialog(DownloadDialogType.DATA_REMOTE);
@@ -171,6 +194,9 @@ public class dialogUIs {
                         setup_export_dialog();
                         saveconfig_dialog.show();
                         b_await_config_export = false;
+                    }else if(b_await_broadcast){
+                        on_start_broadcast();
+                        b_await_broadcast = false;
                     }
                 } else {
                     errText.setText(res_msg);
@@ -183,7 +209,7 @@ public class dialogUIs {
         connect_dialog.show();
     }
     void SetupConnectLocal(){
-        downloader.SetupLocal();
+        rpc_manager.SetupLocal();
         loadlocal_dialog.show();
         loadlocal_dialog.getWindow().setLayout(DIALOG_WIDTH_LIMIT, DIALOG_HEIGHT_LIMIT);
     }
@@ -198,7 +224,6 @@ public class dialogUIs {
         final Activity activity = activityReference.get();
         final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity);
         final View dialogView = LayoutInflater.from(activity).inflate(R.layout.download_dialog_layout, parentRef.get(), false);
-        download_progress = dialogView.findViewById(R.id.loading_layout);
 
         //recycle view
         RecyclerView content_view = dialogView.findViewById(R.id.contentRecView);
@@ -208,14 +233,16 @@ public class dialogUIs {
         //adapter
         switch (type){
             case CONFIGS:
-                content_view.setAdapter(new ConfigCardRecyclerViewAdapter(downloader, this));
+                config_adp = new ConfigCardRecyclerViewAdapter(rpc_manager, this);
+                content_view.setAdapter(config_adp);
                 break;
             case DATA_LOCAL:
-                local_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_LOCAL);
+                local_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, rpc_manager.getDataManager(), this, DownloadDialogType.DATA_LOCAL);
                 content_view.setAdapter(local_card_adp);
                 break;
             case DATA_REMOTE:
-                DSCardRecyclerViewAdapter remote_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, downloader, this, DownloadDialogType.DATA_REMOTE);
+                download_progress = dialogView.findViewById(R.id.loading_layout);
+                DSCardRecyclerViewAdapter remote_card_adp = new DSCardRecyclerViewAdapter(activity, content_view, rpc_manager.getDataManager(), this, DownloadDialogType.DATA_REMOTE);
                 content_view.setAdapter(remote_card_adp);
                 break;
             default:
@@ -246,22 +273,13 @@ public class dialogUIs {
             }});
     }
     void updateOnFrame(){
-        if(downloader == null) return;
-        if(downloader.isDownloadingProcessFinished()){
-            downloader.Reset();
-            JNIInterface.JNIsendDataDone();
-            onProgressFinish();
-        }
-        if(downloader.isDownloadingMaskProcessFinished()){
-            downloader.ResetMast();
-            JNIInterface.JNIsendDataDone();
-        }
+        if(rpc_manager == null) return;
+        if(rpc_manager.CheckProcessFinished())onProgressFinish();
     }
     public void onProgressFinish(){
         activityReference.get().runOnUiThread(new Runnable()  {
             @Override
-            public void run()  {
-
+            public void run(){
                 main_progress.setVisibility(View.GONE);
             }});
     }

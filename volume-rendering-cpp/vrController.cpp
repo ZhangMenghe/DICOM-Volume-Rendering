@@ -3,7 +3,10 @@
 #include <Utils/mathUtils.h>
 #include <dicomRenderer/screenQuad.h>
 #include <glm/gtc/type_ptr.hpp>
-
+#include <math.h>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/glm.hpp>
 using namespace dvr;
 using namespace glm;
 vrController* vrController::myPtr_ = nullptr;
@@ -15,6 +18,9 @@ vrController* vrController::instance(){
 vrController::~vrController(){
     if(texvrRenderer_) delete texvrRenderer_;
     if(raycastRenderer_) delete raycastRenderer_;
+    // if(meshRenderer_) delete meshRenderer_;
+    for(auto inst:line_renderers_)delete inst.second;
+    line_renderers_.clear();
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
@@ -22,6 +28,7 @@ vrController::~vrController(){
 }
 vrController::vrController(){
     onReset();
+    mesh_renders = std::vector<organMeshRenderer*>(dvr::ORGAN_END, nullptr);
     myPtr_ = this;
 }
 void vrController::onReset() {
@@ -43,18 +50,18 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
 
     volume_model_dirty = false;
 }
+
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
+        vol_dimension_ = glm::vec3(ph,pw,pd);
         if(sh<=0 || sw<=0 || sd<=0){
-            texvrRenderer_->setDimension(pd, -1);
-            raycastRenderer_->setDimension(pd, -1);
+            if(pd > 200) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, 0.5f);
+            else if(pd > 100) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, pd / 300.f);
+            else vol_dim_scale_ = glm::vec3(1.0f, 1.0f, pd / 200.f);
         }else if(abs(sh - sw) < 1){
-            texvrRenderer_->setDimension(pd, sd / sh);
-            raycastRenderer_->setDimension(pd, sd / sh);
+             vol_dim_scale_ = glm::vec3(1.0f, 1.0f, sd / sh);
         }else{
-            float ls = fmax(sw,sh);
-            texvrRenderer_->setDimension(pd, sd / ls);
-            raycastRenderer_->setDimension(pd, sd / ls);
+             vol_dim_scale_ = glm::vec3(1.0f, 1.0f, sd / fmax(sw,sh));
             if(sw > sh){
                 ScaleVec3_ = ScaleVec3_* glm::vec3(1.0, sh / sw, 1.0);
             }else{
@@ -62,8 +69,10 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
             }
             volume_model_dirty = true;
         }
+        vol_dim_scale_mat_=glm::scale(glm::mat4(1.0f), vol_dim_scale_);
+        texvrRenderer_->setDimension(vol_dimension_, vol_dim_scale_);
+        cutter_->setDimension(pd, vol_dim_scale_.z);
     }
-
     auto vsize= ph*pw*pd;
     uint32_t* vol_data  = new uint32_t[vsize];
     uint16_t tm;
@@ -83,27 +92,38 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
     delete[]tb_data;
     delete[]vol_data;
     Manager::baked_dirty_ = true;
+    meshRenderer_->Setup(ph,pw,pd);
 }
-//1-baldder, 2-kidn 4 color 8 spleen
+void vrController::setupCenterLine(int id, float* data){
+    int oid = 0;
+    while(id/=2)oid++;
+    line_renderers_[oid] = new centerLineRenderer(oid);
+    // for(int i=0;i<4000;i++){
+    //     data[3*i] = i / 4000.0f - 0.5;
+    //     data[3*i+1] = i / 4000.0f - 0.5;
+    //     data[3*i+2] = .0f;
+
+    // }
+    line_renderers_[oid]->updateVertices(4000, data);
+    cutter_->setupCenterLine((dvr::ORGAN_IDS)oid, data);
+}
+
 void vrController::onViewCreated(){
-    texvrRenderer_ = new texvrRenderer;
-    raycastRenderer_ = new raycastRenderer;
+    texvrRenderer_ = new texvrRenderer();
+    raycastRenderer_ = new raycastRenderer();
+    meshRenderer_ = new organMeshRenderer;
+    cutter_ = new cuttingController;
 }
+
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT);
     screenQuad::instance()->onScreenSizeChange(width, height);
 }
 
-bool vrController::isDirty() {
-    if(!tex_volume) return false;
-    if(volume_model_dirty||Manager::baked_dirty_) return true;
-    if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
-    return texvrRenderer_->isPrecomputeDirty();
-}
 bool vrController::check_ar_ray_intersect(){
     Camera* cam = Manager::camera;
-    glm::mat4 model_inv = glm::inverse(ModelMat_ * raycastRenderer_->getDimScaleMat());
+    glm::mat4 model_inv = glm::inverse(ModelMat_ * vol_dim_scale_mat_);
     glm::vec3 ro = glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0));
     if(!ray_initialized){
         float tangent = tan(Manager::camera->getFOV() * 0.5f);
@@ -125,33 +145,52 @@ bool vrController::check_ar_ray_intersect(){
     vec2 res =  vec2(max(max(t1.x, t1.y), t1.z), min(min(t2.x, t2.y), t2.z));
     return res.x<res.y;
 }
-void vrController::onDraw() {
-    if(!tex_volume) return;
-    vec3 dir = Manager::camera->getViewDirection();
-    if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
 
-    //check if start to hold
-//    if(!Manager::isRayCut() && Manager::show_ar_ray && !Manager::volume_ar_hold)
-//        if(check_ar_ray_intersect()) Manager::volume_ar_hold = true;
+void vrController::onDrawScene(){
+    if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(Manager::volume_ar_hold){
         vec3 view_dir = glm::normalize(Manager::camera->getViewDirection());
         PosVec3_ = Manager::camera->getCameraPosition()+ view_dir;
         RotateMat_ = Manager::camera->getRotationMatrixOfCameraDirection();
-
-//        //a is the vector you want to translate to and b is where you are
-//        const glm::vec3 a = -view_dir;
-//        const glm::vec3 b = vec3(0,0,1);
-//        glm::vec3 v = glm::cross(b, a);
-//        float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
-//        RotateMat_ = glm::rotate(angle, v);
-
         updateVolumeModelMat();
     }
+    glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
+    bool cp_update = Manager::IsCuttingNeedUpdate();
+    bool draw_finished =false;
+    if(cp_update){
+        cutter_->Update();
+        if(Manager::param_bool[dvr::CHECK_CUTTING]){cutter_->Draw(pre_draw_);draw_finished=true;}
+    }
+    if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
+        precompute();
+        if(isRayCasting())  raycastRenderer_->Draw(pre_draw_,model_mat);
+        else texvrRenderer_->Draw(pre_draw_);
+    }
 
+    if(Manager::param_bool[dvr::CHECK_MASKON]){
+        if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]) meshRenderer_->Draw(pre_draw_);
+        //draw centerline
+        if(Manager::param_bool[dvr::CHECK_CENTER_LINE]){
+            for(auto line:line_renderers_)
+                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(pre_draw_,model_mat);
+        }
+    }
+    if(cp_update&&!draw_finished)cutter_->Draw(pre_draw_);
+    Manager::baked_dirty_ = false;
+    //  LOGE("===FPS: %.2f==\n", pm_.Update());
+}
+void vrController::onDraw() {
+    if(!tex_volume) return;
+    glClearColor(.0f,.0f,.0f,.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    precompute();
-    if(isRayCasting())  raycastRenderer_->Draw();
-    else texvrRenderer_->Draw();
+    if(!pre_draw_){onDrawScene();return;}
+
+    //for pre-draw option
+    if(isDirty()){
+        screenQuad::instance()->Clear();
+        onDrawScene();
+    }
+    screenQuad::instance()->Draw();
 }
 void vrController::onSingleTouchDown(float x, float y){
     Mouse_old = glm::fvec2(x, y);
@@ -168,8 +207,8 @@ void vrController::onTouchMove(float x, float y) {
     xoffset *= MOUSE_ROTATE_SENSITIVITY;
     yoffset *= -MOUSE_ROTATE_SENSITIVITY;
 
-    if(Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]) {
-        cuttingController::instance()->onRotate(xoffset, yoffset);
+    if(Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]){
+        cutter_->onRotate(xoffset, yoffset);
         return;
     }
 
@@ -248,7 +287,6 @@ void vrController::precompute(){
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     bakeShader_->UnUse();
-    Manager::baked_dirty_ = false;
     isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
 
@@ -303,14 +341,56 @@ void vrController::setMVPStatus(std::string name){
     cst_name = name;
 }
 void vrController::setCuttingPlane(float value){
-    if(isRayCasting()) raycastRenderer_->setCuttingPlane(value);
-    else texvrRenderer_->setCuttingPlane(value);
+    if(Manager::param_bool[dvr::CHECK_CUTTING] && !isRayCasting()) {
+        cutter_->setCutPlane(value);
+        texvrRenderer_->setCuttingPlane(value);
+        if(pre_draw_)texvrRenderer_->dirtyPrecompute();
+    }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        if(!cutter_->IsCenterLineAvailable())return;
+        cutter_->setCenterLinePos((int)(value * 4000.0f));
+        if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) {
+            AlignModelMatToTraversalPlane();
+            isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+        }
+    }
+}
+void vrController::setCuttingPlane(int id, int delta){
+    if(Manager::param_bool[dvr::CHECK_CUTTING]){
+        if(isRayCasting()) {cutter_->setCuttingPlaneDelta(delta);raycastRenderer_->dirtyPrecompute();}
+        else texvrRenderer_->setCuttingPlaneDelta(delta);
+    }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+        if(!cutter_->IsCenterLineAvailable())return;
+        cutter_->setCenterLinePos(id, delta);
+        if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) {
+            AlignModelMatToTraversalPlane();
+            isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+        }
+    }
 }
 void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
-    if(isRayCasting()) raycastRenderer_->setCuttingPlane(pp, pn);
+    cutter_->setCutPlane(pp, pn);
+    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
 float* vrController::getCuttingPlane(){
-    return raycastRenderer_->getCuttingPlane();
+    return cutter_->getCutPlane();
+}
+void vrController::setCuttingParams(GLuint sp){
+    cutter_->setCuttingParams(sp);
+}
+void vrController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
+    cutter_->SwitchCuttingPlane(cut_plane_id);
+    if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) AlignModelMatToTraversalPlane();
+    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+}
+void vrController::AlignModelMatToTraversalPlane(){
+    glm::vec3 pp, pn;
+    cutter_->getCurrentTraversalInfo(pp, pn);
+    pn = glm::normalize(pn);
+
+    RotateMat_ = glm::toMat4(glm::rotation(pn, glm::vec3(.0,.0,-1.0f)));
+                
+    volume_model_dirty = true;
+    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
 
 void vrController::setDualParameter(int id, float lv, float rv){
@@ -329,4 +409,21 @@ float* vrController::getCurrentReservedStates(){
     memcpy(data+28, glm::value_ptr(Manager::camera->getViewCenter()), 3* sizeof(float));
     return data;
 }
-
+bool vrController::isDirty() {
+    if(!tex_volume) return false;
+    if(!pre_draw_||volume_model_dirty||Manager::baked_dirty_){
+        meshRenderer_->dirtyPrecompute();
+        return true;
+    }
+    if(Manager::IsCuttingNeedUpdate()&&cutter_->isPrecomputeDirty()){
+        meshRenderer_->dirtyPrecompute();
+        if(isRayCasting())raycastRenderer_->dirtyPrecompute();
+        else texvrRenderer_->dirtyPrecompute();
+        return true;
+    }
+    if(Manager::param_bool[dvr::CHECK_VOLUME_ON]){
+        if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
+        return texvrRenderer_->isPrecomputeDirty();
+    }
+    return false;
+}

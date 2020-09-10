@@ -7,10 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.TextView;
+
 import java.lang.ref.WeakReference;
+import java.util.List;
+
 import helmsley.vr.R;
+import helmsley.vr.proto.Request;
+import helmsley.vr.proto.commonResponse;
 import helmsley.vr.proto.configResponse;
-import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.proto.rpcManager;
 
 public class ConfigCardRecyclerViewAdapter extends RecyclerView.Adapter<ConfigCardRecyclerViewAdapter.cardHolder> {
     //config of each card
@@ -27,12 +32,21 @@ public class ConfigCardRecyclerViewAdapter extends RecyclerView.Adapter<ConfigCa
         }
     }
 
-    private final WeakReference<fileTransferClient> downloadRef;
+    private final WeakReference<rpcManager> rpcRef;
     private final WeakReference<dialogUIs> dUIRef;
 
-    ConfigCardRecyclerViewAdapter(fileTransferClient downloader, dialogUIs dui){
-        downloadRef = new WeakReference<>(downloader);
+    private List<configResponse.configInfo> available_config_files;
+    private boolean config_dirty;
+
+    ConfigCardRecyclerViewAdapter(rpcManager manager, dialogUIs dui){
+        rpcRef = new WeakReference<>(manager);
         dUIRef = new WeakReference<>(dui);
+        config_dirty = true;
+    }
+    void SetupContents(){
+//        Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
+//        available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
+//        config_dirty = false;
     }
     @NonNull
     @Override
@@ -54,7 +68,7 @@ public class ConfigCardRecyclerViewAdapter extends RecyclerView.Adapter<ConfigCa
 
     @Override
     public void onBindViewHolder(@NonNull cardHolder cardHolder, int i) {
-        configResponse.configInfo info = downloadRef.get().getAvailableConfigFiles().get(i);
+        configResponse.configInfo info = getAvailableConfigFiles().get(i);
         cardHolder.textView_name.setText(info.getFileName());
         cardHolder.textView_content.setText(info.getContent());
         cardHolder.textView_content.setOnClickListener(new View.OnClickListener() {
@@ -67,8 +81,28 @@ public class ConfigCardRecyclerViewAdapter extends RecyclerView.Adapter<ConfigCa
 
     @Override
     public int getItemCount() {
-        return downloadRef.get().getAvailableConfigFiles().size();
+        return getAvailableConfigFiles().size();
     }
 
+    private List<configResponse.configInfo> getAvailableConfigFiles(){
+        if(config_dirty){
+            try{
+                Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
+                available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
+                config_dirty = false;
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return available_config_files;
+    }
+
+    void ExportConfig(String content){
+        if (content == null) return;
+        Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).setReqMsg(content).build();
+
+        commonResponse res = rpcManager.data_stub.exportConfigs(req);
+        config_dirty = true;
+    }
 }
 

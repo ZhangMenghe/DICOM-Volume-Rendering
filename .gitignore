@@ -1,3 +1,4 @@
+app/src/main/assets/helmsley_cached/*
 # Built application files
 /*/build/
 # **/build/
@@ -40,7 +41,7 @@ app/.settings
 .idea/modules.xml
 .idea/scopes/scope_settings.xml
 .idea/vcs.xml
-
+.idea/*
 *.iml
 
 # OS-specific files
@@ -54,4 +55,5 @@ Thumbs.db
 */.externalNativeBuild/
 
 #Other data files
-*dicom-images*
+*dicom-data*
+*oculus*

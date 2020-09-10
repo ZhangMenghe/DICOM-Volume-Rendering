@@ -9,11 +9,14 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
     <!--surface view-->
+    <!--top panel-->
     <android.opengl.GLSurfaceView
         android:id="@+id/surfaceview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-    <!--top panel-->
+        android:layout_height="match_parent"
+        tools:layout_editor_absoluteX="46dp"
+        tools:layout_editor_absoluteY="311dp" />
+
     <android.support.constraint.ConstraintLayout
         android:id="@+id/topPanel"
         android:layout_width="match_parent"
@@ -58,4 +61,14 @@
     <include
         android:id="@+id/loading_layout"
         layout="@layout/progress_layout"/>
+    <ImageView
+        android:id="@+id/broadcast_img"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:src="@drawable/live"
+        android:tint="@color/yellowOrange"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topPanel"
+        app:layout_constraintDimensionRatio="1:1" />
 </android.support.constraint.ConstraintLayout>

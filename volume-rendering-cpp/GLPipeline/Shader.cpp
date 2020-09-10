@@ -213,9 +213,6 @@ void Shader::DisableKeyword(std::string keyword){
     }
 }
 void Shader::DisableAllKeyword(){
-    for(auto& it: active_keywords_){
-        for (auto k = it.begin();k!=it.end();k++) {
-            it.erase(k);
-        }
-    }
+    for(auto& it: active_keywords_)
+        it.clear();
 }

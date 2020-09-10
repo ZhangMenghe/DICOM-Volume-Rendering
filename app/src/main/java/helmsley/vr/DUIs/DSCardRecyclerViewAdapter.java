@@ -272,7 +272,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 List<Integer> dims = sel_vol_info.getDimsList();
                 List<Float> spacing = sel_vol_info.getResolutionList();
 //                Log.e(TAG, "====onClick: "+ spacing.get(0)*dims.get(0) + " ====" +spacing.get(1)*dims.get(1) + "==="+sel_vol_info.getVolumeLocRange() );
-                JNIInterface.JNIsendDataPrepare(dims.get(0), dims.get(1), dims.get(2),
+                JNIInterface.JNIsendDataPrepare(
+                        sel_ds_name + "/"+ sel_vol_info.getFolderName(),
+                        dims.get(0), dims.get(1), dims.get(2),
                         spacing.get(0)*dims.get(0), spacing.get(1)*dims.get(1), sel_vol_info.getVolumeLocRange(),
                         sel_vol_info.getWithMask());
                 
@@ -336,24 +338,6 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         if(islocal_)downloaderRef.get().setLocalVolumes(sel_ds_name, info_lst);
         else cached_volumeinfo.put(sel_ds_name, info_lst);
         updateLstContent(sel_ds_name, info_lst);
-//        for(volumeResponse.volumeInfo vinfo:info_lst)
-//            Log.e(TAG, "===after: " + vinfo.getFolderName() );
-
-//        //setup card info
-//        ArrayList<String> volcon_lst = new ArrayList<>();
-//        for (volumeResponse.volumeInfo vinfo : info_lst){
-//            List<Integer> dims = vinfo.getDimsList();
-//            volcon_lst.add(actRef.get().getString(
-//                    R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
-//                    +(vinfo.getWithMask()?"\n===>>With Mask<<===":""));
-//        }
-//        if(!contentAdapters.containsKey(sel_ds_name))
-//            contentAdapters.put(sel_ds_name, new ArrayAdapter<>(actRef.get(), android.R.layout.simple_list_item_1, volcon_lst));
-//        else{
-//            contentAdapters.get(sel_ds_name).clear();
-//            contentAdapters.get(sel_ds_name).addAll(volcon_lst);
-//        }
-//        contentAdapters.get(sel_ds_name).notifyDataSetChanged();
     }
     void updateCardContent(){
         notifyDataSetChanged();

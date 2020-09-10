@@ -41,15 +41,19 @@ void arController::onResume(void* env, void* context, void* activity){
         ArInstallStatus install_status;
         bool user_requested_install = !install_requested_;
 
-        CHECK(ArCoreApk_requestInstall(env, activity, user_requested_install,&install_status) == AR_SUCCESS);
+//        auto status = ArCoreApk_requestInstall(env, activity, user_requested_install,&install_status);
+//        CHECK( status== AR_SUCCESS);
+//
+//        LOGE("=======C1 %d %d", status,install_status);
+//        switch (install_status) {
+//            case AR_INSTALL_STATUS_INSTALLED:
+//                break;
+//            case AR_INSTALL_STATUS_INSTALL_REQUESTED:
+//                install_requested_ = true;
+//                return;
+//        }
+        LOGE("=======C2");
 
-        switch (install_status) {
-            case AR_INSTALL_STATUS_INSTALLED:
-                break;
-            case AR_INSTALL_STATUS_INSTALL_REQUESTED:
-                install_requested_ = true;
-                return;
-        }
         try {
             ArSession_create(env, context, &ar_session_);
         } catch (const std::exception& e) {
@@ -71,6 +75,7 @@ void arController::onResume(void* env, void* context, void* activity){
         ArFocusMode focus_mode;
         ArPlaneFindingMode plane_finding_mode;
         ArUpdateMode update_mode;
+        LOGE("=======C3");
 
         ArConfig_create(ar_session_, &ar_config_);
         CHECK(ar_config_);
@@ -82,10 +87,14 @@ void arController::onResume(void* env, void* context, void* activity){
         ArConfig_setFocusMode(ar_session_, ar_config_, AR_FOCUS_MODE_AUTO);
         ArConfig_setUpdateMode(ar_session_, ar_config_, AR_UPDATE_MODE_LATEST_CAMERA_IMAGE);
         CHECK(ArSession_configure(ar_session_, ar_config_) == AR_SUCCESS);
+        LOGE("=======C4");
+
     }
 
     const ArStatus status = ArSession_resume(ar_session_);
 //    CHECK(status == AR_SUCCESS);
+    LOGE("=======C5 %d", status);
+
 }
 
 void arController::onViewChange(int rot, int width, int height){

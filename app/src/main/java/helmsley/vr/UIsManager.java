@@ -67,13 +67,15 @@ public class UIsManager {
         LinkedHashMap vol_map = new LinkedHashMap();
         LinkedHashMap cam_map = new LinkedHashMap();
         float[] v = JUIInterface.JUIgetVCStates();
-        vol_map.put("pos", new float[]{v[0], v[1], v[2]});
-        vol_map.put("scale", new float[]{v[3], v[4], v[5]});
-        vol_map.put("rotation", Arrays.copyOfRange(v, 6, 22));
+        vol_map.put("pos", new ArrayList<Float>(Arrays.asList(v[0], v[1], v[2])));
+        vol_map.put("scale", new ArrayList<Float>(Arrays.asList(v[3], v[4], v[5])));
+        ArrayList<Float> r_values= new ArrayList<Float>();
+        for(float r: Arrays.copyOfRange(v, 6, 22))r_values.add(r);
+        vol_map.put("rotation", r_values);
 
-        cam_map.put("pos", new float[]{v[22], v[23], v[24]});
-        cam_map.put("up", new float[]{v[25], v[26], v[27]});
-        cam_map.put("center", new float[]{v[28], v[29], v[30]});
+        cam_map.put("pos", new ArrayList<Float>(Arrays.asList(v[22], v[23], v[24])));
+        cam_map.put("up", new ArrayList<Float>(Arrays.asList(v[25], v[26], v[27])));
+        cam_map.put("center", new ArrayList<Float>(Arrays.asList(v[28], v[29], v[30])));
 
         LinkedHashMap tf_map = sub_panels_.get(R.string.panel_rendering_name).getCurrentStates();
         LinkedHashMap cut_map = sub_panels_.get(R.string.panel_cut_name).getCurrentStates();
@@ -88,7 +90,7 @@ public class UIsManager {
         map.put("mask", mask_map);
         map.put("ar", ar_map);
     }
-    public void RequestResetWithTemplate(LinkedHashMap map){
+    public void RequestResetWithTemplate(LinkedHashMap map, boolean update_local){
         if(map.isEmpty()) return;
         Resources res = actRef.get().getResources();
         //prepare check params
@@ -117,7 +119,7 @@ public class UIsManager {
             if(center.length == 3) System.arraycopy(center, 0, cam_pose, 6, 3);
         }
 
-        JUIInterface.JUIonReset(check_items_param.size(),
+        JUIInterface.JUIonReset(update_local, check_items_param.size(),
                 check_items_param.toArray(new String[0]),
                 Booleans.toArray(check_values_param),
                 vol_pose, cam_pose);
@@ -136,7 +138,7 @@ public class UIsManager {
             p.showHidePanel(panel_show_status[i]);
             p.setCheckParams(res, check_items_param, check_values_param);
         }
-        JUIInterface.JUIonReset(check_items_param.size(),
+        JUIInterface.JUIonReset(true, check_items_param.size(),
                 check_items_param.toArray(new String[0]),
                 Booleans.toArray(check_values_param),
                 default_vol_pose, default_cam_pose);

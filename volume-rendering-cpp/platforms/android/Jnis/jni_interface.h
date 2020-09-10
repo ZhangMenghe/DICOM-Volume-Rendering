@@ -18,7 +18,9 @@ JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject, jobject);
 
 JNI_METHOD(void, JNIsendData)(JNIEnv*, jclass, jint, jint, jint, jint, jbyteArray);
 
-JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint, jint, jint, jfloat, jfloat,jfloat, jboolean);
+JNI_METHOD(void, JNIsendDataFloats)(JNIEnv*, jclass, jint, jint, jfloatArray);
+
+JNI_METHOD(void, JNIsendDataPrepareNative)(JNIEnv*, jclass, jint, jint, jint, jfloat, jfloat,jfloat, jboolean);
 
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass);
 

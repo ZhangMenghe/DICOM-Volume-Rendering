@@ -20,13 +20,22 @@
 #define PATH(FILENAME) std::string(FILENAME)
 #define GLSL_VERSION "#version 310 es\n"
 
+#elif MEDIAPIPE
+    #include <GLES3/gl32.h>
+    #include <cstring>
+    #include <iostream>
+    #include <stdio.h>
+
+    #define LOGE(...) printf(__VA_ARGS__)
+    #define LOGI(...) printf(__VA_ARGS__)
+    #define GLSL_VERSION "#version 310 es\n"
 #else
 #include <GL/glew.h>
     #include <GLFW/glfw3.h>
     #include <stdio.h>
     #include <cstring>
     #include <iostream>
-
+    #include <glm/gtx/string_cast.hpp>
 
     #define LOGE(...) printf(__VA_ARGS__)
     #define LOGI(...) printf(__VA_ARGS__)

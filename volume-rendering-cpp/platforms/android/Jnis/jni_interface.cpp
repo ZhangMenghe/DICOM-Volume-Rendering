@@ -13,9 +13,12 @@
 using namespace dvr;
 namespace {
     const int LOAD_DCMI_ID = 0, LOAD_MASK_ID = 1;
+    const int LOAD_CENTERLINE_ID=0;
     int CHANEL_NUM = 4;
     //globally
     GLubyte* g_VolumeTexData = nullptr;
+    std::unordered_map<int, float*> centerline_map;
+
     int g_img_h=0, g_img_w=0, g_img_d=0;
     float g_vol_h, g_vol_w, g_vol_depth = 0;
     size_t g_ssize = 0, g_vol_len;
@@ -27,7 +30,7 @@ namespace {
 
     void setupShaderContents(){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-        const char* shader_file_names[14] = {
+        const char* shader_file_names[18] = {
                 "shaders/textureVolume.vert",
                 "shaders/textureVolume.frag",
                 "shaders/raycastVolume.vert",
@@ -41,7 +44,11 @@ namespace {
                 "shaders/colorViz.vert",
                 "shaders/colorViz.frag",
                 "shaders/opaViz.vert",
-                "shaders/opaViz.frag"
+                "shaders/opaViz.frag",
+                "shaders/marching_cube.glsl",
+                "shaders/marching_cube_clear.glsl",
+                "shaders/marching_cube_draw.vert",
+                "shaders/marching_cube_draw.frag"
         };
         const char* android_shader_file_names[9] = {
                 "shaders/arcore_screen_quad.vert",
@@ -99,7 +106,7 @@ JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject context, jobject acti
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    nativeApp(nativeAddr)->onViewCreated();
+    vrController::instance()->onViewCreated();
     overlayController::instance()->onViewCreated();
     arController::instance()->onViewCreated();
 }
@@ -115,7 +122,7 @@ void on_draw_native(){
     if(Manager::show_ar_ray && !Manager::volume_ar_hold){
         //check ar ray intersect
         Camera* cam = Manager::camera;
-        glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrixScaled());
+        glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrix(true));
 
         glm::vec3 ro = glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0));
         if(!ray_initialized){
@@ -152,22 +159,25 @@ void on_draw_native(){
             Manager::volume_ar_hold = (res.x<res.y);
         }
     }
-    nativeApp(nativeAddr)->onDraw();
+//    nativeApp(nativeAddr)->onDraw();
+    vrController::instance()->onDrawScene();
 }
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
     if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
         if(camera_switch_dirty){vrController::instance()->setMVPStatus("template");camera_switch_dirty = false;}
-        if(vrController::instance()->isDirty()){
-            //order matters
-            screenQuad::instance()->Clear();
-            nativeApp(nativeAddr)->onDraw();
-        }
-        screenQuad::instance()->Draw();
+//        if(vrController::instance()->isDirty()){
+//            //order matters
+//            screenQuad::instance()->Clear();
+//            nativeApp(nativeAddr)->onDraw();
+//        }
+//        screenQuad::instance()->Draw();
+        vrController::instance()->onDraw();
         if(vrController::instance()->isDrawing())overlayController::instance()->onDraw();
     }
     else{
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         if(camera_switch_dirty){vrController::instance()->setMVPStatus("ARCam");camera_switch_dirty = false;}
         screenQuad::instance()->Clear();
         arController::instance()->onDraw();
@@ -212,7 +222,18 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
     env->ReleaseByteArrayElements(jdata, data, 0);
 }
 
-JNI_METHOD(void, JNIsendDataPrepare)(JNIEnv*, jclass, jint height, jint width, jint dims,jfloat sh,jfloat sw, jfloat sd, jboolean b_mask){
+JNI_METHOD(void, JNIsendDataFloats)(JNIEnv* env, jclass, jint target, jint chunk_size, jfloatArray arr){
+    LOGE("====CHUNK SIZE: %d", chunk_size);
+    chunk_size = 12001;
+    if(target!=LOAD_CENTERLINE_ID) return;
+    jfloat *data = env->GetFloatArrayElements(arr,0);
+    float* cdata = new float[chunk_size-1];
+    memcpy(cdata, &data[1], (chunk_size-1)* sizeof(float));
+    centerline_map[(int)data[0]] = cdata;
+    env->ReleaseFloatArrayElements(arr,data,0);
+}
+
+JNI_METHOD(void, JNIsendDataPrepareNative)(JNIEnv*, jclass, jint height, jint width, jint dims,jfloat sh,jfloat sw, jfloat sd, jboolean b_mask){
     CHANEL_NUM = b_mask? 4:2;
     g_img_h = height; g_img_w = width; g_img_d = dims;
     g_ssize = CHANEL_NUM * width * height;
@@ -230,6 +251,11 @@ JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
             n_data_offset[i] = 0;
             break;
         }
+    }
+    if(!centerline_map.empty()){
+        for(auto inst:centerline_map)
+            vrController::instance()->setupCenterLine(inst.first, inst.second);
+        centerline_map.clear();
     }
 }
 

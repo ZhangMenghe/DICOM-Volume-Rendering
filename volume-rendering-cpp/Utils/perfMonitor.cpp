@@ -1,5 +1,5 @@
 #include "perfMonitor.h"
-
+#include <sys/time.h>
 perfMonitor::perfMonitor()
         : current_FPS_(0),
           tv_last_sec_(0),

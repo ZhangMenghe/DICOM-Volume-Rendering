@@ -9,8 +9,14 @@ namespace dvr{
         CHECK_CUTTING,
         CHECK_FREEZE_VOLUME,
         CHECK_FREEZE_CPLANE,
+        CHECK_CENTER_LINE_TRAVEL,
+        CHECK_TRAVERSAL_VIEW,
         CHECK_MASKON,
         CHECK_MASK_RECOLOR,
+        CHECK_VOLUME_ON,
+        CHECK_DRAW_POLYGON,
+        CHECK_POLYGON_WIREFRAME,
+        CHECK_CENTER_LINE,
         CHECK_AR_ENABLED,
         CHECK_AR_DRAW_POINT,
         CHECK_AR_DRAW_PLANE,
@@ -22,6 +28,10 @@ namespace dvr{
         TUNE_WIDTHTOP,
         TUNE_CENTER,
         TUNE_END
+    };
+    enum PARAM_CUT_ID{
+        CUT_CUTTING_PLANE=0,
+        CUT_TRAVERSAL
     };
     enum PARAM_DUAL{
         CONTRAST_LIMIT=0,
@@ -53,6 +63,10 @@ namespace dvr{
         SHADER_COLOR_VIZ_FRAG,
         SHADER_OPA_VIZ_VERT,
         SHADER_OPA_VIZ_FRAG,
+        SHADER_MARCHING_CUBE_GLSL,
+        SHADER_MARCHING_CUBE_CLEAR_GLSL,
+        SHADER_MC_VERT,
+        SHADER_MC_FRAG,
         SHADER_END
     };
     enum ANDROID_SHADER_FILES{
@@ -81,6 +95,15 @@ namespace dvr{
     enum TOUCH_TARGET{
         TOUCH_VOLUME=0,
         TOUCH_AR_BUTTON=1
+    };
+    enum ORGAN_IDS{
+        ORGAN_BALDDER=0,
+        ORGAN_KIDNEY,
+        ORGAN_COLON,
+        ORGAN_SPLEEN,
+        ORGAN_ILEUM,
+        ORGAN_AROTA,
+        ORGAN_END
     };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;

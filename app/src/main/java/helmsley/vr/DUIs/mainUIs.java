@@ -22,8 +22,11 @@ import helmsley.vr.UIsManager;
 public class mainUIs {
     final static String TAG = "mainUIs";
     private final WeakReference<Activity> actRef;
-    private final WeakReference<UIsManager> mUIManagerRef;
-    private final String NAME_RESET, NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD, NAME_DATA_REMOTE, NAME_DATA_DEVICE, NAME_DATA_LOCAL;
+    final WeakReference<UIsManager> mUIManagerRef;
+    private final String NAME_RESET,
+            NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD,
+            NAME_DATA_REMOTE, NAME_DATA_DEVICE, NAME_DATA_LOCAL,
+            NAME_START_BROADCAST, NAME_STOP_BROADCAST;
 
     private Spinner spinner_check;
     private dialogUIs dialogController;
@@ -32,6 +35,12 @@ public class mainUIs {
     private checkpanelAdapter cb_panel_adapter;
 
     public mainUIs(final Activity activity, final ViewGroup parent_view, UIsManager manager){
+        Resources res = activity.getResources();
+        NAME_RESET = res.getString(R.string.sys_reset);
+        NAME_TEMPLATE_SAVE = res.getString(R.string.sys_template_save);NAME_TEMPLATE_LOAD = res.getString(R.string.sys_template_load);
+        NAME_DATA_REMOTE = res.getString(R.string.sys_data_remote); NAME_DATA_LOCAL = res.getString(R.string.sys_data_local);NAME_DATA_DEVICE=res.getString(R.string.sys_data_device);
+        NAME_START_BROADCAST = res.getString(R.string.sys_sync_start);NAME_STOP_BROADCAST = res.getString(R.string.sys_sync_stop);
+
         mUIManagerRef = new WeakReference<>(manager);
         actRef = new WeakReference<>(activity);
         //checkbox spinners
@@ -48,11 +57,6 @@ public class mainUIs {
         spinner_data.setAdapter(dAdapter);
 
         dialogController = new dialogUIs(activity, this, parent_view);
-
-        Resources res = activity.getResources();
-        NAME_RESET = res.getString(R.string.sys_reset);
-        NAME_TEMPLATE_SAVE = res.getString(R.string.sys_template_save);NAME_TEMPLATE_LOAD = res.getString(R.string.sys_template_load);
-        NAME_DATA_REMOTE = res.getString(R.string.sys_data_remote); NAME_DATA_LOCAL = res.getString(R.string.sys_data_local);NAME_DATA_DEVICE=res.getString(R.string.sys_data_device);
     }
 
     public void Reset(){
@@ -68,7 +72,7 @@ public class mainUIs {
         Yaml yloader = new Yaml();
         try{
 //            InputStream ins = actRef.get().getAssets().open("config.yml");
-            mUIManagerRef.get().RequestResetWithTemplate((LinkedHashMap)yloader.load(content));
+            mUIManagerRef.get().RequestResetWithTemplate((LinkedHashMap)yloader.load(content), true);
         }catch (Exception e){
             Log.e(TAG, "===fail to load yaml===");
             e.printStackTrace();
@@ -98,10 +102,13 @@ public class mainUIs {
     }
 
     private class syscallListAdapter extends ListAdapter{
+        private final int BROADCAST_POS;
+        private boolean is_on_broadcast;
         syscallListAdapter(Context context, int arrayId, int titleId){
                 super(context, context.getResources().getString(titleId));
                 item_names = Arrays.asList(context.getResources().getStringArray(arrayId));
-
+                BROADCAST_POS = item_names.indexOf(NAME_START_BROADCAST);
+                is_on_broadcast = false;
             }
             public View getDropDownView(int position, View convertView, ViewGroup parent){
                 ViewContentHolder holder;
@@ -113,7 +120,10 @@ public class mainUIs {
                 } else {
                     holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
                 }
-                holder.text_name.setText(item_names.get(position));
+                if(BROADCAST_POS == position)
+                    holder.text_name.setText(is_on_broadcast?NAME_STOP_BROADCAST:NAME_START_BROADCAST);
+                else
+                    holder.text_name.setText(item_names.get(position));
 
                 holder.text_name.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -121,9 +131,16 @@ public class mainUIs {
                         holder.text_name.setTextAppearance(R.style.itemHighlightText);
                         String text_title = ((TextView)v).getText().toString();
                         if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
-//                        else if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
-//                        else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
-//                        else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
+                        else if(text_title.equals(NAME_START_BROADCAST)){
+                            dialogController.StartBroadcast();
+                            is_on_broadcast = true;
+                            holder.text_name.setText(NAME_STOP_BROADCAST);
+                        }
+                        else if(text_title.equals(NAME_STOP_BROADCAST)){
+                            dialogController.StopBroadcast();
+                            is_on_broadcast = false;
+                            holder.text_name.setText(NAME_START_BROADCAST);
+                        }
                         else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
                         else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
                         new android.os.Handler().postDelayed(
@@ -163,12 +180,9 @@ public class mainUIs {
                 public void onClick(View v) {
                     holder.text_name.setTextAppearance(R.style.itemHighlightText);
                     String text_title = ((TextView)v).getText().toString();
-//                    if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
                     if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
                     else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
                     else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
-//                    else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
-//                    else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
                     new android.os.Handler().postDelayed(
                             new Runnable() {
                                 public void run() {

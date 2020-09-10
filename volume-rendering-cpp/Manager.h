@@ -15,11 +15,14 @@ public:
     static int screen_w, screen_h;
     static bool show_ar_ray, volume_ar_hold;
     static bool isRayCut();
+    static bool new_data_available;
 
     Manager();
     ~Manager();
     void onReset();
     void onViewChange(int w, int h);
+    static bool IsCuttingEnabled();
+    static bool IsCuttingNeedUpdate();
 };
 
 

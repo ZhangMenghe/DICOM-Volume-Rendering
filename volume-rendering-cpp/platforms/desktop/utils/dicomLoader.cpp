@@ -2,15 +2,41 @@
 #include <platforms/desktop/common.h>
 #include <cstring> //memset
 
-void dicomLoader::setupDCMIConfig(int width, int height, int dims, bool b_mask){
-    CHANEL_NUM = b_mask? 4:2;
+void dicomLoader:: setupDCMIConfig(int height, int width, int dims, float sh, float sw, float sd, bool b_wmask){
+    CHANEL_NUM = b_wmask? 4:2;
     g_img_h = height; g_img_w = width; g_img_d = dims;
     g_ssize = CHANEL_NUM * width * height;
     g_vol_len = g_ssize* dims;
-    // g_vol_h=sh; g_vol_w=sw; g_vol_depth=sd;
+    g_vol_h=sh; g_vol_w=sw; g_vol_depth=sd;
     if(g_VolumeTexData!= nullptr){delete[]g_VolumeTexData; g_VolumeTexData = nullptr;}
     g_VolumeTexData = new GLubyte[ g_vol_len];
     memset(g_VolumeTexData, 0x00, g_vol_len * sizeof(GLubyte));
+}
+bool dicomLoader::loadData(std::string filename, int h, int w, int d){
+    if(g_maskTexData!=nullptr){delete[]g_maskTexData;g_maskTexData=nullptr;}
+    g_maskTexData = new GLubyte[h*w*d];
+
+    char buffer[1024];
+    #ifdef RESOURCE_DESKTOP_DIR
+    std::ifstream inFile (PATH(filename), std::ios::in | std::ios::binary);
+    #else
+    std::ifstream inFile (filename, std::ios::in | std::ios::binary);
+    #endif
+
+    if(!inFile.is_open()) return false;
+
+    int offset = 0;
+
+    for(int id = 0; !inFile.eof(); id++){
+        inFile.read(buffer, 1024);
+        std::streamsize len = inFile.gcount();
+        if(len == 0) continue;
+
+        GLubyte* tb = g_maskTexData+offset;
+        memcpy(tb, buffer, len);
+        offset+=len;
+    }
+    return true;
 }
 bool dicomLoader::loadData(std::string dicom_path, std::string mask_path, int data_unit_size, int mask_unit_size){
     return (loadData(dicom_path, LOAD_DICOM, data_unit_size)
@@ -19,9 +45,14 @@ bool dicomLoader::loadData(std::string dicom_path, std::string mask_path, int da
 
 bool dicomLoader::loadData(std::string filename, mLoadTarget target, int unit_size){
     char buffer[1024];
+    #ifdef RESOURCE_DESKTOP_DIR
     std::ifstream inFile (PATH(filename), std::ios::in | std::ios::binary);
-    if(!inFile.is_open()) return false;
+    #else
+    std::ifstream inFile (filename, std::ios::in | std::ios::binary);
+    #endif
 
+    if(!inFile.is_open()) return false;
+    
     for(int id = 0; !inFile.eof(); id++){
         inFile.read(buffer, 1024);
         std::streamsize len = inFile.gcount();
@@ -52,4 +83,8 @@ void dicomLoader::send_dicom_data(mLoadTarget target, int id, int chunk_size, in
         }
     }
    n_data_offset[target] += CHANEL_NUM / unit_size * chunk_size;   
+}
+void dicomLoader::startToAssemble(vrController* controller){
+    // std::cout<<g_img_h<<" "<<g_img_w<< " "<< g_img_d<< " "<< g_vol_h<<" "<< g_vol_w<<" "<< g_vol_depth<<std::endl;
+    controller->assembleTexture(2, g_img_h, g_img_w, g_img_d, g_vol_h, g_vol_w, g_vol_depth, g_VolumeTexData, CHANEL_NUM);
 }

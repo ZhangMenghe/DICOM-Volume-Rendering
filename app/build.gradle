@@ -22,7 +22,7 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {
             cmake {
-                cppFlags "-std=c++17 -frtti -fexceptions -fopenmp -Wno-error=format-security "
+                cppFlags "-std=c++17 -frtti -fexceptions -Wno-error=format-security "
                 arguments "-DANDROID_STL=c++_static",
                         "-DARCORE_LIBPATH=${arcore_libpath}/jni",
                         "-DARCORE_INCLUDE=${project.rootDir}/thirdparty/arcore"
@@ -102,8 +102,8 @@ dependencies {
     //yaml
     implementation 'com.github.bmoliveira:snake-yaml:v1.18-android'
     // ARCore library
-    implementation 'com.google.ar:core:1.17.0'
-    natives 'com.google.ar:core:1.17.0'
+    implementation 'com.google.ar:core:1.19.0'
+    natives 'com.google.ar:core:1.19.0'
     //imebra
 //    implementation project(':imebrajni')
     //range seekbar

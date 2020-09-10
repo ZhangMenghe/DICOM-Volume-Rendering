@@ -44,12 +44,20 @@
 
 <!--    mask panel-->
     <string-array name="mask_check_params">
-        <item>@string/mask_check_name</item>
-        <item>@string/mask_color_name</item>
+        <item>Apply</item>
+        <item>Recolor</item>
+        <item>Volume</item>
+        <item>Mesh</item>
+        <item>Wireframe</item>
+        <item>Center Line</item>
     </string-array>
     <string-array name="mask_check_values">
         <item>false</item>
         <item>true</item>
+        <item>true</item>
+        <item>true</item>
+        <item>false</item>
+        <item>false</item>
     </string-array>
 
 <!--    cutting panel-->
@@ -57,6 +65,9 @@
         <item>@string/cutting_check_name</item>
         <item>@string/freezeVolume_check_name</item>
         <item>@string/freezeplane_check_name</item>
+        <item>Center Line Travel</item>
+        <item>Traversal View</item>
+
     </string-array>
     <string-array name="cut_freeze_params">
         <item>@string/freezeVolume_check_name</item>
@@ -65,6 +76,8 @@
     <string-array name="cut_check_values">
         <item>false</item><!-- is cutting-->
         <item>false</item>
+        <item>false</item>
+        <item>false</item><!-- is center traversal-->
         <item>false</item>
     </string-array>
 <!--    ar_check_params-->
@@ -172,6 +185,7 @@
 <!--other functions-->
     <string-array name="functions">
         <item>@string/sys_reset</item>
+        <item>@string/sys_sync_start</item>
         <item>@string/sys_template_save</item>
         <item>@string/sys_template_load</item>
     </string-array>
@@ -183,7 +197,7 @@
 
     <string-array name="cutting_plane">
         <item>0.0</item>
-        <item>50</item>
+        <item>4000</item>
     </string-array>
 
 <!--    order matters for mask bit order!-->
@@ -198,6 +212,9 @@
         <item>Vein</item>
     </string-array>
     <string-array name="masks_status">
+        <item>false</item>
+        <item>true</item>
+        <item>true</item>
         <item>true</item>
         <item>true</item>
         <item>true</item>
