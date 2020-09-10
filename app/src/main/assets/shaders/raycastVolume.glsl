@@ -143,18 +143,20 @@ vec4 tracing(float u, float v, ivec2 spos){
     }
     else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-    drawed_square = (abs(t) < 1000.0)?intersectRayWithCircle(ro+rd*t, uPlane.r):false;
+//    drawed_square = (abs(t) < 1000.0)?intersectRayWithCircle(ro+rd*t, uPlane.r):false;
 
     if(blocked_by_plane && intersect.x <= intersect.y || abs(intersect.x - t) < 0.01) {
         vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
 //        if(traced_color.a > 1e-5) return traced_color;
-        float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
-        return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
+        return mix(traced_color, getBackground(spos), 1.0-traced_color.a);
+//        float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
+//        return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
     }
 
     #endif
-    if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);
-    return Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, getBackground(spos), u_plane_color.a):getBackground(spos);
+    vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+    return mix(traced_color, getBackground(spos), 1.0-traced_color.a);
 }
 void main() {
     ivec2 storePos = ivec2(gl_GlobalInvocationID.xy);

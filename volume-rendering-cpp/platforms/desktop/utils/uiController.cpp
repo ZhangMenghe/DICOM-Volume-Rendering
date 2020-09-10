@@ -8,7 +8,7 @@ void uiController::InitAll(){
     // AddTuneParams();
     InitAllTuneParam();
     InitCheckParam();
-    setMaskBits(7,8);
+    setMaskBits(7,9);
     // setMaskBits(7,2+4+8+16+32+64);
     vrController::instance()->onReset(
         glm::vec3(.0f),
@@ -36,8 +36,8 @@ void uiController::AddTuneParams(){
 void uiController::InitAllTuneParam(){
     float contrast_values[3] = {
         .0f,
-        .8f,
-        1.0f
+        .5f,
+        0.5f
     };
     vrController::instance()->setRenderParam(contrast_values);
 }
@@ -65,7 +65,7 @@ void uiController::InitCheckParam(){
     };
     bool values[pnum] = {
         //overall
-        false,
+        true,
         false,
         //cutting
         false,
@@ -77,8 +77,8 @@ void uiController::InitCheckParam(){
         true,
         true,
         true,
-        true,
-        true,
+        false,
+        false,
         false,
         //ar
         false,

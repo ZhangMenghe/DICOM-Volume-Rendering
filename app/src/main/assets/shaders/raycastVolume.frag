@@ -23,6 +23,7 @@ struct Plane{
 };
 uniform Plane uPlane;
 uniform mediump sampler3D uSampler;
+
 uniform float usample_step_inverse;
 // void main_old(){
 //     fragColor = vec4(1.0, 1.0, .0, 1.0);

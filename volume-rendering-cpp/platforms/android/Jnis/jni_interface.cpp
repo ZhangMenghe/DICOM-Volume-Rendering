@@ -83,6 +83,7 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     new assetLoader(AAssetManager_fromJava(env, asset_manager));
     manager = new Manager;
     nativeAddr =  getNativeClassAddr(new vrController());
+    vrController::instance()->setPredrawOption(true);
     setupShaderContents();
     return nativeAddr;
 }
@@ -159,26 +160,24 @@ void on_draw_native(){
             Manager::volume_ar_hold = (res.x<res.y);
         }
     }
-//    nativeApp(nativeAddr)->onDraw();
     vrController::instance()->onDrawScene();
 }
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
-
     if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
-        if(camera_switch_dirty){vrController::instance()->setMVPStatus("template");camera_switch_dirty = false;}
-//        if(vrController::instance()->isDirty()){
-//            //order matters
-//            screenQuad::instance()->Clear();
-//            nativeApp(nativeAddr)->onDraw();
-//        }
-//        screenQuad::instance()->Draw();
+        if(camera_switch_dirty){
+            vrController::instance()->setMVPStatus("template");
+            camera_switch_dirty = false;
+        }
         vrController::instance()->onDraw();
         if(vrController::instance()->isDrawing())overlayController::instance()->onDraw();
     }
     else{
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        if(camera_switch_dirty){vrController::instance()->setMVPStatus("ARCam");camera_switch_dirty = false;}
+        if(camera_switch_dirty){
+            vrController::instance()->setMVPStatus("ARCam");
+            camera_switch_dirty = false;
+        }
         screenQuad::instance()->Clear();
         arController::instance()->onDraw();
 
