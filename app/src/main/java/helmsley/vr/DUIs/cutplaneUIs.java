@@ -205,11 +205,12 @@ public class cutplaneUIs extends BasePanel{
         boolean cut_status = (Boolean) cutmap.getOrDefault("status", default_primary_check);
         boolean freeze_volume = (Boolean) cutmap.getOrDefault("freeze volume", default_check_vales[1]);
         boolean freeze_plane = (Boolean) cutmap.getOrDefault("freeze plane", default_check_vales[2]);
+        boolean real_sampled = (Boolean) cutmap.getOrDefault("real value", default_check_vales[3]);
         boolean center_line_traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_traversal_check);
         boolean b_traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", false);
 
         primary_checkbox.setChecked(cut_status);
-        cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);
+        cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);cbAdapter_.setValue(2,real_sampled);
         traversal_check_box.setChecked(center_line_traversal);
         view_switch.setChecked(b_traversal_view);
 
@@ -232,6 +233,7 @@ public class cutplaneUIs extends BasePanel{
         map.put("status", primary_checkbox.isChecked());
         map.put("freeze volume", cbAdapter_.getValue(0));
         map.put("freeze plane", cbAdapter_.getValue(1));
+        map.put("real value", cbAdapter_.getValue(2));
         map.put("Center Line Travel", traversal_check_box.isChecked());
         map.put("Traversal View", view_switch.isChecked());
 
@@ -256,10 +258,10 @@ public class cutplaneUIs extends BasePanel{
         List<Boolean> item_values;
         boolean is_cutting;
         ctCheckboxListAdapter(Context context) {
-            super(context, context.getString(R.string.check_freeze_name));
+            super(context, context.getString(R.string.check_raycast_cut_option_name));
             //setup values
             Resources res = context.getResources();
-            item_names = Arrays.asList(res.getStringArray(R.array.cut_freeze_params));
+            item_names = Arrays.asList(res.getStringArray(R.array.cut_raycast_options));
             TypedArray check_values = res.obtainTypedArray(R.array.cut_check_values);
             is_cutting = check_values.getBoolean(0, false);
             item_values = new ArrayList<>();
@@ -306,13 +308,14 @@ public class cutplaneUIs extends BasePanel{
                     item_values.set(position, isChecked);
                     JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
 
+                    if(position<2){
                     int relpos = 1-position;
                     if(isChecked && item_values.get(relpos)){
                         //update another one
                         JUIInterface.JUIsetChecks(item_names.get(relpos), false);
                         item_values.set(relpos, false);
                         notifyDataSetChanged();
-                    }
+                    }}
                 }
             });
             holder.checkBox.setTag(position);

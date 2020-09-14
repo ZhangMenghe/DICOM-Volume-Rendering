@@ -24,6 +24,8 @@ struct Plane{
 uniform Plane uPlane;
 uniform mediump sampler3D uSampler;
 uniform float usample_step_inverse;
+uniform bool u_cutplane_realsample;
+
 // void main_old(){
 //     fragColor = vec4(1.0, 1.0, .0, 1.0);
 // }
@@ -118,6 +120,11 @@ void main(void){
         if(blocked_by_plane && intersect.x <= intersect.y){
             vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
             fragColor = mix(traced_color, vec4(.0f, .0f, .0f, 1.0f), 1.0-traced_color.a);
+            return;
+        }
+        if(u_cutplane_realsample){
+            if(intersect.y < intersect.x || blocked_by_plane) discard;
+            fragColor = Sample(ro+0.5+rd*t);
             return;
         }
     #endif

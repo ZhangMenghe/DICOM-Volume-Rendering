@@ -9,6 +9,7 @@ namespace dvr{
         CHECK_CUTTING,
         CHECK_FREEZE_VOLUME,
         CHECK_FREEZE_CPLANE,
+        CUT_PLANE_REAL_SAMPLE,
         CHECK_CENTER_LINE_TRAVEL,
         CHECK_TRAVERSAL_VIEW,
         CHECK_MASKON,

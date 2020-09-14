@@ -8,7 +8,7 @@ void uiController::InitAll(){
     // AddTuneParams();
     InitAllTuneParam();
     InitCheckParam();
-    setMaskBits(7,8);
+    setMaskBits(7,9);
     // setMaskBits(7,2+4+8+16+32+64);
     vrController::instance()->onReset(
         glm::vec3(.0f),
@@ -43,13 +43,14 @@ void uiController::InitAllTuneParam(){
 }
 
 void uiController::InitCheckParam(){
-    const int pnum = 13;
+    const int pnum = 14;
     const char* keys[pnum] = {
         "Raycasting",
         "Overlays",
         "Cutting",
         "Freeze Volume",
         "Freeze Plane",
+        "Cutting Plane Real Sample",
         "Center Line Travel",
         "Traversal View",
         "Apply",
@@ -61,9 +62,10 @@ void uiController::InitCheckParam(){
     };
     bool values[pnum] = {
         //overall
-        false,
+        true,
         false,
         //cutting
+        true,
         false,
         false,
         false,
@@ -73,8 +75,8 @@ void uiController::InitCheckParam(){
         true,
         true,
         true,
-        true,
-        true,
+        false,
+        false,
         false,
     };
     InitCheckParam(pnum, keys, values);
