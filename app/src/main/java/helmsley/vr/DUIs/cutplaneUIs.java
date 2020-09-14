@@ -37,6 +37,7 @@ public class cutplaneUIs extends BasePanel{
 
     CheckBox traversal_check_box;
     private ctCheckboxListAdapter cbAdapter_;
+    private centerIdListAdapter cid_adapter;
     private static boolean default_traversal_check;
     private View primary_panel, traversal_panel;
     private final static float[]default_cut_pose={0,0,0,0,0,-1};
@@ -160,6 +161,11 @@ public class cutplaneUIs extends BasePanel{
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        //setup traversal id
+        Spinner cid_spinner = (Spinner)panel_.findViewById(R.id.centerline_id_spinner);
+        cid_adapter = new centerIdListAdapter(activity);
+        cid_spinner.setAdapter(cid_adapter);
+
         //setup switch
         view_switch = (Switch)panel_.findViewById(R.id.toggle_view_switch);
         view_switch.setChecked(Boolean.parseBoolean(check_values[VIEW_SWITCH_ID]));
@@ -192,6 +198,7 @@ public class cutplaneUIs extends BasePanel{
         seek_bar_.setProgress((int)(Float.parseFloat(params[0]) * max_seek_value));
         reset_checkbox_and_panel();
         view_switch.setChecked(false);
+        cid_adapter.setTitleById(0);
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
         LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
@@ -214,6 +221,7 @@ public class cutplaneUIs extends BasePanel{
         cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);cbAdapter_.setValue(2,real_sampled);
         traversal_check_box.setChecked(center_line_traversal);
         view_switch.setChecked(b_traversal_view);
+        cid_adapter.setTitleByText((String) cutmap.getOrDefault("traversal target", "Colon"));
 
         Collections.addAll(names, check_names_);
         values.add(cut_status);values.add(freeze_volume);values.add(freeze_plane);values.add(center_line_traversal);values.add(b_traversal_view);
@@ -242,6 +250,8 @@ public class cutplaneUIs extends BasePanel{
 
         map.put("ppoint", new ArrayList<Float>(Arrays.asList(cpv[0], cpv[1], cpv[2])));
         map.put("pnorm", new ArrayList<Float>(Arrays.asList(cpv[3], cpv[4], cpv[5])));
+        map.put("traversal target", cid_adapter.getTitle());
+
         return map;
     }
     public void showHidePanel(boolean show_panel, boolean isRaycast){
@@ -253,6 +263,22 @@ public class cutplaneUIs extends BasePanel{
         if(primary_checkbox.isChecked()){
             if(isRaycast)primary_panel.setVisibility(View.VISIBLE);
             else primary_panel.setVisibility(View.INVISIBLE);
+        }
+    }
+    private static class centerIdListAdapter extends textSimpleListAdapter{
+        centerIdListAdapter(Context context){
+            super(context, R.array.cutting_traversal_target);
+        }
+        void setTitleById(int id){
+            super.setTitleById(id);
+            JUIInterface.JUIsetTraversalTarget(id);
+        }
+        void setTitleByText(String title) {
+            super.setTitleByText(title);
+            JUIInterface.JUIsetTraversalTarget(item_names.indexOf(this.title));
+        }
+        void onItemClick(int position){
+            JUIInterface.JUIsetTraversalTarget(item_names.indexOf(this.title));
         }
     }
     private static class ctCheckboxListAdapter extends ListAdapter {

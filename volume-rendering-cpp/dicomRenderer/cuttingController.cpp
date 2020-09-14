@@ -236,11 +236,11 @@ void cuttingController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     }
     baked_dirty=true;
 }
-void cuttingController::set_centerline_cutting(int& id, glm::vec3& pp, glm::vec3& pn){
+void cuttingController::set_centerline_cutting(dvr::ORGAN_IDS oid, int& id, glm::vec3& pp, glm::vec3& pn){
 	id = fmax(id, center_sample_gap);
 	id = fmin(id,3999-center_sample_gap);
 
-	float * data = pmap[dvr::ORGAN_COLON];
+	float * data = pmap[oid];
 	pp = glm::vec3(data[3*id],data[3*id+1],data[3*id+2]);
 	pn = glm::vec3(data[3*(id+center_sample_gap)], data[3*(id+center_sample_gap)+1], data[3*(id+center_sample_gap)+2]) 
         - glm::vec3(data[3*(id-center_sample_gap)], data[3*(id-center_sample_gap)+1], data[3*(id-center_sample_gap)+2]);
@@ -250,14 +250,11 @@ void cuttingController::set_centerline_cutting(int& id, glm::vec3& pp, glm::vec3
 }
 void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
     pmap[id] = data;
-    if(id == dvr::ORGAN_COLON){
-        clp_id_ = 0;
-        glm::vec3 pp, pn;
-        set_centerline_cutting(clp_id_,pp,pn);
-
-        rt.point=pp;rt.scale=glm::vec3(DEFAULT_TRAVERSAL_SCALE);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
-        centerline_available = true;
-    }
+    clp_id_ = 0;
+    glm::vec3 pp, pn;
+    set_centerline_cutting(id,clp_id_,pp,pn);
+    rt.point=pp;rt.scale=glm::vec3(DEFAULT_TRAVERSAL_SCALE);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
+    centerline_available = true;
     baked_dirty=true;
 }
 void cuttingController::setCenterLinePos(int id, int delta_id){
@@ -266,10 +263,10 @@ void cuttingController::setCenterLinePos(int id, int delta_id){
     }else{
         clp_id_=(clp_id_+delta_id)%(4000-center_sample_gap);
     }
-    set_centerline_cutting(clp_id_, p_point_, p_norm_);
+    set_centerline_cutting(Manager::traversal_target_id, clp_id_, p_point_, p_norm_);
     setCutPlane(p_point_, p_norm_);
     baked_dirty=true;
 }
 void cuttingController::getCurrentTraversalInfo(glm::vec3& pp, glm::vec3& pn){
-    set_centerline_cutting(clp_id_, pp, pn);
+    set_centerline_cutting(Manager::traversal_target_id, clp_id_, pp, pn);
 }

@@ -80,6 +80,11 @@
         <item>false</item><!-- is center traversal-->
         <item>false</item>
     </string-array>
+    <string-array name="cutting_traversal_target">
+        <item>Colon</item>
+        <item>Ileum</item>
+    </string-array>
+
 
     <string-array name="raycast_density">
         <item>Density</item>
