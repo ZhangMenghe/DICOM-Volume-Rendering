@@ -37,7 +37,6 @@ public class cutplaneUIs extends BasePanel{
 
     CheckBox traversal_check_box;
     private ctCheckboxListAdapter cbAdapter_;
-    private final static int TRAVERSAL_CHECK_ID = 3;
     private static boolean default_traversal_check;
     private View primary_panel, traversal_panel;
     private final static float[]default_cut_pose={0,0,0,0,0,-1};
@@ -47,7 +46,9 @@ public class cutplaneUIs extends BasePanel{
     private ColorStateList normal_color, highlight_color;
     private int cutting_status = 0;//0 for none, 1 for cutting, 2 for traversal
     private boolean is_current_raycast;
-    private final static int VIEW_SWITCH_ID = 4;
+
+    private final static int TRAVERSAL_CHECK_ID = 4;
+    private final static int VIEW_SWITCH_ID = 5;
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
