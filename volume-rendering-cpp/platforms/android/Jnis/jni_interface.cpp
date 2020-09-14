@@ -15,6 +15,7 @@ namespace {
     int CHANEL_NUM = 4;
     //globally
     GLubyte* g_VolumeTexData = nullptr;
+    int return_pos = 0;
     std::unordered_map<int, float*> centerline_map;
 
     int g_img_h=0, g_img_w=0, g_img_d=0;
@@ -157,8 +158,16 @@ JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
 }
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
-    jbyteArray garr= env->NewByteArray(g_vol_len);
-    env->SetByteArrayRegion(garr,0,g_vol_len, reinterpret_cast<jbyte*>(g_VolumeTexData));
+    if(return_pos >= g_vol_len) {
+        return_pos = 0;
+        return nullptr;
+    }
+
+    int rsize = fmin(1024, g_vol_len-return_pos);
+
+    jbyteArray garr = env->NewByteArray(rsize);
+    env->SetByteArrayRegion(garr,0, rsize, reinterpret_cast<jbyte*>(g_VolumeTexData + return_pos));
+    return_pos+=rsize;
     return garr;
 }
 JNI_METHOD(void, JNIreleaseBuffer)(JNIEnv*, jclass){

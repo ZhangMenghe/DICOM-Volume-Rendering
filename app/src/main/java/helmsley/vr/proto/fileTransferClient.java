@@ -227,7 +227,6 @@ public class fileTransferClient {
             int id = 0;
             while(data_itor.hasNext()){
                 volumeWholeResponse data = data_itor.next();
-
                 JNIInterface.JNIsendData(0, id, data.getData().size(), 2, data.getData().toByteArray());
                 id++;
             }
@@ -369,7 +368,19 @@ public class fileTransferClient {
 
         try {
             File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, target_ds.getFolderName(), target_vol.getFolderName()), DCM_WMASK_FILE_NAME);
-            fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
+            OutputStream ostream = new FileOutputStream(dataf, true);
+
+            byte[] data = JNIInterface.JNIgetVolumeData();
+            while(data!=null){
+                try{
+                    ostream.write(data);
+                }catch (IOException e){
+                    e.printStackTrace();
+                    Log.e(TAG, "====Failed to Save Large Image to file");
+                }
+                data = JNIInterface.JNIgetVolumeData();
+            }
+            ostream.close();
         } catch (Exception e) {
             Log.e(TAG, "====Failed to Save Masks to file");
         }
@@ -420,7 +431,19 @@ public class fileTransferClient {
             os.write(buffer);
             if(save_complete && !tvol.getWithMask()){
                 File dataf = new File(get_tar_vol_dir(TARGET_ROOT_DIR, tds.getFolderName(), tvol.getFolderName()), DCM_FILE_NAME);
-                fileUtils.saveLargeImageToFile(new FileOutputStream(dataf), JNIInterface.JNIgetVolumeData());
+                    OutputStream ostream = new FileOutputStream(dataf, true);
+
+                    byte[] data = JNIInterface.JNIgetVolumeData();
+                    while(data!=null){
+                        try{
+                            ostream.write(data);
+                        }catch (IOException e){
+                            e.printStackTrace();
+                            Log.e(TAG, "====Failed to Save Large Image to file");
+                        }
+                        data = JNIInterface.JNIgetVolumeData();
+                    }
+                    ostream.close();
             }
 
         }catch (Exception e){
