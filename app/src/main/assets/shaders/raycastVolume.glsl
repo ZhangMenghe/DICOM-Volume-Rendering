@@ -165,14 +165,21 @@ vec4 tracing(float u, float v){
 
     drawed_square = (abs(t) < 1000.0)?intersectRayWithCircle(ro+rd*t, uPlane.r):false;
 
-    if(blocked_by_plane && intersect.x <= intersect.y || abs(intersect.x - t) < 0.01) {
-        vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
-        float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
-        return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
-    }
+
     if(u_cutplane_realsample){
+        if(blocked_by_plane && intersect.x <= intersect.y) {
+            vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+            float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
+            return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
+        }
         if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);
         return Sample(ro+0.5+rd*t);
+    }else{
+        if(blocked_by_plane && intersect.x <= intersect.y || abs(intersect.x - t) < 0.01) {
+            vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+            float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
+            return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
+        }
     }
     #endif
     if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, vec4(.0), u_plane_color.a):vec4(.0);

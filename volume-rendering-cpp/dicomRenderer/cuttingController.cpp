@@ -208,9 +208,9 @@ void cuttingController::update_plane_(glm::vec3 pNorm){
     p_rotate_mat_ = rotMatFromDir(pNorm);
     glm::vec3 vp_obj = vec3MatNorm(vm_inv, Manager::camera->getCameraPosition());
     //cloest point
-     p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
+      p_start_ = cloestVertexToPlane(pNorm, vp_obj) - p_norm_*0.1f;
     //debug
-//    p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
+//   p_start_ = cloestVertexToPlane(pNorm, vp_obj) + p_norm_*0.5f;
 }
 void cuttingController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     if(cut_plane_id == dvr::CUT_CUTTING_PLANE && last_mode==dvr::CUT_TRAVERSAL){

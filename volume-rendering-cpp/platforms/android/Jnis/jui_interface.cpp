@@ -55,7 +55,7 @@ JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolea
     auto it = std::find (param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
         Manager::param_bool[it -param_checks.begin()] = value;
-//        LOGE("======SET  %s, %d", key.c_str(), value);
+        LOGE("======SET  %s, %d", key.c_str(), value);
 //        if(key=="Raycasting") Manager::widget_id = value?1:0;
 //        if(key==freeze_keyworkd) Manager::cutDirty = true;
 //            //!!debug only,
