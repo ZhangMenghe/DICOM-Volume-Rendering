@@ -86,6 +86,11 @@ public class JUIInterface {
         JUIsetColorSchemeNative(id);
         if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.COLOR_SCHEME, id);
     }
+    static void JUIsetTraversalTarget(int id){
+        JUIsetTraversalTargetNative(id);
+        //todo:broadcast
+//        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.COLOR_SCHEME, id);
+    }
 
     public static void JUIonSingleTouchDown(int target, float x, float y){
         JUIonSingleTouchDownNative(target, x, y);
@@ -132,6 +137,7 @@ public class JUIInterface {
     public static native float[] JUIgetCuttingPlaneStatusNative();
     public static native void JUIsetMaskBitsNative(int num, int mbits);
     public static native void JUIsetColorSchemeNative(int id);
+    public static native void JUIsetTraversalTargetNative(int id);
 
     //touch action
     public static native void JUIonSingleTouchDownNative(int target, float x, float y);

@@ -1,7 +1,6 @@
 #version 310 es
 
 #pragma multi_compile CUTTING_PLANE
-#pragma multi_compile DRAW_PLANE_SQUARE
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -27,6 +26,8 @@ struct Plane{
     float r;
 };
 uniform Plane uPlane;
+uniform bool u_cutplane_realsample;
+uniform bool u_is_ar;
 const float constantNCP = 1.0;
 const float alpha_tolerance = 0.01;
 vec3 VolumeSize;
@@ -132,7 +133,6 @@ vec4 tracing(float u, float v, ivec2 spos){
     VolumeSize = vec3(imageSize(srcTex));
 
     bool drawed_square=false; bool blocked_by_plane=false;
-
     //plane
     #ifdef CUTTING_PLANE
     float t;
@@ -143,16 +143,23 @@ vec4 tracing(float u, float v, ivec2 spos){
     }
     else{t = RayPlane(ro, rd, uPlane.p, -uPlane.normal); intersect.y = min(intersect.y, t);}
 
-//    drawed_square = (abs(t) < 1000.0)?intersectRayWithCircle(ro+rd*t, uPlane.r):false;
+    if(!u_is_ar) drawed_square = (abs(t) < 1000.0)?intersectRayWithCircle(ro+rd*t, uPlane.r):false;
 
-    if(blocked_by_plane && intersect.x <= intersect.y || abs(intersect.x - t) < 0.01) {
-        vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
-//        if(traced_color.a > 1e-5) return traced_color;
-        return mix(traced_color, getBackground(spos), 1.0-traced_color.a);
-//        float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
-//        return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
+    if(u_cutplane_realsample){
+        if(blocked_by_plane && intersect.x <= intersect.y) {
+            vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+            float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
+            return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
+        }
+        if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, getBackground(spos), u_plane_color.a):getBackground(spos);
+        return Sample(ro+0.5+rd*t);
+    }else{
+        if(blocked_by_plane && intersect.x <= intersect.y || (abs(intersect.x - t) < 0.01 && !u_is_ar)) {
+            vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);
+            float alpha = (traced_color.a > 1e-5)?traced_color.a:u_plane_color.a;
+            return drawed_square?mix(u_plane_color, traced_color , alpha): traced_color;
+        }
     }
-
     #endif
     if(intersect.y < intersect.x || blocked_by_plane) return drawed_square?mix(u_plane_color, getBackground(spos), u_plane_color.a):getBackground(spos);
     vec4 traced_color = Volume(ro + 0.5, rd, intersect.x, intersect.y);

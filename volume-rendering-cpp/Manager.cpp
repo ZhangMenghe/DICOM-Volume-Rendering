@@ -6,6 +6,7 @@ std::vector<std::string> Manager::shader_contents;
 bool Manager::baked_dirty_;
 bool Manager::new_data_available;
 int Manager::color_scheme_id;
+dvr::ORGAN_IDS Manager::traversal_target_id;
 int Manager::screen_w, Manager::screen_h;
 bool Manager::show_ar_ray, Manager::volume_ar_hold;
 

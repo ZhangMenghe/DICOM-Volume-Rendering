@@ -41,6 +41,8 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
     Shader::Uniform(sp, "uCamposObjSpace",
             glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp,"usample_step_inverse", 1.0f/600.0f);
+    Shader::Uniform(sp,"u_cutplane_realsample", Manager::param_bool[dvr::CUT_PLANE_REAL_SAMPLE]);
+    Shader::Uniform(sp,"u_is_ar", Manager::param_bool[dvr::CHECK_AR_ENABLED]);
 
     if(Manager::IsCuttingEnabled())shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
@@ -53,7 +55,6 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
     else glFrontFace(GL_CW);
     glBindVertexArray(vao_cube_);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
-
     glBindVertexArray(0);
     shader_->UnUse();
     glFrontFace(GL_CCW);
@@ -88,6 +89,9 @@ void raycastRenderer::draw_baked(glm::mat4 model_mat){
     Shader::Uniform(sp, "u_CamToWorld", Manager::camera->getCameraPose());
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
     Shader::Uniform(sp, "usample_step_inverse", 1.0f / 400.0f);
+    Shader::Uniform(sp,"u_cutplane_realsample", Manager::param_bool[dvr::CUT_PLANE_REAL_SAMPLE]);
+    Shader::Uniform(sp,"u_is_ar", Manager::param_bool[dvr::CHECK_AR_ENABLED]);
+
     //todo
     vrController::instance()->setCuttingParams(sp);
 

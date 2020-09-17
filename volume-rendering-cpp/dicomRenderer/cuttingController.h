@@ -79,7 +79,7 @@ private:
     void update_modelMat_o();
     void update_plane_(glm::mat4 rotMat);
     void update_plane_(glm::vec3 pNorm);
-    void set_centerline_cutting(int& id, glm::vec3& pp, glm::vec3& pn);
+    void set_centerline_cutting(dvr::ORGAN_IDS oid, int& id, glm::vec3& pp, glm::vec3& pn);
 
 public:
     static cuttingController* _mptr;

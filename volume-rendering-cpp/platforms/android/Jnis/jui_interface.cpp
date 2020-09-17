@@ -93,6 +93,10 @@ JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint id){
     Manager::color_scheme_id = id;
     Manager::baked_dirty_ = true;
 }
+JUI_METHOD(void, JUIsetTraversalTargetNative)(JNIEnv * env, jclass, jint id){
+    Manager::traversal_target_id = (id == 0)?dvr::ORGAN_COLON:dvr::ORGAN_ILEUM;
+    LOGE("====ID: %d", id);
+}
 JUI_METHOD(void, JUIsetGraphRectNative)(JNIEnv*, jclass, jint id, jint width, jint height, jint left, jint top){
 //    LOGE("====%d, %d, %d, %d,%d", id, width, height, left,top);
     overlayController::instance()->setOverlayRect(id, width, height, left, top);

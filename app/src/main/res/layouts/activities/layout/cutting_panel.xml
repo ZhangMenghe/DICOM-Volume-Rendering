@@ -80,6 +80,13 @@
             app:layout_constraintStart_toEndOf="@id/layout_check_cutting"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
+            <Spinner
+                android:id="@+id/centerline_id_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_gravity="end"
+                style="@style/Spinner"/>
             <Switch
                 android:id="@+id/toggle_view_switch"
                 android:layout_width="wrap_content"

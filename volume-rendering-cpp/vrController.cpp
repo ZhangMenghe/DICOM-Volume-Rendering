@@ -159,7 +159,13 @@ void vrController::onDrawScene(){
     bool draw_finished =false;
     if(cp_update){
         cutter_->Update();
-        if(Manager::param_bool[dvr::CHECK_CUTTING]){cutter_->Draw(pre_draw_);draw_finished=true;}
+        if(Manager::param_bool[dvr::CHECK_CUTTING]){
+            if(isRayCasting() && pre_draw_)draw_finished = true;
+            else{
+                cutter_->Draw(pre_draw_);
+                draw_finished=true;
+            }
+        }
     }
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();

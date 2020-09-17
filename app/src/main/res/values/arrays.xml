@@ -65,21 +65,28 @@
         <item>@string/cutting_check_name</item>
         <item>@string/freezeVolume_check_name</item>
         <item>@string/freezeplane_check_name</item>
+        <item>Real Value</item>
         <item>Center Line Travel</item>
         <item>Traversal View</item>
-
     </string-array>
-    <string-array name="cut_freeze_params">
+    <string-array name="cut_raycast_options">
         <item>@string/freezeVolume_check_name</item>
         <item>@string/freezeplane_check_name</item>
+        <item>Real Value</item>
     </string-array>
     <string-array name="cut_check_values">
         <item>false</item><!-- is cutting-->
         <item>false</item>
         <item>false</item>
+        <item>false</item>
         <item>false</item><!-- is center traversal-->
         <item>false</item>
     </string-array>
+    <string-array name="cutting_traversal_target">
+        <item>Colon</item>
+        <item>Ileum</item>
+    </string-array>
+
 <!--    ar_check_params-->
     <string-array name="ar_check_params">
         <item>@string/ar_check_name</item>
