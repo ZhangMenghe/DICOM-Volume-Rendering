@@ -14,6 +14,10 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/yellowOrange</item>
     </style>
+    <style name="AppThemeNoTitle.Launcher">
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@drawable/splash_window</item>
+    </style>
     <style name="SCBSwitch" parent="Theme.AppCompat.Light">
         <!-- active thumb & track color (30% transparency) -->
         <item name="colorControlActivated">@color/brightBlue</item>
