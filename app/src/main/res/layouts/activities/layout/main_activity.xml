@@ -16,7 +16,18 @@
         android:layout_height="match_parent"
         tools:layout_editor_absoluteX="46dp"
         tools:layout_editor_absoluteY="311dp" />
-
+<!--    <ImageView-->
+<!--        android:id="@+id/tutorial_main"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:src="@drawable/t_main"-->
+<!--        android:visibility="invisible"/>-->
+<!--    <ImageView-->
+<!--        android:id="@+id/tutorial_data"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:src="@drawable/t_data1"-->
+<!--        android:visibility="invisible"/>-->
     <android.support.constraint.ConstraintLayout
         android:id="@+id/topPanel"
         android:layout_width="match_parent"
@@ -61,6 +72,10 @@
     <include
         android:id="@+id/loading_layout"
         layout="@layout/progress_layout"/>
+    <include
+        android:id="@+id/tutorial_main"
+        android:visibility="invisible"
+        layout="@layout/tutorial_layout"/>
     <ImageView
         android:id="@+id/broadcast_img"
         android:layout_width="0dp"

@@ -371,7 +371,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 
         //show/hide list view: volume details
         if(lst_view.getVisibility() == View.VISIBLE)lst_view.setVisibility(View.GONE);
-        else lst_view.setVisibility(View.VISIBLE);
+        else {
+            lst_view.setVisibility(View.VISIBLE);
+            if(islocal_)mainUIs.ShowTutorialDialog("dscard");
+        }
         //show/hide sort view
         View sort_view;
         try{

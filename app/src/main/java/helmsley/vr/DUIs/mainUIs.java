@@ -1,12 +1,18 @@
 package helmsley.vr.DUIs;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.res.Resources;
+import android.support.constraint.ConstraintLayout;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -16,6 +22,7 @@ import java.lang.ref.WeakReference;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 
+import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.UIsManager;
 
@@ -30,7 +37,11 @@ public class mainUIs {
 
     private Spinner spinner_check;
     private dialogUIs dialogController;
-
+    private View tutorial_overlay;
+    private static int tutorial_panel_id = 0;
+    private static boolean ready_for_new_panel_tutorial = true, start_to_go_through_panel=false;
+    private static ImageView tutorial_src_imgview;
+    private static AlertDialog tutorial_dialog;
     //Spinner adapter
     private checkpanelAdapter cb_panel_adapter;
 
@@ -43,6 +54,8 @@ public class mainUIs {
 
         mUIManagerRef = new WeakReference<>(manager);
         actRef = new WeakReference<>(activity);
+        //tutorial
+        prepare_tutorial();
         //checkbox spinners
         spinner_check =  (Spinner)activity.findViewById(R.id.checkPanelSpinner);
         cb_panel_adapter = new checkpanelAdapter(activity, manager);
@@ -101,6 +114,65 @@ public class mainUIs {
         return content;
     }
 
+    private void prepare_tutorial(){
+        if(!MainActivity.need_tutorial) return;
+        Activity activity = actRef.get();
+        final AlertDialog.Builder layoutDialog_builder = new AlertDialog.Builder(activity, R.style.TutorialDialog);
+
+        ViewGroup parent_vp = (ViewGroup)activity.findViewById(R.id.parentPanel);
+        tutorial_overlay = LayoutInflater.from(activity).inflate(R.layout.tutorial_layout, parent_vp, false);
+        tutorial_src_imgview = (ImageView) tutorial_overlay.findViewById(R.id.src_image);
+        tutorial_src_imgview.setImageResource(R.drawable.t_main);
+        layoutDialog_builder.setView(tutorial_overlay);
+        tutorial_dialog = layoutDialog_builder.create();
+        tutorial_overlay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tutorial_dialog.dismiss();
+                if(start_to_go_through_panel && tutorial_panel_id < 3){
+                    ShowTutorialDialog("panel");
+                }
+            }
+        });
+
+        tutorial_dialog.show();
+    }
+    public static void ShowTutorialDialog(String target){
+        if(!MainActivity.need_tutorial) return;
+        if(target.equals("dscard")){
+            tutorial_src_imgview.setImageResource(R.drawable.t_data3);
+        }else if(target.equals("local_data")){
+            tutorial_src_imgview.setImageResource(R.drawable.t_panel0);
+        }else if(target.equals("sets_data")){
+            tutorial_src_imgview.setImageResource(R.drawable.t_data1);
+        }else if(target.equals("volume_data")){
+            tutorial_src_imgview.setImageResource(R.drawable.t_data2);
+        }else if(target.equals("start_panel")){
+            start_to_go_through_panel = true;
+            tutorial_src_imgview.setImageResource(R.drawable.t_render1);
+            tutorial_panel_id = 1;
+            ready_for_new_panel_tutorial = false;
+        }else if(target.equals("panel") && ready_for_new_panel_tutorial){
+            if(tutorial_panel_id == 1)tutorial_src_imgview.setImageResource(R.drawable.t_cut1);
+            else if(tutorial_panel_id == 2)tutorial_src_imgview.setImageResource(R.drawable.t_mask1);
+            else return;
+            tutorial_panel_id++;
+            ready_for_new_panel_tutorial = false;
+        }else if(target.equals("Rendering")){
+            tutorial_src_imgview.setImageResource(R.drawable.t_render2);
+            ready_for_new_panel_tutorial = true;
+        }else if(target.equals("Cut Planes")){
+            tutorial_src_imgview.setImageResource(R.drawable.t_cut2);
+            ready_for_new_panel_tutorial = true;
+        }else if(target.equals("Organs")){
+            tutorial_src_imgview.setImageResource(R.drawable.t_mask2);
+            ready_for_new_panel_tutorial = true;
+            MainActivity.need_tutorial = false;
+        }else{
+            return;
+        }
+        tutorial_dialog.show();
+    }
     private class syscallListAdapter extends ListAdapter{
         private final int BROADCAST_POS;
         private boolean is_on_broadcast;
@@ -152,13 +224,14 @@ public class mainUIs {
                                 300);
                     }
                 });
-            return convertView;
+                return convertView;
         }
         private class ViewContentHolder{
             TextView text_name;
         }
     }
     private class dataListAdapter extends ListAdapter{
+        boolean initialized = false;
         dataListAdapter(Context context, int arrayId, int titleId){
             super(context, context.getResources().getString(titleId));
             item_names = Arrays.asList(context.getResources().getStringArray(arrayId));
@@ -174,13 +247,15 @@ public class mainUIs {
                 holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
             }
             holder.text_name.setText(item_names.get(position));
-
             holder.text_name.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     holder.text_name.setTextAppearance(R.style.itemHighlightText);
                     String text_title = ((TextView)v).getText().toString();
-                    if(text_title.equals(NAME_DATA_LOCAL))dialogController.SetupConnectLocal();
+                    if(text_title.equals(NAME_DATA_LOCAL)){
+                        dialogController.SetupConnectLocal();
+                        ShowTutorialDialog("volume_data");
+                    }
                     else if(text_title.equals(NAME_DATA_DEVICE))dialogController.ShowDICOMPicker();
                     else if(text_title.equals(NAME_DATA_REMOTE))dialogController.ShowDatasetRemote();
                     new android.os.Handler().postDelayed(
@@ -192,6 +267,10 @@ public class mainUIs {
                             300);
                 }
             });
+            if(!initialized){
+                ShowTutorialDialog("sets_data");
+                initialized = true;
+            }
             return convertView;
         }
         private class ViewContentHolder{

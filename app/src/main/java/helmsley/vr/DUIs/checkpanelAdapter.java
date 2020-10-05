@@ -18,6 +18,7 @@ public class checkpanelAdapter extends ListAdapter {
     private final WeakReference<Context> contexRef;
     private final WeakReference<UIsManager> mUIManagerRef;
     private boolean[] item_values;
+    private boolean initialized = false;
 
     checkpanelAdapter(Context context, UIsManager manager) {
         super(context, context.getString(R.string.check_panel_group_name));
@@ -53,12 +54,15 @@ public class checkpanelAdapter extends ListAdapter {
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 if (item_values[position] == isChecked) return;
-                item_values[position]= isChecked;
+                item_values[position] = isChecked;
                 mUIManagerRef.get().onPanelCheckSwitch(position, isChecked);
+                if(isChecked)mainUIs.ShowTutorialDialog(item_names.get(position));
             }
         });
         holder.checkBox.setTag(position);
         holder.checkBox.setChecked(item_values[position]);
+
+        if(!initialized){mainUIs.ShowTutorialDialog("start_panel");initialized=true;}
         return convertView;
     }
 

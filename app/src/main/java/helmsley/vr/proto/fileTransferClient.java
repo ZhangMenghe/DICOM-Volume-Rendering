@@ -5,6 +5,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import helmsley.vr.DUIs.dialogUIs;
+import helmsley.vr.DUIs.mainUIs;
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.Utils.fileUtils;
@@ -527,6 +528,7 @@ public class fileTransferClient {
         }catch (Exception e){
             e.printStackTrace();
         }
+        mainUIs.ShowTutorialDialog("local_data");
         return true;
     }
 

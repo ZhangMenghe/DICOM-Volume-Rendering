@@ -18,6 +18,11 @@
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">@drawable/splash_window</item>
     </style>
+    <style name="TutorialDialog" parent="AppThemeNoTitle">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
     <style name="SCBSwitch" parent="Theme.AppCompat.Light">
         <!-- active thumb & track color (30% transparency) -->
         <item name="colorControlActivated">@color/brightBlue</item>

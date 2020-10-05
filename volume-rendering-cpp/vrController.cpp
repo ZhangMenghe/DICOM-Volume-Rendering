@@ -117,6 +117,7 @@ void vrController::onViewCreated(){
 }
 
 void vrController::onViewChange(int width, int height){
+    //1080 * 2042
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT);
     screenQuad::instance()->onScreenSizeChange(width, height);
