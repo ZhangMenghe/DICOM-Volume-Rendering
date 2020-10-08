@@ -41,7 +41,7 @@
 <!--    mask panel subs-->
     <string name="mask_check_name">Show</string>
 
-    <!--    cut panel subs-->
+<!--    cut panel subs-->
     <string name="cutting_check_name">Cutting</string>
     <string name="check_raycast_cut_option_name">Options</string>
     <string name="freezeplane_check_name">Freeze Plane</string>
@@ -50,7 +50,7 @@
     <string name="cutting_traversal_target">CID</string>
 
 
-    <!--    sys operation names-->
+<!--    sys operation names-->
     <string name="sys_name">System</string>
     <string name="data_name">Data</string>
     <string name="sys_reset">Reset</string>

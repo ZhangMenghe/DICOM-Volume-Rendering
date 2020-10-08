@@ -36,17 +36,18 @@ message volumeResponse{
         string folder_path = 2;
         repeated int32 dims = 3;/*height,width,depth*/
         repeated float orientation = 4;
-        repeated float resolution = 5;/*pix_spacing y, x, slice thickness*/
-        float volume_loc_range = 6;
-        bool with_mask = 7;
+        int32 cut_group = 5;
+        repeated float resolution = 6;/*pix_spacing y, x, slice thickness*/
+        float volume_loc_range = 7;
+        bool with_mask = 8;
         enum DataSource{
             LOCAL = 0;
             SERVER = 1;
             DEVICE = 2;
         }
-        DataSource data_source = 8;
-        bytes sample_img = 9;
-        scoreInfo scores = 10;
+        DataSource data_source = 9;
+        bytes sample_img = 10;
+        scoreInfo scores = 11;
     }
     repeated volumeInfo volumes = 1;
 }

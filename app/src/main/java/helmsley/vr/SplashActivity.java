@@ -9,13 +9,15 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            public void run() {
-                // yourMethod();
-                startActivity(new Intent(SplashActivity.this, MainActivity.class));
-                finish();
-            }
-        }, 2000);   //2 seconds
+//        Handler handler = new Handler();
+//        handler.postDelayed(new Runnable() {
+//            public void run() {
+//                // yourMethod();
+//                startActivity(new Intent(SplashActivity.this, MainActivity.class));
+//                finish();
+//            }
+//        }, 2000);   //2 seconds
+        startActivity(new Intent(SplashActivity.this, MainActivity.class));
+        finish();
     }
 }

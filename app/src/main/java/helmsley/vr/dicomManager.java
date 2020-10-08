@@ -230,6 +230,7 @@ public class dicomManager {
         volumeResponse.volumeInfo.Builder vinfo_builder = volumeResponse.volumeInfo.newBuilder()
                 .setFolderName(vol_name)
                 .setFolderPath(folder_path)
+                .setCutGroup(-1)
                 .setVolumeLocRange(-1)
                 .setWithMask(mask_ava)
                 .setDataSource(volumeResponse.volumeInfo.DataSource.DEVICE);

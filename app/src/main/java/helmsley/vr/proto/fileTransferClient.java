@@ -78,9 +78,10 @@ public class fileTransferClient {
             volumeInfo.Builder vinfo_builder = volumeInfo.newBuilder()
                     .setFolderName(info[3])
                     .setFolderPath(info[4])
-                    .setVolumeLocRange(Float.parseFloat(info[8]))
-                    .setWithMask(Boolean.parseBoolean(info[9]))
-                    .setDataSourceValue(Integer.parseInt(info[10]));
+                    .setCutGroup(Integer.parseInt(info[7]))
+                    .setVolumeLocRange(Float.parseFloat(info[9]))
+                    .setWithMask(Boolean.parseBoolean(info[10]))
+                    .setDataSourceValue(Integer.parseInt(info[11]));
             //set dimensions
             String[] dims_tx = info[5].split(",");
             for(String dt:dims_tx)
@@ -90,7 +91,7 @@ public class fileTransferClient {
             for(String t:ori_tx)
                 vinfo_builder.addOrientation(Float.parseFloat(t));
             //set resolution
-            String[] res_tx = info[7].split(",");
+            String[] res_tx = info[8].split(",");
             for(String t:res_tx)
                 vinfo_builder.addResolution(Float.parseFloat(t));
 
@@ -402,6 +403,8 @@ public class fileTransferClient {
             //set orientation
             listString = tvol.getOrientationList().toString().replaceAll("\\s+","");
             vol_info_lst.add(listString.substring(1, listString.length()-1));
+            //set cut group
+            vol_info_lst.add(String.valueOf(tvol.getCutGroup()));
             //set resolution
             listString = tvol.getResolutionList().toString().replaceAll("\\s+","");
             vol_info_lst.add(listString.substring(1, listString.length()-1));

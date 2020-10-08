@@ -21,7 +21,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
         EGL
         log)
 endif()
-set(GLM_DIRECTORY /usr/local/include/glm)
+set(GLM_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../third_party/glm-0.9.9.7/glm)
 
 SET(GL_PIPELINE_FILES
         GLPipeline/Shader.cpp

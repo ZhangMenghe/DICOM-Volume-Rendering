@@ -17,7 +17,7 @@ public class MainActivity extends GLActivity {
     protected UIsManager ui_manager;
     private dicomManager dcm_manager;
     public static boolean permission_granted = false;
-    public static boolean need_tutorial = true;
+    public static boolean need_tutorial = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

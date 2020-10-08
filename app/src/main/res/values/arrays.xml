@@ -85,6 +85,12 @@
         <item>Ileum</item>
     </string-array>
 
+    <string-array name="dataset_filter_keys">
+        <item>UNKNOWN</item>
+        <item>Sagittal</item>
+        <item>Coronal</item>
+        <item>Traversal</item>
+    </string-array>
 
     <string-array name="raycast_density">
         <item>Density</item>

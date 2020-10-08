@@ -3,6 +3,8 @@ package helmsley.vr.DUIs;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +17,8 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -22,14 +26,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
@@ -49,6 +56,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         ListView lstViewVol;
         TextView textContent;
         Spinner sortSpinner;
+        Spinner filtSpinner;
         View sortView;
         cardHolder(View view) {
             super(view);
@@ -58,6 +66,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             this.lstViewVol = (ListView) itemView.findViewById(R.id.card_list);
             this.textContent = (TextView) itemView.findViewById(R.id.card_detail);
             this.sortSpinner = (Spinner) itemView.findViewById(R.id.sort_key_spinner);
+            this.filtSpinner = (Spinner)  itemView.findViewById(R.id.filter_key_spinner);
             this.sortView = itemView.findViewById(R.id.card_sort_layout);
         }
     }
@@ -71,7 +80,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private final boolean islocal_;
 
     //adapter of listView content
-    private Map<String, ArrayAdapter<String>> contentAdapters;
+    private Map<String, listContentAdapter> contentAdapters;
     //cache remote, keep it null for local ds
     private LinkedHashMap<String, List<volumeResponse.volumeInfo>> cached_volumeinfo = null;
 
@@ -87,7 +96,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private String sel_ds_name;
 
     //sorting stuff
-    private final static List<String> sort_keys = new ArrayList<>(Arrays.asList("HELM Grade", "Name", "Mean", "Range", "SNR"));
+    private final static List<String> sort_keys = new ArrayList<>(Arrays.asList("HELM", "Name", "Mean", "Range", "SNR"));
     private final static int[] sort_keys_ids = {-1, -1, 0, 1, 6};
 //    private static Set<String> dirty_dsname= new ArraySet<>();
     private Map<String, View> sort_view_map = new LinkedHashMap<>();
@@ -149,8 +158,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //load data from local / remote
                 sel_ds_name = info.getFolderName();
-                if(islocal_)sel_vol_info = downloaderRef.get().getLocalVolumeFromDSAt(sel_ds_name, position);
-                else sel_vol_info = cached_volumeinfo.get(sel_ds_name).get(position);
+//                if(islocal_)sel_vol_info = downloaderRef.get().getLocalVolumeFromDSAt(sel_ds_name, position);
+//                else sel_vol_info = cached_volumeinfo.get(sel_ds_name).get(position);
+
+                sel_vol_info = contentAdapters.get(sel_ds_name).getRawDataAt(position);
 
                 //setup preview and contents
                 if(preview_dialog == null) setup_preview_dialog();
@@ -185,6 +196,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         sortListAdapter adp = new sortListAdapter(actRef.get(),this, sort_keys, info.getFolderName());
         holder.sortSpinner.setAdapter(adp);
         adp.setTitleById(0);
+
+        filterCheckboxListAdapter adpf = new filterCheckboxListAdapter(actRef.get(), this);
+        holder.filtSpinner.setAdapter(adpf);
     }
     @Override
     public int getItemCount() {
@@ -197,18 +211,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         if(vol_lst.isEmpty()) return;
         if(!isLocal) cached_volumeinfo.put(ds_name, vol_lst);
 
-        //setup card info
-        ArrayList<String> volcon_lst = new ArrayList<>();
-        for (volumeResponse.volumeInfo vinfo : vol_lst){
-            List<Integer> dims = vinfo.getDimsList();
-            volcon_lst.add(actRef.get().getString(
-                    R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
-                    +(vinfo.getWithMask()?"\n===>>With Mask<<===":""));
-        }
-
-        ArrayAdapter<String> contentAdapter = new ArrayAdapter<>(actRef.get(), android.R.layout.simple_list_item_1, volcon_lst);
-
-        //init listview
+        listContentAdapter contentAdapter = new listContentAdapter(actRef.get(), vol_lst);
         lv.setAdapter(contentAdapter);
 
         ViewGroup.LayoutParams params = lv.getLayoutParams();
@@ -222,6 +225,71 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         }
         lv.setLayoutParams(params);
         contentAdapters.put(ds_name, contentAdapter);
+    }
+    private static class listContentAdapter extends ArrayAdapter<String>{
+        ArrayList<String> all_contents;
+        ArrayList<Integer> sel_ids;
+        HashSet<Integer> rm_filter_ids;
+        List<volumeResponse.volumeInfo> raw_info;
+
+        listContentAdapter(Context context, List<volumeResponse.volumeInfo> vol_lst){
+            super(context, android.R.layout.simple_list_item_1);
+            all_contents = new ArrayList<>();
+            raw_info = new ArrayList<>();
+            sel_ids = new ArrayList<>();
+            rm_filter_ids = new HashSet<>();
+            updateRawData(context, vol_lst);
+        }
+        void updateRawData(Context context, List<volumeResponse.volumeInfo> vol_lst){
+            clear();
+            all_contents.clear();
+            raw_info.clear();
+            raw_info.addAll(vol_lst);
+            sel_ids.clear();
+            for (volumeResponse.volumeInfo vinfo : vol_lst){
+                List<Integer> dims = vinfo.getDimsList();
+                all_contents.add(context.getString(
+                        R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
+                        +(vinfo.getWithMask()?"\n===>>With Mask<<===":""));
+            }
+            if(rm_filter_ids.isEmpty()){
+                addAll(all_contents);
+                for(int i=0; i<vol_lst.size();i++) sel_ids.add(i);
+            }else{
+                for(int i=0; i<raw_info.size(); i++){
+                    if(!rm_filter_ids.contains(raw_info.get(i).getCutGroup())){
+                        sel_ids.add(i);
+                        add(all_contents.get(i));
+                    }
+                }
+            }
+            notifyDataSetChanged();
+        }
+        void updateWithFilter(int idx, boolean isChecked){
+            if(idx < 4){
+                if(isChecked){
+                    for(int i=0; i<raw_info.size(); i++){
+                        if(raw_info.get(i).getCutGroup() == idx){
+                            add(all_contents.get(i));
+                            sel_ids.add(i);
+                        }
+                    }
+                    rm_filter_ids.remove(idx);
+                }else{
+                    for(int i=0; i<raw_info.size(); i++){
+                        if(raw_info.get(i).getCutGroup() == idx){
+                            remove(all_contents.get(i));
+                            sel_ids.remove((Integer)i);
+                        }
+                    }
+                    rm_filter_ids.add(idx);
+                }
+                notifyDataSetChanged();
+            }
+        }
+        volumeResponse.volumeInfo getRawDataAt(int position){
+            return raw_info.get(sel_ids.get(position));
+        }
     }
     private void setup_preview_dialog(){
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -292,8 +360,6 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         if(islocal_) info_lst = downloaderRef.get().getAvailableVolumes(sel_ds_name, true);
         else info_lst = cached_volumeinfo.get(sel_ds_name);
         if(info_lst==null) return;
-//        for(volumeResponse.volumeInfo vinfo:info_lst)
-//            Log.e(TAG, "===before: " + vinfo.getFolderName() );
 
         int kid = sort_keys_ids[sort_keys.indexOf(key)];
         if(kid > 0)
@@ -346,21 +412,10 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     }
     boolean updateLstContent(String ds_name, List<volumeResponse.volumeInfo> info_lst){
         if(info_lst==null || info_lst.isEmpty()) return false;
-        //setup card info
-        ArrayList<String> volcon_lst = new ArrayList<>();
-        for (volumeResponse.volumeInfo vinfo : info_lst){
-            List<Integer> dims = vinfo.getDimsList();
-            volcon_lst.add(actRef.get().getString(
-                    R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
-                    +(vinfo.getWithMask()?"\n===>>With Mask<<===":""));
-        }
         if(!contentAdapters.containsKey(ds_name))
-            contentAdapters.put(ds_name, new ArrayAdapter<>(actRef.get(), android.R.layout.simple_list_item_1, volcon_lst));
-        else{
-            contentAdapters.get(ds_name).clear();
-            contentAdapters.get(ds_name).addAll(volcon_lst);
-        }
-        contentAdapters.get(ds_name).notifyDataSetChanged();
+            contentAdapters.put(ds_name, new listContentAdapter(actRef.get(), info_lst));
+        else
+            contentAdapters.get(ds_name).updateRawData(actRef.get(), info_lst);
         return true;
     }
     private void on_click_ds_card(View v){
@@ -389,8 +444,11 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 //            else sort_view.setVisibility(View.VISIBLE);
         }
     }
+    void UpdateListContentWithFilter(int idx, boolean isChecked){
+        contentAdapters.get(sel_ds_name).updateWithFilter(idx, isChecked);
+    }
     private static class sortListAdapter extends textSimpleListAdapter{
-        int current_id = -1;
+        int current_id = 0;
         String ds_name_;
         private final WeakReference<DSCardRecyclerViewAdapter> parentRef;
         sortListAdapter(Context context, DSCardRecyclerViewAdapter parent, List<String> arrs, String ds_name){
@@ -415,6 +473,68 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
             if(current_id == position) return;
             current_id = position;
             parentRef.get().ReorderVolumeList(ds_name_,item_names.get(position));
+        }
+    }
+    private static class filterCheckboxListAdapter extends ListAdapter {
+        List<Boolean> item_values;
+        private final WeakReference<DSCardRecyclerViewAdapter> parentRef;
+        filterCheckboxListAdapter(Context context, DSCardRecyclerViewAdapter parent) {
+            super(context, "Filter");
+            parentRef = new WeakReference<>(parent);
+            Resources res = context.getResources();
+            item_names = Arrays.asList(res.getStringArray(R.array.dataset_filter_keys));
+            item_values = new ArrayList<>();
+            for(int i=0;i<item_names.size();i++)item_values.add(true);
+        }
+        void setValue(int id, boolean value){
+            if(id < item_values.size() && item_values.get(id)!=value) {
+                item_values.set(id, value);
+                notifyDataSetChanged();
+            }
+        }
+        void ResetAll(){
+            boolean data_changed = false;
+            for(int i=0; i<item_values.size();i++){
+                if(item_values.get(i)){
+                    item_values.set(i, false);
+//                    JUIInterface.JUIsetChecks(item_names.get(i),false);
+                    data_changed = true;
+                }
+            }
+            if(data_changed)notifyDataSetChanged();
+        }
+        boolean getValue(int id){return (id<item_values.size())?item_values.get(id):false;}
+
+        public View getDropDownView(int position, View convertView, ViewGroup parent){
+            ViewContentHolder holder;
+            if (convertView == null) {
+                holder = new ViewContentHolder();
+                convertView = mInflater.inflate(R.layout.spinner_check_layout, null);
+                holder.text_name = (TextView) convertView.findViewById(R.id.checkName);
+                holder.checkBox = (CheckBox) convertView.findViewById(R.id.checkCheckBox);
+
+                convertView.setTag(R.layout.spinner_check_layout, holder);
+
+            } else {
+                holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
+            }
+            holder.text_name.setText(item_names.get(position));
+            holder.checkBox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView,
+                                             boolean isChecked) {
+                    if(item_values.get(position) == isChecked) return;
+                    item_values.set(position, isChecked);
+                    parentRef.get().UpdateListContentWithFilter(position, isChecked);
+                }
+            });
+            holder.checkBox.setTag(position);
+            holder.checkBox.setChecked(item_values.get(position));
+            return convertView;
+        }
+        class ViewContentHolder{
+            TextView text_name;
+            CheckBox checkBox;
         }
     }
 
