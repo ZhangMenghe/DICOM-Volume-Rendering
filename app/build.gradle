@@ -24,6 +24,7 @@ android {
             cmake {
                 cppFlags "-std=c++17 -frtti -fexceptions -Wno-error=format-security "
                 arguments "-DANDROID_STL=c++_static",
+                        "-DGLM_DIRECTORY=${project.rootDir}/thirdparty/glm-0.9.9.8/glm",
                         "-DARCORE_LIBPATH=${arcore_libpath}/jni",
                         "-DARCORE_INCLUDE=${project.rootDir}/thirdparty/arcore"
             }
@@ -68,6 +69,7 @@ android {
         textReport true
         textOutput "stdout"
     }
+    ndkVersion '21.3.6528147'
     sourceSets {
         main {
             java {

@@ -22,7 +22,6 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
         log)
     include_directories(${ARCORE_INCLUDE})
 endif()
-set(GLM_DIRECTORY /usr/local/include/glm)
 
 SET(GL_PIPELINE_FILES
         GLPipeline/Shader.cpp
