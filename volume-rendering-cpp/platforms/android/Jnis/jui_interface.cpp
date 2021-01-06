@@ -117,7 +117,6 @@ JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
         jfloatArray jvol_pose, jfloatArray jcam_pose){
     manager->onReset();
     InitCheckParam(env, num, jkeys, jvalues);
-
     jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
     jfloat* cam_arr = env->GetFloatArrayElements(jcam_pose, 0);
 

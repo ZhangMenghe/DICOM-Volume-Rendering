@@ -21,6 +21,7 @@ public class operateClient {
 
     private static inspectorSyncGrpc.inspectorSyncStub operate_stub;
 
+    private static Request.Builder request_builder;
     private static GestureOp.Builder gesture_builder;
     private static ResetMsg.Builder reset_builder;
     private static TuneMsg.Builder tune_builder;
@@ -28,13 +29,11 @@ public class operateClient {
     private static MaskMsg.Builder msk_builder;
     private static volumeConcise.Builder data_builder;
 
-
     private static List<FrameUpdateMsg.MsgType> type_pool = new ArrayList<>();
     private static List<TuneMsg> tune_pool = new ArrayList<>();
     private static List<CheckMsg> check_pool = new ArrayList<>();
     private static ResetMsg reserve_reset = null;
     private static MaskMsg reserve_msk= null;
-
 
     private static StreamObserver<commonResponse> observer;
     private static int ops = 0;
@@ -43,6 +42,7 @@ public class operateClient {
     private final static int BACH_TIME_MILLS = 100;
     private static boolean initialized = false;
     operateClient(){
+        request_builder = Request.newBuilder();
         gesture_builder = GestureOp.newBuilder();
         reset_builder = ResetMsg.newBuilder();
         tune_builder = TuneMsg.newBuilder();
@@ -68,11 +68,15 @@ public class operateClient {
         operate_stub = inspectorSyncGrpc.newStub(channel);
         initialized = true;
     }
+    public static void startBroadcast(){
+        Request req = request_builder.setClientId(rpcManager.CLIENT_ID).build();
+        operate_stub.startBroadcast(req, observer);
+    }
     public static void setGestureOp(GestureOp.OPType type, float x, float y){
         if(!initialized) return;
         gesture_builder.clear();
         GestureOp req = gesture_builder.setGid(System.currentTimeMillis()).setType(type).setX(x).setY(y).build();
-        operate_stub.setGestureOp(req,observer);
+        operate_stub.setGestureOp(req, observer);
 //        ops++;
 //        if(System.currentTimeMillis() - last_timestamp > BACH_TIME_MILLS){
 //            ops = 0;

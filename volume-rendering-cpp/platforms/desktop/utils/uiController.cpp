@@ -50,7 +50,7 @@ void uiController::InitCheckParam(){
         "Cutting",
         "Freeze Volume",
         "Freeze Plane",
-        "Cutting Plane Real Sample",
+        "Real Value",
         "Center Line Travel",
         "Traversal View",
         "Apply",

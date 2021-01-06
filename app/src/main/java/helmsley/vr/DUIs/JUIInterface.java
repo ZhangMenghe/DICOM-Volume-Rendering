@@ -8,7 +8,10 @@ import helmsley.vr.proto.operateClient;
 
 public class JUIInterface {
     public static boolean on_broadcast = false;
-    static void setBroadcast(boolean on){on_broadcast = on;}
+    static void setBroadcast(boolean on){
+        if(on) operateClient.startBroadcast();
+        on_broadcast = on;
+    }
     public static void JUIonReset(boolean update_local, int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(update_local) JUIonResetNative(num, check_keys, check_value, volume_pose, camera_pose);
         if(on_broadcast){
@@ -88,8 +91,7 @@ public class JUIInterface {
     }
     static void JUIsetTraversalTarget(int id){
         JUIsetTraversalTargetNative(id);
-        //todo:broadcast
-//        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.COLOR_SCHEME, id);
+        if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.SET_TARGET, id, 2);
     }
 
     public static void JUIonSingleTouchDown(int target, float x, float y){
@@ -99,7 +101,7 @@ public class JUIInterface {
     }
     public static void JUIonSingleTouchUp(){
         JUIonSingleTouchUpNative();
-        //TODO:ON BROADCAST
+        if(on_broadcast) operateClient.setGestureOp(GestureOp.OPType.TOUCH_UP, .0f, .0f);
     }
     public static void JUIonTouchMove(float x, float y){
         JUIonTouchMoveNative(x, y);

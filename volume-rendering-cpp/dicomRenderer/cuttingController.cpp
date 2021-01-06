@@ -16,20 +16,30 @@ cuttingController* cuttingController::instance(){
     if(!_mptr)_mptr = new cuttingController;
     return _mptr;
 }
-cuttingController::cuttingController(){
-    auto model_mat = vrController::instance()->getModelMatrix();
+cuttingController::cuttingController() {
+    onReset();
+}
+
+cuttingController::cuttingController(glm::mat4 model_mat) {
     mat4 vm_inv = transpose(inverse(model_mat));
     update_plane_(vec3MatNorm(vm_inv, Manager::camera->getViewDirection()));
-    onReset();
+    update_plane_();
     _mptr = this;
 }
+
 cuttingController::cuttingController(glm::vec3 ps, glm::vec3 pn):
 p_start_(ps), p_norm_(pn){
     p_rotate_mat_ = rotMatFromDir(pn);
-    onReset();
+    update_plane_();
     _mptr = this;
 }
 void cuttingController::onReset(){
+    p_start_ = vec3(.0, .0, 0.6f);
+    p_norm_ = vec3(.0, .0, -1.0);
+    p_rotate_mat_ = rotMatFromDir(p_norm_);
+    update_plane_();
+}
+void cuttingController::update_plane_(){
     p_point_ = p_start_;
     // p_point_world = glm::vec3(model_mat* glm::vec4(p_point_,1.0f));
     p_scale = glm::vec3(DEFAULT_CUTTING_SCALE);
@@ -250,12 +260,17 @@ void cuttingController::set_centerline_cutting(dvr::ORGAN_IDS oid, int& id, glm:
 }
 void cuttingController::setupCenterLine(dvr::ORGAN_IDS id, float* data){
     pmap[id] = data;
-    clp_id_ = 0;
-    glm::vec3 pp, pn;
-    set_centerline_cutting(id,clp_id_,pp,pn);
-    rt.point=pp;rt.scale=glm::vec3(DEFAULT_TRAVERSAL_SCALE);rt.rotate_mat= rotMatFromDir(pn);rt.move_value=.0f;
-    centerline_available = true;
-    baked_dirty=true;
+    if (id == dvr::DEFAULT_TRAVERSAL_ORGAN) {
+        clp_id_ = 0;
+        glm::vec3 pp, pn;
+        set_centerline_cutting(id, clp_id_, pp, pn);
+        rt.point = pp;
+        rt.scale = glm::vec3(DEFAULT_TRAVERSAL_SCALE);
+        rt.rotate_mat = rotMatFromDir(pn);
+        rt.move_value = .0f;
+        centerline_available = true;
+        baked_dirty = true;
+    }
 }
 void cuttingController::setCenterLinePos(int id, int delta_id){
     if(delta_id == 0){

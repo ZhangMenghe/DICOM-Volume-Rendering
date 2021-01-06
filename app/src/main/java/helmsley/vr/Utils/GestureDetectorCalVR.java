@@ -30,7 +30,7 @@ public class GestureDetectorCalVR {
 
             // LEFT(0) OR Right(1) Single Tap [UP]
             public  void onSingleTapUp(int pointerNum, MotionEvent event){
-//                JniInterface.JNIonSingleTouchUp(pointerNum - 1, event.getX(), event.getY());
+                JUIInterface.JUIonSingleTouchUp();
             }
 
             // TWO FINGERS (right mouse click)

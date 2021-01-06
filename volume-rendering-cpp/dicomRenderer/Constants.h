@@ -111,6 +111,9 @@ namespace dvr{
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
     const float MOUSE_PAN_SENSITIVITY = 1.2f;
 
+    //SETTINGS
+    static const ORGAN_IDS DEFAULT_TRAVERSAL_ORGAN = ORGAN_COLON;
+
     //TRS
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f);

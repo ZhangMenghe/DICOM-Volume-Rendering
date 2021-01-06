@@ -34,20 +34,22 @@ vrController::vrController(){
 void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
     rStates_.clear();
-    cst_name="";
+    cst_name = "";
     addStatus("default_status");
     setMVPStatus("default_status");
+    if(cutter_) cutter_->onReset();
 }
 void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
     Mouse_old = glm::fvec2(.0f);
     rStates_.clear();
-    cst_name="";
+    cst_name = "";
     glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
                  * rm
                  * glm::scale(glm::mat4(1.0), sv);
     addStatus("template", mm, rm, sv, pv, cam);
     setMVPStatus("template");
 
+    if(cutter_) cutter_->onReset();
     volume_model_dirty = false;
 }
 
@@ -342,7 +344,7 @@ bool vrController::addStatus(std::string name, bool use_current_status){
 void vrController::setMVPStatus(std::string name){
     if(name == cst_name) return;
     auto rstate_ = rStates_[name];
-    ModelMat_=rstate_.model_mat; RotateMat_=rstate_.rot_mat; ScaleVec3_=rstate_.scale_vec; PosVec3_=rstate_.pos_vec; Manager::camera=rstate_.vcam;
+    ModelMat_= rstate_.model_mat; RotateMat_=rstate_.rot_mat; ScaleVec3_=rstate_.scale_vec; PosVec3_=rstate_.pos_vec; Manager::camera=rstate_.vcam;
     volume_model_dirty = false;
     cst_name = name;
 }
