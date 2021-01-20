@@ -88,9 +88,12 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
         vec3 p = ro + rd * t;
         vec4 val_color = Sample(p);
         if(val_color.a > 0.01){
-            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
-            sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
-            sum.a += (1.0 - sum.a) * val_color.a;
+//            if(pd < 0.01) val_color = subDivide(p, ro, rd, t, usample_step_inverse);
+            float contrib = (1.0 - sum.a) *  val_color.a;
+            sum.rgb += contrib* val_color.rgb;
+            //sum.rgb = sum.rgb * (1.0 - val_color.a) + val_color.a* val_color.rgb;
+            sum.a += contrib;
+            //sum.a = sum.a*(1.0-val_color.a) + val_color.a;
         }
         t += val_color.a > 0.01? usample_step_inverse: usample_step_inverse * 4.0;
         steps++;

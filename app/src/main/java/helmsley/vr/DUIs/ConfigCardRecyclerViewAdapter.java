@@ -36,12 +36,10 @@ public class ConfigCardRecyclerViewAdapter extends RecyclerView.Adapter<ConfigCa
     private final WeakReference<dialogUIs> dUIRef;
 
     private List<configResponse.configInfo> available_config_files;
-    private boolean config_dirty;
 
     ConfigCardRecyclerViewAdapter(rpcManager manager, dialogUIs dui){
         rpcRef = new WeakReference<>(manager);
         dUIRef = new WeakReference<>(dui);
-        config_dirty = true;
     }
     void SetupContents(){
 //        Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
@@ -85,14 +83,11 @@ public class ConfigCardRecyclerViewAdapter extends RecyclerView.Adapter<ConfigCa
     }
 
     private List<configResponse.configInfo> getAvailableConfigFiles(){
-        if(config_dirty){
-            try{
-                Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
-                available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
-                config_dirty = false;
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
+        try{
+            Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).build();
+            available_config_files = rpcManager.data_stub.getAvailableConfigs(req).getConfigsList();
+        }catch (Exception e) {
+            e.printStackTrace();
         }
         return available_config_files;
     }
@@ -100,9 +95,7 @@ public class ConfigCardRecyclerViewAdapter extends RecyclerView.Adapter<ConfigCa
     void ExportConfig(String content){
         if (content == null) return;
         Request req = Request.newBuilder().setClientId(rpcManager.CLIENT_ID).setReqMsg(content).build();
-
         commonResponse res = rpcManager.data_stub.exportConfigs(req);
-        config_dirty = true;
     }
 }
 

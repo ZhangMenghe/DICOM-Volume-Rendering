@@ -93,29 +93,43 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     float step_size = usample_step_inverse;
     vec3 p;
     vec4 val_color;
-    for(float t = head; t<tail; ){
-        if(sum.a >= 0.95 ||steps>800) break;
-        p = ro + rd * t;
-        val_color = Sample(p);
+//    if(u_cutplane_realsample){
+        for(float t = head; t<tail; ){
+            if(sum.a >= 0.95 ||steps>800) break;
+            p = ro + rd * t;
+            val_color = Sample(p);
 
-        if(val_color.a > 0.01){
-            pd = (1.0 - sum.a) * val_color.a;
-
-            if (pd > high_bound){
-                step_size/=2.0; high_bound= min(high_bound*2.0, 1.0);last_succeeded = false;
+            if(val_color.a > 0.01){
+                pd = (1.0 - sum.a) * val_color.a;
+                if (pd > high_bound){
+                    step_size/=2.0; high_bound= min(high_bound*2.0, 1.0);last_succeeded = false;
+                }else{
+                    sum.rgb += pd * val_color.rgb;
+                    sum.a += pd;
+                    t += step_size;
+                    if (last_succeeded){ step_size*=2.0; high_bound/=2.0; }
+                    else last_succeeded = true;
+                }
             }else{
-                sum.rgb += (1.0 - sum.a) *  val_color.a* val_color.rgb;
-                sum.a += pd;
-                t += step_size;
-
-                if (last_succeeded){ step_size*=2.0; high_bound/=2.0; }
-                else last_succeeded = true;
+                t+=4.0*usample_step_inverse;
             }
-        }else{
-            t+=4.0*usample_step_inverse;
+            steps++;
         }
-        steps++;
+/*
+        for(float t = head; t<tail; ){
+            if(sum.a >= 0.95||steps>800) break;
+            vec3 p = ro + rd * t;
+            val_color = Sample(p);
+            if(val_color.a > 0.01){
+                float contrib = (1.0 - sum.a) *  val_color.a;
+                sum.rgb += contrib* val_color.rgb;
+                sum.a += contrib;
+            }
+            t += val_color.a > 0.01? usample_step_inverse: usample_step_inverse * 4.0;
+            steps++;
+        }
     }
+*/
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
 vec4 getBackground(ivec2 pos){

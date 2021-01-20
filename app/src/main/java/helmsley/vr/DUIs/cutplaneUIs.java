@@ -193,9 +193,7 @@ public class cutplaneUIs extends BasePanel{
         else traversal_panel.setVisibility(View.INVISIBLE);
     }
     public void Reset(){
-        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
-        int max_seek_value = Integer.parseInt(params[1]);
-        seek_bar_.setProgress((int)(Float.parseFloat(params[0]) * max_seek_value));
+        seek_bar_.setProgress((int)(initial_progress * max_progress_value));
         reset_checkbox_and_panel();
         view_switch.setChecked(false);
         cid_adapter.setTitleById(0);

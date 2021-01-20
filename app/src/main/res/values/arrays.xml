@@ -203,7 +203,7 @@
     </string-array>
 
     <string-array name="cutting_plane">
-        <item>0.0</item>
+        <item>.0</item>
         <item>4000</item>
     </string-array>
 
