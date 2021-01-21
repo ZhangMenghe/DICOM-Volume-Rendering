@@ -9,3 +9,5 @@
 - Interact volume with cutting plane with cutting panel.
 ## Workspace
 - Load/export workspace config file to server remote.
+## Connect to the server
+- Please refer to [this repo](https://github.com/ZhangMenghe/DICOM-Server)
