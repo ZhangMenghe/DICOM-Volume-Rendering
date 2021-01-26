@@ -255,10 +255,12 @@ void vrController::precompute(){
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
         Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
+
     }
     overlayController::instance()->updateUniforms(render_params_);
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(COLOR_SCHEMES[Manager::color_scheme_id]);
+
     //todo!!!! add flip stuff
     bakeShader_->EnableKeyword("FLIPY");
     if(Manager::param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
@@ -267,6 +269,16 @@ void vrController::precompute(){
     GLuint sp = bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    if(Manager::color_scheme_id > 2){
+        int id = Manager::color_scheme_id - 3;
+//        if(m_color_rgb[id] == nullptr){
+//            m_color_rgb[id] = new float[3*256];
+//            hex2rgb(color_schemes_hex[id], 256, m_color_rgb[id]);
+//        }
+//        Shader::Uniform(sp, "u_hex_color_scheme", 256, 3, m_color_rgb[id]);
+        Shader::Uniform(sp, "u_hex_color_scheme", 256, color_schemes_hex[Manager::color_scheme_id- 3]);
+    }
 
     Shader::Uniform(sp, "u_tex_size", glm::vec3(float(tex_volume->Width()), float(tex_volume->Height()), float(tex_volume->Depth())));
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
@@ -287,6 +299,7 @@ void vrController::precompute(){
     Shader::Uniform(sp, "u_contrast_high", render_params_[RENDER_CONTRAST_HIGH]);
 //    Shader::Uniform(sp, "u_contrast_level", render_params_[RENDER_CONTRAST_LEVEL]);
     Shader::Uniform(sp, "u_brightness", render_params_[RENDER_BRIGHTNESS]);
+
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);

@@ -124,6 +124,9 @@ private:
     //vec3
     glm::vec4 ray_dir;
     bool ray_initialized = false;
+
+    //color scheme
+    std::vector<float*> m_color_rgb = std::vector<float*>(5, nullptr);
     
     static bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
     void updateVolumeModelMat();
