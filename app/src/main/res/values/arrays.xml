@@ -39,8 +39,12 @@
         <item>Grayscale</item>
         <item>HSV</item>
         <item>Bright Color</item>
+        <item>Fire</item>
+        <item>BMY</item>
+        <item>CET-L08</item>
+        <item>CET-L10</item>
+        <item>CET_D7</item>
     </string-array>
-
 
 <!--    mask panel-->
     <string-array name="mask_check_params">

@@ -120,7 +120,16 @@ namespace dvr{
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
 
     //color scheme
-    constexpr char* COLOR_SCHEMES[3]={"COLOR_GRAYSCALE", "COLOR_HSV", "COLOR_BRIGHT"};
+    constexpr char* COLOR_SCHEMES[8]={
+            "COLOR_GRAYSCALE",
+            "COLOR_HSV",
+            "COLOR_BRIGHT",
+            "COLOR_FIRE",
+            "COLOR_BMY",
+            "COLOR_CET_L08",
+            "COLOR_CET_L10",
+            "COLOR_CET_D7"
+            };
 
     struct Rect{
         float width;float height;

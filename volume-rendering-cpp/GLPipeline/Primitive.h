@@ -344,5 +344,13 @@ const int edge_table[256] = {
             0xf00, 0xe09, 0xd03, 0xc0a, 0xb06, 0xa0f, 0x905, 0x80c,
             0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0
         };
-
+inline void hex2rgb(const int* hex, int num, float*&rgb){
+//    rgb = new float[num * 3];
+    for(int i=0;i<num;i++){
+        int u_color = hex[i];
+        rgb[3*i] = (((u_color) >> 16) & 0xFF) / 255.0;
+        rgb[3*i+1] = (((u_color) >> 8) & 0xFF) / 255.0;
+        rgb[3*i+2] = ((u_color) & 0xFF) / 255.0;
+    }
+}
 #endif

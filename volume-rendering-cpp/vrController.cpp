@@ -280,7 +280,7 @@ void vrController::precompute(){
     int visible=0;
     for(int i=0;i<widget_num;i++){visible |= int(visibles[i]) << i;}
     Shader::Uniform(sp, "u_visible_bits", visible);
-    Shader::Uniform(sp, "u_opacity", 6*widget_num, widget_data_pointer);
+    Shader::Uniform(sp, "u_opacity", 6*widget_num,2, widget_data_pointer);
     Shader::Uniform(sp, "u_widget_num", widget_num);
 
     Shader::Uniform(sp, "u_contrast_low", render_params_[RENDER_CONTRAST_LOW]);

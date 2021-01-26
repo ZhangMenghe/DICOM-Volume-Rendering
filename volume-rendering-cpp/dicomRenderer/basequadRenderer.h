@@ -16,7 +16,12 @@ public:
     virtual void setRelativeRenderRect(float w, float h, float left, float bottom){
         r_scale_ = glm::vec2(w*2.0f, h*2.0f); r_offset_=glm::vec2(left, -1.0f + bottom * 2.0);
     }
-    virtual void setUniform(const char* key, const int count, float* data){
+    virtual void setUniform(const char* key, const int count, float* data, int unit_size = 2){
+        GLuint sp = shader_.Use();
+        Shader::Uniform(sp, key, count, unit_size, data);
+        shader_.UnUse();
+    }
+    virtual void setUniform(const char* key, const int count, const int* data){
         GLuint sp = shader_.Use();
         Shader::Uniform(sp, key, count, data);
         shader_.UnUse();

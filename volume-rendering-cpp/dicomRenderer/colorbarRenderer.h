@@ -10,5 +10,7 @@ public:
 
 private:
     GLuint vao_;
+    std::vector<float*> rgb_data;
+
 };
 #endif
