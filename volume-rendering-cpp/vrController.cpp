@@ -12,7 +12,6 @@ using namespace glm;
 vrController* vrController::myPtr_ = nullptr;
 
 vrController* vrController::instance(){
-    if(!myPtr_) myPtr_ = new vrController;
     return myPtr_;
 }
 vrController::~vrController(){
@@ -26,7 +25,8 @@ vrController::~vrController(){
     if(tex_baked) delete tex_baked;
     rStates_.clear();
 }
-vrController::vrController(){
+vrController::vrController(const std::shared_ptr<Manager> &manager)
+:m_manager(manager){
     onReset();
     mesh_renders = std::vector<organMeshRenderer*>(dvr::ORGAN_END, nullptr);
     myPtr_ = this;

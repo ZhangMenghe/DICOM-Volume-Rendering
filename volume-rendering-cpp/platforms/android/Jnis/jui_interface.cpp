@@ -33,7 +33,7 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
     }
     env->ReleaseBooleanArrayElements(jvalues,values,0);
     Manager::baked_dirty_ = true;
-    vrController::instance()->addStatus("ARCam");
+    m_sceneRenderer->addStatus("ARCam");
     camera_switch_dirty = true;
 }
 
@@ -48,10 +48,10 @@ JUI_METHOD(void, JUIremoveAllTuneWidgetNative)(JNIEnv *, jclass){
 }
 JUI_METHOD(void, JUIsetTuneParamByIdNative)(JNIEnv *, jclass, jint tid, jint pid, jfloat value){
     if(tid == 0 && pid < dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
-    else if(tid == 1) vrController::instance()->setRenderParam(pid, value);
+    else if(tid == 1) m_sceneRenderer->setRenderParam(pid, value);
 }
 JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint pid, jfloat minv, jfloat maxv){
-    if(pid < dvr::DUAL_END)vrController::instance()->setDualParameter(pid, minv, maxv);
+    if(pid < dvr::DUAL_END)m_sceneRenderer->setDualParameter(pid, minv, maxv);
 }
 JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolean value){
     std::string key = dvr::jstring2string(env,jkey);
@@ -66,27 +66,27 @@ JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolea
     }
 }
 JUI_METHOD(void, JUISwitchCuttingPlaneNative)(JNIEnv * env, jclass, jint id){
-    vrController::instance()->SwitchCuttingPlane((PARAM_CUT_ID)id);
+    m_sceneRenderer->SwitchCuttingPlane((PARAM_CUT_ID)id);
 }
 JUI_METHOD(jfloatArray, JUIgetVCStatesNative)(JNIEnv * env, jclass){
     jfloatArray res = env->NewFloatArray(31);
-    env->SetFloatArrayRegion(res,0,31, reinterpret_cast<jfloat *>(vrController::instance()->getCurrentReservedStates()));
+    env->SetFloatArrayRegion(res,0,31, reinterpret_cast<jfloat *>(m_sceneRenderer->getCurrentReservedStates()));
     return res;
 }
 JUI_METHOD(jfloatArray, JUIgetCuttingPlaneStatusNative)(JNIEnv * env, jclass){
     jfloatArray res= env->NewFloatArray(7);
-    env->SetFloatArrayRegion(res,0,7, reinterpret_cast<jfloat *>(vrController::instance()->getCuttingPlane()));
+    env->SetFloatArrayRegion(res,0,7, reinterpret_cast<jfloat *>(m_sceneRenderer->getCuttingPlane()));
     return res;
 }
 JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv *, jclass, jfloat value){
-    vrController::instance()->setCuttingPlane(value);
+    m_sceneRenderer->setCuttingPlane(value);
 }
 JUI_METHOD(void, JUIsetCuttingPlaneDeltaNative)(JNIEnv * env, jclass, jint id, jint delta){
-    vrController::instance()->setCuttingPlane(id, delta);
+    m_sceneRenderer->setCuttingPlane(id, delta);
 }
 JUI_METHOD(void, JUIsetMaskBitsNative)(JNIEnv * env, jclass, jint num, jint mbits){
-    vrController::instance()->mask_num_ = (unsigned int)num;
-    vrController::instance()->mask_bits_ = (unsigned int)mbits;
+    m_sceneRenderer->mask_num_ = (unsigned int)num;
+    m_sceneRenderer->mask_bits_ = (unsigned int)mbits;
     Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint id){
@@ -103,8 +103,8 @@ JUI_METHOD(void, JUIsetGraphRectNative)(JNIEnv*, jclass, jint id, jint width, ji
 }
 JUI_METHOD(void, JUIsetAllTuneParamByIdNative)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    if(id == 1)vrController::instance()->setRenderParam(values);
-    else if(id == 2)vrController::instance()->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
+    if(id == 1)m_sceneRenderer->setRenderParam(values);
+    else if(id == 2)m_sceneRenderer->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
 
     env->ReleaseFloatArrayElements(jvalues,values,0);
 }
@@ -115,7 +115,7 @@ JUI_METHOD(void, JUIsetTuneWidgetVisibilityNative)(JNIEnv*, jclass, jint wid, jb
 JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
         jint num, jobjectArray jkeys, jbooleanArray jvalues,
         jfloatArray jvol_pose, jfloatArray jcam_pose){
-    manager->onReset();
+    m_manager->onReset();
     InitCheckParam(env, num, jkeys, jvalues);
     jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
     jfloat* cam_arr = env->GetFloatArrayElements(jcam_pose, 0);
@@ -129,7 +129,7 @@ JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
         }
     }
     //unwrap pose information
-    vrController::instance()->onReset(
+    m_sceneRenderer->onReset(
             glm::vec3(vol_arr[0], vol_arr[1], vol_arr[2]),
             glm::vec3(vol_arr[3], vol_arr[4], vol_arr[5]),
             rot_mat,
@@ -143,7 +143,7 @@ JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
     env->ReleaseFloatArrayElements(jcam_pose, cam_arr, 0);
 }
 JUI_METHOD(void, JUIonSingleTouchDownNative)(JNIEnv *, jclass, jint target, jfloat x, jfloat y){
-    if(target == TOUCH_VOLUME) vrController::instance()->onSingleTouchDown(x, y);
+    if(target == TOUCH_VOLUME) m_sceneRenderer->onSingleTouchDown(x, y);
     else if(target == TOUCH_AR_BUTTON) arController::instance()->onSingleTouchDown(x,y);
 }
 JUI_METHOD(void, JUIonSingleTouchUpNative)(JNIEnv *, jobject){
@@ -174,6 +174,6 @@ JUI_METHOD(void, JUIonARRequest)(JNIEnv * env, jclass, jint id){
     if(id == dvr::PLACE_VOLUME){
         glm::vec3 pos;
         if(arController::instance()->getTouchedPosition(pos));
-            vrController::instance()->setVolumePosition(pos);
+            m_sceneRenderer->setVolumePosition(pos);
     }
 }

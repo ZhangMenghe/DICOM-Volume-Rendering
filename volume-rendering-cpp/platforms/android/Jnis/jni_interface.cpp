@@ -83,19 +83,22 @@ jint JNI_OnLoad(JavaVM *vm, void *) {
 
 JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     new assetLoader(AAssetManager_fromJava(env, asset_manager));
-    manager = new Manager;
-    nativeAddr =  getNativeClassAddr(new vrController());
-    vrController::instance()->setPredrawOption(true);
+
+    m_manager = std::make_shared<Manager>();
+    m_sceneRenderer = std::make_unique<vrController>(m_manager);
+    nativeAddr = getNativeClassAddr(m_sceneRenderer.get());
+
+    m_sceneRenderer->setPredrawOption(true);
     setupShaderContents();
     return nativeAddr;
 }
 JNI_METHOD(void, JNIonPause)(JNIEnv*, jclass){
-    vrController::instance()->onPause();
+    m_sceneRenderer->onPause();
     arController::instance()->onPause();
 }
 
 JNI_METHOD(void, JNIonDestroy)(JNIEnv*, jclass){
-    vrController::instance()->onDestroy();
+    m_sceneRenderer->onDestroy();
     arController::instance()->onDestroy();
     delete nativeApp(nativeAddr);
     delete arController::instance();
@@ -104,19 +107,19 @@ JNI_METHOD(void, JNIonDestroy)(JNIEnv*, jclass){
 }
 
 JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject context, jobject activity){
-    vrController::instance()->onResume(env, context, activity);
+    m_sceneRenderer->onResume(env, context, activity);
     arController::instance()->onResume(env, context, activity);
 }
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
-    vrController::instance()->onViewCreated();
+    m_sceneRenderer->onViewCreated();
     overlayController::instance()->onViewCreated();
     arController::instance()->onViewCreated();
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
-    manager->onViewChange(w, h);
-    nativeApp(nativeAddr)->onViewChange(w, h);
+    m_manager->onViewChange(w, h);
+    m_sceneRenderer->onViewChange(w, h);
     overlayController::instance()->onViewChange(w, h);
     arController::instance()->onViewChange(rot,w,h);
 }
@@ -125,7 +128,7 @@ void on_draw_native(){
     if(Manager::show_ar_ray && !Manager::volume_ar_hold){
         //check ar ray intersect
         Camera* cam = Manager::camera;
-        glm::mat4 model_inv = glm::inverse(vrController::instance()->getModelMatrix(true));
+        glm::mat4 model_inv = glm::inverse(m_sceneRenderer->getModelMatrix(true));
 
         glm::vec3 ro = glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0));
         if(!ray_initialized){
@@ -154,30 +157,30 @@ void on_draw_native(){
             pp = glm::vec3(model_inv * glm::vec4(pp, 1.0f));
             pn = glm::vec3(model_inv * glm::vec4(pn, 1.0f));
 
-            vrController::instance()->setCuttingPlane(pp, pn);}
+            m_sceneRenderer->setCuttingPlane(pp, pn);}
             else{
-                vrController::instance()->setCuttingPlane(glm::vec3(-10.0f), glm::vec3(1.0));
+                m_sceneRenderer->setCuttingPlane(glm::vec3(-10.0f), glm::vec3(1.0));
             }
         }else{
             Manager::volume_ar_hold = (res.x<res.y);
         }
     }
-    vrController::instance()->onDrawScene();
+    m_sceneRenderer->onDrawScene();
 }
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
         if(camera_switch_dirty){
-            vrController::instance()->setMVPStatus("template");
+            m_sceneRenderer->setMVPStatus("template");
             camera_switch_dirty = false;
         }
-        vrController::instance()->onDraw();
-        if(vrController::instance()->isDrawing())overlayController::instance()->onDraw();
+        m_sceneRenderer->onDraw();
+        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
     }
     else{
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         if(camera_switch_dirty){
-            vrController::instance()->setMVPStatus("ARCam");
+            m_sceneRenderer->setMVPStatus("ARCam");
             camera_switch_dirty = false;
         }
         screenQuad::instance()->Clear();
@@ -189,14 +192,14 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
             //update model mat of volume
             auto tplanes = arController::instance()->getTrackedPlanes();
             if(!tplanes.empty()){
-                vrController::instance()->setVolumeRST(tplanes[0].rotMat, glm::vec3(0.2f), tplanes[0].centerVec);
-                vrController::instance()->setMVPStatus("ARCam");
+                m_sceneRenderer->setVolumeRST(tplanes[0].rotMat, glm::vec3(0.2f), tplanes[0].centerVec);
+                m_sceneRenderer->setMVPStatus("ARCam");
                 arInitialized = true;
                 on_draw_native();
             }
         }
         screenQuad::instance()->Draw();
-        if(vrController::instance()->isDrawing())overlayController::instance()->onDraw();
+        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
     }
 }
 
@@ -248,14 +251,14 @@ JNI_METHOD(void, JNIsendDataPrepareNative)(JNIEnv*, jclass, jint height, jint wi
 JNI_METHOD(void, JNIsendDataDone)(JNIEnv*, jclass){
     for(int i=0; i<3; i++){
         if(n_data_offset[i] != 0){
-            vrController::instance()->assembleTexture(i, g_img_h, g_img_w, g_img_d, g_vol_h, g_vol_w, g_vol_depth, g_VolumeTexData, CHANEL_NUM);
+            m_sceneRenderer->assembleTexture(i, g_img_h, g_img_w, g_img_d, g_vol_h, g_vol_w, g_vol_depth, g_VolumeTexData, CHANEL_NUM);
             n_data_offset[i] = 0;
             break;
         }
     }
     if(!centerline_map.empty()){
         for(auto inst:centerline_map)
-            vrController::instance()->setupCenterLine(inst.first, inst.second);
+            m_sceneRenderer->setupCenterLine(inst.first, inst.second);
         centerline_map.clear();
     }
 }

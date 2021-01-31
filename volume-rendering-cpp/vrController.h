@@ -20,7 +20,7 @@ public:
     static vrController* instance();
     bool isDrawing(){return tex_volume!= nullptr;}
 
-    vrController();
+    vrController(const std::shared_ptr<Manager> &manager);
     ~vrController();
     void assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num = 4);
     void setupCenterLine(int id, float* data);
@@ -73,6 +73,7 @@ public:
 
 private:
     static vrController* myPtr_;
+    std::shared_ptr<Manager> m_manager;
 
     //renderers
     texvrRenderer* texvrRenderer_ = nullptr;

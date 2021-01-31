@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <Manager.h>
+#include <vrController.h>
 #include "nEntrance.h"
 
 #define JNI_METHOD(returnType, funcName)\
@@ -19,7 +20,9 @@ namespace dvr{
     inline static JavaVM *g_vm = nullptr;
     inline jlong nativeAddr;
     inline bool camera_switch_dirty;
-    inline Manager* manager;
+
+    inline std::shared_ptr<Manager> m_manager;
+    inline std::unique_ptr<vrController> m_sceneRenderer;
 
     inline jlong getNativeClassAddr(nEntrance * native_controller){
         return reinterpret_cast<intptr_t>(native_controller);
