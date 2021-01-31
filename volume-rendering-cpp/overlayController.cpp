@@ -31,9 +31,9 @@ void overlayController::onReset(){
 }
 void overlayController::onViewCreated(){
     renderers_[OVERLAY_GRAPH] = new GraphRenderer(Manager::shader_contents[SHADER_OPA_VIZ_VERT], Manager::shader_contents[SHADER_OPA_VIZ_FRAG]);
-    renderers_[OVERLAY_COLOR_BARS] = new ColorbarRenderer(Manager::shader_contents[SHADER_COLOR_VIZ_VERT], Manager::shader_contents[SHADER_COLOR_VIZ_FRAG]);
-    Manager::shader_contents[SHADER_OPA_VIZ_VERT] = "";Manager::shader_contents[SHADER_OPA_VIZ_FRAG]="";
-    Manager::shader_contents[SHADER_COLOR_VIZ_VERT] = "";Manager::shader_contents[SHADER_COLOR_VIZ_FRAG]="";
+    renderers_[OVERLAY_COLOR_BARS] = new ColorbarRenderer(Manager::shader_contents[SHADER_COLOR_VIZ_VERT], Manager::shader_contents[SHADER_QUAD_FRAG]);
+//    Manager::shader_contents[SHADER_OPA_VIZ_VERT] = "";Manager::shader_contents[SHADER_OPA_VIZ_FRAG]="";
+//    Manager::shader_contents[SHADER_COLOR_VIZ_VERT] = "";Manager::shader_contents[SHADER_COLOR_VIZ_FRAG]="";
 }
 void overlayController::onViewChange(int width, int height){
     if(!rects_.empty()){
@@ -55,7 +55,8 @@ void overlayController::onViewChange(int width, int height){
 void overlayController::onDraw(){
     if(!overlay_rect_set
     ||!Manager::param_bool[dvr::CHECK_OVERLAY]) return;
-    if(dirty_wid >= 0){
+    //todo!!!!!
+//    if(dirty_wid >= 0){
         renderers_[dvr::OVERLAY_GRAPH]->setData(widget_points_[widget_id], widget_id);
         renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_widget_num", (int)widget_points_.size());
         renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_opacity", 6*widget_points_.size(), u_opacity_data_);
@@ -65,7 +66,7 @@ void overlayController::onDraw(){
         for(int i=0;i<wnum;i++)visible |= int(widget_visibilities_[i]) << i;
         renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_visible_bits", visible);
         dirty_wid = -1;
-    }
+//    }
     for(auto render:renderers_) render.second->Draw();
 }
 void overlayController::update_widget_points_1d_array(){
@@ -136,8 +137,9 @@ void overlayController::setOverlayRect(int id, int width, int height, int left, 
     overlay_rect_set = true;
 }
 void overlayController::updateUniforms(const float* params){
-    renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", Manager::color_scheme_id);
+//    renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("uScheme", Manager::color_scheme_id);
     renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_contrast_low", params[dvr::RENDER_CONTRAST_LOW]);
     renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_contrast_high", params[dvr::RENDER_CONTRAST_HIGH]);
+    renderers_[dvr::OVERLAY_COLOR_BARS]->setUniform("u_brightness", params[RENDER_BRIGHTNESS]);
 }
 

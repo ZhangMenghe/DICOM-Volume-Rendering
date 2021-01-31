@@ -12,7 +12,7 @@ screenQuad::screenQuad(){
        ||!qshader_.AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_QUAD_FRAG])
        ||!qshader_.CompileAndLink())
         LOGE("Screen===Failed to create screen shader program===\n");
-    Manager::shader_contents[dvr::SHADER_QUAD_VERT] = "";Manager::shader_contents[dvr::SHADER_QUAD_FRAG]="";
+//    Manager::shader_contents[dvr::SHADER_QUAD_VERT] = "";Manager::shader_contents[dvr::SHADER_QUAD_FRAG]="";
     myPtr_ = this;
 }
 void screenQuad::onScreenSizeChange(float width, float height){

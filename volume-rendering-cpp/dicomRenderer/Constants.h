@@ -86,6 +86,7 @@ namespace dvr{
     enum TEX_IDS{
         BAKED_TEX_ID=0,
         SCREEN_QUAD_TEX_ID,
+        COLOR_VIZ_QUAD_TEX_ID,
         BACK_GROUND_AR_ID,
         PLANE_AR_ID,
     };
@@ -120,15 +121,12 @@ namespace dvr{
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
 
     //color scheme
-    constexpr char* COLOR_SCHEMES[8]={
+    constexpr char* COLOR_SCHEMES[5]={
             "COLOR_GRAYSCALE",
             "COLOR_HSV",
             "COLOR_BRIGHT",
             "COLOR_FIRE",
-            "COLOR_BMY",
             "COLOR_CET_L08",
-            "COLOR_CET_L10",
-            "COLOR_CET_D7"
             };
 
     struct Rect{

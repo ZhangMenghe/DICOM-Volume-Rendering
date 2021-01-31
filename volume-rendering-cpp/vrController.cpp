@@ -270,15 +270,8 @@ void vrController::precompute(){
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    if(Manager::color_scheme_id > 2){
-        int id = Manager::color_scheme_id - 3;
-//        if(m_color_rgb[id] == nullptr){
-//            m_color_rgb[id] = new float[3*256];
-//            hex2rgb(color_schemes_hex[id], 256, m_color_rgb[id]);
-//        }
-//        Shader::Uniform(sp, "u_hex_color_scheme", 256, 3, m_color_rgb[id]);
+    if(Manager::color_scheme_id > 2)
         Shader::Uniform(sp, "u_hex_color_scheme", 256, color_schemes_hex[Manager::color_scheme_id- 3]);
-    }
 
     Shader::Uniform(sp, "u_tex_size", glm::vec3(float(tex_volume->Width()), float(tex_volume->Height()), float(tex_volume->Depth())));
     Shader::Uniform(sp, "u_maskbits", mask_bits_);
