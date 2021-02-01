@@ -55,10 +55,10 @@ vec3 TransferColor(float intensity){
     vec3 color;
     #ifdef COLOR_GRAYSCALE
     color = vec3(intensity);
-    #elif defined(COLOR_HSV)
-    color = transfer_scheme(intensity);
-    #elif defined(COLOR_BRIGHT)
-    color = bright_scheme(intensity);
+//    #elif defined(COLOR_HSV)
+//    color = transfer_scheme(intensity);
+//    #elif defined(COLOR_BRIGHT)
+//    color = bright_scheme(intensity);
     #else
     color = hex2rgb(u_hex_color_scheme[int(intensity * 256.0)]);
     #endif

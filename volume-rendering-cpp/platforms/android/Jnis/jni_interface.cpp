@@ -6,7 +6,6 @@
 
 #include <android/bitmap.h>
 #include <vector>
-#include <overlayController.h>
 #include <platforms/android/ARHelpers/arController.h>
 #include <dicomRenderer/screenQuad.h>
 
@@ -113,14 +112,14 @@ JNI_METHOD(void, JNIonResume)(JNIEnv* env, jclass, jobject context, jobject acti
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv *, jclass){
     m_sceneRenderer->onViewCreated();
-    overlayController::instance()->onViewCreated();
+//    overlayController::instance()->onViewCreated();
     arController::instance()->onViewCreated();
 }
 
 JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, jint h){
     m_manager->onViewChange(w, h);
     m_sceneRenderer->onViewChange(w, h);
-    overlayController::instance()->onViewChange(w, h);
+//    overlayController::instance()->onViewChange(w, h);
     arController::instance()->onViewChange(rot,w,h);
 }
 
@@ -174,7 +173,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
             camera_switch_dirty = false;
         }
         m_sceneRenderer->onDraw();
-        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
+//        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
     }
     else{
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -199,7 +198,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
             }
         }
         screenQuad::instance()->Draw();
-        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
+//        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
     }
 }
 

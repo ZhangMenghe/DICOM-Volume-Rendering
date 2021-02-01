@@ -3,9 +3,9 @@
 #include <vector>
 #include <GLPipeline/Camera.h>
 #include <dicomRenderer/Constants.h>
+#include <platforms/platform.h>
 
-struct volumeSetupConstBuffer
-{
+struct volumeSetupConstBuffer{
     glm::vec3 u_tex_size;
 
     //opacity widget
@@ -21,11 +21,15 @@ struct volumeSetupConstBuffer
     //mask
     unsigned int u_maskbits;
     unsigned int u_organ_num;
-    int u_mask_recolor;
+    bool u_mask_recolor;
 
     //others
     int u_show_organ;
     int u_color_scheme;
+    volumeSetupConstBuffer(){
+        u_tex_size = glm::vec3(.0);u_widget_num=0;u_visible_bits=0;
+        u_color_scheme = 0;
+    }
 };
 
 class Manager {
@@ -37,7 +41,6 @@ public:
     static std::vector<std::string> shader_contents;
 
     static bool baked_dirty_;
-    static int color_scheme_id;
     static dvr::ORGAN_IDS traversal_target_id;
     static int screen_w, screen_h;
     static bool show_ar_ray, volume_ar_hold;
@@ -65,9 +68,14 @@ public:
     int getDirtyOpacityId() { return m_dirty_wid; }
     float *getDefaultWidgetPoints() { return default_widget_points_; }
     float *getDirtyWidgetPoints() { return dirty_widget_points_; }
-    int getColorScheme(){return 0;}// m_volset_data.u_color_scheme;}
+    int getColorScheme(){return m_volset_data.u_color_scheme;}
+    std::vector<bool>* getOpacityWidgetVisibility(){return &widget_visibilities_;}
+    const char* getColorSchemeKeyword(){
+        return COLOR_SCHEMES[m_volset_data.u_color_scheme];
+    }
+
     //Adders
-    void addOpacityWidget(float *values, int value_num);
+    void addOpacityWidget(std::vector<float> values);
     void removeOpacityWidget(int wid);
     void removeAllOpacityWidgets();
 
@@ -82,6 +90,7 @@ public:
     void setOpacityValue(int pid, float value);
     void setOpacityWidgetVisibility(int wid, bool visible);
     void resetDirtyOpacityId() { m_dirty_wid = -1; }
+    void updateVolumeSetupUniforms(GLuint sp);
 
 private:
     static Manager *myPtr_;
@@ -99,6 +108,16 @@ private:
 
     //check names
     std::vector<std::string> param_checks;
+
+    //color
+    //color scheme
+    const char* COLOR_SCHEMES[5]={
+            "COLOR_GRAYSCALE",
+            "COLOR_HSV",
+            "COLOR_BRIGHT",
+            "COLOR_FIRE",
+            "COLOR_CET_L08",
+    };
 
     void clear_opacity_widgets();
 };

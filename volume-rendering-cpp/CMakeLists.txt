@@ -36,6 +36,7 @@ SET(DICOM_RENDERERS
         dicomRenderer/centerLineRenderer.cpp
         dicomRenderer/cuttingController.cpp
         dicomRenderer/colorbarRenderer.cpp
+        dicomRenderer/dataVisualizer.cpp
         dicomRenderer/graphRenderer.cpp
         dicomRenderer/screenQuad.cpp)
 
@@ -45,7 +46,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(vrNative
         SHARED
         vrController.cpp
-        overlayController.cpp
         Manager.cpp
         ${DICOM_RENDERERS}
         ${GL_PIPELINE_FILES}

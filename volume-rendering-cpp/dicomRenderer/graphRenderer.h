@@ -14,6 +14,8 @@ public:
     void removeInstance(int wid);
     void addInstance();
     void Clear();
+
+    int getVaoNums(){return vaos_.size();}
 private:
     const GLuint single_indices_[12]={0,2,1,0,5,2,0,4,5,0,3,4};
     std::vector<GLuint> vaos_, vbos_;

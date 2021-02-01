@@ -1,6 +1,6 @@
 #include <GLPipeline/Primitive.h>
 #include <GLPipeline/Mesh.h>
-#include <overlayController.h>
+#include <Manager.h>
 #include "graphRenderer.h"
 #include "Constants.h"
 
@@ -53,7 +53,7 @@ void GraphRenderer::getGraphPoints(float values[], float* &points){
     lm = glm::vec2(lb_x, mid_y);
     rm = glm::vec2(rb_x, mid_y);
 
-    if(points) delete points;
+    delete points;
     points = new float[12] {
             lb.x, lb.y, lm.x, lm.y, lt.x, lt.y,
             rb.x, rb.y, rm.x, rm.y, rt.x, rt.y
@@ -88,9 +88,9 @@ void GraphRenderer::Draw(){
     GLuint sp = shader_.Use();
     Shader::Uniform(sp, "uScale", r_scale_);
     Shader::Uniform(sp, "uOffset", r_offset_);
-    auto visibles = overlayController::instance()->getWidgetVisibilities();
-    for(int i=0; i<visibles.size(); i++){
-        if(!visibles[i])continue;
+    auto visibles = Manager::instance()->getOpacityWidgetVisibility();
+    for(int i=0; i<visibles->size(); i++){
+        if(!visibles->at(i))continue;
         glBindVertexArray(vaos_[i]);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

@@ -2,7 +2,6 @@
 #include <android/asset_manager_jni.h>
 #include "jui_interface.h"
 #include <vrController.h>
-#include <overlayController.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <platforms/android/ARHelpers/arController.h>
 
@@ -12,8 +11,8 @@ using namespace dvr;
 JUI_METHOD(void, JUIaddTuneParamsNative)(JNIEnv * env, jclass, jintArray jnums, jfloatArray jvalues){
     jint* nums = env->GetIntArrayElements(jnums, 0);
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    overlayController::instance()->addWidget(std::vector<float>(values, values+nums[0]));
-
+//    overlayController::instance()->addWidget(std::vector<float>(values, values+nums[0]));
+    m_manager->addOpacityWidget(std::vector<float>(values, values+nums[0]));
     env->ReleaseFloatArrayElements(jvalues, values, 0);
     env->ReleaseIntArrayElements(jnums, nums, 0);
 }
@@ -37,20 +36,27 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
 }
 
 JUI_METHOD(void, JUIsetTuneWidgetByIdNative)(JNIEnv *, jclass, jint wid){
-    overlayController::instance()->setWidgetId(wid);
+//    overlayController::instance()->setWidgetId(wid);
+    m_manager->setOpacityWidgetId(wid);
 }
 JUI_METHOD(void, JUIremoveTuneWidgetByIdNative)(JNIEnv *, jclass, jint wid){
-    overlayController::instance()->removeWidget(wid);
+//    overlayController::instance()->removeWidget(wid);
+    m_manager->removeOpacityWidget(wid);
 }
 JUI_METHOD(void, JUIremoveAllTuneWidgetNative)(JNIEnv *, jclass){
-    overlayController::instance()->removeAll();
+//    overlayController::instance()->removeAll();
+    m_manager->removeAllOpacityWidgets();
 }
 JUI_METHOD(void, JUIsetTuneParamByIdNative)(JNIEnv *, jclass, jint tid, jint pid, jfloat value){
-    if(tid == 0 && pid < dvr::TUNE_END)overlayController::instance()->setTuneParameter(pid, value);
-    else if(tid == 1) m_sceneRenderer->setRenderParam(pid, value);
+    if(tid == 0 && pid < dvr::TUNE_END)
+//        overlayController::instance()->setTuneParameter(pid, value);
+        m_manager->setOpacityValue(pid, value);
+    else if(tid == 1)
+        m_manager->setRenderParam(pid, value);
+//       m_sceneRenderer->setRenderParam(pid, value);
 }
 JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint pid, jfloat minv, jfloat maxv){
-    if(pid < dvr::DUAL_END)m_sceneRenderer->setDualParameter(pid, minv, maxv);
+//    if(pid < dvr::DUAL_END)m_sceneRenderer->setDualParameter(pid, minv, maxv);
 }
 JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolean value){
     m_manager->setCheck(dvr::jstring2string(env,jkey), value);
@@ -75,13 +81,15 @@ JUI_METHOD(void, JUIsetCuttingPlaneDeltaNative)(JNIEnv * env, jclass, jint id, j
     m_sceneRenderer->setCuttingPlane(id, delta);
 }
 JUI_METHOD(void, JUIsetMaskBitsNative)(JNIEnv * env, jclass, jint num, jint mbits){
-    m_sceneRenderer->mask_num_ = (unsigned int)num;
-    m_sceneRenderer->mask_bits_ = (unsigned int)mbits;
-    Manager::baked_dirty_ = true;
+    m_manager->setMask(num, mbits);
+//    m_sceneRenderer->mask_num_ = (unsigned int)num;
+//    m_sceneRenderer->mask_bits_ = (unsigned int)mbits;
+//    Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint id){
-    Manager::color_scheme_id = id;
-    Manager::baked_dirty_ = true;
+    m_manager->setColorScheme(id);
+//    Manager::color_scheme_id = id;
+//    Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIsetTraversalTargetNative)(JNIEnv * env, jclass, jint id){
     Manager::traversal_target_id = (id == 0)?dvr::ORGAN_COLON:dvr::ORGAN_ILEUM;
@@ -89,23 +97,27 @@ JUI_METHOD(void, JUIsetTraversalTargetNative)(JNIEnv * env, jclass, jint id){
 }
 JUI_METHOD(void, JUIsetGraphRectNative)(JNIEnv*, jclass, jint id, jint width, jint height, jint left, jint top){
 //    LOGE("====%d, %d, %d, %d,%d", id, width, height, left,top);
-    overlayController::instance()->setOverlayRect(id, width, height, left, top);
+    m_sceneRenderer->setOverlayRects(id, width, height, left, top);
 }
 JUI_METHOD(void, JUIsetAllTuneParamByIdNative)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    if(id == 1)m_sceneRenderer->setRenderParam(values);
-    else if(id == 2)m_sceneRenderer->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
-
+    if(id == 1)
+        m_manager->setRenderParam(values);
+//        m_sceneRenderer->setRenderParam(values);
+    else if(id == 2)
+        m_sceneRenderer->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
     env->ReleaseFloatArrayElements(jvalues,values,0);
 }
 JUI_METHOD(void, JUIsetTuneWidgetVisibilityNative)(JNIEnv*, jclass, jint wid, jboolean value){
-    overlayController::instance()->setWidgetsVisibility(wid, value);
-    Manager::baked_dirty_ = true;
+    m_manager->setOpacityWidgetVisibility(wid,value);
+    //    overlayController::instance()->setWidgetsVisibility(wid, value);
+//    Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
         jint num, jobjectArray jkeys, jbooleanArray jvalues,
         jfloatArray jvol_pose, jfloatArray jcam_pose){
-    m_manager->onReset();
+    //todo:how to reset??
+//    m_manager->onReset();
     InitCheckParam(env, num, jkeys, jvalues);
     jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
     jfloat* cam_arr = env->GetFloatArrayElements(jcam_pose, 0);
@@ -140,13 +152,13 @@ JUI_METHOD(void, JUIonSingleTouchUpNative)(JNIEnv *, jobject){
     arController::instance()->onSingleTouchUp();
 }
 JUI_METHOD(void, JUIonTouchMoveNative)(JNIEnv *, jclass, jfloat x, jfloat y){
-    nativeApp(nativeAddr)->onTouchMove(x, y);
+    m_sceneRenderer->onTouchMove(x, y);
 }
 JUI_METHOD(void, JUIonScaleNative)(JNIEnv *, jclass, jfloat sx, jfloat sy){
-    nativeApp(nativeAddr)->onScale(sx, sy);
+    m_sceneRenderer->onScale(sx, sy);
 }
 JUI_METHOD(void, JUIonPanNative)(JNIEnv *, jclass, jfloat x, jfloat y){
-    nativeApp(nativeAddr)->onPan(x,y);
+    m_sceneRenderer->onPan(x,y);
 }
 JUI_METHOD(void, JUIonLongPress)(JNIEnv *env, jobject obj, jfloat x, jfloat y){
     if(arController::instance()->onLongPress(x,y)){

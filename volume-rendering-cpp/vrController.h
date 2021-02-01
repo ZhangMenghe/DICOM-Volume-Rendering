@@ -13,6 +13,7 @@
 #include "Manager.h"
 #include <unordered_map>
 #include <map>
+#include <dicomRenderer/dataVisualizer.h>
 
 class vrController:public nEntrance{
 public:
@@ -50,14 +51,12 @@ public:
     void setCuttingPlane(int id, int delta);
     void setCuttingPlane(glm::vec3 pp, glm::vec3 pn);
     void setCuttingParams(GLuint sp);
-    void setDualParameter(int id, float lv, float rv);
-    void setRenderParam(int id, float value);
-    void setRenderParam(float* values);
     void setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv);
     void setVolumePosition(glm::vec3 pv){PosVec3_ = pv;volume_model_dirty=true;}
     bool addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam);
     bool addStatus(std::string name, bool use_current_status = false);
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
+    void setOverlayRects(int id, int width, int height, int left, int top);
 
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
@@ -82,6 +81,7 @@ private:
     std::vector<organMeshRenderer*> mesh_renders;
     std::unordered_map<int, centerLineRenderer*> line_renderers_;
     cuttingController* cutter_;
+    dataBoard *data_board_;
 
     //Shader
     Shader* bakeShader_ = nullptr;
@@ -106,7 +106,6 @@ private:
     std::map<std::string, reservedStatus> rStates_;
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
-    float render_params_[dvr::PARAM_RENDER_TUNE_END]={.0f};
     bool pre_draw_ = true;
 
     //volume

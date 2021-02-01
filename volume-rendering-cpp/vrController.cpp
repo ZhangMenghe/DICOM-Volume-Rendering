@@ -1,5 +1,4 @@
 #include "vrController.h"
-#include "overlayController.h"
 #include <Utils/mathUtils.h>
 #include <dicomRenderer/screenQuad.h>
 #include <glm/gtc/type_ptr.hpp>
@@ -29,6 +28,7 @@ vrController::vrController(const std::shared_ptr<Manager> &manager)
 :m_manager(manager){
     onReset();
     mesh_renders = std::vector<organMeshRenderer*>(dvr::ORGAN_END, nullptr);
+//    Manager::camera = new Camera;
     myPtr_ = this;
 }
 void vrController::onReset() {
@@ -72,6 +72,7 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
             volume_model_dirty = true;
         }
         vol_dim_scale_mat_=glm::scale(glm::mat4(1.0f), vol_dim_scale_);
+        m_manager->setDimension(vol_dimension_);
         texvrRenderer_->setDimension(vol_dimension_, vol_dim_scale_);
         cutter_->setDimension(pd, vol_dim_scale_.z);
     }
@@ -115,11 +116,13 @@ void vrController::onViewCreated(){
     raycastRenderer_ = new raycastRenderer();
     meshRenderer_ = new organMeshRenderer;
     cutter_ = new cuttingController;
+    data_board_ = new dataBoard;
 }
 
 void vrController::onViewChange(int width, int height){
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT);
+    data_board_->onViewChange(width, height);
     screenQuad::instance()->onScreenSizeChange(width, height);
 }
 
@@ -184,6 +187,11 @@ void vrController::onDrawScene(){
         }
     }
     if(cp_update&&!draw_finished)cutter_->Draw(pre_draw_);
+
+    //data board
+    if(Manager::param_bool[dvr::CHECK_OVERLAY])
+        data_board_->onDraw(pre_draw_);
+
     Manager::baked_dirty_ = false;
     //  LOGE("===FPS: %.2f==\n", pm_.Update());
 }
@@ -199,6 +207,9 @@ void vrController::onDraw() {
         onDrawScene();
     }
     screenQuad::instance()->Draw();
+//    //data board
+//    if(Manager::param_bool[dvr::CHECK_OVERLAY])
+//        data_board_->onDraw(false);
 }
 void vrController::onSingleTouchDown(float x, float y){
     Mouse_old = glm::fvec2(x, y);
@@ -257,9 +268,8 @@ void vrController::precompute(){
         Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
 
     }
-    overlayController::instance()->updateUniforms(render_params_);
     bakeShader_->DisableAllKeyword();
-    bakeShader_->EnableKeyword(COLOR_SCHEMES[Manager::color_scheme_id]);
+    bakeShader_->EnableKeyword(Manager::instance()->getColorSchemeKeyword());
 
     //todo!!!! add flip stuff
     bakeShader_->EnableKeyword("FLIPY");
@@ -270,29 +280,7 @@ void vrController::precompute(){
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    if(Manager::color_scheme_id > 2)
-        Shader::Uniform(sp, "u_hex_color_scheme", 256, color_schemes_hex[Manager::color_scheme_id- 3]);
-
-    Shader::Uniform(sp, "u_tex_size", glm::vec3(float(tex_volume->Width()), float(tex_volume->Height()), float(tex_volume->Depth())));
-    Shader::Uniform(sp, "u_maskbits", mask_bits_);
-    Shader::Uniform(sp, "u_organ_num", mask_num_);
-    Shader::Uniform(sp, "u_mask_color", Manager::param_bool[CHECK_MASK_RECOLOR]);
-
-    float* widget_data_pointer;
-    int widget_num;
-    overlayController::instance()->getWidgetFlatPoints(widget_data_pointer, widget_num);
-    auto visibles = overlayController::instance()->getWidgetVisibilities();
-    int visible=0;
-    for(int i=0;i<widget_num;i++){visible |= int(visibles[i]) << i;}
-    Shader::Uniform(sp, "u_visible_bits", visible);
-    Shader::Uniform(sp, "u_opacity", 6*widget_num,2, widget_data_pointer);
-    Shader::Uniform(sp, "u_widget_num", widget_num);
-
-    Shader::Uniform(sp, "u_contrast_low", render_params_[RENDER_CONTRAST_LOW]);
-    Shader::Uniform(sp, "u_contrast_high", render_params_[RENDER_CONTRAST_HIGH]);
-//    Shader::Uniform(sp, "u_contrast_level", render_params_[RENDER_CONTRAST_LEVEL]);
-    Shader::Uniform(sp, "u_brightness", render_params_[RENDER_BRIGHTNESS]);
-
+    m_manager->updateVolumeSetupUniforms(sp);
 
     glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
@@ -301,6 +289,8 @@ void vrController::precompute(){
     glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     bakeShader_->UnUse();
+
+    data_board_->onUpdate(m_manager.get());
     isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
 
@@ -308,10 +298,7 @@ void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content)
     if(fid < dvr::SHADER_END)
         Manager::shader_contents[fid] = content;
 }
-void vrController::setRenderParam(float* values){
-    memcpy(render_params_, values, dvr::PARAM_RENDER_TUNE_END*sizeof(float));
-    Manager::baked_dirty_=true;
-}
+
 void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
     RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv;
     volume_model_dirty=true;
@@ -396,6 +383,9 @@ void vrController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) AlignModelMatToTraversalPlane();
     isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
+void vrController::setOverlayRects(int id, int width, int height, int left, int top){
+    data_board_->setOverlayRect(id, width, height, left, top);
+}
 void vrController::AlignModelMatToTraversalPlane(){
     glm::vec3 pp, pn;
     cutter_->getCurrentTraversalInfo(pp, pn);
@@ -407,12 +397,6 @@ void vrController::AlignModelMatToTraversalPlane(){
     isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
 }
 
-void vrController::setDualParameter(int id, float lv, float rv){
-//    if(id == CONTRAST_LIMIT){contrast_low=lv; contrast_high=rv;baked_dirty_=true;}
-}
-void vrController::setRenderParam(int id, float value){
-    render_params_[id] = value;Manager::baked_dirty_ = true;
-}
 float* vrController::getCurrentReservedStates(){
     float* data = new float[31];
     memcpy(data, glm::value_ptr(PosVec3_), 3* sizeof(float));
