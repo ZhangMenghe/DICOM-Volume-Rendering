@@ -14,14 +14,6 @@ layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 layout(binding = 0, r32ui)readonly uniform mediump uimage3D srcTex;
 layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex;
 
-//Uniforms for texture_baked
-struct OpacityAdj{
-    float overall;//0-1
-    float lowbound; //slope adj, 0-1
-    float cutoff;//0,1
-};
-//shaderd by tex and ray, but mutually exclusive
-//uniform OpacityAdj uOpacitys;
 uniform vec2 u_opacity[60];
 uniform int u_widget_num;
 
@@ -34,7 +26,6 @@ uniform float u_contrast_high;
 uniform float u_brightness;
 uniform int u_visible_bits;
 uniform bool u_mask_color;
-
 uniform int u_hex_color_scheme[256];
 
 //uniform float u_contrast_level;

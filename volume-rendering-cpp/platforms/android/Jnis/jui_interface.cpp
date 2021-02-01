@@ -8,9 +8,6 @@
 
 using namespace dvr;
 
-namespace {
-    std::vector<std::string> param_checks;
-}
 //current only opacity has multiple widgets
 JUI_METHOD(void, JUIaddTuneParamsNative)(JNIEnv * env, jclass, jintArray jnums, jfloatArray jvalues){
     jint* nums = env->GetIntArrayElements(jnums, 0);
@@ -21,18 +18,20 @@ JUI_METHOD(void, JUIaddTuneParamsNative)(JNIEnv * env, jclass, jintArray jnums, 
     env->ReleaseIntArrayElements(jnums, nums, 0);
 }
 void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jvalues){
-    param_checks.clear();
-    Manager::param_bool.clear();
-    jboolean* values = env->GetBooleanArrayElements(jvalues, 0);
+    std::vector<std::string> keys;
+    std::vector<bool> values;
+
+    jboolean* jvalue_arr = env->GetBooleanArrayElements(jvalues, 0);
     for(int i=0; i<num; i++){
-        jstring jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
-        std::string key = dvr::jstring2string(env,jkey);
-        param_checks.push_back(key);
-        Manager::param_bool.push_back(values[i]);
-        LOGE("======SET INIT %s, %d", key.c_str(), values[i]);
+        auto jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
+        keys.push_back(dvr::jstring2string(env,jkey));
+        values.push_back(jvalue_arr[i]);
+        LOGE("======SET INIT %s, %d", keys.back().c_str(), values[i]);
     }
-    env->ReleaseBooleanArrayElements(jvalues,values,0);
-    Manager::baked_dirty_ = true;
+    env->ReleaseBooleanArrayElements(jvalues,jvalue_arr,0);
+
+    m_manager->InitCheckParams(keys, values);
+
     m_sceneRenderer->addStatus("ARCam");
     camera_switch_dirty = true;
 }
@@ -54,16 +53,7 @@ JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint pid, jfloat m
     if(pid < dvr::DUAL_END)m_sceneRenderer->setDualParameter(pid, minv, maxv);
 }
 JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolean value){
-    std::string key = dvr::jstring2string(env,jkey);
-
-    auto it = std::find (param_checks.begin(), param_checks.end(), key);
-    if (it != param_checks.end()){
-        int bpos = (int)(it - param_checks.begin());
-        Manager::param_bool[bpos] = value;
-        if(bpos == CHECK_AR_ENABLED)
-            camera_switch_dirty = true;
-        Manager::baked_dirty_ = true;
-    }
+    m_manager->setCheck(dvr::jstring2string(env,jkey), value);
 }
 JUI_METHOD(void, JUISwitchCuttingPlaneNative)(JNIEnv * env, jclass, jint id){
     m_sceneRenderer->SwitchCuttingPlane((PARAM_CUT_ID)id);

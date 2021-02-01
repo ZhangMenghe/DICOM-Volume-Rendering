@@ -125,11 +125,9 @@ void Manager::setRenderParam(float *values)
     m_volset_data.u_brightness = m_render_params[dvr::RENDER_BRIGHTNESS];
     Manager::baked_dirty_ = true;
 }
-void Manager::setCheck(std::string key, bool value)
-{
+void Manager::setCheck(std::string key, bool value){
     auto it = std::find(param_checks.begin(), param_checks.end(), key);
-    if (it != param_checks.end())
-    {
+    if (it != param_checks.end()){
         param_bool[it - param_checks.begin()] = value;
         m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
         m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
