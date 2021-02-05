@@ -128,7 +128,7 @@ vec3 TransferColor(float intensity, int ORGAN_BIT){
 //    #elif defined(COLOR_BRIGHT)
 //        color = bright_scheme(intensity);
     #else
-        color = hex2rgb(u_hex_color_scheme[int(intensity * 256.0)]);
+        color = hex2rgb(u_hex_color_scheme[int(intensity * 255.0)]);
     #endif
 
     #ifdef SHOW_ORGANS

@@ -1,22 +1,25 @@
 package helmsley.vr.DUIs;
 
-import java.util.LinkedHashMap;
-
 import helmsley.vr.proto.GestureOp;
 import helmsley.vr.proto.TuneMsg;
 import helmsley.vr.proto.operateClient;
+import helmsley.vr.proto.volumeInfo;
 
 public class JUIInterface {
     public static boolean on_broadcast = false;
     static void setBroadcast(boolean on){
-        if(on) operateClient.startBroadcast();
+        if(on) {
+            operateClient.startBroadcast();
+        }
         on_broadcast = on;
+    }
+    public static void JUIonChangeVolume(String ds_name, volumeInfo vinfo){
+        if(on_broadcast) operateClient.sendVolume(ds_name, vinfo);
     }
     public static void JUIonReset(boolean update_local, int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(update_local) JUIonResetNative(num, check_keys, check_value, volume_pose, camera_pose);
         if(on_broadcast){
             operateClient.reqestReset(check_keys, check_value, volume_pose, camera_pose);
-            operateClient.sendVolume();
         }
     }
     static void JUIsetGraphRect(int id, int width, int height, int left, int top){

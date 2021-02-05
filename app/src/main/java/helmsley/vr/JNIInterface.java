@@ -30,7 +30,7 @@ public class JNIInterface {
     }
     public static void JNIsendDataPrepare(String target_vol, int ph, int pw, int pd, float sh, float sw, float sd, boolean b_mask){
         JNIsendDataPrepareNative(ph, pw, pd, sh, sw, sd, b_mask);
-        operateClient.setDisplayVolume(target_vol, ph, pw, pd, sh, sw, sd, b_mask);
+//        operateClient.setDisplayVolume(target_vol, ph, pw, pd, sh, sw, sd, b_mask);
     }
     public static native void JNIsendData(int target, int idx, int chunk_size, int unit_size, byte[] data);
     public static native void JNIsendDataFloats(int target, int chunk_size, float[] data);

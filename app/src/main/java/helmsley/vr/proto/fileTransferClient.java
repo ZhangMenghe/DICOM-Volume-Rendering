@@ -11,7 +11,6 @@ import helmsley.vr.Utils.fileUtils;
 import helmsley.vr.dicomManager;
 import io.grpc.stub.StreamObserver;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
-import helmsley.vr.proto.volumeResponse.volumeInfo;
 import java.io.*;
 import java.lang.ref.WeakReference;
 import java.nio.file.Path;
@@ -34,6 +33,7 @@ public class fileTransferClient {
     private static boolean finished = false, finished_mask=false, finished_centerline=false;
 
     private datasetInfo target_ds;
+    private String target_ds_name;//for broadcasting
     private volumeInfo target_vol;
 
     private List<datasetInfo> available_remote_datasets,
@@ -105,7 +105,7 @@ public class fileTransferClient {
             }
 //           group/rank/rscore/...../volscore*3
             String[] score_tx = lpc.get(i*2+1).split("#");
-            volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
+            scoreInfo.Builder s_builder = scoreInfo.newBuilder()
                     .setRgroupId(Integer.parseInt(score_tx[0]))
                     .setRankId(Integer.parseInt(score_tx[1]))
                     .setRankScore(Float.parseFloat(score_tx[2]));
@@ -120,11 +120,15 @@ public class fileTransferClient {
         }
         local_initialized = true;
     }
+    public String getTargetDatasetName(){return target_ds_name;}
+    public volumeInfo getTargetVolumeInfo(){return target_vol;}
 
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
         return isLocal? available_local_datasets: available_remote_datasets;
     }
     public List<volumeInfo> getAvailableVolumes(String dataset_name, boolean isLocal){
+        target_ds_name = dataset_name;
+
         if(isLocal) return local_dv_map.get(dataset_name);
 
         //download
@@ -186,6 +190,7 @@ public class fileTransferClient {
 
 
     public boolean Download(String ds_name, volumeInfo target_volume, boolean is_local){
+        target_ds_name = ds_name;
         target_vol = target_volume;
         if(target_volume.getDataSource() == volumeInfo.DataSource.DEVICE){
             if(dicomManager.LoadDataFromDevice(target_volume)) return true;
@@ -411,7 +416,7 @@ public class fileTransferClient {
             //datasource
             vol_info_lst.add(String.valueOf(tvol.getDataSourceValue()));
             //set score
-            volumeResponse.scoreInfo sinfo = tvol.getScores();
+            scoreInfo sinfo = tvol.getScores();
 //                String[] score_info = {String.valueOf(sinfo.getRgroupId()), String.valueOf(sinfo.getRankScore()), String.valueOf(sinfo.getVolScore(0)), String.valueOf(sinfo.getVolScore(1)), String.valueOf(sinfo.getVolScore(2))};
             List<String> score_info_lst = new ArrayList<>();
             score_info_lst.add(String.valueOf(sinfo.getRgroupId()));

@@ -27,7 +27,7 @@ public class operateClient {
     private static TuneMsg.Builder tune_builder;
     private static CheckMsg.Builder check_builder;
     private static MaskMsg.Builder msk_builder;
-    private static volumeConcise.Builder data_builder;
+    private static DataMsg.Builder data_builder;
 
     private static List<FrameUpdateMsg.MsgType> type_pool = new ArrayList<>();
     private static List<TuneMsg> tune_pool = new ArrayList<>();
@@ -48,8 +48,7 @@ public class operateClient {
         tune_builder = TuneMsg.newBuilder();
         check_builder = CheckMsg.newBuilder();
         msk_builder = MaskMsg.newBuilder();
-        data_builder = volumeConcise.newBuilder();
-
+        data_builder = DataMsg.newBuilder();
         observer = new StreamObserver<commonResponse>() {
             @Override
             public void onNext(commonResponse value) {
@@ -157,15 +156,26 @@ public class operateClient {
 
         operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setSubTarget(sub_tar).setValue(value).build(), observer);
     }
-    public static void setDisplayVolume(String target_vol, int ph, int pw, int pd, float sh, float sw, float sd, boolean b_mask){
+//    public static void setDisplayVolume(volumeInfo vinfo){
+//        if(JUIInterface.on_broadcast && initialized) operate_stub.setDisplayVolume(vinfo, observer);
+//        data_builder.clear();
+//        data_builder.setVolPath(target_vol);
+//        data_builder.addDims(ph).addDims(pw).addDims(pd).addSize(sh).addSize(sw).addSize(sd).setWithMask(b_mask);
+//        if(JUIInterface.on_broadcast && initialized) operate_stub.setDisplayVolume(data_builder.build(), observer);
+//    }
+    public static void sendVolume(String ds_name, volumeInfo vinfo){
         data_builder.clear();
-        data_builder.setVolPath(target_vol);
-        data_builder.addDims(ph).addDims(pw).addDims(pd).addSize(sh).addSize(sw).addSize(sd).setWithMask(b_mask);
-        if(JUIInterface.on_broadcast && initialized) operate_stub.setDisplayVolume(data_builder.build(), observer);
+        data_builder.setDsName(ds_name);
+        data_builder.setVolumeInfo(vinfo);
+        if(JUIInterface.on_broadcast &&initialized){
+            operate_stub.setDisplayVolume(data_builder.build(), observer);
+            Log.e(TAG, "============sendVolume: 1===" );
+        }
     }
     public static void sendVolume(){
-        if(initialized){
-            operate_stub.setDisplayVolume(data_builder.build(), observer);
-        }
+//        if(initialized){
+//            operate_stub.setDisplayVolume(data_builder.build(), observer);
+//            Log.e(TAG, "============sendVolume: 2" );
+//        }
     }
 }

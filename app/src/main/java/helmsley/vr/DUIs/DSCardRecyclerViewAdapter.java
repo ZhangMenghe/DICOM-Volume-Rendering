@@ -35,6 +35,7 @@ import helmsley.vr.JNIInterface;
 import helmsley.vr.R;
 import helmsley.vr.proto.datasetResponse.datasetInfo;
 import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.proto.volumeInfo;
 import helmsley.vr.proto.volumeResponse;
 
 import static helmsley.vr.DUIs.dialogUIs.DownloadDialogType.*;
@@ -73,7 +74,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     //adapter of listView content
     private Map<String, ArrayAdapter<String>> contentAdapters;
     //cache remote, keep it null for local ds
-    private LinkedHashMap<String, List<volumeResponse.volumeInfo>> cached_volumeinfo = null;
+    private LinkedHashMap<String, List<volumeInfo>> cached_volumeinfo = null;
 
     //uis for preview
     private AlertDialog preview_dialog = null;
@@ -83,7 +84,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     private static int PREVIEW_IMG_HEIGHT;
 
     //"selected info"
-    private volumeResponse.volumeInfo sel_vol_info;
+    private volumeInfo sel_vol_info;
     private String sel_ds_name;
 
     //sorting stuff
@@ -193,13 +194,13 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
 
     private void setup_single_card_content_list(ListView lv, String ds_name, boolean isLocal){
         //todo:on processing ui?
-        List<volumeResponse.volumeInfo> vol_lst = downloaderRef.get().getAvailableVolumes(ds_name, isLocal);
+        List<volumeInfo> vol_lst = downloaderRef.get().getAvailableVolumes(ds_name, isLocal);
         if(vol_lst.isEmpty()) return;
         if(!isLocal) cached_volumeinfo.put(ds_name, vol_lst);
 
         //setup card info
         ArrayList<String> volcon_lst = new ArrayList<>();
-        for (volumeResponse.volumeInfo vinfo : vol_lst){
+        for (volumeInfo vinfo : vol_lst){
             List<Integer> dims = vinfo.getDimsList();
             volcon_lst.add(actRef.get().getString(
                     R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))
@@ -272,6 +273,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 List<Integer> dims = sel_vol_info.getDimsList();
                 List<Float> spacing = sel_vol_info.getResolutionList();
 //                Log.e(TAG, "====onClick: "+ spacing.get(0)*dims.get(0) + " ====" +spacing.get(1)*dims.get(1) + "==="+sel_vol_info.getVolumeLocRange() );
+                JUIInterface.JUIonChangeVolume(sel_ds_name, sel_vol_info);
                 JNIInterface.JNIsendDataPrepare(
                         sel_ds_name + "/"+ sel_vol_info.getFolderName(),
                         dims.get(0), dims.get(1), dims.get(2),
@@ -288,18 +290,18 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
     }
     private void ReorderVolumeList(String ds_name, String key){
         sel_ds_name = ds_name;
-        List<volumeResponse.volumeInfo> info_lst;
+        List<volumeInfo> info_lst;
         if(islocal_) info_lst = downloaderRef.get().getAvailableVolumes(sel_ds_name, true);
         else info_lst = cached_volumeinfo.get(sel_ds_name);
         if(info_lst==null) return;
-//        for(volumeResponse.volumeInfo vinfo:info_lst)
+//        for(volumeInfo vinfo:info_lst)
 //            Log.e(TAG, "===before: " + vinfo.getFolderName() );
 
         int kid = sort_keys_ids[sort_keys.indexOf(key)];
         if(kid > 0)
-        Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+        Collections.sort(info_lst, new Comparator<volumeInfo>() {
             @Override
-            public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+            public int compare(volumeInfo u1, volumeInfo u2) {
                 float r1 = u1.getScores().getRawScore(kid);
                 float r2 = u2.getScores().getRawScore(kid);
                 return Float.compare(r2, r1);
@@ -307,9 +309,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         });
         else{
             if(key.equals("Name")){
-                Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+                Collections.sort(info_lst, new Comparator<volumeInfo>() {
                     @Override
-                    public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+                    public int compare(volumeInfo u1, volumeInfo u2) {
                         try{
                             float f1 = Float.parseFloat(u1.getFolderName().split("_")[0]);
                             return Float.compare(f1, Float.parseFloat(u2.getFolderName().split("_")[0]));
@@ -324,9 +326,9 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                     }
                 });
             }else{
-                Collections.sort(info_lst, new Comparator<volumeResponse.volumeInfo>() {
+                Collections.sort(info_lst, new Comparator<volumeInfo>() {
                     @Override
-                    public int compare(volumeResponse.volumeInfo u1, volumeResponse.volumeInfo u2) {
+                    public int compare(volumeInfo u1, volumeInfo u2) {
                         float r1 = u1.getScores().getRankScore();
                         float r2 = u2.getScores().getRankScore();
                         return Float.compare(r2,r1);
@@ -344,11 +346,11 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
         for(View sort_view: sort_view_map.values())
             sort_view.setVisibility(View.GONE);
     }
-    boolean updateLstContent(String ds_name, List<volumeResponse.volumeInfo> info_lst){
+    boolean updateLstContent(String ds_name, List<volumeInfo> info_lst){
         if(info_lst==null || info_lst.isEmpty()) return false;
         //setup card info
         ArrayList<String> volcon_lst = new ArrayList<>();
-        for (volumeResponse.volumeInfo vinfo : info_lst){
+        for (volumeInfo vinfo : info_lst){
             List<Integer> dims = vinfo.getDimsList();
             volcon_lst.add(actRef.get().getString(
                     R.string.volume_lst_item, vinfo.getFolderName(), dims.get(1), dims.get(0), dims.get(2))

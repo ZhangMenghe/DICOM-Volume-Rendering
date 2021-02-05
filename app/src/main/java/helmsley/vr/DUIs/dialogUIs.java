@@ -26,6 +26,7 @@ import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.rpcManager;
+import helmsley.vr.proto.volumeInfo;
 import helmsley.vr.proto.volumeResponse;
 
 public class dialogUIs {
@@ -110,9 +111,10 @@ public class dialogUIs {
         muiRef.get().mUIManagerRef.get().getCurrentStates(map);
         broadcast_icon.setVisibility(View.VISIBLE);
         JUIInterface.setBroadcast(true);
+        JUIInterface.JUIonChangeVolume(rpc_manager.getTargetDatasetName(), rpc_manager.getTargetVolumeInfo());
         muiRef.get().mUIManagerRef.get().RequestResetWithTemplate(map, false);
     }
-    public void NotifyLocalCardUpdate(String ds_name, List<volumeResponse.volumeInfo> info_lst){
+    public void NotifyLocalCardUpdate(String ds_name, List<volumeInfo> info_lst){
         local_card_adp.updateLstContent(ds_name, info_lst);
         local_card_adp.updateCardContent();
     }

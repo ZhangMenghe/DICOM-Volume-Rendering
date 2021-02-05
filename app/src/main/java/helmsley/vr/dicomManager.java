@@ -46,6 +46,8 @@ import java.util.List;
 import helmsley.vr.Utils.PushToImebraPipe;
 import helmsley.vr.proto.datasetResponse;
 import helmsley.vr.proto.fileTransferClient;
+import helmsley.vr.proto.scoreInfo;
+import helmsley.vr.proto.volumeInfo;
 import helmsley.vr.proto.volumeResponse;
 
 public class dicomManager {
@@ -227,12 +229,12 @@ public class dicomManager {
         boolean is_first = true;
         DataSet loadDataSet;
         datasetResponse.datasetInfo.Builder ds_builder = datasetResponse.datasetInfo.newBuilder();
-        volumeResponse.volumeInfo.Builder vinfo_builder = volumeResponse.volumeInfo.newBuilder()
+        volumeInfo.Builder vinfo_builder = volumeInfo.newBuilder()
                 .setFolderName(vol_name)
                 .setFolderPath(folder_path)
                 .setVolumeLocRange(-1)
                 .setWithMask(mask_ava)
-                .setDataSource(volumeResponse.volumeInfo.DataSource.DEVICE);
+                .setDataSource(volumeInfo.DataSource.DEVICE);
 
         for(String name:file_names){
             loadDataSet = CodecFactory.load(name);
@@ -258,7 +260,7 @@ public class dicomManager {
                 }
                 vinfo_builder.addDims((int)height);vinfo_builder.addDims((int)width);vinfo_builder.addDims((int)file_names.size());
                 vinfo_builder.addResolution(-1);vinfo_builder.addResolution(-1);
-                volumeResponse.scoreInfo.Builder s_builder = volumeResponse.scoreInfo.newBuilder()
+                scoreInfo.Builder s_builder = scoreInfo.newBuilder()
                         .setRgroupId(-1)
                         .setRankId(-1)
                         .setRankScore(-1);//random.nextFloat());
@@ -340,7 +342,7 @@ public class dicomManager {
         }
         return data;
     }
-    public static boolean LoadDataFromDevice(volumeResponse.volumeInfo vinfo){
+    public static boolean LoadDataFromDevice(volumeInfo vinfo){
         int height = vinfo.getDims(0);int width = vinfo.getDims(1);int nums = vinfo.getDims(2);
         int ssize = width * height * 2;
         byte[][] datas = new byte[nums][];

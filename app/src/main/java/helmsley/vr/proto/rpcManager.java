@@ -31,7 +31,8 @@ public class rpcManager {
         data_manager = new fileTransferClient(activity, dui);
         opa_manager = new operateClient();
     }
-
+    public String getTargetDatasetName(){return data_manager.getTargetDatasetName();}
+    public volumeInfo getTargetVolumeInfo(){return data_manager.getTargetVolumeInfo();}
     public String Setup(String host, String portStr) {
         try {
             mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();
