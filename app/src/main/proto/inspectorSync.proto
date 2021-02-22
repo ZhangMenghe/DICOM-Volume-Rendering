@@ -77,7 +77,7 @@ message MaskMsg{
 }
 message DataMsg{
     string ds_name = 1;
-    volumeInfo volume_info = 2;
+    string volume_name = 2;
 }
 message FrameUpdateMsg{
     enum MsgType{

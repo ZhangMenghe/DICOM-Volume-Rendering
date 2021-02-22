@@ -32,7 +32,7 @@ public class rpcManager {
         opa_manager = new operateClient();
     }
     public String getTargetDatasetName(){return data_manager.getTargetDatasetName();}
-    public volumeInfo getTargetVolumeInfo(){return data_manager.getTargetVolumeInfo();}
+    public String getTargetVolumeName(){return data_manager.getTargetVolumeName();}
     public String Setup(String host, String portStr) {
         try {
             mChannel = ManagedChannelBuilder.forAddress(host, Integer.valueOf(portStr)).usePlaintext().build();

@@ -115,8 +115,10 @@ void Manager::setRenderParam(int id, float value)
         m_volset_data.u_contrast_low = value;
     else if (id == dvr::RENDER_CONTRAST_HIGH)
         m_volset_data.u_contrast_high = value;
+    else if (id==dvr::RENDER_BRIGHTNESS)
+        m_volset_data.u_brightness = value;
     else
-        m_volset_data.u_brightness = m_render_params[dvr::RENDER_BRIGHTNESS];
+        m_volset_data.u_base_value = value;
 }
 void Manager::setRenderParam(float *values)
 {
@@ -124,6 +126,7 @@ void Manager::setRenderParam(float *values)
     m_volset_data.u_contrast_low = m_render_params[dvr::RENDER_CONTRAST_LOW];
     m_volset_data.u_contrast_high = m_render_params[dvr::RENDER_CONTRAST_HIGH];
     m_volset_data.u_brightness = m_render_params[dvr::RENDER_BRIGHTNESS];
+    m_volset_data.u_base_value = m_render_params[dvr::RENDER_BASE_VALUE];
     Manager::baked_dirty_ = true;
 }
 void Manager::setCheck(std::string key, bool value){
@@ -192,6 +195,8 @@ void Manager::updateVolumeSetupUniforms(GLuint sp){
     Shader::Uniform(sp, "u_contrast_low", m_volset_data.u_contrast_low);
     Shader::Uniform(sp, "u_contrast_high", m_volset_data.u_contrast_high);
     Shader::Uniform(sp, "u_brightness", m_volset_data.u_brightness);
+    Shader::Uniform(sp, "u_base_value", m_volset_data.u_base_value);
+
 }
 bool Manager::isRayCut(){return param_bool[dvr::CHECK_RAYCAST] && param_bool[dvr::CHECK_CUTTING];}
 bool Manager::IsCuttingNeedUpdate(){

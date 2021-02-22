@@ -163,10 +163,10 @@ public class operateClient {
 //        data_builder.addDims(ph).addDims(pw).addDims(pd).addSize(sh).addSize(sw).addSize(sd).setWithMask(b_mask);
 //        if(JUIInterface.on_broadcast && initialized) operate_stub.setDisplayVolume(data_builder.build(), observer);
 //    }
-    public static void sendVolume(String ds_name, volumeInfo vinfo){
+    public static void sendVolume(String ds_name, String vl_name){
         data_builder.clear();
         data_builder.setDsName(ds_name);
-        data_builder.setVolumeInfo(vinfo);
+        data_builder.setVolumeName(vl_name);
         if(JUIInterface.on_broadcast &&initialized){
             operate_stub.setDisplayVolume(data_builder.build(), observer);
             Log.e(TAG, "============sendVolume: 1===" );

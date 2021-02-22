@@ -13,8 +13,8 @@ public class JUIInterface {
         }
         on_broadcast = on;
     }
-    public static void JUIonChangeVolume(String ds_name, volumeInfo vinfo){
-        if(on_broadcast) operateClient.sendVolume(ds_name, vinfo);
+    public static void JUIonChangeVolume(String ds_name, String vl_name){
+        if(on_broadcast) operateClient.sendVolume(ds_name, vl_name);
     }
     public static void JUIonReset(boolean update_local, int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(update_local) JUIonResetNative(num, check_keys, check_value, volume_pose, camera_pose);

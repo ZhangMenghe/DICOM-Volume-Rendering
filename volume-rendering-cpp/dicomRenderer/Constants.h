@@ -47,6 +47,7 @@ namespace dvr{
         RENDER_CONTRAST_LOW=0,
         RENDER_CONTRAST_HIGH,
         RENDER_BRIGHTNESS,
+        RENDER_BASE_VALUE,
         PARAM_RENDER_TUNE_END
     };
     enum SHADER_FILES{

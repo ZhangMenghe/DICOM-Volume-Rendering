@@ -115,6 +115,7 @@
         <item>@array/contrast_low</item>
         <item>@array/contrast_high</item>
         <item>@array/brightness</item>
+        <item>@array/base_value</item>
 
     </string-array>
 <!--    <string-array name="contrast_level">-->
@@ -123,6 +124,12 @@
 <!--        <item>1.0</item>-->
 <!--        <item>255</item>-->
 <!--    </string-array>-->
+    <string-array name="base_value">
+        <item>Value</item>
+        <item>.5</item>
+        <item>1.0</item>
+        <item>255</item>
+    </string-array>
     <string-array name="brightness">
         <item>Brightness</item>
         <item>.5</item>

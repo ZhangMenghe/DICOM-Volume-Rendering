@@ -273,7 +273,7 @@ public class DSCardRecyclerViewAdapter extends RecyclerView.Adapter<DSCardRecycl
                 List<Integer> dims = sel_vol_info.getDimsList();
                 List<Float> spacing = sel_vol_info.getResolutionList();
 //                Log.e(TAG, "====onClick: "+ spacing.get(0)*dims.get(0) + " ====" +spacing.get(1)*dims.get(1) + "==="+sel_vol_info.getVolumeLocRange() );
-                JUIInterface.JUIonChangeVolume(sel_ds_name, sel_vol_info);
+                JUIInterface.JUIonChangeVolume(sel_ds_name, sel_vol_info.getFolderName());
                 JNIInterface.JNIsendDataPrepare(
                         sel_ds_name + "/"+ sel_vol_info.getFolderName(),
                         dims.get(0), dims.get(1), dims.get(2),

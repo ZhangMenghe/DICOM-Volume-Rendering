@@ -24,6 +24,7 @@ uniform vec3 u_tex_size;
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
+uniform float u_base_value;
 uniform int u_visible_bits;
 uniform bool u_mask_color;
 uniform int u_hex_color_scheme[256];
@@ -147,7 +148,7 @@ void main(){
     #endif
 
     //intensity in 0-1
-    float intensity_01 = float(sampled_value.x) * 0.0002442002442002442;
+    float intensity_01 = clamp(float(sampled_value.x) * 0.0002442002442002442+u_base_value-0.5, .0, 1.0);
     float alpha = .0;
     for(int i=0; i<u_widget_num; i++)
     if(((u_visible_bits >> i) & 1) == 1) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity_01));

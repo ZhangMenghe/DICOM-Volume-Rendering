@@ -121,7 +121,7 @@ public class fileTransferClient {
         local_initialized = true;
     }
     public String getTargetDatasetName(){return target_ds_name;}
-    public volumeInfo getTargetVolumeInfo(){return target_vol;}
+    public String getTargetVolumeName(){return target_vol.getFolderName();}
 
     public List<datasetInfo> getAvailableDataset(boolean isLocal){
         return isLocal? available_local_datasets: available_remote_datasets;

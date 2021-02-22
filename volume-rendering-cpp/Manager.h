@@ -17,6 +17,7 @@ struct volumeSetupConstBuffer{
     float u_contrast_low;
     float u_contrast_high;
     float u_brightness;
+    float u_base_value;
 
     //mask
     unsigned int u_maskbits;

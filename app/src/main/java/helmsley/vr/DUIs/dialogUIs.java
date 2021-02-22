@@ -111,7 +111,7 @@ public class dialogUIs {
         muiRef.get().mUIManagerRef.get().getCurrentStates(map);
         broadcast_icon.setVisibility(View.VISIBLE);
         JUIInterface.setBroadcast(true);
-        JUIInterface.JUIonChangeVolume(rpc_manager.getTargetDatasetName(), rpc_manager.getTargetVolumeInfo());
+        JUIInterface.JUIonChangeVolume(rpc_manager.getTargetDatasetName(), rpc_manager.getTargetVolumeName());
         muiRef.get().mUIManagerRef.get().RequestResetWithTemplate(map, false);
     }
     public void NotifyLocalCardUpdate(String ds_name, List<volumeInfo> info_lst){
