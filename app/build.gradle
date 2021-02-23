@@ -26,7 +26,8 @@ android {
                 arguments "-DANDROID_STL=c++_static",
                         "-DGLM_DIRECTORY=${project.rootDir}/thirdparty/glm-0.9.9.8/glm",
                         "-DARCORE_LIBPATH=${arcore_libpath}/jni",
-                        "-DARCORE_INCLUDE=${project.rootDir}/thirdparty/arcore"
+                        "-DARCORE_INCLUDE=${project.rootDir}/thirdparty/arcore",
+                        "-DOPENCV_DIR=${project.rootDir}/thirdparty/opencv-4.5.0/sdk/native"
             }
         }
         ndk {
@@ -106,6 +107,8 @@ dependencies {
     // ARCore library
     implementation 'com.google.ar:core:1.19.0'
     natives 'com.google.ar:core:1.19.0'
+    //opencv
+    implementation project(path: ':opencv')
     //imebra
 //    implementation project(':imebrajni')
     //range seekbar

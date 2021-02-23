@@ -27,6 +27,10 @@ set_target_properties(
         ${ARCORE_LIBPATH}/${ANDROID_ABI}/libarcore_sdk_c.so
         INTERFACE_INCLUDE_DIRECTORIES ${ARCORE_INCLUDE}
 )
+# Import opencv
+add_library( lib_opencv SHARED IMPORTED )
+set_target_properties(lib_opencv PROPERTIES IMPORTED_LOCATION ${OPENCV_DIR}/libs/${ANDROID_ABI}/libopencv_java4.so)
+
 include_directories(${GLM_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 add_library(vrAndroid
@@ -41,6 +45,7 @@ target_link_libraries(
         vrNative
         android
         mediandk
+        lib_opencv
         arcore
         GLESv2
         ${OpenGL_LIBS}

@@ -88,13 +88,10 @@ void arController::onResume(void* env, void* context, void* activity){
         ArConfig_setUpdateMode(ar_session_, ar_config_, AR_UPDATE_MODE_LATEST_CAMERA_IMAGE);
         CHECK(ArSession_configure(ar_session_, ar_config_) == AR_SUCCESS);
         LOGE("=======C4");
-
     }
 
     const ArStatus status = ArSession_resume(ar_session_);
-//    CHECK(status == AR_SUCCESS);
     LOGE("=======C5 %d", status);
-
 }
 
 void arController::onViewChange(int rot, int width, int height){
@@ -115,7 +112,9 @@ void arController::onDraw(){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     if(ar_session_ == nullptr)
-        return ;
+        return;
+
+
     if(!background_tex_initialized){
         ArSession_setCameraTextureName(ar_session_, bg_render->GetTextureId());
         background_tex_initialized = true;
@@ -152,7 +151,9 @@ void arController::onDraw(){
     bg_render->dirtyPrecompute();
     bg_render->Draw(transformed_uvs_);
 
-    if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) return ;
+
+
+    if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) return;
 
     //update and render planes
     update_and_draw_planes();
@@ -192,7 +193,7 @@ void arController::onDraw(){
     stroke_renderer->Draw(mVP);
     //draw cutting plane
     cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection());
-
+    update_ndk_image();
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -475,4 +476,44 @@ void arController::onSingleTouchDown(float x, float y){
 void arController::onSingleTouchUp(){
     Manager::show_ar_ray = false;
     Manager::volume_ar_hold = false;
+}
+bool arController::update_ndk_image(){
+//    std::lock_guard<std::mutex> lock(frame_image_in_use_mutex_);
+    ArImage * ar_image;
+    ArStatus status = ArFrame_acquireCameraImage(ar_session_, ar_frame_, &ar_image);
+    if(ar_image == nullptr || status != AR_SUCCESS) {
+        LOGE("===Fail to get ndk image %d",status );
+        return false;
+    }
+
+    if(ndk_image_width == 0) {
+        ArImageFormat format;
+        int32_t num_plane = 0, stride = 0;
+
+        ArImage_getFormat(ar_session_, ar_image, &format);
+        if (format != AR_IMAGE_FORMAT_YUV_420_888) {
+            LOGE("===Format error: AR_IMAGE_FORMAT_YUV_420_888 needed ");
+            ArImage_release(ar_image);
+            return false;
+        }
+
+        ArImage_getWidth(ar_session_, ar_image, &ndk_image_width);
+        ArImage_getHeight(ar_session_, ar_image, &ndk_image_height);
+        ArImage_getNumberOfPlanes(ar_session_, ar_image, &num_plane);
+        ArImage_getPlaneRowStride(ar_session_, ar_image, 0, &stride);
+
+        if (ndk_image_width <= 0 || ndk_image_height <= 0 || num_plane <= 0 || stride <= 0) {
+            LOGE("===Fail to get ndk image");
+            ArImage_release(ar_image);
+            return false;
+        }
+    }
+
+    int32_t length = 0;
+    ArImage_getPlaneData(ar_session_, ar_image, 0, &m_gray_frame_data, &length);
+
+    cv::Mat gray_frame = cv::Mat(ndk_image_width, ndk_image_height, CV_8U, (void*)m_gray_frame_data);
+//    LOGE("========image %d, %d",gray_frame.cols, gray_frame.rows);
+    ArImage_release(ar_image);
+    return true;
 }

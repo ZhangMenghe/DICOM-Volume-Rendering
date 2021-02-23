@@ -21,6 +21,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL Android)
         EGL
         log)
     include_directories(${ARCORE_INCLUDE})
+    include_directories(${OPENCV_DIR}/jni/include)
 endif()
 
 SET(GL_PIPELINE_FILES

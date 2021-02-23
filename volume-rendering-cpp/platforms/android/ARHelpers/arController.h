@@ -9,7 +9,7 @@
 #include <platforms/android/Renderers/PlaneRenderer.h>
 #include <platforms/android/Renderers/lineRenderer.h>
 #include <platforms/android/Renderers/cutplaneRenderer.h>
-
+#include <opencv2/core.hpp>
 class arController:public nEntrance{
 public:
     static arController * instance();
@@ -82,6 +82,11 @@ private:
 //    ArAnchor* anchors_[MAX_TRACKED_ANCHORS];
     ArAnchor* last_anchor = nullptr;
 
+    //NDK Image
+    std::mutex frame_image_in_use_mutex_;
+    int ndk_image_width = 0, ndk_image_height = 0;
+    const uint8_t* m_gray_frame_data = nullptr;
+
     std::vector<glm::vec3> plane_vertices_;
     std::vector<GLushort> plane_triangles_;
     std::vector<tPlane> tracked_planes;
@@ -90,5 +95,6 @@ private:
     void update_plane_vertices(const ArPlane& ar_plane, glm::mat4& model_mat, glm::vec3& normal_vec);
     float get_dist_to_plane(const ArPose& plane_pose, const ArPose& camera_pose);
     glm::vec3 get_plane_norm(const ArPose& plane_pose);
+    bool update_ndk_image();
 };
 #endif
