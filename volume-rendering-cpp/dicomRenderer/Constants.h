@@ -115,10 +115,11 @@ namespace dvr{
 
     //SETTINGS
     static const ORGAN_IDS DEFAULT_TRAVERSAL_ORGAN = ORGAN_COLON;
+    static const bool AR_CAPTURE_FRAMES = false;
 
     //TRS
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);
-    const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f);
+    const glm::vec3 DEFAULT_SCALE = glm::vec3(0.1f);
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
 
     struct Rect{

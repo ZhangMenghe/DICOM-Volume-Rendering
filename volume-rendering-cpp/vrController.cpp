@@ -159,7 +159,8 @@ void vrController::onDrawScene(){
         RotateMat_ = Manager::camera->getRotationMatrixOfCameraDirection();
         updateVolumeModelMat();
     }
-    glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
+//    m_space_mat = glm::translate(glm::mat4(1.0), glm::vec3(.0,.0,-1.0));
+    glm::mat4 model_mat = m_space_mat* ModelMat_ * vol_dim_scale_mat_;
     bool cp_update = Manager::IsCuttingNeedUpdate();
     bool draw_finished =false;
     if(cp_update){
@@ -174,8 +175,8 @@ void vrController::onDrawScene(){
     }
     if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
         precompute();
-        if(isRayCasting())  raycastRenderer_->Draw(pre_draw_,model_mat);
-        else texvrRenderer_->Draw(pre_draw_);
+        if(isRayCasting())  raycastRenderer_->Draw(pre_draw_, model_mat);
+        else texvrRenderer_->Draw(pre_draw_, ModelMat_);
     }
 
     if(Manager::param_bool[dvr::CHECK_MASKON]){
@@ -305,9 +306,11 @@ void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
 }
 
 void vrController::updateVolumeModelMat(){
-    ModelMat_ =  glm::translate(glm::mat4(1.0), PosVec3_)
-                 * RotateMat_
-                 * glm::scale(glm::mat4(1.0), ScaleVec3_);
+    ModelMat_ =
+//            glm::translate(glm::mat4(1.0), PosVec3_)
+//                 * RotateMat_
+//                 *
+                 glm::scale(glm::mat4(1.0), ScaleVec3_);
 //    ModelMatInv_ = glm::inverse(ModelMat_ * raycastRenderer_->getDimScaleMat());
 }
 bool vrController::addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){

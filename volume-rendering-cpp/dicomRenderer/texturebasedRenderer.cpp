@@ -72,7 +72,7 @@ void texvrRenderer::update_instance_data(GLuint& vbo_instance, bool is_front){
 
     delete[]zInfos;
 }
-void texvrRenderer::draw_scene(){
+void texvrRenderer::draw_scene(glm::mat4 model_mat){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_CULL_FACE);
@@ -85,8 +85,9 @@ void texvrRenderer::draw_scene(){
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
-    glm::mat4 modelmat = vrController::instance()->getModelMatrix();
-    Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat() * Manager::camera->getViewMat() * modelmat);
+    Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat()
+    * Manager::camera->getViewMat()
+    * model_mat);
     Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     //for backface rendering! don't erase
@@ -112,13 +113,13 @@ void texvrRenderer::draw_scene(){
     glDisable(GL_CULL_FACE);
 }
 
-void texvrRenderer::Draw(bool pre_draw){
+void texvrRenderer::Draw(bool pre_draw, glm::mat4 model_mat){
     if(!b_init_successful) {init_vertices(vao_front,vbo_front,true);init_vertices(vao_back,vbo_back,false);}
-    if(pre_draw || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked();
-    else draw_scene();
+    if(pre_draw || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked(model_mat);
+    else draw_scene(model_mat);
 }
 
-void texvrRenderer::draw_baked() {
+void texvrRenderer::draw_baked(glm::mat4 model_mat) {
     if(!Manager::param_bool[dvr::CHECK_AR_ENABLED] && !baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     //render to texture
@@ -126,7 +127,7 @@ void texvrRenderer::draw_baked() {
     glViewport(0, 0, tsize.x, tsize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
     glClear(GL_DEPTH_BUFFER_BIT);
-    draw_scene();
+    draw_scene(model_mat);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
 }

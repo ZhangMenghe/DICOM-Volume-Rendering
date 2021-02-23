@@ -27,7 +27,7 @@ android {
                         "-DGLM_DIRECTORY=${project.rootDir}/thirdparty/glm-0.9.9.8/glm",
                         "-DARCORE_LIBPATH=${arcore_libpath}/jni",
                         "-DARCORE_INCLUDE=${project.rootDir}/thirdparty/arcore",
-                        "-DOPENCV_DIR=${project.rootDir}/thirdparty/opencv-4.5.0/sdk/native"
+                        "-DOPENCV_DIR=${project.rootDir}/thirdparty/opencv-4.3.0/sdk/native"
             }
         }
         ndk {

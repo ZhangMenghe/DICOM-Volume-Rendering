@@ -5,6 +5,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <Manager.h>
 #include <dicomRenderer/Constants.h>
+#include <platforms/android/Utils/assetLoader.h>
 
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
@@ -14,6 +15,7 @@ arController *arController::instance() {
 
 arController::arController(){
     _myPtr = this;
+    m_aruco_tracker = new ArucoMarkerTracker;
 }
 
 arController::~arController(){
@@ -469,16 +471,23 @@ void arController::onReset(){
 }
 
 void arController::onSingleTouchDown(float x, float y){
-    //perform raycast
-    stroke_renderer->setStartPoint(x,y);
-    Manager::show_ar_ray = true;
+    if(dvr::AR_CAPTURE_FRAMES){
+        if(assetLoader::instance()->saveDataToAndroidExternalStorage(m_gray_frame_data))
+            LOGE("=====WRITE SUCCESS %d", m_img_num++);
+        else
+            LOGE("=====WRITE FAILED");
+    }else{
+        //perform raycast
+        stroke_renderer->setStartPoint(x,y);
+        Manager::show_ar_ray = true;
+    }
 }
 void arController::onSingleTouchUp(){
     Manager::show_ar_ray = false;
     Manager::volume_ar_hold = false;
 }
 bool arController::update_ndk_image(){
-//    std::lock_guard<std::mutex> lock(frame_image_in_use_mutex_);
+    std::lock_guard<std::mutex> lock(frame_image_in_use_mutex_);
     ArImage * ar_image;
     ArStatus status = ArFrame_acquireCameraImage(ar_session_, ar_frame_, &ar_image);
     if(ar_image == nullptr || status != AR_SUCCESS) {
@@ -486,9 +495,9 @@ bool arController::update_ndk_image(){
         return false;
     }
 
-    if(ndk_image_width == 0) {
+    if(!initialized) {
         ArImageFormat format;
-        int32_t num_plane = 0, stride = 0;
+        int32_t ndk_image_width=0, ndk_image_height=0, num_plane = 0, stride = 0;
 
         ArImage_getFormat(ar_session_, ar_image, &format);
         if (format != AR_IMAGE_FORMAT_YUV_420_888) {
@@ -507,13 +516,14 @@ bool arController::update_ndk_image(){
             ArImage_release(ar_image);
             return false;
         }
+        m_aruco_tracker->setImageSize(ndk_image_width, ndk_image_height);
+        initialized = true;
     }
 
     int32_t length = 0;
     ArImage_getPlaneData(ar_session_, ar_image, 0, &m_gray_frame_data, &length);
 
-    cv::Mat gray_frame = cv::Mat(ndk_image_width, ndk_image_height, CV_8U, (void*)m_gray_frame_data);
-//    LOGE("========image %d, %d",gray_frame.cols, gray_frame.rows);
+    m_aruco_tracker->Update(m_gray_frame_data);
     ArImage_release(ar_image);
     return true;
 }

@@ -83,6 +83,46 @@ bool assetLoader::LoadPngFromAssetManager(int target, const std::string& path){
                               target, image_obj);
     return true;
 }
+bool assetLoader::saveDataToAndroidExternalStorage(const uint8_t* data){
+    JNIEnv* env = GetJniEnv();
+
+    // Put all the JNI values in a structure that is statically initalized on the
+    // first call to this method.  This makes it thread safe in the unlikely case
+    // of multiple threads calling this method.
+    static struct JNIData {
+        jclass helper_class;
+        jmethodID save_data_method;
+    } jniIds = [env]() -> JNIData {
+        constexpr char kHelperClassName[] =
+                "helmsley/vr/JNIInterface";
+        constexpr char kSaveMethodName[] = "saveCapturedData";
+        constexpr char kSaveMethodSignature[] =
+                "([B)V";
+        jclass helper_class = FindClass(kHelperClassName);
+        if (helper_class) {
+            helper_class = static_cast<jclass>(env->NewGlobalRef(helper_class));
+            jmethodID save_image_method = env->GetStaticMethodID(
+                    helper_class, kSaveMethodName, kSaveMethodSignature);
+            return {helper_class, save_image_method};
+        }
+        LOGE("====Could not find Java helper class %s", kHelperClassName);
+        return {};
+    }();
+
+    if (!jniIds.helper_class) {
+        return false;
+    }
+    int data_len = 480 * 640;
+    jbyteArray retArray;
+    retArray = env->NewByteArray(data_len);
+    void *temp = env->GetPrimitiveArrayCritical((jarray)retArray, 0);
+    memcpy(temp, data, data_len);
+    env->ReleasePrimitiveArrayCritical( retArray, temp, 0);
+
+    env->CallStaticVoidMethod(
+            jniIds.helper_class, jniIds.save_data_method, retArray);
+    return true;
+}
 bool assetLoader::LoadObjFile(const std::string& file_name,
                               std::vector<GLfloat>* out_vertices,
                               std::vector<GLfloat>* out_normals,

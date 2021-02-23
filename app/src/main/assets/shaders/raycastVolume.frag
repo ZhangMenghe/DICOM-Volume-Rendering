@@ -101,10 +101,13 @@ vec4 Volume(vec3 ro, vec3 rd, float head, float tail){
     }
     return vec4(sum.rgb, clamp(sum.a, 0.0, 1.0));
 }
-// void main(void){
-//    fragColor =  vec4(texture(uSampler, fs_in.TexCoords).xyz, 1.0);//vec4(fs_in.TexCoords,1.0);//vec4(.5, .5, .0, 1.0);
-// }
-void main(void){
+ void main(void){
+    fragColor =
+//    vec4(texture(uSampler, fs_in.TexCoords).xyz, 1.0);
+     vec4(fs_in.TexCoords,1.0);//vec4(.5, .5, .0, 1.0);
+ }
+
+void main_old(void){
     vec3 ro = uCamposObjSpace;
     vec3 rd = normalize(fs_in.raydir);
 

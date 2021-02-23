@@ -1,5 +1,6 @@
 package helmsley.vr;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -9,6 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 import helmsley.vr.Utils.CameraPermissionHelper;
+import helmsley.vr.Utils.fileUtils;
 
 public class MainActivity extends GLActivity
         implements DisplayManager.DisplayListener{
@@ -93,7 +95,7 @@ public class MainActivity extends GLActivity
     protected void checkPermissions(){
         String[] PERMISSIONS = {
                 android.Manifest.permission.READ_EXTERNAL_STORAGE,
-
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
         };
         for(String rpermission:PERMISSIONS){
             if(ActivityCompat.checkSelfPermission(this, rpermission) != PackageManager.PERMISSION_GRANTED) {
@@ -102,6 +104,7 @@ public class MainActivity extends GLActivity
             }
         }
         permission_granted = true;
+//        fileUtils.writeFileToExternalStorage();
     }
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults ){
         if(requestCode  == FILE_PERMISSION_CODE){

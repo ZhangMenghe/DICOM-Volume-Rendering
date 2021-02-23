@@ -13,6 +13,7 @@ SET(JNI_FILES
         )
 SET(AR_FILES
         ARHelpers/arController.cpp
+        ARHelpers/ArucoMarkerTracker.cpp
         )
 SET(RENDER_FILES
         Renderers/cutplaneRenderer.cpp

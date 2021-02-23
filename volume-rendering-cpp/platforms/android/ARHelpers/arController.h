@@ -10,6 +10,7 @@
 #include <platforms/android/Renderers/lineRenderer.h>
 #include <platforms/android/Renderers/cutplaneRenderer.h>
 #include <opencv2/core.hpp>
+#include "ArucoMarkerTracker.h"
 class arController:public nEntrance{
 public:
     static arController * instance();
@@ -64,6 +65,7 @@ private:
     lineRenderer* stroke_renderer = nullptr;
     cutplaneRenderer* cutplane_renderer = nullptr;
 
+    ArucoMarkerTracker* m_aruco_tracker;
     //ar camera
     float transformed_uvs_[8];
     bool uvs_initialized_ = false;
@@ -84,8 +86,10 @@ private:
 
     //NDK Image
     std::mutex frame_image_in_use_mutex_;
-    int ndk_image_width = 0, ndk_image_height = 0;
     const uint8_t* m_gray_frame_data = nullptr;
+    int m_img_num = 0;
+    bool initialized = false;
+    //
 
     std::vector<glm::vec3> plane_vertices_;
     std::vector<GLushort> plane_triangles_;

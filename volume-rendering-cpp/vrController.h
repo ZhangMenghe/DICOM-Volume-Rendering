@@ -57,6 +57,7 @@ public:
     bool addStatus(std::string name, bool use_current_status = false);
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setOverlayRects(int id, int width, int height, int left, int top);
+    void setPosition(glm::mat4 space_mat){m_space_mat = space_mat;}
 
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
@@ -111,6 +112,7 @@ private:
     //volume
     glm::vec3 vol_dimension_, vol_dim_scale_;
     glm::mat4 vol_dim_scale_mat_;
+    glm::mat4 m_space_mat;
 
     //ui
     glm::fvec2 Mouse_old;
@@ -128,7 +130,10 @@ private:
     //color scheme
     std::vector<float*> m_color_rgb = std::vector<float*>(5, nullptr);
     
-    static bool isRayCasting(){return Manager::param_bool[dvr::CHECK_RAYCAST];}
+    static bool isRayCasting(){
+        return true;
+//        return Manager::param_bool[dvr::CHECK_RAYCAST];
+    }
     void updateVolumeModelMat();
     void precompute();
     bool check_ar_ray_intersect();

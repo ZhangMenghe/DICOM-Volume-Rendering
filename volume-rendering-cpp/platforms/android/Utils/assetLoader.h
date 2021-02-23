@@ -44,6 +44,7 @@ public:
                      std::vector<GLfloat>* out_normals,
                      std::vector<GLfloat>* out_uv,
                      std::vector<GLushort>* out_indices);
+    bool saveDataToAndroidExternalStorage(const uint8_t* data);
 };
 
 #endif

@@ -11,6 +11,7 @@ import android.util.Log;
 import java.io.IOException;
 
 import helmsley.vr.DUIs.JUIInterface;
+import helmsley.vr.Utils.fileUtils;
 import helmsley.vr.proto.operateClient;
 
 public class JNIInterface {
@@ -50,5 +51,9 @@ public class JNIInterface {
 
     public static void loadTexture(int target, Bitmap bitmap) {
         GLUtils.texImage2D(target, 0, bitmap, 0);
+    }
+    public static void saveCapturedData(byte[] data){
+        if(MainActivity.permission_granted)
+            fileUtils.writeFileToExternalStorage(data);
     }
 }

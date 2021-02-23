@@ -25,8 +25,8 @@ private:
     //for screen baking
     bool baked_dirty_ = true;
     void init_vertices(GLuint &vao_slice, GLuint& vbo_instance,bool is_front);
-    void draw_scene();
-    void draw_baked();
+    void draw_scene(glm::mat4 model_mat);
+    void draw_baked(glm::mat4 model_mat);
     void update_instance_data(GLuint& vbo_instance,bool is_front);
 
 public:
@@ -34,7 +34,7 @@ public:
     void setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale);
     void setCuttingPlane(float percent);
     void setCuttingPlaneDelta(int delta);
-    void Draw(bool pre_draw);
+    void Draw(bool pre_draw, glm::mat4 model_mat);
     void dirtyPrecompute(){baked_dirty_ = true;}
     bool isPrecomputeDirty(){return baked_dirty_;}
 };

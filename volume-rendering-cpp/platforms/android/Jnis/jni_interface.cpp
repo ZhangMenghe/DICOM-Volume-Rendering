@@ -87,7 +87,7 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     m_sceneRenderer = std::make_unique<vrController>(m_manager);
     nativeAddr = getNativeClassAddr(m_sceneRenderer.get());
 
-    m_sceneRenderer->setPredrawOption(true);
+    m_sceneRenderer->setPredrawOption(false);
     setupShaderContents();
     return nativeAddr;
 }
@@ -173,7 +173,6 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
             camera_switch_dirty = false;
         }
         m_sceneRenderer->onDraw();
-//        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
     }
     else{
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -185,7 +184,7 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
         screenQuad::instance()->Clear();
         arController::instance()->onDraw();
 
-        if(arInitialized){
+        /*if(arInitialized){
             on_draw_native();
         }else{
             //update model mat of volume
@@ -196,7 +195,8 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
                 arInitialized = true;
                 on_draw_native();
             }
-        }
+        }*/
+        m_sceneRenderer->onDrawScene();
         screenQuad::instance()->Draw();
 //        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
     }
