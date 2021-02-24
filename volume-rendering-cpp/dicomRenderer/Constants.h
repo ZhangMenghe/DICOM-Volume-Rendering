@@ -119,7 +119,7 @@ namespace dvr{
 
     //TRS
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);
-    const glm::vec3 DEFAULT_SCALE = glm::vec3(0.1f);
+    const glm::vec3 DEFAULT_SCALE = glm::vec3(0.16f);
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
 
     struct Rect{

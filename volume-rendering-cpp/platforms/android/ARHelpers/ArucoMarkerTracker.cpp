@@ -8,6 +8,8 @@
 #include <vrController.h>
 //#include <glm/gtx/component_wise.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtx/quaternion.hpp>
+
 ArucoMarkerTracker::ArucoMarkerTracker(){
 //    m_cameraMatrix = (cv::Mat1d(3, 3) << 492.07322693, 0, 311.530553, 0, 492.19478694, 242.44158817, 0, 0, 1);
 //    m_distCoeffs = (cv::Mat1d(1, 5) << 3.23547400e-01,-1.47500321e+00,-1.40266246e-04,-1.34290186e-03,8.58477151e-01);
@@ -17,6 +19,47 @@ ArucoMarkerTracker::ArucoMarkerTracker(){
 void ArucoMarkerTracker::setImageSize(int width, int height){
 	m_img_width = width;
 	m_img_height= height;
+}
+glm::quat aa2quaternion(const cv::Matx31d& aa)
+{
+	double angle = norm(aa);
+	cv::Matx31d axis(aa(0) / angle, aa(1) / angle, aa(2) / angle);
+	double angle_2 = angle / 2;
+	//qx, qy, qz, qw
+	return glm::quat(axis(0) * sin(angle_2), -axis(1) * sin(angle_2), axis(2) * sin(angle_2), cos(angle_2));
+}
+glm::quat getQuaternion(cv::Vec3d& rodrigues1x3)
+{
+	double Q[4];
+	cv::Mat R;
+	cv::Rodrigues(rodrigues1x3, R);
+	double trace = R.at<double>(0,0) + R.at<double>(1,1) + R.at<double>(2,2);
+
+	if (trace > 0.0)
+	{
+		double s = sqrt(trace + 1.0);
+		Q[3] = (s * 0.5);
+		s = 0.5 / s;
+		Q[0] = ((R.at<double>(2,1) - R.at<double>(1,2)) * s);
+		Q[1] = ((R.at<double>(0,2) - R.at<double>(2,0)) * s);
+		Q[2] = ((R.at<double>(1,0) - R.at<double>(0,1)) * s);
+	}
+
+	else
+	{
+		int i = R.at<double>(0,0) < R.at<double>(1,1) ? (R.at<double>(1,1) < R.at<double>(2,2) ? 2 : 1) : (R.at<double>(0,0) < R.at<double>(2,2) ? 2 : 0);
+		int j = (i + 1) % 3;
+		int k = (i + 2) % 3;
+
+		double s = sqrt(R.at<double>(i, i) - R.at<double>(j,j) - R.at<double>(k,k) + 1.0);
+		Q[i] = s * 0.5;
+		s = 0.5 / s;
+
+		Q[3] = (R.at<double>(k,j) - R.at<double>(j,k)) * s;
+		Q[j] = (R.at<double>(j,i) + R.at<double>(i,j)) * s;
+		Q[k] = (R.at<double>(k,i) + R.at<double>(i,k)) * s;
+	}
+	return glm::quat(Q[3], Q[0], Q[1], Q[2]);
 }
 static glm::vec3 ToDirectionVectorGL(cv::Vec3d& rodrigues1x3) noexcept
 {
@@ -56,78 +99,22 @@ bool ArucoMarkerTracker::Update(const uint8_t* data){
 	// if at least one marker detected
 	cv::aruco::estimatePoseSingleMarkers(corners, 0.16, m_cameraMatrix, m_distCoeffs, m_rvecs, m_tvecs);
 	
-	cv::Mat R;
-//	Rodrigues(m_rvecs[0], R);
-
-	glm::mat4 rot_mat(1.0f);
-
-//	for (int row = 0; row < 3; row++) {
-//		for (int col = 0; col < 3; col++) {
-//			rot_mat[col][row] = (float)R.at<float>(row, col);
-//		}
-//	}
-
-//	auto test_vec = rot_mat * glm::vec4(.0,.0,-1.0,.0);
-//	float len = test_vec.length();
-	glm::vec3 a = glm::vec3(0,0,-1);
-	glm::vec3 b = -ToDirectionVectorGL(m_rvecs[0]); // in my case (1, 0, 0)
-	glm::vec3 v = glm::cross(b, a);
-	float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
-	glm::mat4 rotmat = glm::rotate(angle, v);
-
-	LOGE("===ori: %f, %f, %f", b.x, b.y, b.z);
-
+//	glm::vec3 a = glm::vec3(0,0,-1);
+//	glm::vec3 b = -ToDirectionVectorGL(m_rvecs[0]); // in my case (1, 0, 0)
+//	glm::vec3 v = glm::cross(b, a);
+//	float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
+//	glm::mat4 rotmat = glm::rotate(angle, v);
+//	auto q = aa2quaternion(m_rvecs[0]);
+//	glm::mat4 rotmat = glm::toMat4(q);
+//	LOGE("===ori: %f, %f, %f", b.x, b.y, b.z);
+	glm::quat q = getQuaternion(m_rvecs[0]);
+	q.y = -q.y;q.z = -q.z;
+	glm::mat4 rotmat = glm::toMat4(q);
 
 	auto tvec = m_tvecs[0];
-
 	glm::mat4 model_mat =
 			glm::translate(glm::mat4(1.0), glm::vec3(tvec[0], -tvec[1], -tvec[2]))
 			*rotmat;
-			//*rot_mat;
-
-	//opencv coordinates -> opengl coord, (x,y,z)->(x, -y, -z)
-	//glm is column major
-//	float* pSource = (float*)glm::value_ptr(model_mat);
-//	for (int i = 0; i < 16; i++)pSource[i] *= m_inverse_[i];
-
-
-//	model_mat = model_mat * rot_mat;
-
-	//Rotate the original image 90 degree clockwise(x,y,z)->(y, -x, z)
-//	float tmp = model_mat[3][0];
-//	model_mat[3][0] = model_mat[3][1];  model_mat[3][1] = -tmp;
-//	for (int row = 0; row < 3; row++) {
-//		for (int col = 0; col < 3; col++) {
-//			model_mat[row][col] = (float)R.at<float>(row, col);
-//		}
-//	}
-
-
-
-//	cv::Mat viewMatrixf = cv::Mat::zeros(4, 4, CV_32F);
-//
-//	for (unsigned int row = 0; row < 3; ++row)
-//	{
-//		for (unsigned int col = 0; col < 3; ++col)
-//		{
-//			viewMatrixf.at<float>(row, col) = (float)R.at<double>(row, col);
-//		}
-//		viewMatrixf.at<float>(row, 3) = (float)tvec[row];// *0.1f;
-//	}
-//	viewMatrixf.at<float>(3, 3) = 1.0f;
-//
-//	//反转Y、Z轴
-//	cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
-//	cvToGl.at<float>(0, 0) = 1.0f;
-//	cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis
-//	cvToGl.at<float>(2, 2) = -1.0f; // invert the z axis
-//	cvToGl.at<float>(3, 3) = 1.0f;
-//	viewMatrixf = cvToGl * viewMatrixf;
-////	cv::transpose(viewMatrixf, viewMatrixf);
-//
-//	glm::mat4 test_mat = glm::make_mat4(viewMatrixf.data);
-//	float ttmp = test_mat[3][0];
-//	test_mat[3][0] = test_mat[3][1];  test_mat[3][1] = -ttmp;
 
 	vrController::instance()->setPosition(model_mat);
 	return true;
