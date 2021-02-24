@@ -107,7 +107,7 @@ private:
     std::map<std::string, reservedStatus> rStates_;
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
-    bool pre_draw_ = true;
+    bool pre_draw_ = false;
 
     //volume
     glm::vec3 vol_dimension_, vol_dim_scale_;

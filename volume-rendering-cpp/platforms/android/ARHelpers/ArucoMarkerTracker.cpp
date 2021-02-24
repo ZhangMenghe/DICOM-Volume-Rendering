@@ -4,9 +4,7 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/calib3d.hpp>//Rodrigues
-//#include <glm/gtx/rotate_vector.hpp>
 #include <vrController.h>
-//#include <glm/gtx/component_wise.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
 
@@ -20,16 +18,8 @@ void ArucoMarkerTracker::setImageSize(int width, int height){
 	m_img_width = width;
 	m_img_height= height;
 }
-glm::quat aa2quaternion(const cv::Matx31d& aa)
-{
-	double angle = norm(aa);
-	cv::Matx31d axis(aa(0) / angle, aa(1) / angle, aa(2) / angle);
-	double angle_2 = angle / 2;
-	//qx, qy, qz, qw
-	return glm::quat(axis(0) * sin(angle_2), -axis(1) * sin(angle_2), axis(2) * sin(angle_2), cos(angle_2));
-}
-glm::quat getQuaternion(cv::Vec3d& rodrigues1x3)
-{
+
+glm::quat getQuaternion(cv::Vec3d& rodrigues1x3){
 	double Q[4];
 	cv::Mat R;
 	cv::Rodrigues(rodrigues1x3, R);
@@ -61,29 +51,6 @@ glm::quat getQuaternion(cv::Vec3d& rodrigues1x3)
 	}
 	return glm::quat(Q[3], Q[0], Q[1], Q[2]);
 }
-static glm::vec3 ToDirectionVectorGL(cv::Vec3d& rodrigues1x3) noexcept
-{
-	cv::Mat rotation3x3;
-	cv::Rodrigues(rodrigues1x3, rotation3x3);
-
-	// direction OUT of the screen in CV coordinate system, because we care
-	// about objects facing towards us - you can change this to anything
-	// OpenCV coordsys: +X is Right on the screen, +Y is Down on the screen,
-	//                  +Z is INTO the screen
-	cv::Vec3d axis{ 0, 0, -1 };
-	cv::Mat direction = rotation3x3 * cv::Mat(axis, false);
-
-	// normalize to a unit vector
-	double dirX = direction.at<double>(0);
-	double dirY = direction.at<double>(1);
-	double dirZ = direction.at<double>(2);
-	double len = sqrt(dirX*dirX + dirY*dirY + dirZ*dirZ);
-	dirX /= len;
-	dirY /= len;
-	dirZ /= len;
-	// Convert from OpenCV to OpenGL 3D coordinate system
-	return glm::vec3(float(dirX), float(-dirY), float(dirZ) );
-}
 bool ArucoMarkerTracker::Update(const uint8_t* data){
     cv::Mat gray_frame = cv::Mat(m_img_height, m_img_width, CV_8U, (void*)data);
 	cv::rotate(gray_frame, gray_frame, cv::ROTATE_90_CLOCKWISE);
@@ -98,15 +65,7 @@ bool ArucoMarkerTracker::Update(const uint8_t* data){
 
 	// if at least one marker detected
 	cv::aruco::estimatePoseSingleMarkers(corners, 0.16, m_cameraMatrix, m_distCoeffs, m_rvecs, m_tvecs);
-	
-//	glm::vec3 a = glm::vec3(0,0,-1);
-//	glm::vec3 b = -ToDirectionVectorGL(m_rvecs[0]); // in my case (1, 0, 0)
-//	glm::vec3 v = glm::cross(b, a);
-//	float angle = acos(glm::dot(b, a) / (glm::length(b) * glm::length(a)));
-//	glm::mat4 rotmat = glm::rotate(angle, v);
-//	auto q = aa2quaternion(m_rvecs[0]);
-//	glm::mat4 rotmat = glm::toMat4(q);
-//	LOGE("===ori: %f, %f, %f", b.x, b.y, b.z);
+
 	glm::quat q = getQuaternion(m_rvecs[0]);
 	q.y = -q.y;q.z = -q.z;
 	glm::mat4 rotmat = glm::toMat4(q);

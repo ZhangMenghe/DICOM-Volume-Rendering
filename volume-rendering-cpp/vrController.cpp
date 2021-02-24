@@ -307,11 +307,9 @@ void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
 
 void vrController::updateVolumeModelMat(){
     ModelMat_ =
-//            glm::translate(glm::mat4(1.0), PosVec3_)
-//                 * RotateMat_
-//                 *
-                 glm::scale(glm::mat4(1.0), ScaleVec3_);
-//    ModelMatInv_ = glm::inverse(ModelMat_ * raycastRenderer_->getDimScaleMat());
+            glm::translate(glm::mat4(1.0), PosVec3_)
+                 * RotateMat_
+                 * glm::scale(glm::mat4(1.0), ScaleVec3_);
 }
 bool vrController::addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){
     auto it = rStates_.find(name);
