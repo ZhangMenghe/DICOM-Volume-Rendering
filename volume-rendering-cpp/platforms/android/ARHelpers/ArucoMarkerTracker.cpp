@@ -71,10 +71,11 @@ bool ArucoMarkerTracker::Update(const uint8_t* data){
 	glm::mat4 rotmat = glm::toMat4(q);
 
 	auto tvec = m_tvecs[0];
-	glm::mat4 model_mat =
+	glm::mat4 view_mat =
 			glm::translate(glm::mat4(1.0), glm::vec3(tvec[0], -tvec[1], -tvec[2]))
-			*rotmat;
+			* rotmat;
 
-	vrController::instance()->setPosition(model_mat);
+//	vrController::instance()->setPosition(view_mat);
+	Manager::camera->setViewMat(view_mat, true);
 	return true;
 }

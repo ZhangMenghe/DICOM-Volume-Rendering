@@ -131,7 +131,7 @@ void arController::onDraw(){
     ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
     ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
     Manager::camera->setProjMat(proj_mat);
-    Manager::camera->setViewMat(view_mat);
+    if(!dvr::AR_USE_MARKER) Manager::camera->setViewMat(view_mat, false);
     glm::mat4 mVP = proj_mat * view_mat;
 
 
@@ -152,8 +152,6 @@ void arController::onDraw(){
 
     bg_render->dirtyPrecompute();
     bg_render->Draw(transformed_uvs_);
-
-
 
     if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) return;
 

@@ -86,7 +86,7 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
     Shader::Uniform(sp, "uMVP", Manager::camera->getProjMat()
-    * Manager::camera->getViewMat()
+    * Manager::camera->getViewMat(dvr::AR_USE_MARKER)
     * model_mat);
     Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 

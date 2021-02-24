@@ -8,6 +8,8 @@ class Camera{
     const char* name_;
 
     glm::mat4 _viewMat, _projMat;
+    glm::mat4 _viewMat_marker;
+
     glm::vec3 _eyePos, _center, _up, _front, _right;
 
     glm::mat4 pose_mat;
@@ -49,12 +51,14 @@ public:
         fov = FOV * (3.14f / 180.0f);
         _projMat = glm::perspective(fov, screen_ratio, NEAR_PLANE, FAR_PLANE);
     }
-    void setViewMat(glm::mat4 viewmat){_viewMat = viewmat;}
+    void setViewMat(glm::mat4 viewmat, bool ar_use_marker){
+        if(ar_use_marker) _viewMat_marker = viewmat;
+        else _viewMat = viewmat;
+    }
     void setProjMat(glm::mat4 projmat){
         fov =  2.0*atan( 1.0f/projmat[1][1] );
         _projMat = projmat;
     }
-
     void updateCameraPose(glm::mat4 pose) {
         //pose is in column major
         _eyePos = glm::vec3(pose[3][0], pose[3][1], pose[3][2]);
@@ -65,8 +69,8 @@ public:
     //getters
     float getFOV(){return fov;}
     glm::mat4 getProjMat(){return _projMat;}
-    glm::mat4 getViewMat(){return _viewMat;}
-    glm::mat4 getVPMat(){return _projMat * _viewMat;}
+    glm::mat4 getViewMat(bool ar_use_marker){return ar_use_marker?_viewMat_marker:_viewMat;}
+    glm::mat4 getVPMat(bool ar_use_marker){return ar_use_marker?_projMat * _viewMat_marker:_projMat * _viewMat;}
     glm::vec3 getCameraPosition(){return _eyePos;}
     glm::vec3 getViewCenter(){return _center;}
     glm::vec3 getViewDirection(){return _front;}

@@ -113,7 +113,7 @@ void cuttingController::draw_plane(){
         // Manager::shader_contents[dvr::SHADER_CPLANE_VERT] = "";Manager::shader_contents[dvr::SHADER_CPLANE_FRAG]="";
     }
     GLuint sp = pshader->Use();
-    Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat() * p_p2w_mat);
+    Shader::Uniform(sp,"uMVP", Manager::camera->getVPMat(dvr::AR_USE_MARKER) * p_p2w_mat);
     
     Shader::Uniform(sp,"uBaseColor", plane_color_);
     if (!pVAO_) {

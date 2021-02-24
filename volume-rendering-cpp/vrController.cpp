@@ -159,8 +159,7 @@ void vrController::onDrawScene(){
         RotateMat_ = Manager::camera->getRotationMatrixOfCameraDirection();
         updateVolumeModelMat();
     }
-//    m_space_mat = glm::translate(glm::mat4(1.0), glm::vec3(.0,.0,-1.0));
-    glm::mat4 model_mat = m_space_mat* ModelMat_ * vol_dim_scale_mat_;
+    glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
     bool cp_update = Manager::IsCuttingNeedUpdate();
     bool draw_finished =false;
     if(cp_update){

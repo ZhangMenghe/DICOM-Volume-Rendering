@@ -68,7 +68,7 @@ void organMeshRenderer::draw_scene(){
 
     GLuint dsp = shader_draw_->Use();
     Shader::Uniform(dsp, "uMVP",
-                    Manager::camera->getProjMat() * Manager::camera->getViewMat()
+                    Manager::camera->getProjMat() * Manager::camera->getViewMat(dvr::AR_USE_MARKER)
                     * vrController::instance()->getModelMatrix(true));
     Shader::Uniform(dsp, "uDrawWire", Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME]);
     
