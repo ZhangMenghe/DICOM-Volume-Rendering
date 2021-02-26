@@ -152,9 +152,10 @@ bool vrController::check_ar_ray_intersect(){
 }
 
 void vrController::onDrawScene(){
+    if(!tex_volume) return;
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(Manager::volume_ar_hold){
-        vec3 view_dir = glm::normalize(Manager::camera->getViewDirection(dvr::AR_USE_MARKER));
+        vec3 view_dir = glm::normalize(Manager::camera->getViewDirection());
         PosVec3_ = Manager::camera->getCameraPosition()+ view_dir;
         RotateMat_ = Manager::camera->getRotationMatrixOfCameraDirection();
         updateVolumeModelMat();
@@ -244,7 +245,6 @@ void vrController::onScale(float sx, float sy){
     if(Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]){
         cuttingController::instance()->onScale(sx);
     }else{
-        LOGE("====SCALE %f, %f", ScaleVec3_.x, sx);
         ScaleVec3_ = ScaleVec3_* sx;
         volume_model_dirty = true;
     }

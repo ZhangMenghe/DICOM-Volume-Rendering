@@ -199,6 +199,9 @@ void Manager::updateVolumeSetupUniforms(GLuint sp){
 
 }
 bool Manager::isRayCut(){return param_bool[dvr::CHECK_RAYCAST] && param_bool[dvr::CHECK_CUTTING];}
+bool Manager::isARWithMarker(){
+    return dvr::AR_USE_MARKER && param_bool[dvr::CHECK_AR_ENABLED];
+}
 bool Manager::IsCuttingNeedUpdate(){
     return param_bool[dvr::CHECK_CUTTING] || param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];
 }

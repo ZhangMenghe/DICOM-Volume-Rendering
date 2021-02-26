@@ -161,7 +161,7 @@ bool arController::onDrawARCoreBased(ArCamera*& camera){
     //update and render planes
     update_and_draw_planes();
 
-    auto mVP = Manager::camera->getVPMat(false);
+    auto mVP = Manager::camera->getVPMat();
     // Update and render point cloud.
     ArPointCloud* ar_point_cloud = nullptr;
     ArStatus point_cloud_status =
@@ -179,24 +179,10 @@ bool arController::onDrawARCoreBased(ArCamera*& camera){
 
         ArPointCloud_release(ar_point_cloud);
     }
-
-    ArPose* camera_pose = nullptr;
-    ArPose_create(ar_session_, nullptr, &camera_pose);
-    ArCamera_getDisplayOrientedPose(ar_session_, camera, camera_pose);
-    ArCamera_release(camera);
-    float camera_pose_raw[7] = {0.f};
-    ArPose_getPoseRaw(ar_session_, camera_pose, camera_pose_raw);
-//    Manager::camera->setCamPos(glm::vec3(camera_pose_raw[4], camera_pose_raw[5],camera_pose_raw[6]));
-
-    ArPose_getMatrix(ar_session_, camera_pose, glm::value_ptr(camera_pose_col_major_) );
-    Manager::camera->updateCameraPose(camera_pose_col_major_);//(glm::transpose(camera_pose_col_major_));
-
-    ArPose_destroy(camera_pose);
-
     //draw stroke
     stroke_renderer->Draw(mVP);
     //draw cutting plane
-    cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection(false));
+    cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection());
 
     return true;
 }
@@ -227,7 +213,7 @@ void arController::onDraw(){
     ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
     ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
     Manager::camera->setProjMat(proj_mat);
-    if(!dvr::AR_USE_MARKER) Manager::camera->setViewMat(view_mat, false);
+    if(!dvr::AR_USE_MARKER) Manager::camera->setViewMat(view_mat);
 
     //draw background
     int32_t geometry_changed = 0;

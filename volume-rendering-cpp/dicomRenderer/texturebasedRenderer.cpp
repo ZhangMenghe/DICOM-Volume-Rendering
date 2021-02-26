@@ -85,12 +85,12 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
-    Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat(dvr::AR_USE_MARKER) * model_mat);
+    Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat() * model_mat);
     Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     //for backface rendering! don't erase
     glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
-    glm::vec3 dir = Manager::camera->getViewDirection(dvr::AR_USE_MARKER);
+    glm::vec3 dir = Manager::camera->getViewDirection();
     float test = rotmat[2][2] * dir.z;
     if(test < 0){
         Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);

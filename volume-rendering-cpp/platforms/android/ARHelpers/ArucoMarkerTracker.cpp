@@ -11,6 +11,7 @@
 ArucoMarkerTracker::ArucoMarkerTracker(){
 //    m_cameraMatrix = (cv::Mat1d(3, 3) << 492.07322693, 0, 311.530553, 0, 492.19478694, 242.44158817, 0, 0, 1);
 //    m_distCoeffs = (cv::Mat1d(1, 5) << 3.23547400e-01,-1.47500321e+00,-1.40266246e-04,-1.34290186e-03,8.58477151e-01);
+    //samsung after rotation
     m_cameraMatrix = (cv::Mat1d(3, 3) << 492.1944152, 0, 236.55853355, 0, 492.07290321, 311.53035564, 0, 0, 1);
     m_distCoeffs = (cv::Mat1d(1, 5) << 3.23544718e-01, -1.47495319e+00, -1.34309892e-03,  1.40473255e-04,8.58269404e-01);
 }
@@ -75,7 +76,6 @@ bool ArucoMarkerTracker::Update(const uint8_t* data){
 			glm::translate(glm::mat4(1.0), glm::vec3(tvec[0], -tvec[1], -tvec[2]))
 			* rotmat;
 
-//	vrController::instance()->setPosition(view_mat);
-	Manager::camera->setViewMat(view_mat, true);
+	Manager::camera->setViewMat(view_mat);
 	return true;
 }

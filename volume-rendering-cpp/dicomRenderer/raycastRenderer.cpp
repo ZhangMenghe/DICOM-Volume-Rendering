@@ -33,8 +33,8 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
     glActiveTexture(GL_TEXTURE0 + dvr::BAKED_TEX_ID);
     glBindTexture(GL_TEXTURE_3D, vrController::instance()->getBakedTex());
     Shader::Uniform(sp, "uSampler", dvr::BAKED_TEX_ID);
-    Shader::Uniform(sp, "uVPMat", Manager::camera->getVPMat(dvr::AR_USE_MARKER));
-    //model_mat = Manager::camera->getViewMat(dvr::AR_USE_MARKER)*model_mat;
+    Shader::Uniform(sp, "uVPMat", Manager::camera->getVPMat());
+    //model_mat = Manager::camera->getViewMat()*model_mat;
     glm::mat4 model_inv = glm::inverse(model_mat);
 
     Shader::Uniform(sp, "uModelMat", model_mat);

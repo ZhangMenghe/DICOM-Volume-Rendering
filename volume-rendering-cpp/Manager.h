@@ -58,6 +58,7 @@ public:
     static bool IsCuttingNeedUpdate();
     static bool isRayCasting();
     static void setTraversalTargetId(int id);
+    static bool isARWithMarker();
 
     //Getters
     volumeSetupConstBuffer *getVolumeSetupConstData() { return &m_volset_data; }
