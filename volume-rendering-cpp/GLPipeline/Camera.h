@@ -73,7 +73,12 @@ public:
     glm::mat4 getVPMat(bool ar_use_marker){return ar_use_marker?_projMat * _viewMat_marker:_projMat * _viewMat;}
     glm::vec3 getCameraPosition(){return _eyePos;}
     glm::vec3 getViewCenter(){return _center;}
-    glm::vec3 getViewDirection(){return _front;}
+    glm::vec3 getViewDirection(bool ar_use_marker){
+        if(ar_use_marker){
+            return glm::vec3(_viewMat_marker * glm::vec4(.0,.0,-1.0,.0));
+        }
+        return _front;
+    }
     glm::vec3 getViewUpDirection(){return _up;}
     glm::mat4 getCameraPose(){return pose_mat;}
     glm::mat4 getRotationMatrixOfCameraDirection(){

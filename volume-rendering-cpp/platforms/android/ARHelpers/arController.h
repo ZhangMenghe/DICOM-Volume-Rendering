@@ -95,10 +95,11 @@ private:
     std::vector<GLushort> plane_triangles_;
     std::vector<tPlane> tracked_planes;
 
+    bool onDrawMarkerBased();
+    bool onDrawARCoreBased(ArCamera*& camera);
     void update_and_draw_planes();
     void update_plane_vertices(const ArPlane& ar_plane, glm::mat4& model_mat, glm::vec3& normal_vec);
     float get_dist_to_plane(const ArPose& plane_pose, const ArPose& camera_pose);
     glm::vec3 get_plane_norm(const ArPose& plane_pose);
-    bool update_ndk_image();
 };
 #endif

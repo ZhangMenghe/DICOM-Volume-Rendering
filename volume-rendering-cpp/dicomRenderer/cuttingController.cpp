@@ -22,7 +22,7 @@ cuttingController::cuttingController() {
 
 cuttingController::cuttingController(glm::mat4 model_mat) {
     mat4 vm_inv = transpose(inverse(model_mat));
-    update_plane_(vec3MatNorm(vm_inv, Manager::camera->getViewDirection()));
+    update_plane_(vec3MatNorm(vm_inv, Manager::camera->getViewDirection(dvr::AR_USE_MARKER)));
     update_plane_();
     _mptr = this;
 }
@@ -50,7 +50,7 @@ void cuttingController::update_plane_(){
 void cuttingController::Update(){
     auto model_mat = vrController::instance()->getModelMatrix(true);
     if(keep_cutting_position()){//keep it static
-        glm::vec3 vdir_w = Manager::camera->getViewDirection();
+        glm::vec3 vdir_w = Manager::camera->getViewDirection(dvr::AR_USE_MARKER);
         p_norm_ = vec3MatNorm(glm::inverse(model_mat), vdir_w);
         p_point_ += p_norm_ * cmove_value;
 

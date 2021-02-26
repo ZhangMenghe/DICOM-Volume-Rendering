@@ -6,6 +6,7 @@
 #include <Manager.h>
 #include <dicomRenderer/Constants.h>
 #include <platforms/android/Utils/assetLoader.h>
+#include <vrController.h>
 
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
@@ -104,60 +105,63 @@ void arController::onViewChange(int rot, int width, int height){
         ArSession_setDisplayGeometry(ar_session_, rot, width, height);
     }
 }
-void arController::onDraw(){
-    // Render the scene.
-//    glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
-//    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    if(ar_session_ == nullptr)
-        return;
-
-
-    if(!background_tex_initialized){
-        ArSession_setCameraTextureName(ar_session_, bg_render->GetTextureId());
-        background_tex_initialized = true;
-    }
-    // Update session to get current frame and render camera background.
-    if (ArSession_update(ar_session_, ar_frame_) != AR_SUCCESS) {
-        LOGE("OnDrawFrame ArSession_update error");
+bool arController::onDrawMarkerBased(){
+    std::lock_guard<std::mutex> lock(frame_image_in_use_mutex_);
+    ArImage * ar_image;
+    ArStatus status = ArFrame_acquireCameraImage(ar_session_, ar_frame_, &ar_image);
+    if(ar_image == nullptr || status != AR_SUCCESS) {
+        return false;
     }
 
-    ArCamera* camera;
-    ArFrame_acquireCamera(ar_session_, ar_frame_, &camera);
-    ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
-    ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
-    Manager::camera->setProjMat(proj_mat);
-    if(!dvr::AR_USE_MARKER) Manager::camera->setViewMat(view_mat, false);
-    glm::mat4 mVP = proj_mat * view_mat;
+    if(!initialized) {
+        ArImageFormat format;
+        int32_t ndk_image_width=0, ndk_image_height=0, num_plane = 0, stride = 0;
 
+        ArImage_getFormat(ar_session_, ar_image, &format);
+        if (format != AR_IMAGE_FORMAT_YUV_420_888) {
+            LOGE("===Format error: AR_IMAGE_FORMAT_YUV_420_888 needed ");
+            ArImage_release(ar_image);
+            return false;
+        }
 
-    // If the camera isn't tracking don't bother rendering other objects.
+        ArImage_getWidth(ar_session_, ar_image, &ndk_image_width);
+        ArImage_getHeight(ar_session_, ar_image, &ndk_image_height);
+        ArImage_getNumberOfPlanes(ar_session_, ar_image, &num_plane);
+        ArImage_getPlaneRowStride(ar_session_, ar_image, 0, &stride);
+
+        if (ndk_image_width <= 0 || ndk_image_height <= 0 || num_plane <= 0 || stride <= 0) {
+            LOGE("===Fail to get ndk image");
+            ArImage_release(ar_image);
+            return false;
+        }
+        m_aruco_tracker->setImageSize(ndk_image_width, ndk_image_height);
+        initialized = true;
+
+        vrController::instance()->setVolumeRST(
+                glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,1.0,.0))
+                *glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,.0,1.0)),
+                glm::vec3(0.16f),
+                glm::vec3(.0));
+    }
+
+    int32_t length = 0;
+    ArImage_getPlaneData(ar_session_, ar_image, 0, &m_gray_frame_data, &length);
+
+    m_aruco_tracker->Update(m_gray_frame_data);
+    ArImage_release(ar_image);
+    return true;
+}
+bool arController::onDrawARCoreBased(ArCamera*& camera){
+// If the camera isn't tracking don't bother rendering other objects.
     ArTrackingState camera_tracking_state;
     ArCamera_getTrackingState(ar_session_, camera, &camera_tracking_state);
 
-
-    //draw background
-    int32_t geometry_changed = 0;
-    ArFrame_getDisplayGeometryChanged(ar_session_, ar_frame_, &geometry_changed);
-    if (geometry_changed != 0 || !uvs_initialized_) {
-        ArFrame_transformCoordinates2d(ar_session_, ar_frame_,
-                                       AR_COORDINATES_2D_OPENGL_NORMALIZED_DEVICE_COORDINATES, kNumVertices, kVertices,
-                                       AR_COORDINATES_2D_TEXTURE_NORMALIZED, transformed_uvs_);
-        uvs_initialized_ = true;
-    }
-
-    bg_render->dirtyPrecompute();
-    bg_render->Draw(transformed_uvs_);
-
-    if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) return;
+    if (camera_tracking_state != AR_TRACKING_STATE_TRACKING) return false;
 
     //update and render planes
     update_and_draw_planes();
 
+    auto mVP = Manager::camera->getVPMat(false);
     // Update and render point cloud.
     ArPointCloud* ar_point_cloud = nullptr;
     ArStatus point_cloud_status =
@@ -192,8 +196,55 @@ void arController::onDraw(){
     //draw stroke
     stroke_renderer->Draw(mVP);
     //draw cutting plane
-    cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection());
-    update_ndk_image();
+    cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection(false));
+
+    return true;
+}
+void arController::onDraw(){
+    // Render the scene.
+//    glClearColor(0.9f, 0.9f, 0.9f, 1.0f);
+//    glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    if(ar_session_ == nullptr)
+        return;
+
+
+    if(!background_tex_initialized){
+        ArSession_setCameraTextureName(ar_session_, bg_render->GetTextureId());
+        background_tex_initialized = true;
+    }
+    // Update session to get current frame and render camera background.
+    if (ArSession_update(ar_session_, ar_frame_) != AR_SUCCESS) {
+        LOGE("OnDrawFrame ArSession_update error");
+    }
+
+    ArCamera* camera;
+    ArFrame_acquireCamera(ar_session_, ar_frame_, &camera);
+    ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
+    ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
+    Manager::camera->setProjMat(proj_mat);
+    if(!dvr::AR_USE_MARKER) Manager::camera->setViewMat(view_mat, false);
+
+    //draw background
+    int32_t geometry_changed = 0;
+    ArFrame_getDisplayGeometryChanged(ar_session_, ar_frame_, &geometry_changed);
+    if (geometry_changed != 0 || !uvs_initialized_) {
+        ArFrame_transformCoordinates2d(ar_session_, ar_frame_,
+                                       AR_COORDINATES_2D_OPENGL_NORMALIZED_DEVICE_COORDINATES, kNumVertices, kVertices,
+                                       AR_COORDINATES_2D_TEXTURE_NORMALIZED, transformed_uvs_);
+        uvs_initialized_ = true;
+    }
+
+    bg_render->dirtyPrecompute();
+    bg_render->Draw(transformed_uvs_);
+
+    if(dvr::AR_USE_MARKER) onDrawMarkerBased();
+    else onDrawARCoreBased(camera);
+
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -483,45 +534,4 @@ void arController::onSingleTouchDown(float x, float y){
 void arController::onSingleTouchUp(){
     Manager::show_ar_ray = false;
     Manager::volume_ar_hold = false;
-}
-bool arController::update_ndk_image(){
-    std::lock_guard<std::mutex> lock(frame_image_in_use_mutex_);
-    ArImage * ar_image;
-    ArStatus status = ArFrame_acquireCameraImage(ar_session_, ar_frame_, &ar_image);
-    if(ar_image == nullptr || status != AR_SUCCESS) {
-        LOGE("===Fail to get ndk image %d",status );
-        return false;
-    }
-
-    if(!initialized) {
-        ArImageFormat format;
-        int32_t ndk_image_width=0, ndk_image_height=0, num_plane = 0, stride = 0;
-
-        ArImage_getFormat(ar_session_, ar_image, &format);
-        if (format != AR_IMAGE_FORMAT_YUV_420_888) {
-            LOGE("===Format error: AR_IMAGE_FORMAT_YUV_420_888 needed ");
-            ArImage_release(ar_image);
-            return false;
-        }
-
-        ArImage_getWidth(ar_session_, ar_image, &ndk_image_width);
-        ArImage_getHeight(ar_session_, ar_image, &ndk_image_height);
-        ArImage_getNumberOfPlanes(ar_session_, ar_image, &num_plane);
-        ArImage_getPlaneRowStride(ar_session_, ar_image, 0, &stride);
-
-        if (ndk_image_width <= 0 || ndk_image_height <= 0 || num_plane <= 0 || stride <= 0) {
-            LOGE("===Fail to get ndk image");
-            ArImage_release(ar_image);
-            return false;
-        }
-        m_aruco_tracker->setImageSize(ndk_image_width, ndk_image_height);
-        initialized = true;
-    }
-
-    int32_t length = 0;
-    ArImage_getPlaneData(ar_session_, ar_image, 0, &m_gray_frame_data, &length);
-
-    m_aruco_tracker->Update(m_gray_frame_data);
-    ArImage_release(ar_image);
-    return true;
 }

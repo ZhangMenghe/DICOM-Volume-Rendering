@@ -129,8 +129,7 @@ private:
     std::vector<float*> m_color_rgb = std::vector<float*>(5, nullptr);
     
     static bool isRayCasting(){
-        return true;
-//        return Manager::param_bool[dvr::CHECK_RAYCAST];
+        return Manager::param_bool[dvr::CHECK_RAYCAST];
     }
     void updateVolumeModelMat();
     void precompute();

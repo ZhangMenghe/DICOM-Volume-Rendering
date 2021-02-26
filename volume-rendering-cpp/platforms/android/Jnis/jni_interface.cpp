@@ -150,7 +150,7 @@ void on_draw_native(){
         //intersect
         if(Manager::isRayCut()){
             if(res.x<res.y){
-            glm::vec3 pn = cam->getViewDirection();
+            glm::vec3 pn = cam->getViewDirection(dvr::AR_USE_MARKER);
             glm::vec3 pp = cam->getCameraPosition() + glm::normalize(pn)*0.5f;
 
             pp = glm::vec3(model_inv * glm::vec4(pp, 1.0f));
