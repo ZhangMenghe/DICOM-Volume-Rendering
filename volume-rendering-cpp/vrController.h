@@ -62,7 +62,6 @@ public:
     GLuint getBakedTex(){return tex_baked->GLTexture();}
     glm::mat4 getModelMatrix(bool dim_scaled = false){
         return dim_scaled?ModelMat_ * vol_dim_scale_mat_:ModelMat_;}
-    glm::mat4 getRotationMatrix(){return RotateMat_;}
     glm::vec3 getModelPos(){return PosVec3_;}
     float* getCurrentReservedStates();
     float* getCuttingPlane();
@@ -124,8 +123,11 @@ private:
     glm::vec4 ray_dir;
     bool ray_initialized = false;
 
-    //color scheme
-    std::vector<float*> m_color_rgb = std::vector<float*>(5, nullptr);
+    const float m_inverse_[16] = {
+            1.0, -1.0, -1.0, 1.0,
+            1.0,-1.0,-1.0,1.0,
+            1.0,-1.0,-1.0,1.0,
+            1.0, -1.0, -1.0, 1.0 };
     
     static bool isRayCasting(){
         return Manager::param_bool[dvr::CHECK_RAYCAST];

@@ -89,21 +89,18 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
     Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     //for backface rendering! don't erase
-    glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
     glm::vec3 dir = Manager::camera->getViewDirection();
-    float test = rotmat[2][2] * dir.z;
-    if(test < 0){
-        Shader::Uniform(sp, "u_cut_texz", 1.0f-dimension_inv * cut_id);
-        Shader::Uniform(sp, "u_front", true);
-        glFrontFace(GL_CCW);
-        glBindVertexArray(vao_front); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
+    bool is_front = (model_mat[2][2] * dir.z) < .0f;
+    Shader::Uniform(sp, "u_front", is_front);
+    Shader::Uniform(sp, "u_cut_texz", is_front?1.0f-dimension_inv * cut_id : dimension_inv * cut_id);
+
+    if(is_front){
+        glFrontFace(GL_CCW); glBindVertexArray(vao_front);
     }else{
-        Shader::Uniform(sp, "u_cut_texz", dimension_inv * cut_id);
-        Shader::Uniform(sp, "u_front", false);
-        glFrontFace(GL_CW);
-        glBindVertexArray(vao_back); glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
+        glFrontFace(GL_CW); glBindVertexArray(vao_back);
     }
 
+    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimensions);
     shader_->UnUse();
     glFrontFace(GL_CCW);
     glDisable(GL_BLEND);

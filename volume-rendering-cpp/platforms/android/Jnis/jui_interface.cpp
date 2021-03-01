@@ -25,7 +25,7 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
         auto jkey = (jstring) (env->GetObjectArrayElement(jkeys, i));
         keys.push_back(dvr::jstring2string(env,jkey));
         values.push_back(jvalue_arr[i]);
-        LOGE("======SET INIT %s, %d", keys.back().c_str(), values[i]);
+        LOGE("======SET INIT %s, %s", keys.back().c_str(), values[i]?"true":"false");
     }
     env->ReleaseBooleanArrayElements(jvalues,jvalue_arr,0);
 

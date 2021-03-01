@@ -312,6 +312,10 @@ void vrController::updateVolumeModelMat(){
             glm::translate(glm::mat4(1.0), PosVec3_)
                  * RotateMat_
                  * glm::scale(glm::mat4(1.0), ScaleVec3_);
+    if(Manager::isARWithMarker()){
+        float* pData = glm::value_ptr(ModelMat_);
+        for(int i=0;i<16;i++) pData[i]*=m_inverse_[i];
+    }
 }
 bool vrController::addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){
     auto it = rStates_.find(name);

@@ -50,8 +50,7 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
     vrController::instance()->setCuttingParams(sp);
 
     //for backface rendering! don't erase
-    glm::mat4 rotmat = vrController::instance()->getRotationMatrix();
-    if(rotmat[2][2] > 0) glFrontFace(GL_CCW);
+    if(model_mat[2][2] > 0) glFrontFace(GL_CCW);
     else glFrontFace(GL_CW);
     glBindVertexArray(vao_cube_);
     glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);

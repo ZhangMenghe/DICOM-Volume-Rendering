@@ -138,8 +138,9 @@ bool arController::onDrawMarkerBased(){
         initialized = true;
 
         vrController::instance()->setVolumeRST(
-                glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,1.0,.0))
-                *glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,.0,1.0)),
+                glm::mat4(1.0),
+//                glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,1.0,.0))
+//                *glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,.0,1.0)),
                 glm::vec3(0.16f),
                 glm::vec3(.0));
     }
