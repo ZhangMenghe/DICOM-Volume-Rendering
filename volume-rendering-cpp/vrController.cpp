@@ -172,20 +172,25 @@ void vrController::onDrawScene(){
             }
         }
     }
-    if(!Manager::param_bool[dvr::CHECK_MASKON] || Manager::param_bool[dvr::CHECK_VOLUME_ON]){
-        precompute();
+
+    precompute();
+
+    //volume
+    if(Manager::isDrawVolume()){
         if(isRayCasting())  raycastRenderer_->Draw(pre_draw_,model_mat);
         else texvrRenderer_->Draw(pre_draw_);
     }
 
-    if(Manager::param_bool[dvr::CHECK_MASKON]){
-        if(Manager::param_bool[dvr::CHECK_DRAW_POLYGON]) meshRenderer_->Draw(pre_draw_);
-        //draw centerline
-        if(Manager::param_bool[dvr::CHECK_CENTER_LINE]){
-            for(auto line:line_renderers_)
-                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(pre_draw_,model_mat);
-        }
+    //mesh
+    if(Manager::isDrawMesh()) meshRenderer_->Draw(pre_draw_);
+
+    //centerline
+    if(Manager::isDrawCenterLine()){
+        auto mask_bits = Manager::getMaskBits();
+        for(auto line:line_renderers_)
+            if((mask_bits>> (line.first+1)) & 1)line.second->onDraw(pre_draw_,model_mat);
     }
+
     if(cp_update&&!draw_finished)cutter_->Draw(pre_draw_);
 
     //data board

@@ -109,8 +109,8 @@ void organMeshRenderer::Draw(bool pre_draw) {
         glBindImageTexture(2, vrController::instance()->getVolumeTex(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     
         GLuint sp = shader_->Use();
-        Shader::Uniform(sp, "u_maskbits", vrController::instance()->mask_bits_);
-        Shader::Uniform(sp, "u_organ_num", vrController::instance()->mask_num_);
+        Shader::Uniform(sp, "u_maskbits", Manager::getMaskBits());
+        Shader::Uniform(sp, "u_organ_num", Manager::getMaskNum());
         Shader::Uniform(sp, "u_gridsize", volume_size);
 
         glDispatchCompute((GLuint)(volume_size.x + 7) / 8, (GLuint)(volume_size.y + 7) / 8, (GLuint)(volume_size.z + 7) / 8);

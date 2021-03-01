@@ -82,9 +82,6 @@ JUI_METHOD(void, JUIsetCuttingPlaneDeltaNative)(JNIEnv * env, jclass, jint id, j
 }
 JUI_METHOD(void, JUIsetMaskBitsNative)(JNIEnv * env, jclass, jint num, jint mbits){
     m_manager->setMask(num, mbits);
-//    m_sceneRenderer->mask_num_ = (unsigned int)num;
-//    m_sceneRenderer->mask_bits_ = (unsigned int)mbits;
-//    Manager::baked_dirty_ = true;
 }
 JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint id){
     m_manager->setColorScheme(id);

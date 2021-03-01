@@ -25,7 +25,7 @@ void ColorbarRenderer::Draw(){
     GLuint sp = m_compute_shader->Use();
     glBindImageTexture(0, m_cv_tex->GLTexture(), 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
-    auto vol_setup = Manager::instance()->getVolumeSetupConstData();
+    auto vol_setup = Manager::getVolumeSetupConstData();
     if(vol_setup->u_color_scheme > 0)
         Shader::Uniform(sp, "u_hex_color_scheme", 256, color_schemes_hex[vol_setup->u_color_scheme - 1]);
 
