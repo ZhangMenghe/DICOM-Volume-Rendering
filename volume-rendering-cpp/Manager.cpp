@@ -4,6 +4,7 @@
 #include <GLPipeline/Primitive.h>
 Camera* Manager::camera = nullptr;
 std::vector<bool> Manager::param_bool;
+volumeSetupConstBuffer Manager::m_volset_data;
 std::vector<std::string> Manager::shader_contents;
 bool Manager::baked_dirty_;
 bool Manager::new_data_available;
