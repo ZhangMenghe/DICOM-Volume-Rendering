@@ -59,16 +59,16 @@ public:
     static void setTraversalTargetId(int id);
 
     //Getters
-    volumeSetupConstBuffer *getVolumeSetupConstData() { return &m_volset_data; }
-    unsigned int getMaskBits() { return m_volset_data.u_maskbits; }
-    bool getCheck(dvr::PARAM_BOOL id) { return param_bool[id]; }
-    bool isDrawVolume() { return !param_bool[dvr::CHECK_MASKON] || param_bool[dvr::CHECK_VOLUME_ON]; }
-    bool isDrawCenterLine() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_CENTER_LINE]; }
-    bool isDrawMesh() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_DRAW_POLYGON]; }
+    static volumeSetupConstBuffer *getVolumeSetupConstData() { return &m_volset_data; }
+    static unsigned int getMaskBits() { return m_volset_data.u_maskbits; }
+    static unsigned int getMaskNum() { return m_volset_data.u_organ_num; }
+    static bool isDrawVolume() { return !param_bool[dvr::CHECK_MASKON] || param_bool[dvr::CHECK_VOLUME_ON]; }
+    static bool isDrawCenterLine() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_CENTER_LINE]; }
+    static bool isDrawMesh() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_DRAW_POLYGON]; }
+
     int getDirtyOpacityId() { return m_dirty_wid; }
     float *getDefaultWidgetPoints() { return default_widget_points_; }
     float *getDirtyWidgetPoints() { return dirty_widget_points_; }
-    int getColorScheme(){return m_volset_data.u_color_scheme;}
     std::vector<bool>* getOpacityWidgetVisibility(){return &widget_visibilities_;}
     const char* getColorSchemeKeyword(){
         return COLOR_SCHEMES[m_volset_data.u_color_scheme];
@@ -94,7 +94,7 @@ public:
 
 private:
     static Manager *myPtr_;
-    volumeSetupConstBuffer m_volset_data;
+    static volumeSetupConstBuffer m_volset_data;
 
     //contrast, brightness, etc
     float m_render_params[dvr::PARAM_RENDER_TUNE_END] = {.0f};

@@ -33,7 +33,7 @@ void dataBoard::onViewChange(int width, int height){
     m_screen_w = width; m_screen_h = height;
 }
 void dataBoard::onUpdate(Manager* manager){
-    volumeSetupConstBuffer* vol_setup = manager->getVolumeSetupConstData();
+    volumeSetupConstBuffer* vol_setup = Manager::getVolumeSetupConstData();
     if (vol_setup->u_widget_num == 0) {
         m_renderers[dvr::OVERLAY_GRAPH]->Clear();
     }else{

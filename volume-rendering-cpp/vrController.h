@@ -17,7 +17,6 @@
 
 class vrController:public nEntrance{
 public:
-    unsigned int mask_num_, mask_bits_;
     static vrController* instance();
     bool isDrawing(){return tex_volume!= nullptr;}
 
