@@ -184,7 +184,7 @@ void vrController::onDrawScene(){
         //draw centerline
         if(Manager::param_bool[dvr::CHECK_CENTER_LINE]){
             for(auto line:line_renderers_)
-                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(pre_draw_,model_mat);
+                if((mask_bits_>> (line.first+1)) & 1)line.second->onDraw(pre_draw_, model_mat);
         }
     }
     if(cp_update&&!draw_finished)cutter_->Draw(pre_draw_);
@@ -208,9 +208,6 @@ void vrController::onDraw() {
         onDrawScene();
     }
     screenQuad::instance()->Draw();
-//    //data board
-//    if(Manager::param_bool[dvr::CHECK_OVERLAY])
-//        data_board_->onDraw(false);
 }
 void vrController::onSingleTouchDown(float x, float y){
     Mouse_old = glm::fvec2(x, y);
