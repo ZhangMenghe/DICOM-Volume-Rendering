@@ -22,14 +22,14 @@ private:
     size_t buffer_size;
     size_t max_number_of_vertices;
     glm::vec3 volume_size;
-    void draw_scene();
-    void draw_baked();
+    void draw_scene(glm::mat4 model_mat);
+    void draw_baked(glm::mat4 model_mat);
 public:
     organMeshRenderer();
     ~organMeshRenderer();
 
     void Setup(int h, int w, int d);
-    void Draw(bool pre_draw);
+    void Draw(bool pre_draw, glm::mat4 model_mat);
     void dirtyPrecompute(){baked_dirty_ = true;}
     bool isPrecomputeDirty(){return baked_dirty_;}
 };

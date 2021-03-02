@@ -60,16 +60,14 @@ void organMeshRenderer::Setup(int h, int w, int d){
     }
     baked_dirty_=true;
 }
-void organMeshRenderer::draw_scene(){
+void organMeshRenderer::draw_scene(glm::mat4 model_mat){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
     GLuint dsp = shader_draw_->Use();
-    Shader::Uniform(dsp, "uMVP",
-                    Manager::camera->getProjMat() * Manager::camera->getViewMat()
-                    * vrController::instance()->getModelMatrix(true));
+    Shader::Uniform(dsp, "uMVP", Manager::camera->getVPMat() * model_mat);
     Shader::Uniform(dsp, "uDrawWire", Manager::param_bool[dvr::CHECK_POLYGON_WIREFRAME]);
     
     bool is_cut_enable = Manager::IsCuttingEnabled();
@@ -90,18 +88,18 @@ void organMeshRenderer::draw_scene(){
     glDisable(GL_BLEND);
     glDisable(GL_DEPTH_TEST);
 }
-void organMeshRenderer::draw_baked(){
-    if(!baked_dirty_) return;
+void organMeshRenderer::draw_baked(glm::mat4 model_mat){
+    if(!Manager::param_bool[dvr::CHECK_AR_ENABLED] && !baked_dirty_) return;
     if(!frame_buff_) Texture::initFBO(frame_buff_, screenQuad::instance()->getTex(), nullptr);
     glm::vec2 tsize = screenQuad::instance()->getTexSize();
     glViewport(0, 0, tsize.x, tsize.y);
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
     glClear(GL_DEPTH_BUFFER_BIT);
-    draw_scene();
+    draw_scene(model_mat);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
 }
-void organMeshRenderer::Draw(bool pre_draw) {
+void organMeshRenderer::Draw(bool pre_draw, glm::mat4 model_mat) {
     if(Manager::baked_dirty_){
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buffer_vertices);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, buffer_triangle_table);
@@ -118,6 +116,6 @@ void organMeshRenderer::Draw(bool pre_draw) {
         glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32UI);
         shader_->UnUse();
     }
-    if(pre_draw)draw_baked();
-    else draw_scene();
+    if(pre_draw || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked(model_mat);
+    else draw_scene(model_mat);
 }

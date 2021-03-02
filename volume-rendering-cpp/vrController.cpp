@@ -27,8 +27,6 @@ vrController::~vrController(){
 vrController::vrController(const std::shared_ptr<Manager> &manager)
 :m_manager(manager){
     onReset();
-    mesh_renders = std::vector<organMeshRenderer*>(dvr::ORGAN_END, nullptr);
-//    Manager::camera = new Camera;
     myPtr_ = this;
 }
 void vrController::onReset() {
@@ -183,13 +181,13 @@ void vrController::onDrawScene(){
     }
 
     //mesh
-    if(Manager::isDrawMesh()) meshRenderer_->Draw(pre_draw_);
+    if(Manager::isDrawMesh()) meshRenderer_->Draw(pre_draw_, model_mat);
 
     //centerline
     if(Manager::isDrawCenterLine()){
         auto mask_bits = Manager::getMaskBits();
         for(auto line:line_renderers_)
-            if((mask_bits>> (line.first+1)) & 1)line.second->onDraw(pre_draw_,model_mat);
+            if((mask_bits>> (line.first+1)) & 1)line.second->onDraw(pre_draw_, model_mat);
     }
 
     if(cp_update&&!draw_finished)cutter_->Draw(pre_draw_);

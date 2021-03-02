@@ -34,7 +34,7 @@ void centerLineRenderer::updateVertices(int point_num, const float * data){
     baked_dirty_ = true;
 }
 void centerLineRenderer::onDraw(bool pre_draw, glm::mat4 model_mat){
-    if(pre_draw) draw_baked(model_mat);
+    if(pre_draw || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked(model_mat);
     else draw_scene(model_mat);
 }
 void centerLineRenderer::draw_scene(glm::mat4 model_mat){   
