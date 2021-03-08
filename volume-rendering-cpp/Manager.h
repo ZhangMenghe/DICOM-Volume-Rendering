@@ -4,7 +4,7 @@
 #include <GLPipeline/Camera.h>
 #include <dicomRenderer/Constants.h>
 #include <platforms/platform.h>
-
+#include <unordered_map>
 struct volumeSetupConstBuffer{
     glm::vec3 u_tex_size;
 
@@ -33,6 +33,17 @@ struct volumeSetupConstBuffer{
     }
 };
 
+struct reservedStatus{
+    glm::mat4 rot_mat;//model_mat,
+    glm::vec3 scale_vec, pos_vec;
+    Camera vcam;
+//    reservedStatus(){}
+    reservedStatus(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
+        rot_mat=rm; scale_vec=sv; pos_vec=pv;
+    }
+    reservedStatus():rot_mat(dvr::DEFAULT_ROTATE), scale_vec(dvr::DEFAULT_SCALE), pos_vec(dvr::DEFAULT_POS){}
+};
+
 class Manager {
 public:
     static Manager *instance();
@@ -41,12 +52,25 @@ public:
     static std::vector<bool> param_bool;
     static std::vector<std::string> shader_contents;
 
-    static bool baked_dirty_;
+    static bool baked_dirty_, mvp_dirty_;
     static dvr::ORGAN_IDS traversal_target_id;
     static int screen_w, screen_h;
     static bool show_ar_ray, volume_ar_hold;
-    static bool isRayCut();
+    static bool isRayCut(){return param_bool[dvr::CHECK_RAYCAST] && param_bool[dvr::CHECK_CUTTING];}
     static bool new_data_available;
+
+    //static getters
+    static unsigned int getMaskBits() { return m_volset_data.u_maskbits; }
+    static unsigned int getMaskNum() { return m_volset_data.u_organ_num; }
+    static volumeSetupConstBuffer *getVolumeSetupConstData() { return &m_volset_data; }
+
+    static bool IsCuttingEnabled(){return param_bool[dvr::CHECK_CUTTING] ||(param_bool[dvr::CHECK_CENTER_LINE_TRAVEL] && param_bool[dvr::CHECK_TRAVERSAL_VIEW]);}
+    static bool IsCuttingNeedUpdate(){return param_bool[dvr::CHECK_CUTTING] || param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];}
+    static void setTraversalTargetId(int id){traversal_target_id = (id == 0) ? dvr::ORGAN_COLON : dvr::ORGAN_ILEUM;}
+    static bool isARWithMarker(){return dvr::AR_USE_MARKER && param_bool[dvr::CHECK_AR_ENABLED];}
+    static bool isDrawVolume() { return !param_bool[dvr::CHECK_MASKON] || param_bool[dvr::CHECK_VOLUME_ON]; }
+    static bool isDrawCenterLine() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_CENTER_LINE]; }
+    static bool isDrawMesh() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_DRAW_POLYGON]; }
 
     Manager();
     ~Manager();
@@ -54,20 +78,7 @@ public:
     void onViewChange(int w, int h);
     void InitCheckParams(std::vector<std::string> keys, std::vector<bool> values);
 
-    static bool IsCuttingEnabled();
-    static bool IsCuttingNeedUpdate();
-    static bool isRayCasting();
-    static void setTraversalTargetId(int id);
-    static bool isARWithMarker();
-
     //Getters
-    static volumeSetupConstBuffer *getVolumeSetupConstData() { return &m_volset_data; }
-    static unsigned int getMaskBits() { return m_volset_data.u_maskbits; }
-    static unsigned int getMaskNum() { return m_volset_data.u_organ_num; }
-    static bool isDrawVolume() { return !param_bool[dvr::CHECK_MASKON] || param_bool[dvr::CHECK_VOLUME_ON]; }
-    static bool isDrawCenterLine() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_CENTER_LINE]; }
-    static bool isDrawMesh() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_DRAW_POLYGON]; }
-
     int getDirtyOpacityId() { return m_dirty_wid; }
     float *getDefaultWidgetPoints() { return default_widget_points_; }
     float *getDirtyWidgetPoints() { return dirty_widget_points_; }
@@ -94,9 +105,17 @@ public:
     void resetDirtyOpacityId() { m_dirty_wid = -1; }
     void updateVolumeSetupUniforms(GLuint sp);
 
+    //mvp status
+    bool addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status);
+    bool addMVPStatus(std::string name, bool use_as_current_status);
+    bool setMVPStatus(std::string status_name);
+    void getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv);
+
 private:
     static Manager *myPtr_;
     static volumeSetupConstBuffer m_volset_data;
+
+    std::unordered_map<std::string, reservedStatus> m_mvp_status;
 
     //contrast, brightness, etc
     float m_render_params[dvr::PARAM_RENDER_TUNE_END] = {.0f};
@@ -110,6 +129,9 @@ private:
 
     //check names
     std::vector<std::string> param_checks;
+
+    //mvp status
+    std::string m_last_mvp_name, m_current_mvp_name;
 
     //color
     //color scheme

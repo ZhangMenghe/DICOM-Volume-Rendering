@@ -19,7 +19,6 @@
 namespace dvr{
     inline static JavaVM *g_vm = nullptr;
     inline jlong nativeAddr;
-    inline bool camera_switch_dirty;
 
     inline std::shared_ptr<Manager> m_manager;
     inline std::unique_ptr<vrController> m_sceneRenderer;

@@ -30,9 +30,7 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
     env->ReleaseBooleanArrayElements(jvalues,jvalue_arr,0);
 
     m_manager->InitCheckParams(keys, values);
-
-    m_sceneRenderer->addStatus("ARCam");
-    camera_switch_dirty = true;
+    m_manager->addMVPStatus("ARCam", false);
 }
 
 JUI_METHOD(void, JUIsetTuneWidgetByIdNative)(JNIEnv *, jclass, jint wid){
@@ -127,16 +125,17 @@ JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
             rot_mat[i][j] = vol_arr[id++];
         }
     }
+    Camera cam;
+    cam.Reset(                    glm::vec3(cam_arr[0], cam_arr[1], cam_arr[2]),
+                                  glm::vec3(cam_arr[3], cam_arr[4], cam_arr[5]),
+                                  glm::vec3(cam_arr[6], cam_arr[7], cam_arr[8])
+                                  );
     //unwrap pose information
     m_sceneRenderer->onReset(
             glm::vec3(vol_arr[0], vol_arr[1], vol_arr[2]),
             glm::vec3(vol_arr[3], vol_arr[4], vol_arr[5]),
             rot_mat,
-            new Camera(
-                    glm::vec3(cam_arr[0], cam_arr[1], cam_arr[2]),
-                    glm::vec3(cam_arr[3], cam_arr[4], cam_arr[5]),
-                    glm::vec3(cam_arr[6], cam_arr[7], cam_arr[8])
-            ));
+            &cam);
 
     env->ReleaseFloatArrayElements(jvol_pose, vol_arr, 0);
     env->ReleaseFloatArrayElements(jcam_pose, cam_arr, 0);

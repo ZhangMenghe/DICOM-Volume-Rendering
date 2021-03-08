@@ -168,19 +168,11 @@ void on_draw_native(){
 }
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
-        if(camera_switch_dirty){
-            m_sceneRenderer->setMVPStatus("template");
-            camera_switch_dirty = false;
-        }
         m_sceneRenderer->onDraw();
     }
     else{
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        if(camera_switch_dirty){
-            m_sceneRenderer->setMVPStatus("ARCam");
-            camera_switch_dirty = false;
-        }
         screenQuad::instance()->Clear();
         arController::instance()->onDraw();
 

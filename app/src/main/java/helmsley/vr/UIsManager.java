@@ -38,7 +38,7 @@ public class UIsManager {
             R.string.panel_ar_name
     };
     private final static float[]default_vol_pose={0,0,0,1,1,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
-    private final static float[]default_cam_pose={0,0,4.0f,0,1,0,0,0,2.0f};
+    private final static float[]default_cam_pose={0,0,4.0f,0,1,0,0,0,0.0f};
 
     UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);

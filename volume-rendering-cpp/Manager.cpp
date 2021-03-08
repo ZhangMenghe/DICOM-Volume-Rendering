@@ -6,7 +6,7 @@ Camera* Manager::camera = nullptr;
 std::vector<bool> Manager::param_bool;
 volumeSetupConstBuffer Manager::m_volset_data;
 std::vector<std::string> Manager::shader_contents;
-bool Manager::baked_dirty_;
+bool Manager::baked_dirty_, Manager::mvp_dirty_;
 bool Manager::new_data_available;
 dvr::ORGAN_IDS Manager::traversal_target_id;
 int Manager::screen_w, Manager::screen_h;
@@ -28,19 +28,24 @@ Manager::Manager(){
     myPtr_ = this;
 }
 Manager::~Manager(){
-    if(camera) delete camera;
     param_bool.clear();
     shader_contents.clear();
+
+    m_mvp_status.clear();
+    camera = nullptr;
 }
 
 void Manager::onReset(){
-    if(camera){delete camera; camera= nullptr;}
+    m_mvp_status.clear();
+    m_current_mvp_name.clear(); m_last_mvp_name.clear();
+
+    camera = nullptr;
     clear_opacity_widgets();
-    baked_dirty_ = true;
+    baked_dirty_ = true; mvp_dirty_=false;
     m_dirty_wid = -1;
 }
 void Manager::onViewChange(int w, int h){
-    camera->setProjMat(w, h);
+    for(auto& status: m_mvp_status) status.second.vcam.setProjMat(w, h);
     screen_w = w; screen_h = h;
 }
 void Manager::clear_opacity_widgets(){
@@ -108,6 +113,7 @@ void Manager::removeAllOpacityWidgets()
 {
     clear_opacity_widgets();
 }
+
 void Manager::setRenderParam(int id, float value)
 {
     m_render_params[id] = value;
@@ -133,9 +139,15 @@ void Manager::setRenderParam(float *values)
 void Manager::setCheck(std::string key, bool value){
     auto it = std::find(param_checks.begin(), param_checks.end(), key);
     if (it != param_checks.end()){
-        param_bool[it - param_checks.begin()] = value;
-        m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
-        m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
+        int pi = it - param_checks.begin();
+        param_bool[pi] = value;
+        if(pi == (int)dvr::CHECK_AR_ENABLED){
+            setMVPStatus(value? "ARCam":"template");
+            mvp_dirty_ = true;
+        }else{
+            m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
+            m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
+        }
         baked_dirty_ = true;
     }
 }
@@ -197,18 +209,41 @@ void Manager::updateVolumeSetupUniforms(GLuint sp){
     Shader::Uniform(sp, "u_contrast_high", m_volset_data.u_contrast_high);
     Shader::Uniform(sp, "u_brightness", m_volset_data.u_brightness);
     Shader::Uniform(sp, "u_base_value", m_volset_data.u_base_value);
+}
+bool Manager::addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status){
+    auto it = m_mvp_status.find(name);
+    if(it != m_mvp_status.end()) return false;
 
+    m_mvp_status[name] = reservedStatus(rm, sv, pv);
+    m_mvp_status[name].vcam.Reset(cam);
+    if(Manager::screen_w != 0)m_mvp_status[name].vcam.setProjMat(Manager::screen_w,Manager:: screen_h);
+    if(use_as_current_status) return setMVPStatus(name);
+    return true;
 }
-bool Manager::isRayCut(){return param_bool[dvr::CHECK_RAYCAST] && param_bool[dvr::CHECK_CUTTING];}
-bool Manager::isARWithMarker(){
-    return dvr::AR_USE_MARKER && param_bool[dvr::CHECK_AR_ENABLED];
+
+bool Manager::addMVPStatus(std::string name, bool use_as_current_status){
+    auto it = m_mvp_status.find(name);
+    if(it != m_mvp_status.end()) return false;
+
+    m_mvp_status[name] = reservedStatus();
+
+    if(screen_w != 0) m_mvp_status[name].vcam.setProjMat(Manager::screen_w, Manager::screen_h);
+    if(use_as_current_status) return setMVPStatus(name);
+    return true;
 }
-bool Manager::IsCuttingNeedUpdate(){
-    return param_bool[dvr::CHECK_CUTTING] || param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];
+bool Manager::setMVPStatus(std::string name){
+    if(name == m_current_mvp_name) return false;
+    camera = &m_mvp_status[name].vcam;
+    m_last_mvp_name = m_current_mvp_name; m_current_mvp_name = name;
+    LOGE("=====name %s", name.c_str());
+    return true;
 }
-bool Manager::IsCuttingEnabled(){
-    return param_bool[dvr::CHECK_CUTTING] ||(param_bool[dvr::CHECK_CENTER_LINE_TRAVEL] && param_bool[dvr::CHECK_TRAVERSAL_VIEW]);
-}
-void Manager::setTraversalTargetId(int id){
-    traversal_target_id = (id == 0) ? dvr::ORGAN_COLON : dvr::ORGAN_ILEUM;
+void Manager::getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv){
+    if(!m_last_mvp_name.empty() && m_mvp_status.find(m_last_mvp_name)!=m_mvp_status.end()){
+        m_mvp_status[m_last_mvp_name].rot_mat = rm; m_mvp_status[m_last_mvp_name].scale_vec = sv;m_mvp_status[m_last_mvp_name].pos_vec = pv;
+    }
+
+    auto rstate_ = m_mvp_status[m_current_mvp_name];
+    rm=rstate_.rot_mat; sv=rstate_.scale_vec; pv=rstate_.pos_vec;
+    mvp_dirty_ = false;
 }

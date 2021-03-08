@@ -22,33 +22,31 @@ vrController::~vrController(){
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
     if(tex_baked) delete tex_baked;
-    rStates_.clear();
 }
 vrController::vrController(const std::shared_ptr<Manager> &manager)
 :m_manager(manager){
-    onReset();
+//    onReset();
     myPtr_ = this;
 }
 void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
-    rStates_.clear();
-    cst_name = "";
-    addStatus("default_status");
-    setMVPStatus("default_status");
+    if(m_manager->addMVPStatus("default_status", true)){
+        m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
+        volume_model_dirty = true;
+    }
     if(cutter_) cutter_->onReset();
 }
 void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
     Mouse_old = glm::fvec2(.0f);
-    rStates_.clear();
-    cst_name = "";
-    glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
-                 * rm
-                 * glm::scale(glm::mat4(1.0), sv);
-    addStatus("template", mm, rm, sv, pv, cam);
-    setMVPStatus("template");
+//    glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
+//                 * rm
+//                 * glm::scale(glm::mat4(1.0), sv);
+    if(m_manager->addMVPStatus("template", rm, sv, pv, cam, true)){
+        m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
+        volume_model_dirty = true;
+    }
 
     if(cutter_) cutter_->onReset();
-    volume_model_dirty = false;
 }
 
 void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
@@ -151,6 +149,7 @@ bool vrController::check_ar_ray_intersect(){
 
 void vrController::onDrawScene(){
     if(!tex_volume) return;
+    if(Manager::mvp_dirty_){m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_); volume_model_dirty=true;}
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(Manager::volume_ar_hold){
         vec3 view_dir = glm::normalize(Manager::camera->getViewDirection());
@@ -315,37 +314,9 @@ void vrController::updateVolumeModelMat(){
         for(int i=0;i<16;i++) pData[i]*=m_inverse_[i];
     }
 }
-bool vrController::addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){
-    auto it = rStates_.find(name);
-    if(it != rStates_.end()) return false;
 
-    rStates_[name] = reservedStatus(mm, rm, sv, pv, cam);
-    if(Manager::screen_w != 0)rStates_[name].vcam->setProjMat(Manager::screen_w,Manager:: screen_h);
-    return true;
-}
 
-bool vrController::addStatus(std::string name, bool use_current_status){
-    auto it = rStates_.find(name);
-    if(it != rStates_.end()) return false;
 
-    if(use_current_status){
-        if(volume_model_dirty){
-            updateVolumeModelMat();
-            volume_model_dirty = false;
-        }
-        rStates_[name] = reservedStatus(ModelMat_, RotateMat_, ScaleVec3_, PosVec3_, new Camera(name.c_str()));
-    }else rStates_[name] = reservedStatus();
-    if(Manager::screen_w != 0)rStates_[name].vcam->setProjMat(Manager::screen_w, Manager::screen_h);
-    return true;
-}
-
-void vrController::setMVPStatus(std::string name){
-    if(name == cst_name) return;
-    auto rstate_ = rStates_[name];
-    ModelMat_= rstate_.model_mat; RotateMat_=rstate_.rot_mat; ScaleVec3_=rstate_.scale_vec; PosVec3_=rstate_.pos_vec; Manager::camera=rstate_.vcam;
-    volume_model_dirty = false;
-    cst_name = name;
-}
 void vrController::setCuttingPlane(float value){
     if(Manager::param_bool[dvr::CHECK_CUTTING] && !isRayCasting()) {
         cutter_->setCutPlane(value);

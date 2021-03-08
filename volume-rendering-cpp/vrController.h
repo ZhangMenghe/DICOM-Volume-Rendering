@@ -11,7 +11,6 @@
 #include "nEntrance.h"
 #include "dicomRenderer/Constants.h"
 #include "Manager.h"
-#include <unordered_map>
 #include <map>
 #include <dicomRenderer/dataVisualizer.h>
 
@@ -45,15 +44,12 @@ public:
     //setter funcs
     void setPredrawOption(bool pre_draw){pre_draw_=pre_draw;}
     static void setShaderContents(dvr::SHADER_FILES fid, std::string content);
-    void setMVPStatus(std::string status_name);
     void setCuttingPlane(float value);
     void setCuttingPlane(int id, int delta);
     void setCuttingPlane(glm::vec3 pp, glm::vec3 pn);
     void setCuttingParams(GLuint sp);
     void setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv);
     void setVolumePosition(glm::vec3 pv){PosVec3_ = pv;volume_model_dirty=true;}
-    bool addStatus(std::string name, glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam);
-    bool addStatus(std::string name, bool use_current_status = false);
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setOverlayRects(int id, int width, int height, int left, int top);
 
@@ -87,21 +83,6 @@ private:
     //Textures
     Texture *tex_volume = nullptr, *tex_baked = nullptr;
 
-    struct reservedStatus{
-        glm::mat4 model_mat, rot_mat;
-        glm::vec3 scale_vec, pos_vec;
-        Camera* vcam;
-        reservedStatus(glm::mat4 mm, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam){
-            model_mat=mm; rot_mat=rm; scale_vec=sv; pos_vec=pv; vcam=cam;
-        }
-        reservedStatus():rot_mat(dvr::DEFAULT_ROTATE), scale_vec(dvr::DEFAULT_SCALE), pos_vec(dvr::DEFAULT_POS), vcam(new Camera){
-            model_mat =  glm::translate(glm::mat4(1.0), pos_vec)
-                         * rot_mat
-                         * glm::scale(glm::mat4(1.0), scale_vec);
-        }
-    };
-    std::string cst_name;
-    std::map<std::string, reservedStatus> rStates_;
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
     bool pre_draw_ = false;

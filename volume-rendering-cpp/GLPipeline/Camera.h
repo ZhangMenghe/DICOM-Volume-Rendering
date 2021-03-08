@@ -14,20 +14,14 @@ class Camera{
 
     float fov;
 
-    const float DEFAULT_NEAR_PLANE = 1.8f;
-    const float DEFAULT_FAR_PLANE = 1000.0f;
-    const float DEFAULT_FOV = 45.0f;
-    const glm::vec3 DEFAULT_CAM_POS = glm::vec3(0.0f, .0f, 4.f);
-    const glm::vec3 DEFAULT_CAM_UP = glm::vec3(0.0f, 1.0f, 0.0f);
-    const glm::vec3 DEFAULT_VIEW_CENTER = glm::vec3(0.0f);
+    float DEFAULT_NEAR_PLANE = 1.8f;
+    float DEFAULT_FAR_PLANE = 1000.0f;
+    float DEFAULT_FOV = 45.0f;
+    glm::vec3 DEFAULT_CAM_POS = glm::vec3(0.0f, .0f, 4.f);
+    glm::vec3 DEFAULT_CAM_UP = glm::vec3(0.0f, 1.0f, 0.0f);
+    glm::vec3 DEFAULT_VIEW_CENTER = glm::vec3(0.0f);
 
-    void reset(glm::vec3 pos, glm::vec3 up, glm::vec3 center){
-        _up = up;
-        _eyePos = pos;
-        _center = center;
-        _front = _center - _eyePos;
-        _viewMat = glm::lookAt(pos, center, up);
-    }
+
     void update_cam_pose() {
         poseMat_ = glm::inverse(_viewMat);
         _eyePos = glm::vec3(poseMat_[3][0], poseMat_[3][1], poseMat_[3][2]);
@@ -35,14 +29,25 @@ class Camera{
     }
 public:
     Camera(){
-        reset(DEFAULT_CAM_POS, DEFAULT_CAM_UP, DEFAULT_VIEW_CENTER);
+        Reset(DEFAULT_CAM_POS, DEFAULT_CAM_UP, DEFAULT_VIEW_CENTER);
     }
-    Camera(const char* cam_name)
-    :name_(cam_name){
-        reset(DEFAULT_CAM_POS, DEFAULT_CAM_UP, DEFAULT_VIEW_CENTER);
+//    Camera(const char* cam_name)
+//    :name_(cam_name){
+//        reset(DEFAULT_CAM_POS, DEFAULT_CAM_UP, DEFAULT_VIEW_CENTER);
+//    }
+//    Camera(const char* cam_name, glm::vec3 pos, glm::vec3 up, glm::vec3 center)
+//    :name_(cam_name){
+//        reset(pos, up, center);
+//    }
+    void Reset(Camera* cam){
+        Reset(cam->_eyePos, cam->_up, cam->_center);
     }
-    Camera(glm::vec3 pos, glm::vec3 up, glm::vec3 center){
-        reset(pos, up, center);
+    void Reset(glm::vec3 pos, glm::vec3 up, glm::vec3 center){
+        _up = up;
+        _eyePos = pos;
+        _center = center;
+        _front = _center - _eyePos;
+        _viewMat = glm::lookAt(pos, center, up);
     }
 
     //setters
