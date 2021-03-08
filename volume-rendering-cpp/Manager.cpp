@@ -41,7 +41,7 @@ void Manager::onReset(){
 
     camera = nullptr;
     clear_opacity_widgets();
-    baked_dirty_ = true; mvp_dirty_=false;
+    baked_dirty_ = true; mvp_dirty_ = false; m_mvp_ar_dirty=false;
     m_dirty_wid = -1;
 }
 void Manager::onViewChange(int w, int h){
@@ -144,7 +144,11 @@ void Manager::setCheck(std::string key, bool value){
         if(pi == (int)dvr::CHECK_AR_ENABLED){
             setMVPStatus(value? "ARCam":"template");
             mvp_dirty_ = true;
-        }else{
+        }else if(pi == (int)dvr::CHECK_AR_USE_ARCORE){
+            mvp_dirty_ = true;
+            m_mvp_ar_dirty = true;
+        }
+        else{
             m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
             m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
         }
@@ -235,15 +239,19 @@ bool Manager::setMVPStatus(std::string name){
     if(name == m_current_mvp_name) return false;
     camera = &m_mvp_status[name].vcam;
     m_last_mvp_name = m_current_mvp_name; m_current_mvp_name = name;
-    LOGE("=====name %s", name.c_str());
+//    LOGE("=====name %s", name.c_str());
     return true;
 }
 void Manager::getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv){
-    if(!m_last_mvp_name.empty() && m_mvp_status.find(m_last_mvp_name)!=m_mvp_status.end()){
-        m_mvp_status[m_last_mvp_name].rot_mat = rm; m_mvp_status[m_last_mvp_name].scale_vec = sv;m_mvp_status[m_last_mvp_name].pos_vec = pv;
+    if(m_mvp_ar_dirty){
+        rm = dvr::DEFAULT_ROTATE_AR; sv = dvr::DEFAULT_SCALE_AR; pv = dvr::DEFAULT_POS_AR;
+        m_mvp_ar_dirty = false;
+    }else{
+        if(!m_last_mvp_name.empty() && m_mvp_status.find(m_last_mvp_name)!=m_mvp_status.end()){
+            m_mvp_status[m_last_mvp_name].rot_mat = rm; m_mvp_status[m_last_mvp_name].scale_vec = sv;m_mvp_status[m_last_mvp_name].pos_vec = pv;
+        }
+        auto rstate_ = m_mvp_status[m_current_mvp_name];
+        rm=rstate_.rot_mat; sv=rstate_.scale_vec; pv=rstate_.pos_vec;
     }
-
-    auto rstate_ = m_mvp_status[m_current_mvp_name];
-    rm=rstate_.rot_mat; sv=rstate_.scale_vec; pv=rstate_.pos_vec;
     mvp_dirty_ = false;
 }

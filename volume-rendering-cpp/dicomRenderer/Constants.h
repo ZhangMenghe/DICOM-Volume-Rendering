@@ -19,8 +19,10 @@ namespace dvr{
         CHECK_POLYGON_WIREFRAME,
         CHECK_CENTER_LINE,
         CHECK_AR_ENABLED,
+        CHECK_AR_USE_ARCORE,
         CHECK_AR_DRAW_POINT,
         CHECK_AR_DRAW_PLANE,
+        CHECK_AR_3D_POINTER
     };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
@@ -116,13 +118,16 @@ namespace dvr{
     //SETTINGS
     static const ORGAN_IDS DEFAULT_TRAVERSAL_ORGAN = ORGAN_COLON;
     static const bool AR_CAPTURE_FRAMES = false;
-//    todo:make it a parameter
-    static bool AR_USE_MARKER = true;
 
     //TRS
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f);
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
+
+    //TRS AR
+    const glm::mat4 DEFAULT_ROTATE_AR = glm::mat4(1.0f);
+    const glm::vec3 DEFAULT_SCALE_AR = glm::vec3(0.16f);
+    const glm::vec3 DEFAULT_POS_AR = glm::vec3(.0f);
 
     struct Rect{
         float width;float height;

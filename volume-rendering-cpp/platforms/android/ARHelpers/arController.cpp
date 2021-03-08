@@ -137,12 +137,7 @@ bool arController::onDrawMarkerBased(){
         m_aruco_tracker->setImageSize(ndk_image_width, ndk_image_height);
         initialized = true;
 
-        vrController::instance()->setVolumeRST(
-                glm::mat4(1.0),
-//                glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,1.0,.0))
-//                *glm::rotate(glm::mat4(1.0f), 3.1415926535f, glm::vec3(.0,.0,1.0)),
-                glm::vec3(0.16f),
-                glm::vec3(.0));
+        vrController::instance()->setVolumeRST(dvr::DEFAULT_ROTATE_AR, dvr::DEFAULT_SCALE_AR, dvr::DEFAULT_POS_AR);
     }
 
     int32_t length = 0;
@@ -150,6 +145,7 @@ bool arController::onDrawMarkerBased(){
 
     m_aruco_tracker->Update(m_gray_frame_data);
     ArImage_release(ar_image);
+    m_lasttime_arcore = false;
     return true;
 }
 bool arController::onDrawARCoreBased(ArCamera*& camera){
@@ -161,6 +157,8 @@ bool arController::onDrawARCoreBased(ArCamera*& camera){
 
     //update and render planes
     update_and_draw_planes();
+    if(!m_lasttime_arcore && !tracked_planes.empty())
+        vrController::instance()->setVolumeRST(tracked_planes[0].rotMat, glm::vec3(0.2f), tracked_planes[0].centerVec);
 
     auto mVP = Manager::camera->getVPMat();
     // Update and render point cloud.
@@ -184,7 +182,7 @@ bool arController::onDrawARCoreBased(ArCamera*& camera){
     stroke_renderer->Draw(mVP);
     //draw cutting plane
     cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection());
-
+    m_lasttime_arcore = true;
     return true;
 }
 void arController::onDraw(){
@@ -214,7 +212,7 @@ void arController::onDraw(){
     ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
     ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
     Manager::camera->setProjMat(proj_mat);
-    if(!dvr::AR_USE_MARKER) Manager::camera->setViewMat(view_mat);
+    if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE]) Manager::camera->setViewMat(view_mat);
 
     //draw background
     int32_t geometry_changed = 0;
@@ -229,8 +227,8 @@ void arController::onDraw(){
     bg_render->dirtyPrecompute();
     bg_render->Draw(transformed_uvs_);
 
-    if(dvr::AR_USE_MARKER) onDrawMarkerBased();
-    else onDrawARCoreBased(camera);
+    if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE]) onDrawARCoreBased(camera);
+    else onDrawMarkerBased();
 
     glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
@@ -394,7 +392,7 @@ float arController::get_dist_to_plane(const ArPose& plane_pose, const ArPose& ca
 }
 
 bool arController::onLongPress(float x, float y){
-    if (ar_frame_ == nullptr || ar_session_ == nullptr) return false;
+    if (!Manager::param_bool[dvr::CHECK_AR_USE_ARCORE] || ar_frame_ == nullptr || ar_session_ == nullptr) return false;
 
     ArHitResultList* hit_result_list = nullptr;
     ArHitResultList_create(ar_session_, &hit_result_list);

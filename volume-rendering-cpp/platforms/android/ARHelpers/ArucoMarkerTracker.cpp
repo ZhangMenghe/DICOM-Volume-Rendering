@@ -4,9 +4,9 @@
 #include <opencv2/aruco.hpp>
 #include <opencv2/core/mat.hpp>
 #include <opencv2/calib3d.hpp>//Rodrigues
-#include <vrController.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <Manager.h>
 
 ArucoMarkerTracker::ArucoMarkerTracker(){
 //    m_cameraMatrix = (cv::Mat1d(3, 3) << 492.07322693, 0, 311.530553, 0, 492.19478694, 242.44158817, 0, 0, 1);

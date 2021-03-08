@@ -89,7 +89,7 @@ private:
     const uint8_t* m_gray_frame_data = nullptr;
     int m_img_num = 0;
     bool initialized = false;
-    //
+    bool m_lasttime_arcore;
 
     std::vector<glm::vec3> plane_vertices_;
     std::vector<GLushort> plane_triangles_;

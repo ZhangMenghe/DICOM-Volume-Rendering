@@ -124,7 +124,7 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
 }
 
 void on_draw_native(){
-    if(Manager::show_ar_ray && !Manager::volume_ar_hold){
+    if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE] && Manager::show_ar_ray && !Manager::volume_ar_hold){
         //check ar ray intersect
         Camera* cam = Manager::camera;
         glm::mat4 model_inv = glm::inverse(m_sceneRenderer->getModelMatrix(true));
@@ -169,28 +169,16 @@ void on_draw_native(){
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
         m_sceneRenderer->onDraw();
-    }
-    else{
+    }else{
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-        screenQuad::instance()->Clear();
-        arController::instance()->onDraw();
 
-        /*if(arInitialized){
-            on_draw_native();
-        }else{
-            //update model mat of volume
-            auto tplanes = arController::instance()->getTrackedPlanes();
-            if(!tplanes.empty()){
-                m_sceneRenderer->setVolumeRST(tplanes[0].rotMat, glm::vec3(0.2f), tplanes[0].centerVec);
-                m_sceneRenderer->setMVPStatus("ARCam");
-                arInitialized = true;
-                on_draw_native();
-            }
-        }*/
-        m_sceneRenderer->onDrawScene();
+        screenQuad::instance()->Clear();
+
+        arController::instance()->onDraw();
+        on_draw_native();
+
         screenQuad::instance()->Draw();
-//        if(m_sceneRenderer->isDrawing())overlayController::instance()->onDraw();
     }
 }
 

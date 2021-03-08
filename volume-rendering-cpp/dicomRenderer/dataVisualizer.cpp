@@ -60,6 +60,7 @@ void dataBoard::onUpdate(Manager* manager){
 void dataBoard::onDraw(bool pre_draw){
     if(!m_overlay_rect_set) return;
     if(pre_draw) draw_baked();
+    if(pre_draw || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked();
     else draw_scene();
 }
 void dataBoard::draw_scene(){

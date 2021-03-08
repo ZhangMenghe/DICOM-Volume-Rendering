@@ -33,7 +33,7 @@ import helmsley.vr.UIsManager;
 public class arUIs extends BasePanel{
     private static WeakReference<arUIs> selfRef;
     private Spinner spinner_check_render;
-    private CheckBox check_pointer;
+    private CheckBox check_arcore;
     //Spinner adapter
     private checklistAdapter cb_adapter;
     private PopupMenu pop_menu;
@@ -47,7 +47,6 @@ public class arUIs extends BasePanel{
 
         View panel_ = mInflater.inflate(R.layout.ar_panel, parent_view, false);
         spinner_check_render =  (Spinner)panel_.findViewById(R.id.check_render_spinner);
-        cb_adapter = new checklistAdapter(activity);
 
         sub_panels_.add(panel_);
         setup_checks(
@@ -92,16 +91,21 @@ public class arUIs extends BasePanel{
         });
         bottom_panel.setVisibility(View.GONE);
 
-        check_pointer = (CheckBox)panel_.findViewById(R.id.check_float_widget);
-        check_pointer.setChecked(false);
-        check_pointer.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+        cb_adapter = new checklistAdapter(activity, bottom_panel);
+
+        check_arcore = (CheckBox)panel_.findViewById(R.id.check_float_widget);
+
+        check_arcore.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
             @Override
-            public void onCheckedChanged(CompoundButton buttonView,
-                                         boolean isChecked) {
-                if(isChecked) bottom_panel.setVisibility(View.VISIBLE);
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                spinner_check_render.setVisibility(isChecked? View.VISIBLE:View.GONE);
+                if(isChecked && cb_adapter.getValue(2)) bottom_panel.setVisibility(View.VISIBLE);
                 else bottom_panel.setVisibility(View.GONE);
+                JUIInterface.JUIsetChecks("Use ARCore", isChecked);
             }
         });
+        check_arcore.setChecked(false);//TODO:GRAB VALUE FROM ar_check_values
+
         setup_pop_dialog(activity, parent_view);
     }
     private void setup_pop_dialog(Activity activity, ViewGroup parent_view){
@@ -133,7 +137,7 @@ public class arUIs extends BasePanel{
     public void Reset(){
         spinner_check_render.setAdapter(cb_adapter);
         primary_checkbox.setChecked(default_primary_check);
-        check_pointer.setChecked(false);
+        check_arcore.setChecked(false);
 //        bottom_panel.setVisibility(View.GONE);
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
@@ -156,14 +160,16 @@ public class arUIs extends BasePanel{
 
     private static class checklistAdapter extends ListAdapter {
         List<Boolean> item_values;
-        checklistAdapter(Context context) {
+        WeakReference<View> m_panel_ref;
+        checklistAdapter(Context context, View panel) {
             super(context, context.getString(R.string.ar_draw_name));
             //setup values
+            m_panel_ref = new WeakReference<>(panel);
             Resources res = context.getResources();
             item_names = Arrays.asList(res.getStringArray(R.array.ar_render_params));
             TypedArray check_values = res.obtainTypedArray(R.array.ar_check_values);
             item_values = new ArrayList<>();
-            for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+1, false));
+            for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+2, false));
             check_values.recycle();
         }
         void setValue(int id, boolean value){
@@ -193,9 +199,13 @@ public class arUIs extends BasePanel{
                                              boolean isChecked) {
                     if(item_values.get(position) == isChecked) return;
                     item_values.set(position, isChecked);
-                    JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
+                    if(position == 2){
+                        m_panel_ref.get().setVisibility(isChecked?View.VISIBLE:View.GONE);
+                    }else
+                        JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
                 }
             });
+
             holder.checkBox.setTag(position);
             holder.checkBox.setChecked(item_values.get(position));
             return convertView;

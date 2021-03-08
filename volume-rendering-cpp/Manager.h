@@ -67,7 +67,7 @@ public:
     static bool IsCuttingEnabled(){return param_bool[dvr::CHECK_CUTTING] ||(param_bool[dvr::CHECK_CENTER_LINE_TRAVEL] && param_bool[dvr::CHECK_TRAVERSAL_VIEW]);}
     static bool IsCuttingNeedUpdate(){return param_bool[dvr::CHECK_CUTTING] || param_bool[dvr::CHECK_CENTER_LINE_TRAVEL];}
     static void setTraversalTargetId(int id){traversal_target_id = (id == 0) ? dvr::ORGAN_COLON : dvr::ORGAN_ILEUM;}
-    static bool isARWithMarker(){return dvr::AR_USE_MARKER && param_bool[dvr::CHECK_AR_ENABLED];}
+    static bool isARWithMarker(){return param_bool[dvr::CHECK_AR_ENABLED] && (!param_bool[dvr::CHECK_AR_USE_ARCORE]);}
     static bool isDrawVolume() { return !param_bool[dvr::CHECK_MASKON] || param_bool[dvr::CHECK_VOLUME_ON]; }
     static bool isDrawCenterLine() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_CENTER_LINE]; }
     static bool isDrawMesh() { return param_bool[dvr::CHECK_MASKON] && Manager::param_bool[dvr::CHECK_DRAW_POLYGON]; }
@@ -143,6 +143,8 @@ private:
             "COLOR_CET_L08",
     };
 
+    //ar status
+    bool m_mvp_ar_dirty;
     void clear_opacity_widgets();
 };
 #endif //VOLUME_RENDERING_MANAGER_H
