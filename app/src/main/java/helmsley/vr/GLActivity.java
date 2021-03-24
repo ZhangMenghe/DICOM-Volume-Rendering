@@ -13,6 +13,7 @@ import java.io.File;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import helmsley.vr.Record.RecordableSurfaceView;
 import helmsley.vr.Utils.GestureDetectorCalVR;
 import helmsley.vr.Utils.fileUtils;
 
@@ -32,7 +33,7 @@ public class GLActivity extends AppCompatActivity {
     // Opaque native pointer to the native application instance.
 
     //Surface view
-    protected GLSurfaceView surfaceView;
+    protected RecordableSurfaceView surfaceView;
     protected long nativeAddr;
 
     //For touch event
@@ -94,12 +95,13 @@ public class GLActivity extends AppCompatActivity {
     }
 
     private void setupSurfaceView(){
-        surfaceView = (GLSurfaceView) findViewById(R.id.surfaceview);
-        // Set up renderer.
-        surfaceView.setPreserveEGLContextOnPause(true);
-        surfaceView.setEGLContextClientVersion(3);
-        surfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0); // Alpha used for plane blending.
-        surfaceView.setRenderer(new GLActivity.Renderer());
+        surfaceView = (RecordableSurfaceView) findViewById(R.id.surfaceview);
+        surfaceView.onInitialize();
+//        // Set up renderer.
+//        surfaceView.setPreserveEGLContextOnPause(true);
+//        surfaceView.setEGLContextClientVersion(3);
+//        surfaceView.setEGLConfigChooser(8, 8, 8, 8, 16, 0); // Alpha used for plane blending.
+//        surfaceView.setRenderer(new GLActivity.Renderer());
         surfaceView.setRenderMode(GLSurfaceView.RENDERMODE_CONTINUOUSLY);
     }
     protected void copyFromAssets(){
