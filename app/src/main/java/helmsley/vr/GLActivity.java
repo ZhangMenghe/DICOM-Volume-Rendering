@@ -13,6 +13,7 @@ import java.io.File;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import helmsley.vr.Record.RecordableGLRenderer;
 import helmsley.vr.Record.RecordableSurfaceView;
 import helmsley.vr.Utils.GestureDetectorCalVR;
 import helmsley.vr.Utils.fileUtils;
@@ -27,9 +28,7 @@ public class GLActivity extends AppCompatActivity {
 
     final static boolean skipLoadingResource = true;
 
-    protected boolean viewportChanged = false;
-    protected int viewportWidth;
-    protected int viewportHeight;
+
     // Opaque native pointer to the native application instance.
 
     //Surface view
@@ -96,7 +95,8 @@ public class GLActivity extends AppCompatActivity {
 
     private void setupSurfaceView(){
         surfaceView = (RecordableSurfaceView) findViewById(R.id.surfaceview);
-        surfaceView.onInitialize();
+        surfaceView.setupGLActivityRef(this);
+//        surfaceView.onInitialize();
 //        // Set up renderer.
 //        surfaceView.setPreserveEGLContextOnPause(true);
 //        surfaceView.setEGLContextClientVersion(3);
@@ -120,41 +120,16 @@ public class GLActivity extends AppCompatActivity {
         }
     }
 
-    protected boolean setupResource(){
+    public boolean setupResource(){
         copyFromAssets();
         return true;
     }
-    protected void updateOnFrame(){}
-    protected class Renderer implements GLSurfaceView.Renderer {
-        @Override
-        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-            if(setupResource()){
-                JNIInterface.JNIonGlSurfaceCreated();
-            }
+    public boolean updateOnFrame(boolean viewportChanged, int viewportWidth, int viewportHeight){
+        if(nativeAddr == 0)return false;
+        if (viewportChanged) {
+            int displayRotation = getWindowManager().getDefaultDisplay().getRotation();
+            JNIInterface.JNIonSurfaceChanged(displayRotation, viewportWidth, viewportHeight);
         }
-
-        @Override
-        public void onSurfaceChanged(GL10 gl, int width, int height) {
-            viewportWidth = width;
-            viewportHeight = height;
-            viewportChanged = true;
-        }
-
-        @Override
-        public void onDrawFrame(GL10 gl) {
-            // Synchronized to avoid racing onDestroy.
-            updateOnFrame();	            synchronized (this) {
-                if (nativeAddr == 0) {
-                    return;
-                }
-                if (viewportChanged) {
-                    int displayRotation = getWindowManager().getDefaultDisplay().getRotation();
-                    JNIInterface.JNIonSurfaceChanged(displayRotation, viewportWidth, viewportHeight);
-                    viewportChanged = false;
-                }
-                JNIInterface.JNIdrawFrame();
-                updateOnFrame();
-            }
-        }
+        return true;
     }
 }

@@ -123,10 +123,11 @@ public class MainActivity extends GLActivity
     }
 
     @Override
-    protected void updateOnFrame(){
+    public boolean updateOnFrame(boolean viewportChanged, int viewportWidth, int viewportHeight){
+        if(!super.updateOnFrame(viewportChanged, viewportWidth, viewportHeight)) return false;
         ui_manager.updateOnFrame();
         dcm_manager.updateOnFrame();
-        super.updateOnFrame();
+        return true;
     }
 
     @Override
@@ -231,6 +232,6 @@ public class MainActivity extends GLActivity
 
     @Override
     public void onDisplayChanged(int displayId) {
-        viewportChanged = true;
+        surfaceView.dirtyViewport();
     }
 }

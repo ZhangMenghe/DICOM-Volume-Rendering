@@ -5,6 +5,8 @@ import android.opengl.GLSurfaceView;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import helmsley.vr.GLActivity;
+
 /**
  * A view container where OpenGL ES graphics can be drawn on screen.
  * This view can also be used to capture touch events, such as a user
@@ -31,7 +33,9 @@ public class RecordableGLSurfaceView extends RecordableSurfaceView implements Re
         mRenderer = new RecordableGLRenderer();
         setRendererCallbacks(this);
     }
-
+    public void setupGLActivityRef(GLActivity activity) {
+        mRenderer.setupGLActivityRef(activity);
+    }
     @Override
     public boolean onTouchEvent(MotionEvent e) {
         return false;
@@ -66,4 +70,8 @@ public class RecordableGLSurfaceView extends RecordableSurfaceView implements Re
     public void onDrawFrame() {
         mRenderer.onDrawFrame(null);
     }
+
+    @Override
+    public void dirtyViewport(){mRenderer.dirtyViewport();}
+
 }

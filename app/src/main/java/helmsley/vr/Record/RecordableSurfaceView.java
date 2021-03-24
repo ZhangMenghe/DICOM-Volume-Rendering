@@ -39,6 +39,8 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import helmsley.vr.GLActivity;
+
 /**
  * Used to record video of the content of a SurfaceView, backed by a GL render loop.
  * <p>
@@ -131,6 +133,7 @@ public class RecordableSurfaceView extends SurfaceView {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
     public void onInitialize(){}
+    public void setupGLActivityRef(GLActivity activity) {}
     /**
      * Performs necessary setup operations such as creating a MediaCodec persistent surface and
      * setting up initial state.
@@ -381,6 +384,7 @@ public class RecordableSurfaceView extends SurfaceView {
         }
 
     }
+    public void dirtyViewport(){}
 
     /**
      * Returns the reference (if any) to the {@link RendererCallbacks}
