@@ -141,7 +141,7 @@ public class GLActivity extends AppCompatActivity {
         @Override
         public void onDrawFrame(GL10 gl) {
             // Synchronized to avoid racing onDestroy.
-            updateOnFrame();	            synchronized (this) {
+            synchronized (this) {
                 if (nativeAddr == 0) {
                     return;
                 }
