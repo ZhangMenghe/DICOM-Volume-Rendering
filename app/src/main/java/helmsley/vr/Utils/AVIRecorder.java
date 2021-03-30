@@ -20,11 +20,14 @@ public class AVIRecorder {
     public void onStartRecordingNS(String filePath){
         mGrabRunnable.Reset(filePath);
         mGrabThread = new Thread(mGrabRunnable);
+        Log.e(TAG, "=====onStartRecordingNS, new thread " );
+
         mGrabThread.start();
     }
     public void onStopRecordingNS(){
         mGrabRunnable.Stop();
         try {
+            Log.e(TAG, "=====onStartRecordingNS, new thread " );
             mGrabThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();

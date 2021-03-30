@@ -10,6 +10,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import org.opencv.core.CvType;
@@ -20,6 +22,7 @@ import org.opencv.videoio.VideoWriter;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.Date;
 
 import helmsley.vr.Utils.AVIRecorder;
 import helmsley.vr.Utils.CameraPermissionHelper;
@@ -37,12 +40,35 @@ public class MainActivity extends GLActivity
     protected UIsManager ui_manager;
     private dicomManager dcm_manager;
     public static boolean permission_granted = false;
+    private AVIRecorder mAVIRecorder;
+    private boolean mIsRecording = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         System.loadLibrary("imebra_lib");
         ui_manager = new UIsManager(this);
         dcm_manager = new dicomManager(this);
+        mAVIRecorder = new AVIRecorder();
+
+        Button btn = findViewById(R.id.record_button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsRecording) {
+                    mAVIRecorder.onStopRecordingNS();
+                    ((Button)v).setText("Record");
+                } else {
+                    String filename = new Date().getTime() + "";
+                    File file = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_MOVIES), filename+".avi");
+
+                    mAVIRecorder.onStartRecordingNS(file.getAbsolutePath());
+                    ((Button)v).setText("Stop");
+                }
+                mIsRecording=!mIsRecording;
+            }
+        });
+
     }
 
     @Override
@@ -119,7 +145,7 @@ public class MainActivity extends GLActivity
         permission_granted = true;
 //        debugVideoWriter();
 //        debugJNIVideoWriter();
-        debugAVIRecorder();
+//        debugAVIRecorder();
 
 //        fileUtils.writeFileToExternalStorage();
     }
