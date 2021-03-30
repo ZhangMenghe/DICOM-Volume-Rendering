@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -117,7 +118,8 @@ public class MainActivity extends GLActivity
         }
         permission_granted = true;
 //        debugVideoWriter();
-        debugJNIVideoWriter();
+//        debugJNIVideoWriter();
+        debugAVIRecorder();
 
 //        fileUtils.writeFileToExternalStorage();
     }
@@ -144,40 +146,53 @@ public class MainActivity extends GLActivity
             }
         }
     }
-    void debugJNIVideoWriter(){
+    void debugAVIRecorder(){
         File file = new File(Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_MOVIES), "videoWriter.avi");
-        AVIRecorder.onStartRecording(file.getAbsolutePath());
-        byte[] data = new byte[640 * 480 * 3];
-        Arrays.fill(data, (byte)255);
-        for (int i = 0; i < 1000; i++) {
-            AVIRecorder.WriteToVideo(data);
-        }
-        AVIRecorder.onStopRecording();
-    }
-    void debugVideoWriter(){
-        File file = new File(Environment.getExternalStoragePublicDirectory(
-                Environment.DIRECTORY_MOVIES), "videoWriter.avi");
-        String filePath = file.getAbsolutePath();
-        double FPS = 30.0;
-        int w = 460, h=640;
-
-        VideoWriter videoWriter = new VideoWriter(filePath, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
-        videoWriter.open(filePath, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
-
-        if(!videoWriter.isOpened()){
-            Log.e(TAG, "======debugVideoWriter: fail to open" );
-        }else{
-            for (int i = 0; i < 1000; i++) {
-//            byte[] image = images.get(i);
-                Mat rgbMat = new Mat(h,w, CvType.CV_8UC3);
-                rgbMat.setTo(new Scalar(255,0,0));
-                videoWriter.write(rgbMat);
-                rgbMat.release();
+        AVIRecorder recorder = new AVIRecorder();
+        recorder.onStartRecordingNS(file.getAbsolutePath());
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                recorder.onStopRecordingNS();
             }
-        }
-        videoWriter.release();
+        }, 5000);
     }
+//    void debugJNIVideoWriter(){
+//        File file = new File(Environment.getExternalStoragePublicDirectory(
+//                Environment.DIRECTORY_MOVIES), "videoWriter.avi");
+//        AVIRecorder.onStartRecording(file.getAbsolutePath());
+//        byte[] data = new byte[640 * 480 * 3];
+//        Arrays.fill(data, (byte)255);
+//        for (int i = 0; i < 1000; i++) {
+//            AVIRecorder.WriteToVideo(data);
+//        }
+//        AVIRecorder.onStopRecording();
+//    }
+//    void debugVideoWriter(){
+//        File file = new File(Environment.getExternalStoragePublicDirectory(
+//                Environment.DIRECTORY_MOVIES), "videoWriter.avi");
+//        String filePath = file.getAbsolutePath();
+//        double FPS = 30.0;
+//        int w = 460, h=640;
+//
+//        VideoWriter videoWriter = new VideoWriter(filePath, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
+//        videoWriter.open(filePath, VideoWriter.fourcc('M','J','P','G'), FPS, new Size(w,h));
+//
+//        if(!videoWriter.isOpened()){
+//            Log.e(TAG, "======debugVideoWriter: fail to open" );
+//        }else{
+//            for (int i = 0; i < 1000; i++) {
+////            byte[] image = images.get(i);
+//                Mat rgbMat = new Mat(h,w, CvType.CV_8UC3);
+//                rgbMat.setTo(new Scalar(255,0,0));
+//                videoWriter.write(rgbMat);
+//                rgbMat.release();
+//            }
+//        }
+//        videoWriter.release();
+//    }
     // DisplayListener methods
     @Override
     public void onDisplayAdded(int displayId) {}
