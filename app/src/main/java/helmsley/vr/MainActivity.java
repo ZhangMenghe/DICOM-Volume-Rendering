@@ -230,4 +230,7 @@ public class MainActivity extends GLActivity
     public void onDisplayChanged(int displayId) {
         viewportChanged = true;
     }
+    protected void onSurfaceSizeChanged(){
+        mAVIRecorder.onSizeChanged(viewportWidth, viewportHeight);
+    }
 }

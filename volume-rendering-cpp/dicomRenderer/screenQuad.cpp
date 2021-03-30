@@ -20,13 +20,14 @@ void screenQuad::onScreenSizeChange(float width, float height){
 
     tex_width = GLuint (width);
     tex_height = GLuint(height);
-    auto vsize = tex_width* tex_height * 4;
-    GLbyte * vdata = new GLbyte[vsize];
-    memset(vdata, 0x00, vsize * sizeof(GLbyte));
+    m_screen_data_size = tex_width* tex_height * 4;
+    screen_pixels = new GLubyte[m_screen_data_size];
+    memset(screen_pixels, 0x00, m_screen_data_size * sizeof(GLbyte));
     if(qtex_) delete qtex_;
 
-    qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, vdata);
-    screen_pixels = new GLubyte[tex_width * tex_height * 4];
+    qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, screen_pixels);
+
+    LOGE("=======TEX WIDTH = %d, HEIGHT= %d", tex_width, tex_height);
 }
 void screenQuad::Draw(){
     glViewport(0, 0, tex_width, tex_height);
@@ -51,8 +52,9 @@ void screenQuad::Clear(){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 GLubyte* screenQuad::getCurrentFrame(){
-    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
-    glReadPixels(0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, screen_pixels);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+//    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+//    glReadPixels(0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, screen_pixels);
+//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    memset(screen_pixels, 0xff, m_screen_data_size);
     return screen_pixels;
 }

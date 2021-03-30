@@ -16,6 +16,8 @@ namespace {
     int CHANEL_NUM = 4;
     //globally
     GLubyte* g_VolumeTexData = nullptr;
+    int m_screen_data_size = 0;
+
     int return_pos = 0;
     std::unordered_map<int, float*> centerline_map;
 
@@ -121,6 +123,7 @@ JNI_METHOD(void, JNIonSurfaceChanged)(JNIEnv * env, jclass, jint rot, jint w, ji
     m_sceneRenderer->onViewChange(w, h);
 //    overlayController::instance()->onViewChange(w, h);
     arController::instance()->onViewChange(rot,w,h);
+    m_screen_data_size = w * h * 4;
 }
 
 void on_draw_native(){
@@ -255,7 +258,11 @@ JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
     return_pos+=rsize;
     return garr;
 }
-JNI_METHOD(jbyteArray, JNIgetFrameData)(JNIEnv*, jclass){
+JNI_METHOD(jbyteArray, JNIgetFrameData)(JNIEnv* env, jclass){
+    auto data = screenQuad::instance()->getCurrentFrame();
+    jbyteArray g_screenBuff = env->NewByteArray(m_screen_data_size);
+    env->SetByteArrayRegion(g_screenBuff,0, m_screen_data_size, reinterpret_cast<jbyte*>(data));
+    return g_screenBuff;
 }
 JNI_METHOD(void, JNIreleaseBuffer)(JNIEnv*, jclass){
     delete[]g_VolumeTexData; g_VolumeTexData = nullptr;

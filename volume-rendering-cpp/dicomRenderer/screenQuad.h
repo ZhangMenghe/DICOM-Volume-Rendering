@@ -10,7 +10,7 @@ private:
 
     Shader qshader_;
     Texture* qtex_ = nullptr;
-    GLuint tex_width=0, tex_height=0;
+    GLuint tex_width=0, tex_height=0, m_screen_data_size=0;
     GLuint vao_;
     GLuint frame_buff_ = 0;
     GLubyte* screen_pixels = nullptr;
