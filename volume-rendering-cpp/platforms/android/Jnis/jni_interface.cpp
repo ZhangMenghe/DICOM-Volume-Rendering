@@ -255,6 +255,8 @@ JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv* env, jclass){
     return_pos+=rsize;
     return garr;
 }
+JNI_METHOD(jbyteArray, JNIgetFrameData)(JNIEnv*, jclass){
+}
 JNI_METHOD(void, JNIreleaseBuffer)(JNIEnv*, jclass){
     delete[]g_VolumeTexData; g_VolumeTexData = nullptr;
 }

@@ -48,6 +48,7 @@ public class JNIInterface {
     public static native void JNIsendDataPrepareNative(int ph, int pw, int pd, float sh, float sw, float sd, boolean b_mask);
 
     public static native byte[] JNIgetVolumeData();
+    public static native byte[] JNIgetFrameData();
     public static Bitmap loadImage(String imageName) {
         try {
             return BitmapFactory.decodeStream(assetManager.open(imageName));

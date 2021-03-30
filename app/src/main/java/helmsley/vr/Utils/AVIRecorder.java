@@ -9,6 +9,8 @@ import org.opencv.videoio.VideoWriter;
 
 import java.util.Arrays;
 
+import helmsley.vr.JNIInterface;
+
 public class AVIRecorder {
     private static final String TAG = "AVIRecorder";
     Thread mGrabThread;
@@ -20,14 +22,11 @@ public class AVIRecorder {
     public void onStartRecordingNS(String filePath){
         mGrabRunnable.Reset(filePath);
         mGrabThread = new Thread(mGrabRunnable);
-        Log.e(TAG, "=====onStartRecordingNS, new thread " );
-
         mGrabThread.start();
     }
     public void onStopRecordingNS(){
         mGrabRunnable.Stop();
         try {
-            Log.e(TAG, "=====onStartRecordingNS, new thread " );
             mGrabThread.join();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -69,9 +68,11 @@ public class AVIRecorder {
 
         int mFrames = 0;
         boolean isRunning = true;
+        Mat mRGBMat;
         public void Reset(String filePath){
-            int w = 460, h=640;
+            int w = 480, h=640;
             double FPS = 30.0;
+            mRGBMat = new Mat(h, w, CvType.CV_8UC4);
 
             if(videoWriter == null){
 //            File file = new File(Environment.getExternalStoragePublicDirectory(
@@ -87,17 +88,14 @@ public class AVIRecorder {
         @Override
         public void run() {
             while(isRunning){
-                int w = 460, h=640;
                 if(!videoWriter.isOpened()){
                     Log.e(TAG, "======debugVideoWriter: fail to open" );
                 }else{
-                    byte[] data = new byte[640 * 480 * 3];
+                    int w = 480, h=640;
+                    byte[] data = new byte[w*h * 4];
                     Arrays.fill(data, (byte)255);
-
-                    Mat rgbMat = new Mat(h,w, CvType.CV_8UC3);
-                    rgbMat.put(0,0, data);
-                    videoWriter.write(rgbMat);
-                    rgbMat.release();
+                    mRGBMat.put(0, 0, data);//JNIInterface.JNIgetFrameData());
+                    videoWriter.write(mRGBMat);
                 }
                 mFrames++;
             }
@@ -105,6 +103,7 @@ public class AVIRecorder {
         }
         public void Stop(){
             isRunning = false;
+            mRGBMat.release();
         }
     }
 }

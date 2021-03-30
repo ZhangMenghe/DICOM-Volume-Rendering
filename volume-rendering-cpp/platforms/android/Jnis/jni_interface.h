@@ -28,6 +28,8 @@ JNI_METHOD(void, JNIreleaseBuffer)(JNIEnv*, jclass);
 
 JNI_METHOD(jbyteArray, JNIgetVolumeData)(JNIEnv*, jclass);
 
+JNI_METHOD(jbyteArray, JNIgetFrameData)(JNIEnv*, jclass);
+
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass);
 
 JNI_METHOD(void, JNIonGlSurfaceCreated)(JNIEnv * env, jclass);
