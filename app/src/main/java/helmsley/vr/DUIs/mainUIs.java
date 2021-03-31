@@ -26,7 +26,7 @@ public class mainUIs {
     private final String NAME_RESET,
             NAME_TEMPLATE_SAVE, NAME_TEMPLATE_LOAD,
             NAME_DATA_REMOTE, NAME_DATA_DEVICE, NAME_DATA_LOCAL,
-            NAME_START_BROADCAST, NAME_STOP_BROADCAST;
+            NAME_START_BROADCAST, NAME_STOP_BROADCAST, NAME_RECORDING;
 
     private Spinner spinner_check;
     private dialogUIs dialogController;
@@ -40,6 +40,7 @@ public class mainUIs {
         NAME_TEMPLATE_SAVE = res.getString(R.string.sys_template_save);NAME_TEMPLATE_LOAD = res.getString(R.string.sys_template_load);
         NAME_DATA_REMOTE = res.getString(R.string.sys_data_remote); NAME_DATA_LOCAL = res.getString(R.string.sys_data_local);NAME_DATA_DEVICE=res.getString(R.string.sys_data_device);
         NAME_START_BROADCAST = res.getString(R.string.sys_sync_start);NAME_STOP_BROADCAST = res.getString(R.string.sys_sync_stop);
+        NAME_RECORDING =  res.getString(R.string.sys_record);
 
         mUIManagerRef = new WeakReference<>(manager);
         actRef = new WeakReference<>(activity);
@@ -143,6 +144,8 @@ public class mainUIs {
                         }
                         else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
                         else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
+                        else if(text_title.equals(NAME_RECORDING))dialogController.onChangeRecordingPanel();
+
                         new android.os.Handler().postDelayed(
                                 new Runnable() {
                                     public void run() {

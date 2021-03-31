@@ -13,6 +13,7 @@ import java.io.File;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
+import helmsley.vr.Utils.AVIRecorder;
 import helmsley.vr.Utils.GestureDetectorCalVR;
 import helmsley.vr.Utils.fileUtils;
 
@@ -123,7 +124,6 @@ public class GLActivity extends AppCompatActivity {
         return true;
     }
     protected void updateOnFrame(){}
-    protected void onSurfaceSizeChanged(){}
     protected class Renderer implements GLSurfaceView.Renderer {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
@@ -149,7 +149,7 @@ public class GLActivity extends AppCompatActivity {
                 if (viewportChanged) {
                     int displayRotation = getWindowManager().getDefaultDisplay().getRotation();
                     JNIInterface.JNIonSurfaceChanged(displayRotation, viewportWidth, viewportHeight);
-                    onSurfaceSizeChanged();
+                    AVIRecorder.onViewportSizeChanged(viewportWidth, viewportHeight);
                     viewportChanged = false;
                 }
                 JNIInterface.JNIdrawFrame();

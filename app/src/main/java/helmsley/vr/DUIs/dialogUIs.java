@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.method.ScrollingMovementMethod;
@@ -17,13 +18,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import helmsley.vr.JNIInterface;
 import helmsley.vr.MainActivity;
 import helmsley.vr.R;
+import helmsley.vr.Utils.AVIRecorder;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.rpcManager;
 import helmsley.vr.proto.volumeInfo;
@@ -50,6 +54,11 @@ public class dialogUIs {
     private View download_progress, main_progress, broadcast_icon;
     private boolean remote_layout_set = false, config_layout_set = false;
 
+    //recording
+    private AVIRecorder mAVIRecorder;
+    private boolean mIsRecording = false;
+    private Button recording_button;
+
     enum DownloadDialogType{CONFIGS, DATA_LOCAL, DATA_REMOTE}
     dialogUIs(final Activity activity_, mainUIs mui, ViewGroup parent_view){
         activityReference = new WeakReference<>(activity_);
@@ -67,6 +76,8 @@ public class dialogUIs {
         loadlocal_dialog = setup_download_dialog(DownloadDialogType.DATA_LOCAL);
         main_progress = activity_.findViewById(R.id.loading_layout);
         broadcast_icon = activity_.findViewById(R.id.broadcast_img);
+
+        setup_recording();
     }
     void ShowDatasetRemote(){
         if(!remote_connection_success){b_await_data=true;setup_remote_connection();}
@@ -117,6 +128,10 @@ public class dialogUIs {
     public void NotifyLocalCardUpdate(String ds_name, List<volumeInfo> info_lst){
         local_card_adp.updateLstContent(ds_name, info_lst);
         local_card_adp.updateCardContent();
+    }
+    public void onChangeRecordingPanel(){
+        boolean isOn = (recording_button.getVisibility() == View.VISIBLE);
+        recording_button.setVisibility(isOn? View.INVISIBLE:View.VISIBLE);
     }
     private void setup_export_dialog(){
         Activity activity = activityReference.get();
@@ -254,6 +269,30 @@ public class dialogUIs {
         tv.setText((type == DownloadDialogType.CONFIGS)?R.string.dialog_config_title:R.string.dialog_select_title);
         layoutDialog_builder.setView(dialogView);
         return layoutDialog_builder.create();
+    }
+
+    private void setup_recording(){
+        mAVIRecorder = new AVIRecorder();
+
+        recording_button = activityReference.get().findViewById(R.id.record_button);
+        recording_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mIsRecording) {
+                    mAVIRecorder.onStopRecordingNS();
+                    ((Button)v).setText("Record");
+                } else {
+                    String filename = new Date().getTime() + "";
+                    File file = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_MOVIES), filename+".avi");
+
+                    mAVIRecorder.onStartRecordingNS(file.getAbsolutePath());
+                    ((Button)v).setText("Stop");
+                }
+                mIsRecording=!mIsRecording;
+            }
+        });
+        recording_button.setVisibility(View.INVISIBLE);
     }
 
     void onDownloadingUI(boolean isLocal){

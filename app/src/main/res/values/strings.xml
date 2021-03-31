@@ -67,6 +67,7 @@
     <string name="sys_data_remote">From Remote..</string>
     <string name="sys_data_device">From Device..</string>
     <string name="sys_data_local">From Local..</string>
+    <string name="sys_record">Recording</string>
     <string name="sys_req_code">123</string>
     <string name="data_device_dir_name">Device</string>    
 </resources>

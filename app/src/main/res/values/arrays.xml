@@ -207,6 +207,7 @@
         <item>@string/sys_sync_start</item>
         <item>@string/sys_template_save</item>
         <item>@string/sys_template_load</item>
+        <item>@string/sys_record</item>
     </string-array>
     <string-array name="data_loading">
         <item>@string/sys_data_local</item>

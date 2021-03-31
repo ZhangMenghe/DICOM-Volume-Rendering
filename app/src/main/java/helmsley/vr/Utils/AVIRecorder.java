@@ -15,8 +15,7 @@ import helmsley.vr.JNIInterface;
 public class AVIRecorder {
     private static final String TAG = "AVIRecorder";
     Thread mGrabThread;
-    JNIFrameGrabber mGrabRunnable;
-
+    static JNIFrameGrabber mGrabRunnable;
     public AVIRecorder(){
         mGrabRunnable = new JNIFrameGrabber();
     }
@@ -41,6 +40,9 @@ public class AVIRecorder {
         }
     }
     public void onSizeChanged(int width, int height){
+        mGrabRunnable.onSizeChanged(width, height);
+    }
+    public static void onViewportSizeChanged(int width, int height){
         mGrabRunnable.onSizeChanged(width, height);
     }
 
