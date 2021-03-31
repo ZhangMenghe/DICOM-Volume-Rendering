@@ -83,7 +83,7 @@ public class AVIRecorder {
 //        int mWidth = 480, mHeight = 640;
         Size mSize, mSize_origin;
         final float mFactor = 0.5f;
-        final double FPS = 30.0;
+        final double FPS = 60.0;
 
         public void onSizeChanged(int width, int height){
             mSize_origin = new Size(width, height);

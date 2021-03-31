@@ -28,6 +28,7 @@ import helmsley.vr.JNIInterface;
 import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.Utils.AVIRecorder;
+import helmsley.vr.Utils.AudioRecorder;
 import helmsley.vr.Utils.PermissionHelper;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.rpcManager;
@@ -57,6 +58,7 @@ public class dialogUIs {
 
     //recording
     private AVIRecorder mAVIRecorder;
+    private AudioRecorder mAudioRecorder;
     private boolean mIsRecording = false;
     private Button recording_button;
 
@@ -274,6 +276,7 @@ public class dialogUIs {
 
     private void setup_recording(){
         mAVIRecorder = new AVIRecorder();
+        mAudioRecorder = new AudioRecorder();
 
         recording_button = activityReference.get().findViewById(R.id.record_button);
         recording_button.setOnClickListener(new View.OnClickListener() {
@@ -281,13 +284,18 @@ public class dialogUIs {
             public void onClick(View v) {
                 if (mIsRecording) {
                     mAVIRecorder.onStopRecordingNS();
+                    mAudioRecorder.onStopRecording();
                     ((Button)v).setText("Record");
                 } else {
                     String filename = new Date().getTime() + "";
                     File file = new File(Environment.getExternalStoragePublicDirectory(
                             Environment.DIRECTORY_MOVIES), filename+".avi");
-
                     mAVIRecorder.onStartRecordingNS(file.getAbsolutePath());
+
+                    File file_audio = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_MOVIES), filename+".3gp");
+                    mAudioRecorder.onStartRecording(file_audio.getAbsolutePath());
+
                     ((Button)v).setText("Stop");
                 }
                 mIsRecording=!mIsRecording;
