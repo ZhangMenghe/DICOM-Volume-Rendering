@@ -288,13 +288,13 @@ public class dialogUIs {
                     ((Button)v).setText("Record");
                 } else {
                     String filename = new Date().getTime() + "";
-                    File file = new File(Environment.getExternalStoragePublicDirectory(
-                            Environment.DIRECTORY_MOVIES), filename+".avi");
-                    mAVIRecorder.onStartRecordingNS(file.getAbsolutePath());
-
                     File file_audio = new File(Environment.getExternalStoragePublicDirectory(
                             Environment.DIRECTORY_MOVIES), filename+".3gp");
                     mAudioRecorder.onStartRecording(file_audio.getAbsolutePath());
+
+                    File file = new File(Environment.getExternalStoragePublicDirectory(
+                            Environment.DIRECTORY_MOVIES), filename+".avi");
+                    mAVIRecorder.onStartRecordingNS(file.getAbsolutePath());
 
                     ((Button)v).setText("Stop");
                 }
