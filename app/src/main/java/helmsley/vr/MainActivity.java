@@ -1,20 +1,18 @@
 package helmsley.vr;
 
-import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.display.DisplayManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
-import helmsley.vr.Utils.CameraPermissionHelper;
+
+import helmsley.vr.Utils.PermissionHelper;
 
 public class MainActivity extends GLActivity
         implements DisplayManager.DisplayListener{
 
     final static String TAG = MainActivity.class.getSimpleName();
-    public static final int FILE_PERMISSION_CODE = 123;
     static {
         System.loadLibrary("vrAndroid");
     }
@@ -34,15 +32,15 @@ public class MainActivity extends GLActivity
     @Override
     protected void onResume() {
         super.onResume();
-        if(Boolean.parseBoolean(getString(R.string.ar_enable))){
-            if (!CameraPermissionHelper.hasCameraPermission(this)) {
-                CameraPermissionHelper.requestCameraPermission(this);
-                return;
-            }
-            try{
-                JNIInterface.JNIonResume(getApplicationContext(), this);
-            }catch (Exception e){
-                Log.e(TAG, "====onResume error I can't solve" );
+
+        //camera for ar
+        if(PermissionHelper.checkAllPermissions(this)[1]){
+            if(Boolean.parseBoolean(getString(R.string.ar_enable))){
+                try{
+                    JNIInterface.JNIonResume(getApplicationContext(), this);
+                }catch (Exception e){
+                    Log.e(TAG, "====onResume error I can't solve" );
+                }
             }
         }
 
@@ -87,25 +85,14 @@ public class MainActivity extends GLActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == FILE_PERMISSION_CODE && resultCode == RESULT_OK)
+        if(requestCode == PermissionHelper.FILE_PERMISSION_CODE && resultCode == RESULT_OK)
             dcm_manager.Run(data.getData());
     }
-    @Override
-    protected void checkPermissions(){
-        String[] PERMISSIONS = {
-                android.Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
-        };
-        for(String rpermission:PERMISSIONS){
-            if(ActivityCompat.checkSelfPermission(this, rpermission) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, PERMISSIONS, FILE_PERMISSION_CODE);
-                return;
-            }
-        }
-        permission_granted = true;
-    }
+
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults ){
-        if(requestCode  == FILE_PERMISSION_CODE){
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if(requestCode  == PermissionHelper.FILE_PERMISSION_CODE){
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 permission_granted = true;
             } else {
@@ -115,15 +102,30 @@ public class MainActivity extends GLActivity
                         Toast.LENGTH_SHORT
                 ).show();
             }
-        }else if(requestCode == CameraPermissionHelper.CAMERA_PERMISSION_CODE){
-            if (!CameraPermissionHelper.hasCameraPermission(this)) {
+        }else if(requestCode == PermissionHelper.CAMERA_PERMISSION_CODE){
+            if (PermissionHelper.hasCameraPermission(this)) {
+
+                if(Boolean.parseBoolean(getString(R.string.ar_enable))){
+                    try{
+                        JNIInterface.JNIonResume(getApplicationContext(), this);
+                    }catch (Exception e){
+                        Log.e(TAG, "====onResume error I can't solve" );
+                    }
+                }
+
+            }else{
                 Toast.makeText(this, "Camera permission is needed to run this application", Toast.LENGTH_LONG)
                         .show();
-                if (!CameraPermissionHelper.shouldShowRequestPermissionRationale(this)) {
-                    // Permission denied with checking "Do not ask again".
-                    CameraPermissionHelper.launchPermissionSettings(this);
-                }
-                finish();
+            }
+        }else{
+            if (!PermissionHelper.hasAudioRecordPermission(this)) {
+                Toast.makeText(this, "Audio recorder permission is needed to run this application", Toast.LENGTH_LONG)
+                        .show();
+//                if (!PermissionHelper.shouldShowRequestPermissionRationale(this)) {
+//                    // Permission denied with checking "Do not ask again".
+//                    PermissionHelper.launchPermissionSettings(this);
+//                }
+//                finish();
             }
         }
     }

@@ -28,6 +28,7 @@ import helmsley.vr.JNIInterface;
 import helmsley.vr.MainActivity;
 import helmsley.vr.R;
 import helmsley.vr.Utils.AVIRecorder;
+import helmsley.vr.Utils.PermissionHelper;
 import helmsley.vr.proto.fileTransferClient;
 import helmsley.vr.proto.rpcManager;
 import helmsley.vr.proto.volumeInfo;
@@ -356,7 +357,11 @@ public class dialogUIs {
                 .setType("*/*")
                 .setAction(Intent.ACTION_OPEN_DOCUMENT);
 
-        activityReference.get().startActivityForResult(Intent.createChooser(intent, "Select a DICOM file"), MainActivity.FILE_PERMISSION_CODE);
+        activityReference.get().
+                startActivityForResult(
+                        Intent.createChooser(intent, "Select a DICOM file"),
+                        PermissionHelper.FILE_PERMISSION_CODE
+                );
 
     }
 }

@@ -43,13 +43,12 @@ public class GLActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
-        checkPermissions();
         setupSurfaceView();
         JNIInterface.assetManager = getAssets();
         nativeAddr = JNIInterface.JNIonCreate(JNIInterface.assetManager);
         setupTouchDetector();
     }
-    protected void checkPermissions(){}
+
     @Override
     protected void onResume() {
         super.onResume();
