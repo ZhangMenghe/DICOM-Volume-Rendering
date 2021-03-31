@@ -22,6 +22,7 @@ extern "C"{
     JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint, jfloat, jfloat);
     JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring, jboolean);
     JUI_METHOD(void, JUISwitchCuttingPlaneNative)(JNIEnv * env, jclass, jint);
+    JUI_METHOD(void, JUIsetOnChangeRecordingStatus)(JNIEnv * env, jclass, jboolean);
 
     JUI_METHOD(jfloatArray, JUIgetVCStatesNative)(JNIEnv * env, jclass);
     JUI_METHOD(void, JUIsetCuttingPlaneNative)(JNIEnv * env, jclass, jfloat);

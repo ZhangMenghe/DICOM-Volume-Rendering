@@ -88,7 +88,6 @@ JNI_METHOD(jlong, JNIonCreate)(JNIEnv* env, jclass , jobject asset_manager){
     m_manager = std::make_shared<Manager>();
     m_sceneRenderer = std::make_unique<vrController>(m_manager);
     nativeAddr = getNativeClassAddr(m_sceneRenderer.get());
-
     m_sceneRenderer->setPredrawOption(false);
     setupShaderContents();
     return nativeAddr;

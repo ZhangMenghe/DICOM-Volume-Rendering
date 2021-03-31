@@ -4,6 +4,7 @@
 #include <vrController.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <platforms/android/ARHelpers/arController.h>
+#include <dicomRenderer/screenQuad.h>
 
 using namespace dvr;
 
@@ -61,6 +62,11 @@ JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolea
 }
 JUI_METHOD(void, JUISwitchCuttingPlaneNative)(JNIEnv * env, jclass, jint id){
     m_sceneRenderer->SwitchCuttingPlane((PARAM_CUT_ID)id);
+}
+JUI_METHOD(void, JUIsetOnChangeRecordingStatus)(JNIEnv * env, jclass, jboolean is_recording){
+    if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]) m_sceneRenderer->setPredrawOption(is_recording);
+
+    screenQuad::instance()->setOnChangeRecordingStatus(is_recording);
 }
 JUI_METHOD(jfloatArray, JUIgetVCStatesNative)(JNIEnv * env, jclass){
     jfloatArray res = env->NewFloatArray(31);

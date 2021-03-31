@@ -22,7 +22,7 @@ void screenQuad::onScreenSizeChange(float width, float height){
     tex_height = GLuint(height);
     m_screen_data_size = tex_width* tex_height * 4;
     screen_pixels = new GLubyte[m_screen_data_size];
-    memset(screen_pixels, 0x00, m_screen_data_size * sizeof(GLbyte));
+    memset(screen_pixels, 0xff, m_screen_data_size * sizeof(GLbyte));
     if(qtex_) delete qtex_;
 
     qtex_ = new Texture(GL_RGBA8, GL_RGBA, GL_UNSIGNED_BYTE, tex_width, tex_height, screen_pixels);
@@ -37,11 +37,18 @@ void screenQuad::Draw(){
     GLuint sp = qshader_.Use();
     glActiveTexture(GL_TEXTURE0 + dvr::SCREEN_QUAD_TEX_ID);
     glBindTexture(GL_TEXTURE_2D, qtex_->GLTexture());
+
     Shader::Uniform(sp, "uSampler", dvr::SCREEN_QUAD_TEX_ID);
     glBindVertexArray(vao_);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
     qshader_.UnUse();
+
+    if(m_is_recording){
+        glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
+        glReadPixels(0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, screen_pixels);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
 }
 
 void screenQuad::Clear(){
@@ -50,11 +57,4 @@ void screenQuad::Clear(){
     glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-}
-GLubyte* screenQuad::getCurrentFrame(){
-//    glBindFramebuffer(GL_FRAMEBUFFER, frame_buff_);
-//    glReadPixels(0, 0, tex_width, tex_height, GL_RGBA, GL_UNSIGNED_BYTE, screen_pixels);
-//    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    memset(screen_pixels, 0xff, m_screen_data_size);
-    return screen_pixels;
 }
