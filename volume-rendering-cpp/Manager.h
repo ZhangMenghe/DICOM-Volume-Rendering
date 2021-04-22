@@ -23,6 +23,8 @@ struct volumeSetupConstBuffer{
     unsigned int u_maskbits;
     unsigned int u_organ_num;
     bool u_mask_recolor;
+    bool u_att_first;
+    bool u_att_second;
 
     //others
     int u_show_organ;

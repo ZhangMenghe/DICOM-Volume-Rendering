@@ -70,6 +70,8 @@ void Manager::InitCheckParams(std::vector<std::string> keys, std::vector<bool> v
 
     m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
     m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
+    m_volset_data.u_att_first = param_bool[dvr::CHECK_ATTENTION_MAP];
+    m_volset_data.u_att_second = param_bool[dvr::CHECK_ATTENTION_MAP_SECOND];
 
     baked_dirty_ = true;
 }
@@ -151,6 +153,8 @@ void Manager::setCheck(std::string key, bool value){
         else{
             m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
             m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
+            m_volset_data.u_att_first = param_bool[dvr::CHECK_ATTENTION_MAP];
+            m_volset_data.u_att_second = param_bool[dvr::CHECK_ATTENTION_MAP_SECOND];
         }
         baked_dirty_ = true;
     }
@@ -204,6 +208,10 @@ void Manager::updateVolumeSetupUniforms(GLuint sp){
     Shader::Uniform(sp, "u_maskbits", m_volset_data.u_maskbits);
     Shader::Uniform(sp, "u_organ_num", m_volset_data.u_organ_num);
     Shader::Uniform(sp, "u_mask_color", m_volset_data.u_mask_recolor);
+    //TODO:DEBUG ONLY
+    Shader::Uniform(sp, "u_with_organ", false);
+    Shader::Uniform(sp, "u_att_first", m_volset_data.u_att_first);
+    Shader::Uniform(sp, "u_att_second", m_volset_data.u_att_second);
 
     Shader::Uniform(sp, "u_visible_bits", m_volset_data.u_visible_bits);
     Shader::Uniform(sp, "u_opacity", 6*m_volset_data.u_widget_num, 2, m_volset_data.u_opacity);

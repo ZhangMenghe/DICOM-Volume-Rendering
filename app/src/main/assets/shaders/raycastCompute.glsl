@@ -28,6 +28,9 @@ uniform float u_base_value;
 uniform int u_visible_bits;
 uniform bool u_mask_color;
 uniform int u_hex_color_scheme[256];
+uniform bool u_with_organ;
+uniform bool u_att_first;
+uniform bool u_att_second;
 
 //uniform float u_contrast_level;
 const vec3 ORGAN_COLORS[7]= vec3[7](vec3(0.24, 0.004, 0.64), vec3(0.008, 0.278, 0.99), vec3(0.75, 0.634, 0.996),
@@ -79,7 +82,9 @@ int getMaskBit(uint mask_value){
     }
     return CHECK_BIT;
 }
-
+float getAttentionMapValue(uint mask_value){
+    return float(mask_value) / 255.0f;
+}
 uvec2 Sample(ivec3 pos){
     #ifdef FLIPY
         pos = ivec3(pos.x, uint(u_tex_size.y-float(pos.y)),pos.z);
@@ -120,21 +125,28 @@ vec3 hex2rgb(int hex){
         (float((hex) & 0xFF)) / 255.0
     );
 }
-vec3 TransferColor(float intensity, int ORGAN_BIT){
+vec3 TransferColor(float intensity){
+    //debug only for attention map
     vec3 color;
     #ifdef COLOR_GRAYSCALE
         color = vec3(intensity);
-//    #elif defined(COLOR_HSV)
-//        color = transfer_scheme(intensity);
-//    #elif defined(COLOR_BRIGHT)
-//        color = bright_scheme(intensity);
     #else
         color = hex2rgb(u_hex_color_scheme[int(intensity * 255.0)]);
     #endif
 
-    #ifdef SHOW_ORGANS
-        if(u_mask_color && ORGAN_BIT > int(0)) color = transfer_scheme(ORGAN_BIT, intensity);
-    #endif
+    return AdjustContrastBrightness(color);
+}
+vec3 TransferColor(float intensity, int ORGAN_BIT){
+    vec3 color;
+//    #ifdef COLOR_GRAYSCALE
+        color = vec3(intensity);
+//    #else
+//        color = hex2rgb(u_hex_color_scheme[int(intensity * 255.0)]);
+//    #endif
+
+//    #ifdef SHOW_ORGANS
+//        if(u_mask_color && ORGAN_BIT > int(0)) color = transfer_scheme(ORGAN_BIT, intensity);
+//    #endif
     return AdjustContrastBrightness(color);
 }
 
@@ -142,9 +154,14 @@ void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
     uvec2 sampled_value = Sample(storePos);
     int ORGAN_BIT = -1;
+    float attention_first = -1.0, attention_second = -1.0;
     #ifdef SHOW_ORGANS
-        ORGAN_BIT = getMaskBit(sampled_value.y);
-        if(ORGAN_BIT< 0) {imageStore(destTex, storePos, vec4(.0)); return;}
+        if(u_with_organ){
+            ORGAN_BIT = getMaskBit(sampled_value.y);
+            if(ORGAN_BIT< 0) {imageStore(destTex, storePos, vec4(.0)); return;}
+        }
+        if(u_att_first) attention_first = getAttentionMapValue(sampled_value.y >> 8);
+        if(u_att_second) attention_second = getAttentionMapValue(sampled_value.y&uint(0x00ff));
     #endif
 
     //intensity in 0-1
@@ -153,5 +170,10 @@ void main(){
     for(int i=0; i<u_widget_num; i++)
     if(((u_visible_bits >> i) & 1) == 1) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity_01));
 
-    imageStore(destTex, storePos, vec4(TransferColor(intensity_01, ORGAN_BIT), alpha));
+    vec3 final_color = TransferColor(intensity_01, ORGAN_BIT);
+    if(attention_first >= .0f)
+        final_color = mix(final_color, TransferColor(attention_first), 0.5f);
+    if(attention_second >= .0f)
+        final_color = mix(final_color, TransferColor(attention_second), 0.5f);
+    imageStore(destTex, storePos, vec4(final_color, alpha));
 }
