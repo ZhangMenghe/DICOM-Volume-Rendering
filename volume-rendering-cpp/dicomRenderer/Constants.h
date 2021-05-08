@@ -55,6 +55,8 @@ namespace dvr{
     enum SHADER_FILES{
         SHADER_TEXTUREVOLUME_VERT=0,
         SHADER_TEXTUREVOLUME_FRAG,
+        SHADER_VIEW_ALIGNED_VERT,
+        SHADER_VIEW_ALIGNED_FRAG,
         SHADER_RAYCASTVOLUME_VERT,
         SHADER_RAYCASTVOLUME_FRAG,
         SHADER_RAYCASTCOMPUTE_GLSL,
@@ -109,6 +111,12 @@ namespace dvr{
         ORGAN_ILEUM,
         ORGAN_AROTA,
         ORGAN_END
+    };
+    enum RENDER_METHOD{
+        TEXTURE_BASED = 0,
+        VIEW_ALIGN_SLICING,
+        RAYCASTING,
+        RENDER_METHOD_END
     };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;

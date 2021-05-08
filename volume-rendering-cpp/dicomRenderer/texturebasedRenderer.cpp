@@ -3,14 +3,15 @@
 #include "texturebasedRenderer.h"
 #include "screenQuad.h"
 
-texvrRenderer::texvrRenderer(){
+texvrRenderer::texvrRenderer()
+:baseDicomRenderer(){
     //program
     shader_ = new Shader();
     if(!shader_->AddShader(GL_VERTEX_SHADER, Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT])
        ||!shader_->AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG])
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
-    Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
+//    Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
     setCuttingPlane(.0f);
 }
 
@@ -128,6 +129,8 @@ void texvrRenderer::draw_baked(glm::mat4 model_mat) {
 }
 
 void texvrRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale){
+    baseDicomRenderer::setDimension(vol_dim, vol_scale);
+
     dimensions = int(vol_dim.z * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
     vol_thickness_factor = vol_scale.z;
     update_instance_data(vbo_front, true);

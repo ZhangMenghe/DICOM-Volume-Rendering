@@ -56,7 +56,6 @@ public:
     static dvr::ORGAN_IDS traversal_target_id;
     static int screen_w, screen_h;
     static bool show_ar_ray, volume_ar_hold;
-    static bool isRayCut(){return param_bool[dvr::CHECK_RAYCAST] && param_bool[dvr::CHECK_CUTTING];}
     static bool new_data_available;
 
     //static getters
@@ -114,7 +113,6 @@ public:
 private:
     static Manager *myPtr_;
     static volumeSetupConstBuffer m_volset_data;
-
     std::unordered_map<std::string, reservedStatus> m_mvp_status;
 
     //contrast, brightness, etc

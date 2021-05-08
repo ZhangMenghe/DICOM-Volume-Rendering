@@ -35,7 +35,7 @@ public class renderUIs extends BasePanel{
     private tunerListAdapter rendertuneAdapter;
     private Button btn_hide;
 
-    private static String CHECK_TEXRAY_NAME, CHECK_OVERLAYS;
+    private static String CHECK_OVERLAYS;//CHECK_TEXRAY_NAME;
 
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
         super(activity, parent_view);
@@ -127,7 +127,7 @@ public class renderUIs extends BasePanel{
         });
 
         setup_checks(R.array.render_check_params, R.array.render_check_values);
-        CHECK_TEXRAY_NAME = check_names_[0];//res.getStringArray(R.array.render_check_params)[0];
+//        CHECK_TEXRAY_NAME = check_names_[0];//res.getStringArray(R.array.render_check_params)[0];
         CHECK_OVERLAYS = check_names_[1];//res.getStringArray(R.array.render_check_params)[1];
     }
     public void Reset(){
@@ -190,9 +190,6 @@ public class renderUIs extends BasePanel{
         map.put("opacity", opa_values);
         map.put("color scheme", colorAdapter.getTitle());
         return map;
-    }
-    private void onTexRaySwitch(boolean isRaycast){
-        JUIInterface.JUIsetChecks(CHECK_TEXRAY_NAME, isRaycast);
     }
     public void showHidePanel(boolean show_panel){
         if(panel_visible && !show_panel){
@@ -436,30 +433,27 @@ public class renderUIs extends BasePanel{
         }
     }
     private class renderListAdapter extends textSimpleListAdapter{
-        final private int RAYCAST_ID;
         int current_id = -1;
         renderListAdapter(Context context, int arrayId){
             super(context, arrayId);
-            RAYCAST_ID = UIsManager.raycast_id;
         }
         void onItemClick(int position){
-//            if(position == current_id) return;
-            mUIManagerRef.get().onTexRaySwitch(position == RAYCAST_ID);
-            onTexRaySwitch(RAYCAST_ID == position);
+            mUIManagerRef.get().onRenderingMethodChange(position);
+            JUIInterface.JUIsetRenderingMethod(position);
             current_id = position;
         }
         void setTitleByText(String tt){
             super.setTitleByText(tt);
             int id = item_names.indexOf(this.title);
-            mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == id);
-            onTexRaySwitch(RAYCAST_ID == id);
+            mUIManagerRef.get().onRenderingMethodChange(id);
+            JUIInterface.JUIsetRenderingMethod(id);
             current_id = id;
         }
         void setTitleById(int id){
 //            if(id == current_id) return;
             super.setTitleById(id);
-            mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == id);
-            onTexRaySwitch(RAYCAST_ID == id);
+            mUIManagerRef.get().onRenderingMethodChange(id);
+            JUIInterface.JUIsetRenderingMethod(id);
             current_id = id;
         }
     }

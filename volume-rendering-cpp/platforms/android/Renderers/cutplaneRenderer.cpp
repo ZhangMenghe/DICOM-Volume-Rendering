@@ -21,7 +21,7 @@ cutplaneRenderer::cutplaneRenderer(bool screen_baked)
 }
 
 void cutplaneRenderer::Draw(glm::mat4 viewproj_mat, glm::vec3 position, glm::vec3 normal_vec){
-    if(!Manager::show_ar_ray || !Manager::isRayCut()) return;
+    if(!Manager::show_ar_ray || !vrController::instance()->isRayCut()) return;
 
     glm::vec3 dir = vrController::instance()->getModelPos() - Manager::camera->getCameraPosition();
 

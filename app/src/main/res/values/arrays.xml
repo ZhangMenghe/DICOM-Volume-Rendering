@@ -33,6 +33,7 @@
 <!--    order matters!, consistent with uimanager static final values-->
     <string-array name="rendering_mode">
         <item>Slice by slice</item>
+        <item>View Aligned Slicing</item>
         <item>@string/raycast_render_mode_name</item>
     </string-array>
     <string-array name="color_schemes">

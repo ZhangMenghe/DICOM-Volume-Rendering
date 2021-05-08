@@ -24,7 +24,8 @@ const float quad_vertices_tex_standard[24] = {//Word          Texture
         -1.0f,1.0f,	.0, 0.0f,1.0f,.0
 };
 
-const float cuboid[24] = {//World
+
+const float cuboid[24] = {
         -0.5f,-0.5f,0.5f,
         0.5f,-0.5f,0.5f,
         0.5f,0.5f,0.5f,
@@ -34,8 +35,7 @@ const float cuboid[24] = {//World
         0.5f,0.5f,-0.5f,
         -0.5f,0.5f,-0.5f,
 };
-
-const float cuboid_with_texture[48] = {//World
+const float cuboid_with_texture[48] = {
         -0.5f,-0.5f,0.5f,   0.0f,0.0f,1.0f,
         0.5f,-0.5f,0.5f,    1.0f,0.0f,1.0f,
         0.5f,0.5f,0.5f,	    1.0f,1.0f,1.0f,

@@ -90,6 +90,9 @@ JUI_METHOD(void, JUIsetTraversalTargetNative)(JNIEnv * env, jclass, jint id){
     Manager::traversal_target_id = (id == 0)?dvr::ORGAN_COLON:dvr::ORGAN_ILEUM;
     LOGE("====ID: %d", id);
 }
+JUI_METHOD(void, JUIsetRenderingMethod)(JNIEnv * env, jclass, jint id){
+    m_sceneRenderer->setRenderingMethod(dvr::RENDER_METHOD(id));
+}
 JUI_METHOD(void, JUIsetGraphRectNative)(JNIEnv*, jclass, jint id, jint width, jint height, jint left, jint top){
 //    LOGE("====%d, %d, %d, %d,%d", id, width, height, left,top);
     m_sceneRenderer->setOverlayRects(id, width, height, left, top);

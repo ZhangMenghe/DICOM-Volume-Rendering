@@ -255,7 +255,9 @@ public class cutplaneUIs extends BasePanel{
     public void showHidePanel(boolean show_panel, boolean isRaycast){
         super.showHidePanel(show_panel);
     }
-    public void onTexRayChange(boolean isRaycast){
+
+    public void onRenderingMethodChange(int rm_id){
+        boolean isRaycast = (rm_id == 2);
         showHidePanel(panel_visible, isRaycast);
         is_current_raycast = isRaycast;
         if(primary_checkbox.isChecked()){

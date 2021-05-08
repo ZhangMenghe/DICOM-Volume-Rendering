@@ -3,7 +3,8 @@
 #include "screenQuad.h"
 #include <GLPipeline/Primitive.h>
 #include <glm/gtx/string_cast.hpp>
-raycastRenderer::raycastRenderer(){
+raycastRenderer::raycastRenderer()
+:baseDicomRenderer(){
     //geometry
     Mesh::InitQuadWithTex(vao_cube_, cuboid_with_texture, 8, cuboid_indices, 36);
 

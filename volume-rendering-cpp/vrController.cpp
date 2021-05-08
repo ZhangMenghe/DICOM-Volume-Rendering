@@ -6,6 +6,9 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/glm.hpp>
+#include <dicomRenderer/texturebasedRenderer.h>
+#include <dicomRenderer/raycastRenderer.h>
+#include <dicomRenderer/ViewAlignedSlicingRenderer.h>
 using namespace dvr;
 using namespace glm;
 vrController* vrController::myPtr_ = nullptr;
@@ -14,14 +17,13 @@ vrController* vrController::instance(){
     return myPtr_;
 }
 vrController::~vrController(){
-    if(texvrRenderer_) delete texvrRenderer_;
-    if(raycastRenderer_) delete raycastRenderer_;
-    // if(meshRenderer_) delete meshRenderer_;
+    for(auto render:vRenderer_)delete render;
+    delete meshRenderer_;
     for(auto inst:line_renderers_)delete inst.second;
     line_renderers_.clear();
-    if(bakeShader_) delete bakeShader_;
-    if(tex_volume) delete tex_volume;
-    if(tex_baked) delete tex_baked;
+    delete bakeShader_;
+    delete tex_volume;
+    delete tex_baked;
 }
 vrController::vrController(const std::shared_ptr<Manager> &manager)
 :m_manager(manager){
@@ -69,7 +71,7 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
         }
         vol_dim_scale_mat_=glm::scale(glm::mat4(1.0f), vol_dim_scale_);
         m_manager->setDimension(vol_dimension_);
-        texvrRenderer_->setDimension(vol_dimension_, vol_dim_scale_);
+        for(auto render:vRenderer_)render->setDimension(vol_dimension_, vol_dim_scale_);
         cutter_->setDimension(pd, vol_dim_scale_.z);
     }
     auto vsize= ph*pw*pd;
@@ -108,8 +110,11 @@ void vrController::setupCenterLine(int id, float* data){
 }
 
 void vrController::onViewCreated(){
-    texvrRenderer_ = new texvrRenderer();
-    raycastRenderer_ = new raycastRenderer();
+    vRenderer_.reserve(dvr::RENDER_METHOD_END);
+    vRenderer_.emplace_back(new texvrRenderer);
+    vRenderer_.emplace_back(new ViewAlignedSlicingRenderer);
+    vRenderer_.emplace_back(new raycastRenderer);
+
     meshRenderer_ = new organMeshRenderer;
     cutter_ = new cuttingController;
     data_board_ = new dataBoard;
@@ -175,8 +180,8 @@ void vrController::onDrawScene(){
 
     //volume
     if(Manager::isDrawVolume()){
-        if(isRayCasting())  raycastRenderer_->Draw(pre_draw_, model_mat);
-        else texvrRenderer_->Draw(pre_draw_, ModelMat_);
+        auto mm = isRayCasting()?model_mat:ModelMat_;
+        vRenderer_[m_rmethod_id]->Draw(pre_draw_, mm);
     }
 
     //mesh
@@ -219,7 +224,7 @@ void vrController::onTouchMove(float x, float y) {
 
     if(!Manager::param_bool[dvr::CHECK_CUTTING]&&Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]) return;
 
-    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+    vRenderer_[m_rmethod_id]->dirtyPrecompute();
 
     float xoffset = x - Mouse_old.x, yoffset = Mouse_old.y - y;
     Mouse_old = glm::fvec2(x, y);
@@ -236,7 +241,7 @@ void vrController::onTouchMove(float x, float y) {
 }
 void vrController::onScale(float sx, float sy){
     if(!tex_volume) return;
-    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+    vRenderer_[m_rmethod_id]->dirtyPrecompute();
     //unified scaling
     if(sx > 1.0f) sx = 1.0f + (sx - 1.0f) * MOUSE_SCALE_SENSITIVITY;
     else sx = 1.0f - (1.0f - sx)* MOUSE_SCALE_SENSITIVITY;
@@ -250,7 +255,7 @@ void vrController::onScale(float sx, float sy){
 }
 void vrController::onPan(float x, float y){
     if(!tex_volume|| Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]) return;
-    if(raycastRenderer_)isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+    vRenderer_[m_rmethod_id]->dirtyPrecompute();
 
     float offx = x / Manager::screen_w* MOUSE_PAN_SENSITIVITY, offy = -y /Manager::screen_h*MOUSE_PAN_SENSITIVITY;
     PosVec3_.x += offx * ScaleVec3_.x;
@@ -266,7 +271,6 @@ void vrController::precompute(){
            ||!bakeShader_->CompileAndLink())
             LOGE("Raycast=====Failed to create geometry shader");
         Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
-
     }
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(Manager::instance()->getColorSchemeKeyword());
@@ -291,7 +295,7 @@ void vrController::precompute(){
     bakeShader_->UnUse();
 
     data_board_->onUpdate(m_manager.get());
-    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+    vRenderer_[m_rmethod_id]->dirtyPrecompute();
 }
 
 void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content){
@@ -320,33 +324,34 @@ void vrController::updateVolumeModelMat(){
 void vrController::setCuttingPlane(float value){
     if(Manager::param_bool[dvr::CHECK_CUTTING] && !isRayCasting()) {
         cutter_->setCutPlane(value);
-        texvrRenderer_->setCuttingPlane(value);
-        if(pre_draw_)texvrRenderer_->dirtyPrecompute();
+        vRenderer_[m_rmethod_id]->setCuttingPlane(value);
+        vRenderer_[m_rmethod_id]->dirtyPrecompute();
     }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
         if(!cutter_->IsCenterLineAvailable())return;
         cutter_->setCenterLinePos((int)(value * 4000.0f));
         if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) {
             AlignModelMatToTraversalPlane();
-            isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+            vRenderer_[m_rmethod_id]->dirtyPrecompute();
         }
     }
 }
 void vrController::setCuttingPlane(int id, int delta){
     if(Manager::param_bool[dvr::CHECK_CUTTING]){
-        if(isRayCasting()) {cutter_->setCuttingPlaneDelta(delta);raycastRenderer_->dirtyPrecompute();}
-        else texvrRenderer_->setCuttingPlaneDelta(delta);
+        if(isRayCasting()) cutter_->setCuttingPlaneDelta(delta);
+        else vRenderer_[m_rmethod_id]->setCuttingPlaneDelta(delta);
+        vRenderer_[m_rmethod_id]->dirtyPrecompute();
     }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
         if(!cutter_->IsCenterLineAvailable())return;
         cutter_->setCenterLinePos(id, delta);
         if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) {
             AlignModelMatToTraversalPlane();
-            isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+            vRenderer_[m_rmethod_id]->dirtyPrecompute();
         }
     }
 }
 void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
     cutter_->setCutPlane(pp, pn);
-    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+    vRenderer_[m_rmethod_id]->dirtyPrecompute();
 }
 float* vrController::getCuttingPlane(){
     return cutter_->getCutPlane();
@@ -357,7 +362,7 @@ void vrController::setCuttingParams(GLuint sp){
 void vrController::SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id){
     cutter_->SwitchCuttingPlane(cut_plane_id);
     if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) AlignModelMatToTraversalPlane();
-    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+    vRenderer_[m_rmethod_id]->dirtyPrecompute();
 }
 void vrController::setOverlayRects(int id, int width, int height, int left, int top){
     data_board_->setOverlayRect(id, width, height, left, top);
@@ -370,7 +375,7 @@ void vrController::AlignModelMatToTraversalPlane(){
     RotateMat_ = glm::toMat4(glm::rotation(pn, glm::vec3(.0,.0,-1.0f)));
                 
     volume_model_dirty = true;
-    isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
+    vRenderer_[m_rmethod_id]->dirtyPrecompute();
 }
 
 float* vrController::getCurrentReservedStates(){
@@ -389,15 +394,14 @@ bool vrController::isDirty() {
         meshRenderer_->dirtyPrecompute();
         return true;
     }
+
     if(Manager::IsCuttingNeedUpdate()&&cutter_->isPrecomputeDirty()){
         meshRenderer_->dirtyPrecompute();
-        if(isRayCasting())raycastRenderer_->dirtyPrecompute();
-        else texvrRenderer_->dirtyPrecompute();
+        vRenderer_[m_rmethod_id]->dirtyPrecompute();
         return true;
     }
-    if(Manager::param_bool[dvr::CHECK_VOLUME_ON]){
-        if(isRayCasting()) return raycastRenderer_->isPrecomputeDirty();
-        return texvrRenderer_->isPrecomputeDirty();
-    }
+
+    if(Manager::param_bool[dvr::CHECK_VOLUME_ON])
+        return vRenderer_[m_rmethod_id]->isPrecomputeDirty();
     return false;
 }

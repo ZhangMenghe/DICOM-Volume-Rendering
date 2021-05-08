@@ -30,9 +30,11 @@ namespace {
 
     void setupShaderContents(){
         vrController* vrc = dynamic_cast<vrController*>(nativeApp(nativeAddr));
-        const char* shader_file_names[18] = {
+        const char* shader_file_names[20] = {
                 "shaders/textureVolume.vert",
                 "shaders/textureVolume.frag",
+                "shaders/viewAlignedSlicing.vert",
+                "shaders/viewAlignedSlicing.frag",
                 "shaders/raycastVolume.vert",
                 "shaders/raycastVolume.frag",
                 "shaders/raycastVolume.glsl",
@@ -148,7 +150,7 @@ void on_draw_native(){
         glm::vec2 res =  glm::vec2(glm::max(glm::max(t1.x, t1.y), t1.z), glm::min(glm::min(t2.x, t2.y), t2.z));
 
         //intersect
-        if(Manager::isRayCut()){
+        if(m_sceneRenderer->isRayCut()){
             if(res.x<res.y){
             glm::vec3 pn = cam->getViewDirection();
             glm::vec3 pp = cam->getCameraPosition() + glm::normalize(pn)*0.5f;
