@@ -10,7 +10,8 @@
 class ViewAlignedSlicingRenderer:public baseDicomRenderer{
 private:
     float vol_thickness_factor = 1.0f;
-    const static int MAX_DIMENSIONS = 100;
+    const float SLICE_SAMPLE_RATE = 0.2f;
+    const static int MAX_DIMENSIONS = 200;
     GLuint m_vaos[MAX_DIMENSIONS], m_vbos[MAX_DIMENSIONS];//, m_ebos[MAX_DIMENSIONS];
     int m_indice_num[MAX_DIMENSIONS];
     int m_slice_num;

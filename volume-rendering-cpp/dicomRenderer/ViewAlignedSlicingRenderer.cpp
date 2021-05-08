@@ -24,15 +24,13 @@ ViewAlignedSlicingRenderer::ViewAlignedSlicingRenderer()
         glBindVertexArray(m_vaos[i]);
 
         glBindBuffer(GL_ARRAY_BUFFER, m_vbos[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 36, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 18, nullptr, GL_DYNAMIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*12, m_indices_data, GL_STATIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
@@ -98,22 +96,7 @@ void SortPoints(std::vector<vec3>& points, vec3 pn){
         return glm::dot(v, pn) > .0f;
     } );
 }
-void AssembleVerticesAndCenterlize(const std::vector<vec3>& points, float*& vertices, int& vertex_num){
-    vertex_num = points.size();
-    if(vertex_num < 3) return;
 
-//    vertices = new float[vertex_num * 3];
-//    glm::vec3 center = glm::vec3(.0f);
-    for(int i=0; i<vertex_num; i++){
-//        center+=points[i];
-        vertices[6*i]=points[i].x;vertices[6*i+1]=points[i].y;vertices[6*i+2]=points[i].z;
-        //todo: texcoord
-    }
-//    center/=vertex_num;
-//    for(int i=0; i<vertex_num; i++){
-//        vertices[6*i]-=center.x; vertices[6*i+1]-=center.y;vertices[6*i+2]-=center.z;
-//    }
-}
 void ViewAlignedSlicingRenderer::update_instance_data(glm::mat4 model_mat){
     //Step 1: Transform the volume bounding box vertices into view coordinates using the modelview matrix
     // Volume view vertices
@@ -144,18 +127,17 @@ void ViewAlignedSlicingRenderer::update_instance_data(glm::mat4 model_mat){
     glm::vec3 zmax_model = vec3(zmax_modelv4.x, zmax_modelv4.y, zmax_modelv4.z) / zmax_modelv4.w;
     glm::vec3 distance = zmax_model - zmin_model;
     float slice_distance = glm::length(distance);
-    float slice_spacing = 0.1f;
 
-    m_slice_num = int(slice_distance/ slice_spacing);
+    m_slice_num = min(int(float(dimensions) * slice_distance * SLICE_SAMPLE_RATE), MAX_DIMENSIONS);
+    float slice_spacing = 1.0f/float(m_slice_num);
 
     //For each plane in front-to-back or back-to-front order
     vec3 aabb_min(-0.5f), aabb_max(0.5f);
     glm::vec4 pnv4 = model_view_inv* glm::vec4(.0, .0, -1.0f, 1.0f);
     glm::vec3 pn = glm::normalize(vec3(pnv4.x, pnv4.y, pnv4.z) / pnv4.w);
-//    glm::vec4 ppv4 = model_view_inv*glm::vec4(volume_view_vertices[z_min_id][0], volume_view_vertices[z_min_id][1], volume_view_vertices[z_min_id][2], 1.0f);
-//    glm::vec3 pp = vec3(ppv4.x, ppv4.y, ppv4.z) / ppv4.w;
     glm::vec3 pp = vec3(cuboid[3*z_min_id], cuboid[3*z_min_id+1], cuboid[3*z_min_id+2]);
-    float* vertices = new float[6 * 6];
+
+    float vertices[18] = {.0f};
     int vertex_num;
 
     for(int slice = 0; slice<m_slice_num; slice++){
@@ -167,22 +149,27 @@ void ViewAlignedSlicingRenderer::update_instance_data(glm::mat4 model_mat){
         //b. compute center and sort them in counter-clockwise
         //c. Tessellate the proxy polygon
         SortPoints(polygon_points, pn);
-        AssembleVerticesAndCenterlize(polygon_points, vertices, vertex_num);
+
+        vertex_num = polygon_points.size();
+        if(vertex_num < 3) continue;
+
+        for(int i=0; i<vertex_num; i++){
+            vertices[3*i]=polygon_points[i].x;vertices[3*i+1]=polygon_points[i].y;vertices[3*i+2]=polygon_points[i].z;}
+
         m_indice_num[slice] = (vertex_num - 2) * 3;
 
         //update to gpu
         glBindBuffer(GL_ARRAY_BUFFER, m_vbos[slice]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 6* vertex_num, vertices);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3* vertex_num, vertices);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-    delete []vertices;
 }
 void ViewAlignedSlicingRenderer::draw_scene(glm::mat4 model_mat){
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glEnable(GL_DEPTH_TEST);
+//    glEnable(GL_CULL_FACE);
+//    glCullFace(GL_BACK);
+//    glEnable(GL_DEPTH_TEST);
 
     GLuint sp = shader_->Use();
 
@@ -191,16 +178,17 @@ void ViewAlignedSlicingRenderer::draw_scene(glm::mat4 model_mat){
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
     Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat() * model_mat);
-//    Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     for(int i=0; i<m_slice_num; i++) {
         glBindVertexArray(m_vaos[i]);
         glDrawElements(GL_TRIANGLES, m_indice_num[i], GL_UNSIGNED_INT, 0);
     }
     shader_->UnUse();
+    glFrontFace(GL_CCW);
+
     glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
+//    glDisable(GL_DEPTH_TEST);
+//    glDisable(GL_CULL_FACE);
 }
 
 void ViewAlignedSlicingRenderer::Draw(bool pre_draw, glm::mat4 model_mat){
@@ -233,7 +221,7 @@ void ViewAlignedSlicingRenderer::draw_baked(glm::mat4 model_mat) {
 }
 
 void ViewAlignedSlicingRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale){
-//    baseDicomRenderer::setDimension(vol_dim, vol_scale);
+    baseDicomRenderer::setDimension(vol_dim, vol_scale);
 //
 //    dimensions = int(vol_dim.z * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
 //    vol_thickness_factor = vol_scale.z;

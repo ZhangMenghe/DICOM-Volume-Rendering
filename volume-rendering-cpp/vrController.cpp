@@ -180,7 +180,7 @@ void vrController::onDrawScene(){
 
     //volume
     if(Manager::isDrawVolume()){
-        auto mm = isRayCasting()?model_mat:ModelMat_;
+        auto mm = m_rmethod_id == (int)dvr::TEXTURE_BASED?ModelMat_:model_mat;
         vRenderer_[m_rmethod_id]->Draw(pre_draw_, mm);
     }
 

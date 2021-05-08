@@ -11,7 +11,7 @@ uniform mediump sampler3D uSampler_baked;
 //uniform bool u_cut;
 
 void main(){
-	fragColor = vec4(1.0f, 0.5, .0, 0.5f);
+	fragColor =  texture(uSampler_baked, vTexcoord);
 //	if(u_cut){
 //		if(u_front && vTexcoord.z > u_cut_texz) discard;
 //		else if(!u_front && vTexcoord.z < u_cut_texz) discard;
