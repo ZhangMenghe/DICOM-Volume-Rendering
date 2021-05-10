@@ -126,6 +126,7 @@ namespace dvr{
     //SETTINGS
     static const ORGAN_IDS DEFAULT_TRAVERSAL_ORGAN = ORGAN_COLON;
     static const bool AR_CAPTURE_FRAMES = false;
+    static const bool VIEW_ALIGNED_LAZY_UPDATE = false;
 
     //TRS
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);

@@ -25,6 +25,7 @@ public:
     }
     virtual void setCuttingPlane(float percent){}
     virtual void setCuttingPlaneDelta(int delta){}
+    virtual void UpdateVertices(glm::mat4 model_mat){}
     virtual void Draw(bool pre_draw, glm::mat4 model_mat) = 0;
     virtual void dirtyPrecompute(){baked_dirty_ = true;}
     virtual bool isPrecomputeDirty(){return baked_dirty_;}

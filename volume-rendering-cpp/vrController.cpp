@@ -34,7 +34,7 @@ void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
     if(m_manager->addMVPStatus("default_status", true)){
         m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
-        volume_model_dirty = true;
+        volume_model_dirty = true;volume_rotate_dirty=true;
     }
     if(cutter_) cutter_->onReset();
 }
@@ -45,7 +45,7 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
 //                 * glm::scale(glm::mat4(1.0), sv);
     if(m_manager->addMVPStatus("template", rm, sv, pv, cam, true)){
         m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
-        volume_model_dirty = true;
+        volume_model_dirty = true;volume_rotate_dirty=true;
     }
 
     if(cutter_) cutter_->onReset();
@@ -154,7 +154,7 @@ bool vrController::check_ar_ray_intersect(){
 
 void vrController::onDrawScene(){
     if(!tex_volume) return;
-    if(Manager::mvp_dirty_){m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_); volume_model_dirty=true;}
+    if(Manager::mvp_dirty_){m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_); volume_model_dirty=true;volume_rotate_dirty=true;}
     if(volume_model_dirty){updateVolumeModelMat();volume_model_dirty = false;}
     if(Manager::volume_ar_hold){
         vec3 view_dir = glm::normalize(Manager::camera->getViewDirection());
@@ -180,8 +180,19 @@ void vrController::onDrawScene(){
 
     //volume
     if(Manager::isDrawVolume()){
-        auto mm = m_rmethod_id == (int)dvr::TEXTURE_BASED?ModelMat_:model_mat;
-        vRenderer_[m_rmethod_id]->Draw(pre_draw_, mm);
+        switch(m_rmethod_id){
+            case dvr::TEXTURE_BASED:
+                vRenderer_[m_rmethod_id]->Draw(pre_draw_, ModelMat_);
+                break;
+            case dvr::VIEW_ALIGN_SLICING:
+                if(volume_rotate_dirty) vRenderer_[m_rmethod_id]->UpdateVertices(RotateMat_);
+                volume_rotate_dirty = false;
+            case dvr::RAYCASTING:
+                vRenderer_[m_rmethod_id]->Draw(pre_draw_, model_mat);
+                break;
+            default:
+                break;
+        }
     }
 
     //mesh
@@ -237,7 +248,7 @@ void vrController::onTouchMove(float x, float y) {
     }
 
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
-    volume_model_dirty = true;
+    volume_model_dirty = true;volume_rotate_dirty=true;
 }
 void vrController::onScale(float sx, float sy){
     if(!tex_volume) return;
@@ -305,7 +316,7 @@ void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content)
 
 void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
     RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv;
-    volume_model_dirty=true;
+    volume_model_dirty=true;volume_rotate_dirty=true;
 }
 
 void vrController::updateVolumeModelMat(){
@@ -374,7 +385,7 @@ void vrController::AlignModelMatToTraversalPlane(){
 
     RotateMat_ = glm::toMat4(glm::rotation(pn, glm::vec3(.0,.0,-1.0f)));
                 
-    volume_model_dirty = true;
+    volume_model_dirty = true;volume_rotate_dirty=true;
     vRenderer_[m_rmethod_id]->dirtyPrecompute();
 }
 

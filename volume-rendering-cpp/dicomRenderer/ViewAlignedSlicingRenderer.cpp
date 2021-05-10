@@ -37,6 +37,14 @@ ViewAlignedSlicingRenderer::ViewAlignedSlicingRenderer()
     }
 }
 
+//float RayPlane(vec3 ro, vec3 rd, vec3 pp, vec3 pn, float& t) {
+//    float d = dot(pn, rd);
+//    if(fabs(d) > 1e-6){
+//        t = dot(pp - ro, pn) / d;
+//        return (t >= 0);
+//    }
+//    return false;
+//}
 float RayPlane(vec3 ro, vec3 rd, vec3 pp, vec3 pn) {
     float d = dot(pn, rd);
     float t = dot(pp - ro, pn);
@@ -97,13 +105,30 @@ void SortPoints(std::vector<vec3>& points, vec3 pn){
     } );
 }
 
-void ViewAlignedSlicingRenderer::update_instance_data(glm::mat4 model_mat){
+void ViewAlignedSlicingRenderer::UpdateVertices(glm::mat4 model_mat){
+    glm::mat4 model_view = Manager::camera->getViewMat() * model_mat;
+    glm::mat4 model_view_inv = glm::inverse(model_view);
+
+    glm::vec4 pnv4 = model_view_inv* glm::vec4(.0, .0, 1.0f, 1.0f);
+    glm::vec3 pn = glm::normalize(vec3(pnv4.x, pnv4.y, pnv4.z) / pnv4.w);
+//    LOGE("====PN : %f, %f, %f", pn.x, pn.y, pn.z);
+
+    m_right_order = (pn.x + pn.y + pn.z) > .0;
+    if(!m_right_order)pn = -pn;
+
+    if(dvr::VIEW_ALIGNED_LAZY_UPDATE){
+        if(abs(pn.x) > abs(pn.y) && abs(pn.x) > abs(pn.z)){pn.x = pn.x > .0f?1.0:-1.0;pn.y=0;pn.z=0;}
+        else if(abs(pn.y) > abs(pn.x) && abs(pn.y) > abs(pn.z)){pn.y = pn.y > .0f?1.0:-1.0;pn.x=0;pn.z=0;}
+        else if(abs(pn.z) > abs(pn.y) && abs(pn.z) > abs(pn.x)){pn.z = pn.z > .0f?1.0:-1.0;pn.y=0;pn.x=0;}
+        if(glm::all(glm::equal(m_last_vec3, pn))) return;
+        m_last_vec3 = pn;
+        //    LOGE("====PN : %f, %f, %f", pn.x, pn.y, pn.z);
+        //    LOGE("====pp : %f, %f, %f", pp.x, pp.y, pp.z);
+    }
+
     //Step 1: Transform the volume bounding box vertices into view coordinates using the modelview matrix
     // Volume view vertices
     float volume_view_vertices[8][3];
-
-    glm::mat4 model_view = Manager::camera->getViewMat() * model_mat;
-    glm::mat4 model_view_inv = glm::inverse(model_view);
 
     for(int i=0;i<8;i++){
         glm::vec4 v(cuboid[3*i], cuboid[3*i+1], cuboid[3*i+2], 1.0f);
@@ -133,30 +158,28 @@ void ViewAlignedSlicingRenderer::update_instance_data(glm::mat4 model_mat){
 
     //For each plane in front-to-back or back-to-front order
     vec3 aabb_min(-0.5f), aabb_max(0.5f);
-    glm::vec4 pnv4 = model_view_inv* glm::vec4(.0, .0, -1.0f, 1.0f);
-    glm::vec3 pn = glm::normalize(vec3(pnv4.x, pnv4.y, pnv4.z) / pnv4.w);
-    glm::vec3 pp = vec3(cuboid[3*z_min_id], cuboid[3*z_min_id+1], cuboid[3*z_min_id+2]);
+    int id = m_right_order?3*z_min_id:3*z_max_id;
+    glm::vec3 pp = vec3(cuboid[id], cuboid[id+1], cuboid[id+2]);
 
     float vertices[18] = {.0f};
     int vertex_num;
 
-    for(int slice = 0; slice<m_slice_num; slice++){
-        pp+=pn*slice_spacing;
+    for(int slice = 0; slice<m_slice_num; slice++,pp+=pn*slice_spacing){
         // a. Test for intersections with the edges of the bounding box. Add each intersection point to a temporary vertex list. Up to six intersections are generated, so the maximum size of the list is fixed.
         std::vector<vec3> polygon_points;
         PlaneBox(aabb_min, aabb_max, pp, pn, polygon_points);
+
+        vertex_num = polygon_points.size();
+        m_indice_num[slice] = (vertex_num - 2) * 3;
+
+        if(vertex_num < 3) continue;
 
         //b. compute center and sort them in counter-clockwise
         //c. Tessellate the proxy polygon
         SortPoints(polygon_points, pn);
 
-        vertex_num = polygon_points.size();
-        if(vertex_num < 3) continue;
-
         for(int i=0; i<vertex_num; i++){
             vertices[3*i]=polygon_points[i].x;vertices[3*i+1]=polygon_points[i].y;vertices[3*i+2]=polygon_points[i].z;}
-
-        m_indice_num[slice] = (vertex_num - 2) * 3;
 
         //update to gpu
         glBindBuffer(GL_ARRAY_BUFFER, m_vbos[slice]);
@@ -169,7 +192,7 @@ void ViewAlignedSlicingRenderer::draw_scene(glm::mat4 model_mat){
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 //    glEnable(GL_CULL_FACE);
 //    glCullFace(GL_BACK);
-//    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
 
     GLuint sp = shader_->Use();
 
@@ -179,20 +202,32 @@ void ViewAlignedSlicingRenderer::draw_scene(glm::mat4 model_mat){
 
     Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat() * model_mat);
 
-    for(int i=0; i<m_slice_num; i++) {
-        glBindVertexArray(m_vaos[i]);
-        glDrawElements(GL_TRIANGLES, m_indice_num[i], GL_UNSIGNED_INT, 0);
+    if(m_right_order){
+        for(int i=0; i<m_slice_num; i++) {
+            if(m_indice_num[i]> 0){
+                glBindVertexArray(m_vaos[i]);
+                glDrawElements(GL_TRIANGLES, m_indice_num[i], GL_UNSIGNED_INT, 0);
+            }
+        }
+    }else{
+        for(int i=m_slice_num-1; i>=0; i--) {
+            if(m_indice_num[i]> 0){
+                glBindVertexArray(m_vaos[i]);
+                glDrawElements(GL_TRIANGLES, m_indice_num[i], GL_UNSIGNED_INT, 0);
+            }
+        }
     }
+
     shader_->UnUse();
     glFrontFace(GL_CCW);
 
     glDisable(GL_BLEND);
-//    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
 //    glDisable(GL_CULL_FACE);
 }
 
 void ViewAlignedSlicingRenderer::Draw(bool pre_draw, glm::mat4 model_mat){
-    update_instance_data(model_mat);
+//    update_instance_data(model_mat);
 //    float vertices[24] = {
 //            -0.5f,-0.5f,0.f,   0.0f,0.0f,1.0f,
 //            0.5f,-0.5f,0.f,    1.0f,0.0f,1.0f,

@@ -46,7 +46,7 @@ public:
         _up = up;
         _eyePos = pos;
         _center = center;
-        _front = _center - _eyePos;
+        _front = glm::normalize(_center - _eyePos);
         _viewMat = glm::lookAt(pos, center, up);
     }
 

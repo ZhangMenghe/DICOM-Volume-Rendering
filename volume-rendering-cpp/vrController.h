@@ -102,7 +102,7 @@ private:
     glm::fvec2 Mouse_old;
 
     //flags
-    bool volume_model_dirty;
+    bool volume_model_dirty, volume_rotate_dirty;
     
     //performance 
     perfMonitor pm_;

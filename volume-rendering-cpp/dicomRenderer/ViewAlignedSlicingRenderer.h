@@ -18,11 +18,11 @@ private:
     const unsigned int m_indices_data[12] = {
             0,1,2,0,2,3,0,3,4,0,4,5
     };
-
+    glm::vec3 m_last_vec3=glm::vec3(1e6);
+    bool m_right_order;
     //for screen baking
     void draw_scene(glm::mat4 model_mat);
     void draw_baked(glm::mat4 model_mat);
-    void update_instance_data(glm::mat4 model_mat);
 
 public:
     ViewAlignedSlicingRenderer();
@@ -30,5 +30,6 @@ public:
     void setCuttingPlane(float percent);
     void setCuttingPlaneDelta(int delta);
     void Draw(bool pre_draw, glm::mat4 model_mat);
+    void UpdateVertices(glm::mat4 model_mat);
 };
 #endif
