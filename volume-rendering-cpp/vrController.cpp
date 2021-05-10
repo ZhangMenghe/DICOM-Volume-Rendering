@@ -348,7 +348,7 @@ void vrController::setCuttingPlane(float value){
 }
 void vrController::setCuttingPlane(int id, int delta){
     if(Manager::param_bool[dvr::CHECK_CUTTING]){
-        if(isRayCasting()) cutter_->setCuttingPlaneDelta(delta);
+        if(m_rmethod_id != (int)dvr::TEXTURE_BASED) cutter_->setCuttingPlaneDelta(delta);
         else vRenderer_[m_rmethod_id]->setCuttingPlaneDelta(delta);
         vRenderer_[m_rmethod_id]->dirtyPrecompute();
     }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){

@@ -27,8 +27,8 @@ private:
 public:
     ViewAlignedSlicingRenderer();
     void setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale);
-    void setCuttingPlane(float percent);
-    void setCuttingPlaneDelta(int delta);
+//    void setCuttingPlane(float percent);
+//    void setCuttingPlaneDelta(int delta);
     void Draw(bool pre_draw, glm::mat4 model_mat);
     void UpdateVertices(glm::mat4 model_mat);
 };

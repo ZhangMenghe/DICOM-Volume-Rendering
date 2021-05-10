@@ -202,6 +202,11 @@ void ViewAlignedSlicingRenderer::draw_scene(glm::mat4 model_mat){
 
     Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat() * model_mat);
 
+    if(Manager::IsCuttingEnabled())shader_->EnableKeyword("CUTTING_PLANE");
+    else shader_->DisableKeyword("CUTTING_PLANE");
+
+    vrController::instance()->setCuttingParams(sp);
+
     if(m_right_order){
         for(int i=0; i<m_slice_num; i++) {
             if(m_indice_num[i]> 0){
@@ -263,11 +268,11 @@ void ViewAlignedSlicingRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_s
 //    update_instance_data(vbo_front, true);
 //    update_instance_data(vbo_back, false);
 }
-void ViewAlignedSlicingRenderer::setCuttingPlane(float percent){
-//    cut_id = int(dimensions * percent);
-//    baked_dirty_ = true;
-}
-void ViewAlignedSlicingRenderer::setCuttingPlaneDelta(int delta){
-//    cut_id = ((int)fmax(0, cut_id + delta))%dimensions;
-//    baked_dirty_ = true;
-}
+//void ViewAlignedSlicingRenderer::setCuttingPlane(float percent){
+////    cut_id = int(dimensions * percent);
+////    baked_dirty_ = true;
+//}
+//void ViewAlignedSlicingRenderer::setCuttingPlaneDelta(int delta){
+////    cut_id = ((int)fmax(0, cut_id + delta))%dimensions;
+////    baked_dirty_ = true;
+//}

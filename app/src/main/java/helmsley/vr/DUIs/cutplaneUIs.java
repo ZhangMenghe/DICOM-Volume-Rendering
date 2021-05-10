@@ -257,11 +257,11 @@ public class cutplaneUIs extends BasePanel{
     }
 
     public void onRenderingMethodChange(int rm_id){
-        boolean isRaycast = (rm_id == 2);
-        showHidePanel(panel_visible, isRaycast);
-        is_current_raycast = isRaycast;
+        boolean is_all_dir = (rm_id !=0 );
+        showHidePanel(panel_visible, is_all_dir);
+        is_current_raycast = is_all_dir;
         if(primary_checkbox.isChecked()){
-            if(isRaycast)primary_panel.setVisibility(View.VISIBLE);
+            if(is_all_dir)primary_panel.setVisibility(View.VISIBLE);
             else primary_panel.setVisibility(View.INVISIBLE);
         }
     }
