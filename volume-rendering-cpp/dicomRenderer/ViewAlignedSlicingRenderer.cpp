@@ -154,6 +154,12 @@ void ViewAlignedSlicingRenderer::UpdateVertices(glm::mat4 model_mat){
     float slice_distance = glm::length(distance);
 
     m_slice_num = min(int(float(dimensions) * slice_distance * SLICE_SAMPLE_RATE), MAX_DIMENSIONS);
+//    m_slice_amount+=m_slice_num;
+//    m_slice_count++;
+//    if(m_slice_count > 300){
+//        LOGE("=======SLICE NUM %f", m_slice_amount/m_slice_count);
+//        m_slice_amount = 0; m_slice_count=0;
+//    }
     float slice_spacing = 1.0f/float(m_slice_num);
 
     //For each plane in front-to-back or back-to-front order

@@ -9,6 +9,7 @@
 #include <dicomRenderer/texturebasedRenderer.h>
 #include <dicomRenderer/raycastRenderer.h>
 #include <dicomRenderer/ViewAlignedSlicingRenderer.h>
+#include <chrono>
 using namespace dvr;
 using namespace glm;
 vrController* vrController::myPtr_ = nullptr;
@@ -185,7 +186,17 @@ void vrController::onDrawScene(){
                 vRenderer_[m_rmethod_id]->Draw(pre_draw_, ModelMat_);
                 break;
             case dvr::VIEW_ALIGN_SLICING:
-                if(volume_rotate_dirty) vRenderer_[m_rmethod_id]->UpdateVertices(RotateMat_);
+                if(volume_rotate_dirty) {
+//                    auto start = std::chrono::high_resolution_clock::now();
+                    vRenderer_[m_rmethod_id]->UpdateVertices(RotateMat_);
+//                    auto stop = std::chrono::high_resolution_clock::now();
+//                    time_all+=duration_cast<std::chrono::microseconds>(stop - start).count();
+//                    time_count++;
+//                    if(time_count > 300){
+//                        LOGE("====GENERATE: %f", time_all / time_count);
+//                        time_count = 0; time_all = 0;
+//                    }
+                }
                 volume_rotate_dirty = false;
             case dvr::RAYCASTING:
                 vRenderer_[m_rmethod_id]->Draw(pre_draw_, model_mat);
@@ -212,7 +223,7 @@ void vrController::onDrawScene(){
         data_board_->onDraw(pre_draw_);
 
     Manager::baked_dirty_ = false;
-    //  LOGE("===FPS: %.2f==\n", pm_.Update());
+//    LOGE("===FPS: %.2f==\n", pm_.Update());
 }
 void vrController::onDraw() {
     if(!tex_volume) return;
@@ -335,7 +346,9 @@ void vrController::updateVolumeModelMat(){
 void vrController::setCuttingPlane(float value){
     if(Manager::param_bool[dvr::CHECK_CUTTING] && !isRayCasting()) {
         cutter_->setCutPlane(value);
-        vRenderer_[m_rmethod_id]->setCuttingPlane(value);
+        vRenderer_[0]->setCuttingPlane(value);
+        vRenderer_[1]->setCuttingPlane(value);
+
         vRenderer_[m_rmethod_id]->dirtyPrecompute();
     }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
         if(!cutter_->IsCenterLineAvailable())return;
@@ -348,8 +361,9 @@ void vrController::setCuttingPlane(float value){
 }
 void vrController::setCuttingPlane(int id, int delta){
     if(Manager::param_bool[dvr::CHECK_CUTTING]){
-        if(m_rmethod_id != (int)dvr::TEXTURE_BASED) cutter_->setCuttingPlaneDelta(delta);
-        else vRenderer_[m_rmethod_id]->setCuttingPlaneDelta(delta);
+//        if(m_rmethod_id != (int)dvr::TEXTURE_BASED)
+            cutter_->setCuttingPlaneDelta(delta);
+//        else vRenderer_[m_rmethod_id]->setCuttingPlaneDelta(delta);
         vRenderer_[m_rmethod_id]->dirtyPrecompute();
     }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
         if(!cutter_->IsCenterLineAvailable())return;

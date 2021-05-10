@@ -107,6 +107,8 @@ private:
     //performance 
     perfMonitor pm_;
 
+//    float time_all = 0, time_count = 0;
+
     //vec3
     glm::vec4 ray_dir;
     bool ray_initialized = false;
