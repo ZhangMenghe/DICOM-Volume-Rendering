@@ -51,6 +51,10 @@ JUI_METHOD(void, JUIsetTuneParamByIdNative)(JNIEnv *, jclass, jint tid, jint pid
         m_manager->setOpacityValue(pid, value);
     else if(tid == 1)
         m_manager->setRenderParam(pid, value);
+    else{
+        jfloat tmp[] = {value};
+        m_sceneRenderer->setRenderingParameters(dvr::RENDER_METHOD(tid-2), tmp);
+    }
 //       m_sceneRenderer->setRenderParam(pid, value);
 }
 JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint pid, jfloat minv, jfloat maxv){
@@ -102,8 +106,12 @@ JUI_METHOD(void, JUIsetAllTuneParamByIdNative)(JNIEnv* env, jclass, jint id, jfl
     if(id == 1)
         m_manager->setRenderParam(values);
 //        m_sceneRenderer->setRenderParam(values);
-    else if(id == 2)
+    else if(id == 5)
         m_sceneRenderer->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
+    else{
+        //Individual parameters for 3 rendering methods
+        m_sceneRenderer->setRenderingParameters(dvr::RENDER_METHOD(id-2), values);
+    }
     env->ReleaseFloatArrayElements(jvalues,values,0);
 }
 JUI_METHOD(void, JUIsetTuneWidgetVisibilityNative)(JNIEnv*, jclass, jint wid, jboolean value){

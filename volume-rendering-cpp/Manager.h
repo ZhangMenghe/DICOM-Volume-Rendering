@@ -57,6 +57,7 @@ public:
     static int screen_w, screen_h;
     static bool show_ar_ray, volume_ar_hold;
     static bool new_data_available;
+    static float indiv_rendering_params[3];
 
     //static getters
     static unsigned int getMaskBits() { return m_volset_data.u_maskbits; }
@@ -109,7 +110,6 @@ public:
     bool addMVPStatus(std::string name, bool use_as_current_status);
     bool setMVPStatus(std::string status_name);
     void getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv);
-
 private:
     static Manager *myPtr_;
     static volumeSetupConstBuffer m_volset_data;

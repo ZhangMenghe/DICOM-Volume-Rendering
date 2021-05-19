@@ -122,7 +122,34 @@
         <item>@array/contrast_high</item>
         <item>@array/brightness</item>
         <item>@array/base_value</item>
+    </string-array>
 
+    <string-array name="TexturebasedParams">
+        <item>@array/dense_factor</item>
+    </string-array>
+    <string-array name="ViewAlignParams">
+        <item>@array/sample_rate</item>
+    </string-array>
+    <string-array name="RaycastParams">
+        <item>@array/sample_step</item>
+    </string-array>
+    <string-array name="dense_factor">
+        <item>Dense Factor</item>
+        <item>1.0</item>
+        <item>2.0</item>
+        <item>200</item>
+    </string-array>
+    <string-array name="sample_rate">
+        <item>Sampling Rate</item>
+        <item>0.3</item>
+        <item>1.0</item>
+        <item>100</item>
+    </string-array>
+    <string-array name="sample_step">
+        <item>Sampling Step</item>
+        <item>100</item>
+        <item>600</item>
+        <item>100</item>
     </string-array>
 <!--    <string-array name="contrast_level">-->
 <!--        <item>Level</item>-->

@@ -15,6 +15,7 @@ raycastRenderer::raycastRenderer()
             ||!shader_->CompileAndLink())
         LOGE("Raycast===Failed to create raycast shader program===");
     Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_FRAG]="";
+    m_sample_steps = Manager::indiv_rendering_params[dvr::RAYCASTING];
 }
 void raycastRenderer::Draw(bool pre_draw, glm::mat4 model_mat) {
     if (pre_draw)draw_baked(model_mat);
@@ -41,7 +42,7 @@ void raycastRenderer::draw_scene(glm::mat4 model_mat){
     Shader::Uniform(sp, "uModelMat", model_mat);
     Shader::Uniform(sp, "uCamposObjSpace",
             glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
-    Shader::Uniform(sp,"usample_step_inverse", 1.0f/600.0f);
+    Shader::Uniform(sp,"usample_step_inverse", 1.0f/m_sample_steps);
     Shader::Uniform(sp,"u_cutplane_realsample", Manager::param_bool[dvr::CUT_PLANE_REAL_SAMPLE]);
     Shader::Uniform(sp,"u_is_ar", Manager::param_bool[dvr::CHECK_AR_ENABLED]);
 
@@ -88,7 +89,7 @@ void raycastRenderer::draw_baked(glm::mat4 model_mat){
     Shader::Uniform(sp, "u_WorldToModel", model_inv);
     Shader::Uniform(sp, "u_CamToWorld", Manager::camera->getCameraPose());
     Shader::Uniform(sp, "uCamposObjSpace", glm::vec3(model_inv*glm::vec4(Manager::camera->getCameraPosition(), 1.0)));
-    Shader::Uniform(sp, "usample_step_inverse", 1.0f / 400.0f);
+    Shader::Uniform(sp, "usample_step_inverse", 1.0f / m_sample_steps);
     Shader::Uniform(sp,"u_cutplane_realsample", Manager::param_bool[dvr::CUT_PLANE_REAL_SAMPLE]);
     Shader::Uniform(sp,"u_is_ar", Manager::param_bool[dvr::CHECK_AR_ENABLED]);
 

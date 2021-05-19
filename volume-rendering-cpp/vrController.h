@@ -56,7 +56,13 @@ public:
         if(m_rmethod_id == method) return;
         m_rmethod_id = method;//vRenderer_[m_rmethod_id]->dirtyPrecompute();
     }
-
+    void setRenderingParameters(dvr::RENDER_METHOD method, float* values){
+        if(method < vRenderer_.size())
+            vRenderer_[method]->setRenderingParameters(values);
+        else{
+            Manager::indiv_rendering_params[method] = values[0];
+        }
+    }
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}

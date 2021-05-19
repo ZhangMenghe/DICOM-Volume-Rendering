@@ -33,7 +33,10 @@ public class renderUIs extends BasePanel{
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private widgetListAdapter widAdapter;
     private tunerListAdapter rendertuneAdapter;
+    private final int RENDERING_METHOD_NUM=3;
+    private tunerListAdapter indivAdapter[] = new tunerListAdapter[RENDERING_METHOD_NUM];
     private Button btn_hide;
+    private Spinner param_seekbar_spinner;
 
     private static String CHECK_OVERLAYS;//CHECK_TEXRAY_NAME;
 
@@ -56,6 +59,18 @@ public class renderUIs extends BasePanel{
         contrast_seekbar_spinner.setDropDownVerticalOffset(150);
         rendertuneAdapter = new tunerListAdapter(activity,1, R.string.contrast_group_name, R.array.contrastParams);
         contrast_seekbar_spinner.setAdapter(rendertuneAdapter);
+
+        param_seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.param_seekbar_spinner);
+        contrast_seekbar_spinner.setDropDownVerticalOffset(150);
+
+        int[] indivual_param_group_name ={
+                R.array.TexturebasedParams,
+                R.array.ViewAlignParams,
+                R.array.RaycastParams
+        };
+
+        for(int i=0;i<RENDERING_METHOD_NUM;i++)
+            indivAdapter[i] = new tunerListAdapter(activity,i+2, R.string.other_tune_group_name, indivual_param_group_name[i]);
 
         Spinner widget_spinner = (Spinner)tune_panel_.findViewById(R.id.tune_widget_id_spinner);
         widAdapter = new widgetListAdapter(activity, this, new tunerListAdapter[]{tunerAdapter});
@@ -135,6 +150,12 @@ public class renderUIs extends BasePanel{
         widAdapter.addItem();
         rendertuneAdapter.Reset();
         rendertuneAdapter.addInstance(0);
+
+        for(int i=0;i<RENDERING_METHOD_NUM;i++) {
+            indivAdapter[i].Reset();
+            indivAdapter[i].addInstance(0);
+            JUIInterface.JUIsetAllTuneParamById(indivAdapter[i].TID, indivAdapter[i].getDefaultValues());
+        }
         //render mode should be the first to set!!
         rendermodeAdapter.setTitleById(0);
         colorAdapter.setTitleById(0);
@@ -147,6 +168,11 @@ public class renderUIs extends BasePanel{
         //transfer-func: contrast
         rendertuneAdapter.Reset();
         rendertuneAdapter.addInstanceWithValue(0, Floats.toArray((ArrayList<Float>)tfmap.getOrDefault("contrast", new ArrayList<Float>())));
+
+        for(int i=0;i<RENDERING_METHOD_NUM;i++) {
+            indivAdapter[i].Reset();
+            indivAdapter[i].addInstance(0);
+        }
 
         //transfer-func: opacity widgets
         widAdapter.Reset();
@@ -204,6 +230,10 @@ public class renderUIs extends BasePanel{
     private void onWidgetChange(boolean visible){
         if(visible) btn_hide.setBackground(actRef.get().getResources().getDrawable(R.drawable.visible, null));
         else btn_hide.setBackground(actRef.get().getResources().getDrawable(R.drawable.invisible, null));
+    }
+    public void onRenderingMethodChange(int id){
+        param_seekbar_spinner.setAdapter(indivAdapter[id]);
+        mUIManagerRef.get().onRenderingMethodChange(id);
     }
     private static class tunerListAdapter extends ListAdapter{
         //TID: 0 for opacity, 1 for contrast
@@ -438,21 +468,21 @@ public class renderUIs extends BasePanel{
             super(context, arrayId);
         }
         void onItemClick(int position){
-            mUIManagerRef.get().onRenderingMethodChange(position);
+            onRenderingMethodChange(position);
             JUIInterface.JUIsetRenderingMethod(position);
             current_id = position;
         }
         void setTitleByText(String tt){
             super.setTitleByText(tt);
             int id = item_names.indexOf(this.title);
-            mUIManagerRef.get().onRenderingMethodChange(id);
+            onRenderingMethodChange(id);
             JUIInterface.JUIsetRenderingMethod(id);
             current_id = id;
         }
         void setTitleById(int id){
 //            if(id == current_id) return;
             super.setTitleById(id);
-            mUIManagerRef.get().onRenderingMethodChange(id);
+            onRenderingMethodChange(id);
             JUIInterface.JUIsetRenderingMethod(id);
             current_id = id;
         }

@@ -35,6 +35,8 @@ ViewAlignedSlicingRenderer::ViewAlignedSlicingRenderer()
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }
+    float tmp[] ={Manager::indiv_rendering_params[dvr::VIEW_ALIGN_SLICING]};
+    setRenderingParameters(tmp);
 }
 
 //float RayPlane(vec3 ro, vec3 rd, vec3 pp, vec3 pn, float& t) {
@@ -106,6 +108,7 @@ void SortPoints(std::vector<vec3>& points, vec3 pn){
 }
 
 void ViewAlignedSlicingRenderer::UpdateVertices(glm::mat4 model_mat){
+    baseDicomRenderer::UpdateVertices(model_mat);
     glm::mat4 model_view = Manager::camera->getViewMat() * model_mat;
     glm::mat4 model_view_inv = glm::inverse(model_view);
 
@@ -153,7 +156,7 @@ void ViewAlignedSlicingRenderer::UpdateVertices(glm::mat4 model_mat){
     glm::vec3 distance = zmax_model - zmin_model;
     float slice_distance = glm::length(distance);
 
-    m_slice_num = min(int(float(dimensions) * slice_distance * SLICE_SAMPLE_RATE), MAX_DIMENSIONS);
+    m_slice_num = min(int(float(dimensions_origin) * slice_distance * m_sampling_rate), MAX_DIMENSIONS);
 //    m_slice_amount+=m_slice_num;
 //    m_slice_count++;
 //    if(m_slice_count > 300){
@@ -265,15 +268,15 @@ void ViewAlignedSlicingRenderer::draw_baked(glm::mat4 model_mat) {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
 }
-
-void ViewAlignedSlicingRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale){
-    baseDicomRenderer::setDimension(vol_dim, vol_scale);
-//
-//    dimensions = int(vol_dim.z * DENSE_FACTOR);dimension_inv = 1.0f / dimensions;
-//    vol_thickness_factor = vol_scale.z;
-//    update_instance_data(vbo_front, true);
-//    update_instance_data(vbo_back, false);
+void ViewAlignedSlicingRenderer::setRenderingParameters(float* values){
+    if(values[0]!=m_sampling_rate){
+        vertices_dirty_ = true;
+        m_sampling_rate = values[0];
+    }
 }
+//void ViewAlignedSlicingRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale){
+//    dimensions = vol_dim.z;
+//}
 //void ViewAlignedSlicingRenderer::setCuttingPlane(float percent){
 ////    cut_id = int(dimensions * percent);
 ////    baked_dirty_ = true;

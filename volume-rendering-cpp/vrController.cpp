@@ -186,7 +186,7 @@ void vrController::onDrawScene(){
                 vRenderer_[m_rmethod_id]->Draw(pre_draw_, ModelMat_);
                 break;
             case dvr::VIEW_ALIGN_SLICING:
-                if(volume_rotate_dirty) {
+                if(volume_rotate_dirty || vRenderer_[m_rmethod_id]->isVerticesDirty()) {
 //                    auto start = std::chrono::high_resolution_clock::now();
                     vRenderer_[m_rmethod_id]->UpdateVertices(RotateMat_);
 //                    auto stop = std::chrono::high_resolution_clock::now();
