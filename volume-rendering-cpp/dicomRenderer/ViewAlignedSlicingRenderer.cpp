@@ -39,18 +39,10 @@ ViewAlignedSlicingRenderer::ViewAlignedSlicingRenderer()
     setRenderingParameters(tmp);
 }
 
-//float RayPlane(vec3 ro, vec3 rd, vec3 pp, vec3 pn, float& t) {
-//    float d = dot(pn, rd);
-//    if(fabs(d) > 1e-6){
-//        t = dot(pp - ro, pn) / d;
-//        return (t >= 0);
-//    }
-//    return false;
-//}
 float RayPlane(vec3 ro, vec3 rd, vec3 pp, vec3 pn) {
     float d = dot(pn, rd);
     float t = dot(pp - ro, pn);
-    return d > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
+    return fabs(d) > 1e-5 ? (t / d) : (t > .0 ? 1e5 : -1e5);
 }
 void PlaneBox(vec3 aabb_min, vec3 aabb_max, vec3 pp, vec3 pn, std::vector<vec3>& out_points){
     float t;

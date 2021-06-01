@@ -11,69 +11,70 @@ texvrRenderer::texvrRenderer()
        ||!shader_->AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG])
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
+    init_vertices(vao_front,vbo_front, ibo_front);
+    init_vertices(vao_back,vbo_back, ibo_back);
+
 //    Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
     setCuttingPlane(.0f);
     float tmp[] ={Manager::indiv_rendering_params[0]};
     setRenderingParameters(tmp);
 }
+void texvrRenderer::init_vertices(GLuint &vao, GLuint& vbo, GLuint& ibo){
+    glGenVertexArrays(1, &vao);
+    glGenBuffers(1, &vbo);
+    glGenBuffers(1, &ibo);
 
-void texvrRenderer::init_vertices(GLuint &vao_slice, GLuint& vbo_instance,bool is_front){
-    glGenBuffers(1, &vbo_instance);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec2) * MAX_DIMENSIONS, nullptr, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(vao);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12 * MAX_DIMENSIONS, nullptr, GL_DYNAMIC_DRAW);
 
-    glGenVertexArrays(1, &vao_slice);
-    unsigned int VBO, EBO;
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*6*MAX_DIMENSIONS, nullptr, GL_DYNAMIC_DRAW);
 
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-    glBindVertexArray((GLuint)vao_slice);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * 4, quad_vertices_2d, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*6, quad_indices, GL_STATIC_DRAW);
-
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
 
-    glEnableVertexAttribArray(1);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_instance); // this attribute comes from a different vertex buffer
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), (void*)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glVertexAttribDivisor(1, 1); // tell OpenGL this is an instanced vertex attribute.
-    b_init_successful = true;
-
-    update_instance_data(vbo_instance, is_front);
+    glBindVertexArray(0);
 }
-void texvrRenderer::update_instance_data(GLuint& vbo_instance, bool is_front){
-    if(dimension_draw == 0) return;
-    glm::vec2 *zInfos = new glm::vec2[dimension_draw];
 
-    float zTex = .0f;
-    float step = 1.0f / dimension_draw;
-    if(is_front){
-        float mappedZVal = - (dimension_draw - 1) / 2.0f * step;
-        for (int i = 0; i < dimension_draw; i++){
-            zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
-            mappedZVal+=step; zTex+=dimension_draw_inv;
+void texvrRenderer::update_instance_data(){
+    if(dimension_draw == 0) return;
+    if(!b_init_successful){
+        m_vertices_front = new float[12 * MAX_DIMENSIONS]; m_vertices_back= new float[12*MAX_DIMENSIONS];
+        for(int i=0, idj=0;i<dimension_draw;i++,idj+=12){
+            for(int j=0; j<12; j++){
+                m_vertices_front[idj+j]= quad_vertices_3d[j];
+                m_vertices_back[idj+j] = quad_vertices_3d[j];
+            }
         }
-    }else{
-        float mappedZVal = (dimension_draw - 1) / 2.0f * step;
-        for (int i = 0; i < dimension_draw; i++){
-            zInfos[i].x = mappedZVal*vol_thickness_factor; zInfos[i].y = zTex;
-            mappedZVal-=step; zTex+=dimension_draw_inv;
+
+        m_indices = new unsigned[6*MAX_DIMENSIONS];
+        for(int i=0, idk=0;i<dimension_draw;i++, idk+=6){
+            for(int k=0;k<6;k++)m_indices[idk+k]=quad_indices[k]+4*i;
         }
+        b_init_successful = true;
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo_instance);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, dimension_draw *sizeof(glm::vec2), zInfos);
+    float mappedZVal = -0.5f;
+    for(int i=0, id=0;i<dimension_draw;i++,id+=12){
+        m_vertices_front[id+2]=mappedZVal;m_vertices_front[id+5]=mappedZVal;m_vertices_front[id+8]=mappedZVal;m_vertices_front[id+11]=mappedZVal;
+        mappedZVal+= dimension_draw_inv;
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_front);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*dimension_draw *12, m_vertices_front);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    delete[]zInfos;
+    mappedZVal = 0.5f;
+    for(int i=0, id=0;i<dimension_draw;i++,id+=12){
+        m_vertices_back[id+2]=m_vertices_back[id+5]=m_vertices_back[id+8]=m_vertices_back[id+11]=mappedZVal;
+        mappedZVal-=dimension_draw_inv;
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_back);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*dimension_draw *12, m_vertices_back);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 void texvrRenderer::draw_scene(glm::mat4 model_mat){
     glEnable(GL_BLEND);
@@ -89,7 +90,8 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
     Shader::Uniform(sp, "uSampler_baked", dvr::BAKED_TEX_ID);
 
     Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat() * model_mat);
-//    Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
+    Shader::Uniform(sp, "uVolumeThickness", vol_thickness_factor);
+    Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     if(Manager::IsCuttingEnabled())shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
@@ -99,16 +101,15 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
     //for backface rendering! don't erase
     glm::vec3 dir = Manager::camera->getViewDirection();
     bool is_front = (model_mat[2][2] * dir.z) < .0f;
-    Shader::Uniform(sp, "u_front", is_front);
     Shader::Uniform(sp, "u_cut_texz", is_front?1.0f-dimension_draw_inv * cut_id : dimension_draw_inv * cut_id);
-
     if(is_front){
         glFrontFace(GL_CCW); glBindVertexArray(vao_front);
     }else{
         glFrontFace(GL_CW); glBindVertexArray(vao_back);
     }
+    glDrawElements(GL_TRIANGLES, 6*dimension_draw, GL_UNSIGNED_INT, m_indices);
+    glBindVertexArray(0);
 
-    glDrawElementsInstanced(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0, dimension_draw);
     shader_->UnUse();
     glFrontFace(GL_CCW);
     glDisable(GL_BLEND);
@@ -117,7 +118,6 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
 }
 
 void texvrRenderer::Draw(bool pre_draw, glm::mat4 model_mat){
-    if(!b_init_successful) {init_vertices(vao_front,vbo_front,true);init_vertices(vao_back,vbo_back,false);}
     if(pre_draw || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked(model_mat);
     else draw_scene(model_mat);
 }
@@ -141,10 +141,9 @@ void texvrRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale){
     on_update_dimension_draw();
 }
 void texvrRenderer::on_update_dimension_draw(){
-    dimension_draw = int(dimensions_origin * dense_factor);
-    dimension_draw_inv = 1.0f / dimension_draw;
-    update_instance_data(vbo_front, true);
-    update_instance_data(vbo_back, false);
+    dimension_draw = int(float(dimensions_origin) * dense_factor);
+    dimension_draw_inv = 1.0f / float(dimension_draw);
+    update_instance_data();
 }
 
 void texvrRenderer::setRenderingParameters(float* values){
