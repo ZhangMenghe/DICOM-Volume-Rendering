@@ -11,9 +11,10 @@ private:
     float dense_factor = 1.0f;
     float vol_thickness_factor = 1.0f;
     const static int MAX_DIMENSIONS = 1000;
+    bool m_instance_data_dirty = false;
 
-    GLuint vao_front = 0, vbo_front, ibo_front;
-    GLuint vao_back = 0, vbo_back, ibo_back;
+    GLuint vao_front = 0, vbo_front;
+    GLuint vao_back = 0, vbo_back;
 
     bool b_init_successful = false;
     int cut_id = 0;
@@ -22,7 +23,7 @@ private:
     unsigned int *m_indices=nullptr;
 
     //for screen baking
-    void init_vertices(GLuint &vao, GLuint& vbo, GLuint& ibo);
+    void init_vertices(GLuint &vao, GLuint& vbo);
     void draw_scene(glm::mat4 model_mat);
     void draw_baked(glm::mat4 model_mat);
     void update_instance_data();

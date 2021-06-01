@@ -11,15 +11,16 @@ texvrRenderer::texvrRenderer()
        ||!shader_->AddShader(GL_FRAGMENT_SHADER, Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG])
        ||!shader_->CompileAndLink())
         LOGE("TextureBas===Failed to create texture based shader program===");
-    init_vertices(vao_front,vbo_front, ibo_front);
-    init_vertices(vao_back,vbo_back, ibo_back);
+    init_vertices(vao_front,vbo_front);
+    init_vertices(vao_back,vbo_back);
 
 //    Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_VERT] = "";Manager::shader_contents[dvr::SHADER_TEXTUREVOLUME_FRAG]="";
     setCuttingPlane(.0f);
     float tmp[] ={Manager::indiv_rendering_params[0]};
     setRenderingParameters(tmp);
 }
-void texvrRenderer::init_vertices(GLuint &vao, GLuint& vbo, GLuint& ibo){
+void texvrRenderer::init_vertices(GLuint &vao, GLuint& vbo){
+    GLuint ibo;
     glGenVertexArrays(1, &vao);
     glGenBuffers(1, &vbo);
     glGenBuffers(1, &ibo);
@@ -28,8 +29,14 @@ void texvrRenderer::init_vertices(GLuint &vao, GLuint& vbo, GLuint& ibo){
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12 * MAX_DIMENSIONS, nullptr, GL_DYNAMIC_DRAW);
 
+    if(m_indices == nullptr){
+        m_indices = new unsigned[6*MAX_DIMENSIONS];
+        for(int i=0, idk=0;i<MAX_DIMENSIONS;i++, idk+=6){
+            for(int k=0;k<6;k++)m_indices[idk+k]=quad_indices[k]+4*i;
+        }
+    }
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*6*MAX_DIMENSIONS, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*6*MAX_DIMENSIONS, m_indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -43,16 +50,10 @@ void texvrRenderer::update_instance_data(){
     if(dimension_draw == 0) return;
     if(!b_init_successful){
         m_vertices_front = new float[12 * MAX_DIMENSIONS]; m_vertices_back= new float[12*MAX_DIMENSIONS];
-        for(int i=0, idj=0;i<dimension_draw;i++,idj+=12){
+        for(int i=0, idj=0;i<MAX_DIMENSIONS;i++,idj+=12){
             for(int j=0; j<12; j++){
-                m_vertices_front[idj+j]= quad_vertices_3d[j];
-                m_vertices_back[idj+j] = quad_vertices_3d[j];
+                m_vertices_front[idj+j]= quad_vertices_3d[j];m_vertices_back[idj+j] = quad_vertices_3d[j];
             }
-        }
-
-        m_indices = new unsigned[6*MAX_DIMENSIONS];
-        for(int i=0, idk=0;i<dimension_draw;i++, idk+=6){
-            for(int k=0;k<6;k++)m_indices[idk+k]=quad_indices[k]+4*i;
         }
         b_init_successful = true;
     }
@@ -118,6 +119,10 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
 }
 
 void texvrRenderer::Draw(bool pre_draw, glm::mat4 model_mat){
+    if(m_instance_data_dirty){
+        update_instance_data();
+        m_instance_data_dirty = false;
+    }
     if(pre_draw || Manager::param_bool[dvr::CHECK_AR_ENABLED]) draw_baked(model_mat);
     else draw_scene(model_mat);
 }
@@ -141,9 +146,9 @@ void texvrRenderer::setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale){
     on_update_dimension_draw();
 }
 void texvrRenderer::on_update_dimension_draw(){
-    dimension_draw = int(float(dimensions_origin) * dense_factor);
+    dimension_draw = fmin(float(dimensions_origin) * dense_factor, MAX_DIMENSIONS);
     dimension_draw_inv = 1.0f / float(dimension_draw);
-    update_instance_data();
+    m_instance_data_dirty = true;
 }
 
 void texvrRenderer::setRenderingParameters(float* values){
