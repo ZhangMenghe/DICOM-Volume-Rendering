@@ -9,19 +9,18 @@
 
 class ViewAlignedSlicingRenderer:public baseDicomRenderer{
 private:
-//    float vol_thickness_factor = 1.0f;
-//    const float SLICE_SAMPLE_RATE = 0.4f;
     const static int MAX_DIMENSIONS = 200;
-    GLuint m_vaos[MAX_DIMENSIONS], m_vbos[MAX_DIMENSIONS];//, m_ebos[MAX_DIMENSIONS];
-    int m_indice_num[MAX_DIMENSIONS];
+    GLuint m_vao, m_vbo, m_ibo;
+    float* m_vertices=nullptr;
+    unsigned int *m_indices;
     int m_slice_num;
     float m_sampling_rate = 0.3f;
-//    float m_slice_amount = .0f, m_slice_count = 0;
-    const unsigned int m_indices_data[12] = {
-            0,1,2,0,2,3,0,3,4,0,4,5
-    };
-    glm::vec3 m_last_vec3=glm::vec3(1e6);
-    bool m_right_order;
+
+    int m_vertices_num, m_indices_num;
+
+    //    glm::vec3 m_last_vec3=glm::vec3(1e6);
+    //    float m_slice_amount = .0f, m_slice_count = 0;
+
     //for screen baking
     void draw_scene(glm::mat4 model_mat);
     void draw_baked(glm::mat4 model_mat);

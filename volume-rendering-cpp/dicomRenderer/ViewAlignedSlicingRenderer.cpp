@@ -5,6 +5,11 @@
 #include <algorithm>
 
 using namespace glm;
+namespace {
+    const unsigned int m_single_indices_data[12] = {
+            0,1,2,0,2,3,0,3,4,0,4,5
+    };
+}
 ViewAlignedSlicingRenderer::ViewAlignedSlicingRenderer()
         :baseDicomRenderer(){
     //program
@@ -14,27 +19,27 @@ ViewAlignedSlicingRenderer::ViewAlignedSlicingRenderer()
        ||!shader_->CompileAndLink())
         LOGE("ViewAligned ===Failed to create shader program===");
 
-    for(int i=0;i<MAX_DIMENSIONS;i++){
-        glGenVertexArrays(1, &m_vaos[i]);
-        unsigned int EBO;
-        glGenBuffers(1, &m_vbos[i]);
-        glGenBuffers(1, &EBO);
+    glGenVertexArrays(1, &m_vao);
+    glGenBuffers(1, &m_vbo);
+    glGenBuffers(1, &m_ibo);
 
-        // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
-        glBindVertexArray(m_vaos[i]);
+    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+    glBindVertexArray(m_vao);
 
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbos[i]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 18, nullptr, GL_DYNAMIC_DRAW);
+    m_vertices = new float[18 * MAX_DIMENSIONS];
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 18 * MAX_DIMENSIONS, nullptr, GL_DYNAMIC_DRAW);
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*12, m_indices_data, GL_STATIC_DRAW);
+    m_indices = new unsigned int[12*MAX_DIMENSIONS];
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int)*12*MAX_DIMENSIONS, nullptr, GL_DYNAMIC_DRAW);
 
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-        glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
+
     float tmp[] ={Manager::indiv_rendering_params[dvr::VIEW_ALIGN_SLICING]};
     setRenderingParameters(tmp);
 }
@@ -86,7 +91,6 @@ void PlaneBox(vec3 aabb_min, vec3 aabb_max, vec3 pp, vec3 pn, std::vector<vec3>&
         if(t >= .0 && t <= 1.0f) out_points.push_back(ro+rd*t);
     }
 }
-
 void SortPoints(std::vector<vec3>& points, vec3 pn){
     if (points.empty()) return;
 
@@ -108,18 +112,15 @@ void ViewAlignedSlicingRenderer::UpdateVertices(glm::mat4 model_mat){
     glm::vec3 pn = glm::normalize(vec3(pnv4.x, pnv4.y, pnv4.z) / pnv4.w);
 //    LOGE("====PN : %f, %f, %f", pn.x, pn.y, pn.z);
 
-    m_right_order = (pn.x + pn.y + pn.z) > .0;
-    if(!m_right_order)pn = -pn;
-
-    if(dvr::VIEW_ALIGNED_LAZY_UPDATE){
-        if(abs(pn.x) > abs(pn.y) && abs(pn.x) > abs(pn.z)){pn.x = pn.x > .0f?1.0:-1.0;pn.y=0;pn.z=0;}
-        else if(abs(pn.y) > abs(pn.x) && abs(pn.y) > abs(pn.z)){pn.y = pn.y > .0f?1.0:-1.0;pn.x=0;pn.z=0;}
-        else if(abs(pn.z) > abs(pn.y) && abs(pn.z) > abs(pn.x)){pn.z = pn.z > .0f?1.0:-1.0;pn.y=0;pn.x=0;}
-        if(glm::all(glm::equal(m_last_vec3, pn))) return;
-        m_last_vec3 = pn;
+//    if(dvr::VIEW_ALIGNED_LAZY_UPDATE){
+//        if(abs(pn.x) > abs(pn.y) && abs(pn.x) > abs(pn.z)){pn.x = pn.x > .0f?1.0:-1.0;pn.y=0;pn.z=0;}
+//        else if(abs(pn.y) > abs(pn.x) && abs(pn.y) > abs(pn.z)){pn.y = pn.y > .0f?1.0:-1.0;pn.x=0;pn.z=0;}
+//        else if(abs(pn.z) > abs(pn.y) && abs(pn.z) > abs(pn.x)){pn.z = pn.z > .0f?1.0:-1.0;pn.y=0;pn.x=0;}
+//        if(glm::all(glm::equal(m_last_vec3, pn))) return;
+//        m_last_vec3 = pn;
         //    LOGE("====PN : %f, %f, %f", pn.x, pn.y, pn.z);
         //    LOGE("====pp : %f, %f, %f", pp.x, pp.y, pp.z);
-    }
+//    }
 
     //Step 1: Transform the volume bounding box vertices into view coordinates using the modelview matrix
     // Volume view vertices
@@ -159,34 +160,42 @@ void ViewAlignedSlicingRenderer::UpdateVertices(glm::mat4 model_mat){
 
     //For each plane in front-to-back or back-to-front order
     vec3 aabb_min(-0.5f), aabb_max(0.5f);
-    int id = m_right_order?3*z_min_id:3*z_max_id;
+    int id = 3*z_min_id;
     glm::vec3 pp = vec3(cuboid[id], cuboid[id+1], cuboid[id+2]);
 
-    float vertices[18] = {.0f};
-    int vertex_num;
-
-    for(int slice = 0; slice<m_slice_num; slice++,pp+=pn*slice_spacing){
+//    float vertices[18] = {.0f};
+    int s_vertex_num, s_indice_num;
+    m_indices_num = 0; m_vertices_num=0;
+    for(int slice = 0, offset=0, off_ind=0; slice<m_slice_num; slice++,pp+=pn*slice_spacing){
         // a. Test for intersections with the edges of the bounding box. Add each intersection point to a temporary vertex list. Up to six intersections are generated, so the maximum size of the list is fixed.
         std::vector<vec3> polygon_points;
         PlaneBox(aabb_min, aabb_max, pp, pn, polygon_points);
 
-        vertex_num = polygon_points.size();
-        m_indice_num[slice] = (vertex_num - 2) * 3;
+        s_vertex_num = polygon_points.size();
+        if(s_vertex_num < 3) continue;
 
-        if(vertex_num < 3) continue;
+        s_indice_num = (s_vertex_num - 2) * 3;
+        for(int i=0;i<s_indice_num;i++)m_indices[off_ind+i]=m_single_indices_data[i]+m_vertices_num;
+        m_vertices_num+=s_vertex_num;
+        m_indices_num+=s_indice_num;
 
         //b. compute center and sort them in counter-clockwise
         //c. Tessellate the proxy polygon
         SortPoints(polygon_points, pn);
 
-        for(int i=0; i<vertex_num; i++){
-            vertices[3*i]=polygon_points[i].x;vertices[3*i+1]=polygon_points[i].y;vertices[3*i+2]=polygon_points[i].z;}
-
-        //update to gpu
-        glBindBuffer(GL_ARRAY_BUFFER, m_vbos[slice]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3* vertex_num, vertices);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        for(int i=0; i<s_vertex_num; i++){
+            m_vertices[offset+3*i]=polygon_points[i].x;m_vertices[offset+3*i+1]=polygon_points[i].y;m_vertices[offset+3*i+2]=polygon_points[i].z;}
+        offset+=s_vertex_num*3;
+        off_ind+=s_indice_num;
     }
+    //update to gpu
+    glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 3* m_vertices_num, m_vertices);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ibo);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned int) * m_indices_num, m_indices);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 void ViewAlignedSlicingRenderer::draw_scene(glm::mat4 model_mat){
     glEnable(GL_BLEND);
@@ -207,22 +216,8 @@ void ViewAlignedSlicingRenderer::draw_scene(glm::mat4 model_mat){
     else shader_->DisableKeyword("CUTTING_PLANE");
 
     vrController::instance()->setCuttingParams(sp);
-
-    if(m_right_order){
-        for(int i=0; i<m_slice_num; i++) {
-            if(m_indice_num[i]> 0){
-                glBindVertexArray(m_vaos[i]);
-                glDrawElements(GL_TRIANGLES, m_indice_num[i], GL_UNSIGNED_INT, 0);
-            }
-        }
-    }else{
-        for(int i=m_slice_num-1; i>=0; i--) {
-            if(m_indice_num[i]> 0){
-                glBindVertexArray(m_vaos[i]);
-                glDrawElements(GL_TRIANGLES, m_indice_num[i], GL_UNSIGNED_INT, 0);
-            }
-        }
-    }
+    glBindVertexArray(m_vao);
+    glDrawElements(GL_TRIANGLES, m_indices_num, GL_UNSIGNED_INT, 0);
 
     shader_->UnUse();
     glFrontFace(GL_CCW);

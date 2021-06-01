@@ -30,7 +30,7 @@ void texvrRenderer::init_vertices(GLuint &vao, GLuint& vbo){
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 12 * MAX_DIMENSIONS, nullptr, GL_DYNAMIC_DRAW);
 
     if(m_indices == nullptr){
-        m_indices = new unsigned[6*MAX_DIMENSIONS];
+        m_indices = new unsigned int[6*MAX_DIMENSIONS];
         for(int i=0, idk=0;i<MAX_DIMENSIONS;i++, idk+=6){
             for(int k=0;k<6;k++)m_indices[idk+k]=quad_indices[k]+4*i;
         }
