@@ -33,7 +33,7 @@ public class renderUIs extends BasePanel{
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private widgetListAdapter widAdapter;
     private tunerListAdapter rendertuneAdapter;
-    private final int RENDERING_METHOD_NUM=3;
+    private final int RENDERING_METHOD_NUM=3, TID_OPACITY=0, TID_CONTRAST=1, TID_FIRST_RENDER=2;
     private tunerListAdapter indivAdapter[] = new tunerListAdapter[RENDERING_METHOD_NUM];
     private Button btn_hide;
     private Spinner param_seekbar_spinner;
@@ -52,12 +52,12 @@ public class renderUIs extends BasePanel{
         //details of tune panel
         Spinner seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.tune_seekbar_spinner);
         seekbar_spinner.setDropDownVerticalOffset(150);
-        tunerListAdapter tunerAdapter = new tunerListAdapter(activity, 0, R.string.opacity_group_name, R.array.opaParams);
+        tunerListAdapter tunerAdapter = new tunerListAdapter(activity, TID_OPACITY, R.string.opacity_group_name, R.array.opaParams);
         seekbar_spinner.setAdapter(tunerAdapter);
 
         Spinner contrast_seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.contrast_seekbar_spinner);
         contrast_seekbar_spinner.setDropDownVerticalOffset(150);
-        rendertuneAdapter = new tunerListAdapter(activity,1, R.string.contrast_group_name, R.array.contrastParams);
+        rendertuneAdapter = new tunerListAdapter(activity,TID_CONTRAST, R.string.contrast_group_name, R.array.contrastParams);
         contrast_seekbar_spinner.setAdapter(rendertuneAdapter);
 
         param_seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.param_seekbar_spinner);
@@ -70,7 +70,7 @@ public class renderUIs extends BasePanel{
         };
 
         for(int i=0;i<RENDERING_METHOD_NUM;i++)
-            indivAdapter[i] = new tunerListAdapter(activity,i+2, R.string.other_tune_group_name, indivual_param_group_name[i]);
+            indivAdapter[i] = new tunerListAdapter(activity,i+TID_FIRST_RENDER, R.string.other_tune_group_name, indivual_param_group_name[i]);
 
         Spinner widget_spinner = (Spinner)tune_panel_.findViewById(R.id.tune_widget_id_spinner);
         widAdapter = new widgetListAdapter(activity, this, new tunerListAdapter[]{tunerAdapter});

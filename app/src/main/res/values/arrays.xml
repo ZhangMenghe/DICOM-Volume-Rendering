@@ -43,6 +43,19 @@
         <item>Fire</item>
         <item>CET-L08</item>
     </string-array>
+    <string-array name="contrastParams">
+        <!--        <item>@array/contrast_level</item>-->
+        <item>@array/contrast_low</item>
+        <item>@array/contrast_high</item>
+        <item>@array/brightness</item>
+        <item>@array/base_value</item>
+    </string-array>
+    <string-array name="RenderingIndividualParamArr">
+        <item>@array/TexturebasedParams</item>
+        <item>@array/ViewAlignParams</item>
+        <item>@array/RaycastParams</item>
+    </string-array>
+
 <!--    mask panel-->
     <string-array name="mask_check_params">
         <item>Apply</item>
@@ -116,14 +129,6 @@
         <item>600</item>
     </string-array>
 
-    <string-array name="contrastParams">
-<!--        <item>@array/contrast_level</item>-->
-        <item>@array/contrast_low</item>
-        <item>@array/contrast_high</item>
-        <item>@array/brightness</item>
-        <item>@array/base_value</item>
-    </string-array>
-
     <string-array name="TexturebasedParams">
         <item>@array/dense_factor</item>
     </string-array>
@@ -133,6 +138,7 @@
     <string-array name="RaycastParams">
         <item>@array/sample_step</item>
     </string-array>
+
     <string-array name="dense_factor">
         <item>Dense Factor</item>
         <item>1.0</item>
@@ -148,7 +154,7 @@
     <string-array name="sample_step">
         <item>Sampling Step</item>
         <item>100</item>
-        <item>600</item>
+        <item>300</item>
         <item>100</item>
     </string-array>
 <!--    <string-array name="contrast_level">-->

@@ -24,6 +24,15 @@ namespace dvr{
         CHECK_AR_DRAW_PLANE,
         CHECK_AR_3D_POINTER
     };
+    enum PARAM_TID{
+        TID_OPACITY=0,
+        TID_CONTRAST,
+        TID_TEXTURE_BASED,
+        TID_VIEW_ALIGNED,
+        TID_RAYCAST,
+        TID_CUTTING_PLANE,
+        TID_END
+    };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
         TUNE_LOWEST,
@@ -45,7 +54,6 @@ namespace dvr{
         PLACE_ANCHOR
     };
     enum PARAM_RENDER_TUNE{
-//        RENDER_CONTRAST_LEVEL=0,
         RENDER_CONTRAST_LOW=0,
         RENDER_CONTRAST_HIGH,
         RENDER_BRIGHTNESS,

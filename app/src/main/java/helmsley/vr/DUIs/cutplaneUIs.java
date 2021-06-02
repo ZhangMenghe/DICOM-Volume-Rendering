@@ -50,6 +50,8 @@ public class cutplaneUIs extends BasePanel{
 
     private final static int TRAVERSAL_CHECK_ID = 4;
     private final static int VIEW_SWITCH_ID = 5;
+    private final static int TID_CUTTING_PLANE = 5;
+
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
@@ -231,7 +233,7 @@ public class cutplaneUIs extends BasePanel{
         if(pos.length == 3) System.arraycopy(pos, 0, cut_pose, 0, 3);
         float[] norm = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("pnorm", new ArrayList<Float>()));
         if(norm.length == 3) System.arraycopy(norm, 0, cut_pose, 3, 3);
-        JUIInterface.JUIsetAllTuneParamById(5, cut_pose);
+        JUIInterface.JUIsetAllTuneParamById(TID_CUTTING_PLANE, cut_pose);
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
