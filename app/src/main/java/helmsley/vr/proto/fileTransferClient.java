@@ -216,8 +216,8 @@ public class fileTransferClient {
         public String run(String folder_path, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
             target_path = folder_path;
-//            loadTextureOnly(blockingStub);
-            loadProcessedVolume(blockingStub);
+            loadTextureOnly(blockingStub);
+//            loadProcessedVolume(blockingStub);
 //            loadDCMImage(blockingStub);
             return "===Success!\n";
         }

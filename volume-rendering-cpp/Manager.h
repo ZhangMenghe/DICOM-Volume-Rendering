@@ -50,7 +50,7 @@ public:
 
     static Camera* camera;
     static std::vector<bool> param_bool;
-    static std::vector<std::string> shader_contents;
+    static std::vector<std::string> shader_contents, shader_clahes;
 
     static bool baked_dirty_, mvp_dirty_;
     static dvr::ORGAN_IDS traversal_target_id;

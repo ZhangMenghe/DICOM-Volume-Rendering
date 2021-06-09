@@ -86,6 +86,13 @@ namespace dvr{
         SHADER_ANDROID_END,
         SHADER_ALL_END
     };
+//    enum CLAHE_SHADER_FILES{
+//        MIN_MAX_COMP,
+//        LUT_COMP,
+//
+//        SHADER_CLAHE_END
+//
+//    };
     enum TEX_IDS{
         BAKED_TEX_ID=0,
         SCREEN_QUAD_TEX_ID,

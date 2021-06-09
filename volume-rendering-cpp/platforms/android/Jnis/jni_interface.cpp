@@ -62,6 +62,24 @@ namespace {
                 "shaders/ar_cutplane.vert",
                 "shaders/ar_cutplane.frag"
         };
+        const char* clahe_shader_file_names[15]={
+                "shaders/clahe/minMax.comp",
+                "shaders/clahe/LUT.comp",
+                "shaders/clahe/hist.comp",
+                "shaders/clahe/excess.comp",
+                "shaders/clahe/clipHist.comp",
+                "shaders/clahe/clipHist_p2.comp",
+                "shaders/clahe/lerp.comp",
+                "shaders/clahe/lerp_focused.comp",
+
+                "shaders/clahe/minMax_masked.comp",
+                "shaders/clahe/LUT_masked.comp",
+                "shaders/clahe/hist_masked.comp",
+                "shaders/clahe/excess_masked.comp",
+                "shaders/clahe/clipHist_masked.comp",
+                "shaders/clahe/clipHist_p2_masked.comp",
+                "shaders/clahe/lerp_masked.comp",
+        };
         for(int i = 0; i<int(dvr::SHADER_END); i++){
             std::string content;
             assetLoader::instance()->LoadTextFileFromAssetManager(shader_file_names[i], &content);
@@ -72,6 +90,11 @@ namespace {
             std::string content;
             assetLoader::instance()->LoadTextFileFromAssetManager(android_shader_file_names[i], &content);
             Manager::shader_contents[dvr::SHADER_END + i] = content;
+        }
+        for(int i=0; i<15; i++){
+            std::string content;
+            assetLoader::instance()->LoadTextFileFromAssetManager(clahe_shader_file_names[i], &content);
+            Manager::shader_clahes[i] = content;
         }
     }
 }
