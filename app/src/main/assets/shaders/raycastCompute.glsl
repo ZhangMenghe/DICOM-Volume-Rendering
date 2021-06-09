@@ -4,7 +4,7 @@
 #pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT COLOR_FIRE COLOR_CET_L08
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 #pragma multi_compile FLIPY
-//#pragma multi_compile RAW_DATA
+#pragma multi_compile RAW_DATA
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -149,11 +149,11 @@ void main(){
     #endif
 
     float intensity_01;
-//    #ifdef RAW_DATA
-//        intensity_01 = float(int(sampled_value.x >> 4) & 0xFF) / 255.0;
-//    #else
+    #ifdef RAW_DATA
+        intensity_01 = float(int(sampled_value.x >> 4) & 0xFF) / 255.0;
+    #else
         intensity_01 = float(int(sampled_value.x) & 0xFF) / 255.0;
-//    #endif
+    #endif
 
     float alpha = .0;
     for(int i=0; i<u_widget_num; i++)

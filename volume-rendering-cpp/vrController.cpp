@@ -274,8 +274,8 @@ void vrController::precompute(){
     //todo!!!! add flip stuff
     bakeShader_->EnableKeyword("FLIPY");
 
-//    if(m_use_raw_data)bakeShader_->EnableKeyword("RAW_DATA");
-//    else bakeShader_->DisableKeyword("RAW_DATA");
+    if(m_use_raw_data)bakeShader_->EnableKeyword("RAW_DATA");
+    else bakeShader_->DisableKeyword("RAW_DATA");
 
     if(Manager::param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
