@@ -109,7 +109,9 @@ private:
             1.0,-1.0,-1.0,1.0,
             1.0,-1.0,-1.0,1.0,
             1.0, -1.0, -1.0, 1.0 };
-    
+
+    //TODO:ADD TO PARAM_BOOL
+    bool m_use_raw_data = true;
     static bool isRayCasting(){
         return Manager::param_bool[dvr::CHECK_RAYCAST];
     }

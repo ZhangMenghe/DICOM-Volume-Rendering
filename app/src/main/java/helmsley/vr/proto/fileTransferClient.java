@@ -216,7 +216,8 @@ public class fileTransferClient {
         public String run(String folder_path, dataTransferGrpc.dataTransferBlockingStub blockingStub, dataTransferGrpc.dataTransferStub asyncStub)
                 throws Exception{
             target_path = folder_path;
-            loadTextureOnly(blockingStub);
+//            loadTextureOnly(blockingStub);
+            loadProcessedVolume(blockingStub);
 //            loadDCMImage(blockingStub);
             return "===Success!\n";
         }
@@ -233,6 +234,17 @@ public class fileTransferClient {
             while(data_itor.hasNext()){
                 volumeWholeResponse data = data_itor.next();
                 JNIInterface.JNIsendData(0, id, data.getData().size(), 2, data.getData().toByteArray());
+                id++;
+            }
+        }
+        private void loadProcessedVolume(dataTransferGrpc.dataTransferBlockingStub blockingStub){
+            RequestWholeVolume req = RequestWholeVolume.newBuilder().setClientId(1).setReqMsg(target_path).build();
+            Iterator<volumeWholeResponse> data_itor;
+            data_itor = blockingStub.downloadVolumeProcessed(req);
+            int id = 0;
+            while(data_itor.hasNext()){
+                volumeWholeResponse data = data_itor.next();
+                JNIInterface.JNIsendData(0, id, data.getData().size(), 1, data.getData().toByteArray());
                 id++;
             }
         }
