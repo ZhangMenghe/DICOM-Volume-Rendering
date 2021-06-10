@@ -81,7 +81,7 @@ private:
     Shader* bakeShader_ = nullptr;
 
     //Textures
-    Texture *tex_volume = nullptr, *tex_baked = nullptr;
+    Texture *tex_volume = nullptr, *tex_mask=nullptr, *tex_baked = nullptr;
 
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;

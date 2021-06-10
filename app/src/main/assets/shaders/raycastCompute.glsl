@@ -13,7 +13,10 @@ precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 layout(binding = 0, r32ui)readonly uniform mediump uimage3D srcTex;
-layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex;
+#ifdef SHOW_ORGANS
+    layout(binding = 1, r32ui)readonly uniform mediump uimage3D mskTex;
+#endif
+layout(binding = 2, rgba8)writeonly uniform mediump image3D destTex;
 
 uniform vec2 u_opacity[60];
 uniform int u_widget_num;
@@ -86,27 +89,18 @@ uvec2 Sample(ivec3 pos){
         pos = ivec3(pos.x, uint(u_tex_size.y-float(pos.y)),pos.z);
     #endif
     uint value = imageLoad(srcTex, pos).r;
-    //lower part as color, higher part as mask
-    return uvec2(value&uint(0xffff), value>>uint(16));
+    uint mask = uint(0);
+    #ifdef SHOW_ORGANS
+        mask = imageLoad(mskTex, pos).r;
+    #endif
+    return uvec2(value&uint(0xffff), mask&uint(0x00ff));
 }
 
 //applied contrast, brightness, 12bit->8bit, return value 0-1
 float TransferIntensityStepOne(float intensity){
-    //max value 4095
-//
-
-
     intensity = (intensity - u_contrast_low) / (u_contrast_high - u_contrast_low);
-
     intensity = max(.0, min(1.0, intensity));
     intensity = clamp(intensity + u_brightness*2.0 - 1.0, .0, 1.0);
-
-//    if(intensity_01 > u_contrast_high||intensity_01 < u_contrast_low) intensity_01 = .0;
-
-//    intensity_01 = smoothstep(u_contrast_low, u_contrast_high, intensity_01);
-
-//    intensity_01 = (intensity_01 - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
-//    intensity_01 = clamp(u_brightness+intensity_01 - 0.5, .0, 1.0);
     return intensity;
 }
 vec3 AdjustContrastBrightness(vec3 color){
@@ -150,7 +144,7 @@ void main(){
 
     float intensity_01;
     #ifdef RAW_DATA
-        intensity_01 = float(int(sampled_value.x >> 4) & 0xFF) / 255.0;
+        intensity_01 = float(sampled_value.x) / 65355.0f+u_base_value-0.5;
     #else
         intensity_01 = float(int(sampled_value.x) & 0xFF) / 255.0;
     #endif

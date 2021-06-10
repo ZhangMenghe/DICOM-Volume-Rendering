@@ -21,6 +21,7 @@ vrController::~vrController(){
     line_renderers_.clear();
     if(bakeShader_) delete bakeShader_;
     if(tex_volume) delete tex_volume;
+    delete tex_mask;
     if(tex_baked) delete tex_baked;
 }
 vrController::vrController(const std::shared_ptr<Manager> &manager)
@@ -49,7 +50,9 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
     if(cutter_) cutter_->onReset();
 }
 
-void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
+void vrController::assembleTexture(int update_target,
+        int ph, int pw, int pd, float sh, float sw, float sd,
+        GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
         vol_dimension_ = glm::vec3(ph,pw,pd);
         if(sh<=0 || sw<=0 || sd<=0){
@@ -73,17 +76,33 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
         cutter_->setDimension(pd, vol_dim_scale_.z);
     }
     auto vsize= ph*pw*pd;
-    uint32_t* vol_data  = new uint32_t[vsize];
-    uint16_t tm;
-    //fuse volume data
-    for(auto i=0, shift = 0; i<vsize; i++, shift+=channel_num) {
-        vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
-        tm = (channel_num==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
-        vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
-        // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
+    auto* vol_data  = new uint32_t[vsize];
+    // int16_t* vol_data  = new int16_t[vsize];
+    for(auto i=0, shift =0; i<vsize; i++, shift+=channel_num){
+        vol_data[i] = (((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift];
+        float tmp = float(vol_data[i]) * 0.0002442002442002442f;
+        vol_data[i] = uint32_t(tmp * 0xffff);
     }
-    if(tex_volume!= nullptr){delete tex_volume; tex_volume= nullptr;}
+
+//    uint32_t* vol_data  = new uint32_t[vsize];
+//    uint16_t tm;
+//    //fuse volume data
+//    for(auto i=0, shift = 0; i<vsize; i++, shift+=channel_num) {
+//        vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
+//        tm = (channel_num==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
+//        vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
+//        // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
+//    }
+
+    if(tex_volume!= nullptr){delete tex_volume; tex_volume=nullptr;}
     tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, vol_data);
+    if(channel_num == 4){
+        auto* mask_data  = new uint32_t[vsize];
+        for(auto i=0; i<vsize; i++)mask_data[i]=(uint32_t)data[channel_num*i+2];
+        if(tex_mask!=nullptr){delete tex_mask; tex_mask=nullptr;}
+        tex_mask = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, mask_data);
+    }
+
 
     auto* tb_data = new GLubyte[vsize * 4];
     if(tex_baked!= nullptr){delete tex_baked; tex_baked= nullptr;}
@@ -282,7 +301,9 @@ void vrController::precompute(){
 
     GLuint sp = bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
-    glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    if(tex_mask && Manager::param_bool[dvr::CHECK_MASKON])
+        glBindImageTexture(1, tex_mask->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
+    glBindImageTexture(2, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
 
     m_manager->updateVolumeSetupUniforms(sp);
 
@@ -290,7 +311,9 @@ void vrController::precompute(){
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
-    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
+    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
 
     bakeShader_->UnUse();
 
