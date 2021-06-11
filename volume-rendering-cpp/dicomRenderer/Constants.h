@@ -95,6 +95,7 @@ namespace dvr{
 //    };
     enum TEX_IDS{
         BAKED_TEX_ID=0,
+        CLAHE_TEX_ID,
         SCREEN_QUAD_TEX_ID,
         COLOR_VIZ_QUAD_TEX_ID,
         BACK_GROUND_AR_ID,

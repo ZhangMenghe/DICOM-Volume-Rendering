@@ -12,11 +12,13 @@
 precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
 layout(binding = 0, r32ui)readonly uniform mediump uimage3D srcTex;
-#ifdef SHOW_ORGANS
-    layout(binding = 1, r32ui)readonly uniform mediump uimage3D mskTex;
-#endif
+layout(binding = 1, r32ui)readonly uniform mediump uimage3D mskTex;
 layout(binding = 2, rgba8)writeonly uniform mediump image3D destTex;
+
+precision mediump float;
+uniform mediump sampler3D uSampler_clahe;
 
 uniform vec2 u_opacity[60];
 uniform int u_widget_num;
@@ -25,6 +27,7 @@ uniform int u_widget_num;
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
 uniform vec3 u_tex_size;
+uniform vec3 u_tex_size_inverse;
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
@@ -84,16 +87,15 @@ int getMaskBit(uint mask_value){
     return CHECK_BIT;
 }
 
-uvec2 Sample(ivec3 pos){
-    #ifdef FLIPY
-        pos = ivec3(pos.x, uint(u_tex_size.y-float(pos.y)),pos.z);
-    #endif
-    uint value = imageLoad(srcTex, pos).r;
-    uint mask = uint(0);
-    #ifdef SHOW_ORGANS
-        mask = imageLoad(mskTex, pos).r;
-    #endif
-    return uvec2(value&uint(0xffff), mask&uint(0x00ff));
+uint SampleMask(ivec3 pos){
+    return (imageLoad(mskTex, pos).r)&uint(0x00ff);
+}
+uint SampleRawTex(ivec3 pos){
+    return (imageLoad(srcTex, pos).r)&uint(0xffff);
+}
+float SampleCLAHETex(ivec3 pos){
+    vec3 sample_point = vec3(pos) * u_tex_size_inverse;
+    return textureLod(uSampler_clahe, sample_point, 0.0).r;
 }
 
 //applied contrast, brightness, 12bit->8bit, return value 0-1
@@ -135,18 +137,19 @@ vec3 TransferColor(float intensity, int ORGAN_BIT){
 
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
-    uvec2 sampled_value = Sample(storePos);
+    ivec3 samplePos = ivec3(storePos.x, int(u_tex_size.y-float(storePos.y)), storePos.z);
+
     int ORGAN_BIT = -1;
     #ifdef SHOW_ORGANS
-        ORGAN_BIT = getMaskBit(sampled_value.y);
-        if(ORGAN_BIT< 0) {imageStore(destTex, storePos, vec4(.0)); return;}
+        ORGAN_BIT = getMaskBit(SampleMask(samplePos));
+        if(ORGAN_BIT< 0) {imageStore(destTex, samplePos, vec4(.0)); return;}
     #endif
 
     float intensity_01;
     #ifdef RAW_DATA
-        intensity_01 = float(sampled_value.x) / 65355.0f+u_base_value-0.5;
+        intensity_01 = float(SampleRawTex(samplePos)) *1.53e-05 +u_base_value-0.5;
     #else
-        intensity_01 = float(int(sampled_value.x) & 0xFF) / 255.0;
+        intensity_01 = SampleCLAHETex(samplePos);
     #endif
 
     float alpha = .0;

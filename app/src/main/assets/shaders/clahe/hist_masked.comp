@@ -1,15 +1,10 @@
-////////////////////////////////////////
-// hist_masked.comp
-// computes the local Histograms for Masked CLAHE
-////////////////////////////////////////
-
-#version 440 
+#version 310 es
 
 layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;	// 64 threads
 
 // input Dicom Volume
-layout(binding = 0, r16ui) uniform uimage3D volume;
-layout(r8ui, binding = 1) uniform uimage3D mask;
+layout(binding = 0, r32ui) readonly uniform mediump uimage3D volume;
+layout(r32ui, binding = 1) readonly uniform mediump uimage3D mask;
 
 // input LUT
 layout(std430, binding = 2) buffer lutBuffer {
@@ -18,11 +13,11 @@ layout(std430, binding = 2) buffer lutBuffer {
 
 // output Histogram
 layout(std430, binding = 3) buffer outHist {
-    uint hist[];
+    int hist[];
 };
 // output histogram max values 
 layout(std430, binding = 4) buffer outHistMax {
-	uint histMax[];
+	int histMax[];
 };
 
 uniform uint NUM_BINS;		// number of gray values in the Volume 
@@ -40,13 +35,13 @@ void main() {
 	}
 	// if we are using the mask but are masked out -> return 
 	uint maskVal = imageLoad(mask, ivec3(index)).x;
-	if ( maskVal == 0 ) {
+	if ( maskVal == uint(0) ) {
 		return;
 	}
 
 	// get the gray value of the Volume
 	uint volSample = imageLoad( volume, ivec3(index) ).x;
-	uint histIndex = uint(log2(maskVal));
+	uint histIndex = uint(log2(float(maskVal)));
 	
 	// Increment the appropriate histogram
 	uint grayIndex = (NUM_BINS * histIndex) + volSample;

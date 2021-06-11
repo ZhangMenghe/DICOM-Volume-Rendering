@@ -1,9 +1,4 @@
-////////////////////////////////////////
-// LUT_masked.comp
-// computes the LUTs for Masked CLAHE
-////////////////////////////////////////
-
-#version 430
+#version 310 es
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;	// 64 threads
 
@@ -28,18 +23,18 @@ void main() {
 	
 	uint index = gl_GlobalInvocationID.x;
 
-	for (int currOrgan = 0; currOrgan < numOrgans; currOrgan++) {
+	for (int currOrgan = 0; currOrgan < int(numOrgans); currOrgan++) {
 		uint currMin = minData[currOrgan];
 		uint currMax = maxData[currOrgan];
 	
 		// calculate the size of the bins
-		uint binSize = 1 + uint((currMax - currMin) / NUM_OUT_BINS);
+		uint binSize = uint(1) + uint((currMax - currMin) / NUM_OUT_BINS);
 
 		// build up the LUT
-		LUT[currOrgan * NUM_IN_BINS + index] = 0;
+		LUT[currOrgan * int(NUM_IN_BINS) + int(index)] = uint(0);
 		if (index >= currMin || index <= currMax) {
 			// LUT                                =       (i - min)       / binSize
-			LUT[currOrgan * NUM_IN_BINS + index] = ( index - currMin ) / binSize;
+			LUT[currOrgan * int(NUM_IN_BINS) + int(index)] = uint(( index - currMin ) / binSize);
 		}
 	}
 }

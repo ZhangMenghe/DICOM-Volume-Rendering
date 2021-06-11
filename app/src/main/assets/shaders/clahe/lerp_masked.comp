@@ -1,16 +1,11 @@
-////////////////////////////////////////
-// lerp_masked.comp
-// Trilinear Interpolation for Masked CLAHE
-////////////////////////////////////////
-
-#version 430
+#version 310 es
 
 layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;	// 64 threads
 
 // input Dicom volume
-layout(r16ui, binding = 0) uniform uimage3D volume;
+layout(r32ui, binding = 0) readonly uniform mediump uimage3D volume;
 // input mask data
-layout(r8ui, binding = 1) uniform uimage3D mask;
+layout(r32ui, binding = 1) readonly uniform mediump uimage3D mask;
 
 // input LUT
 layout(std430, binding = 2) buffer lutBuffer {
@@ -22,7 +17,7 @@ layout(std430, binding = 3) buffer inHist {
 };
 
 // output Volume Data
-layout(r16f, binding = 4) uniform image3D newVolume;
+layout(r32f, binding = 4) uniform mediump image3D newVolume;
 
 
 uniform ivec3 numSB;	// number of Sub Blocks
@@ -35,7 +30,7 @@ void main() {
 	// figure out which block this voxel belongs to
 	uvec3 index = gl_GlobalInvocationID.xyz;	
 	uint maskVal = imageLoad(mask, ivec3(index)).r;
-	uint histIndex = uint(log2(maskVal));
+	uint histIndex = uint(log2(float(maskVal)));
 
 	// get the current gray value 
 	uint grayValue = imageLoad(volume, ivec3(index)).x;
@@ -43,17 +38,17 @@ void main() {
 		grayValue = LUT [histIndex * NUM_IN_BINS + grayValue ];
 	}
 
-	float newGrayValue = hist[histIndex + grayValue] / float(NUM_IN_BINS);
+	float newGrayValue = float(hist[histIndex + grayValue]) / float(NUM_IN_BINS);
 
 	// if we are using masks AND we are masked out -> store the original grayValue
-	if (maskVal == 0) {
+	if (maskVal == uint(0)) {
 		// re-do the LUT if needed bc only use the organs for the LUT generation
 		uint grayValue = imageLoad(volume, ivec3(index)).x;
 //		if (useLUT) {
 //			uint binSize = 1 + (NUM_IN_BINS / NUM_OUT_BINS);
 //			grayValue = grayValue / binSize;
 //		}
-		imageStore(newVolume, ivec3(index), vec4(grayValue / float(NUM_OUT_BINS), 0, 0, 0));
+		imageStore(newVolume, ivec3(index), vec4(float(grayValue) / float(NUM_OUT_BINS), 0, 0, 0));
 	}
 	// otherwise -> store the new value 
 	else {

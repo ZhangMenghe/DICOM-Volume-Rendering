@@ -1,9 +1,4 @@
-////////////////////////////////////////
-// LUT.comp
-// computes the LUT for CLAHE
-////////////////////////////////////////
-
-#version 430
+#version 310 es
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;	// 64 threads
 
@@ -29,10 +24,10 @@ void main() {
 	uint globalMax = minMaxData[1];
 	
 	// calculate the size of the bins
-	uint binSize = 1 + uint((globalMax - globalMin) / NUM_OUT_BINS);
+	uint binSize = uint(1) + uint((globalMax - globalMin) / NUM_OUT_BINS);
 
 	// build up the LUT
-	LUT[index] = 0;
+	LUT[index] = uint(0);
 	if (index >= globalMin || index <= globalMax) {
 		// LUT     =       (i - min)       / binSize
 		LUT[index] = ( index - globalMin ) / binSize;

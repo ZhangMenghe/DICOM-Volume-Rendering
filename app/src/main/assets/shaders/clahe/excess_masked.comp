@@ -1,10 +1,4 @@
-////////////////////////////////////////
-// excess_masked.comp
-// computes the number of excess pixels in the local 
-// Histograms according to the clipLimit for Masked CLAHE
-////////////////////////////////////////
-
-#version 430
+#version 310 es
 
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;	// 64 threads
 
@@ -24,7 +18,7 @@ layout(std430, binding = 2) buffer inClipValue {
 
 // output the amount of excess pixels 
 layout (std430, binding = 3) buffer excessPixels {
-    uint excess[];
+    int excess[];
 };
 
 uniform uint NUM_BINS;      // number of gray values in the Final Volume

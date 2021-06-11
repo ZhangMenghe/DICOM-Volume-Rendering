@@ -54,7 +54,7 @@ void vrController::assembleTexture(int update_target,
         int ph, int pw, int pd, float sh, float sw, float sd,
         GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
-        vol_dimension_ = glm::vec3(ph,pw,pd);
+        vol_dimension_ = glm::vec3(pw,ph,pd);
         if(sh<=0 || sw<=0 || sd<=0){
             if(pd > 200) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, 0.5f);
             else if(pd > 100) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, pd / 300.f);
@@ -103,6 +103,8 @@ void vrController::assembleTexture(int update_target,
         tex_mask = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, mask_data);
     }
 
+    if(claheManager_!= nullptr){delete claheManager_; claheManager_= nullptr;}
+    claheManager_ = new claheManager(tex_volume->GLTexture(), tex_mask->GLTexture(), vol_dimension_);
 
     auto* tb_data = new GLubyte[vsize * 4];
     if(tex_baked!= nullptr){delete tex_baked; tex_baked= nullptr;}
@@ -301,13 +303,17 @@ void vrController::precompute(){
 
     GLuint sp = bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
-    if(tex_mask && Manager::param_bool[dvr::CHECK_MASKON])
-        glBindImageTexture(1, tex_mask->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
+    glBindImageTexture(1, (tex_mask==nullptr)?0:tex_mask->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
     glBindImageTexture(2, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    glActiveTexture(GL_TEXTURE0+dvr::CLAHE_TEX_ID);
+    glBindTexture(GL_TEXTURE_3D, claheManager_->getCurrentTexture());
+    Shader::Uniform(sp, "uSampler_clahe", dvr::CLAHE_TEX_ID);
+    Shader::Uniform(sp, "u_tex_size_inverse", 1.0f/vol_dimension_);
 
     m_manager->updateVolumeSetupUniforms(sp);
 
-    glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
+    glDispatchCompute((GLuint)(vol_dimension_.x+ 7) / 8, (GLuint)(vol_dimension_.y+ 7) / 8, (GLuint)(vol_dimension_.z + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
     glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);

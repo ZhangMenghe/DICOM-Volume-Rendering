@@ -6,6 +6,7 @@
 #include <dicomRenderer/organMeshRenderer.h>
 #include <dicomRenderer/centerLineRenderer.h>
 #include <dicomRenderer/cuttingController.h>
+#include <dicomRenderer/claheManager.h>
 #include <Utils/perfMonitor.h>
 #include <GLPipeline/Texture.h>
 #include "nEntrance.h"
@@ -69,6 +70,7 @@ private:
     std::shared_ptr<Manager> m_manager;
 
     //renderers
+    claheManager* claheManager_ = nullptr;
     texvrRenderer* texvrRenderer_ = nullptr;
     raycastRenderer* raycastRenderer_ = nullptr;
     organMeshRenderer* meshRenderer_ = nullptr;

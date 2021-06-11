@@ -1,15 +1,9 @@
-////////////////////////////////////////
-// clipHist_p2_masked.comp
-// Pass 2 of redistributing the excess pixels above the clipLimit for Masked CLAHE
-////////////////////////////////////////
-
-#version 430
-
+#version 310 es
 layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;	// 64 threads
 
 // input Histogram
 layout(std430, binding = 0) buffer inHist {
-    uint hist[];
+    int hist[];
 };
 // input Histogram Max Values 
 layout(std430, binding = 1) buffer inHistMax {
@@ -17,7 +11,7 @@ layout(std430, binding = 1) buffer inHistMax {
 };
 // input the amount of excess pixels 
 layout (std430, binding = 2) buffer excessPixels {
-    uint excess[];
+    int excess[];
 };
 // input lower limit for the Clip Value
 layout(std430, binding = 3) buffer inClipValue {
@@ -47,11 +41,11 @@ void main() {
     uint currHistIndex = index % NUM_BINS;
 
     // add excess to the histogram
-    bool add = (currHistIndex % stepSize == 0) && (hist[index] < clipValue);
+    bool add = (currHistIndex % stepSize == uint(0)) && (hist[index] < int(clipValue));
 
     barrier();
 
-    uint prev = atomicAdd(excess[histIndex], -1);
+    int prev = atomicAdd(excess[histIndex], -1);
     if (prev == 0) excess[histIndex] = 0;
 
 	atomicAdd(hist[index], (add && prev > 0) ? 1 : 0);

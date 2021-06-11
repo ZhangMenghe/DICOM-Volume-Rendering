@@ -1,14 +1,9 @@
-////////////////////////////////////////
-// hist.comp
-// computes the local Histogram for CLAHE
-////////////////////////////////////////
-
-#version 440 
+#version 310 es
 
 layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;	// 64 threads
 
 // input Dicom Volume
-layout(binding = 0, r16ui) uniform uimage3D volume;
+layout(binding = 0, r32ui) readonly uniform mediump uimage3D volume;
 // input LUT
 layout(std430, binding = 1) buffer lutBuffer {
     uint LUT[];
@@ -16,11 +11,11 @@ layout(std430, binding = 1) buffer lutBuffer {
 
 // output Histogram
 layout(std430, binding = 2) buffer outHist {
-    uint hist[];
+    int hist[];
 };
 // output histogram max values 
 layout(std430, binding = 3) buffer outHistMax {
-	uint histMax[];
+	int histMax[];
 };
 
 uniform ivec3 numSB;		// number of Sub Blocks
@@ -33,8 +28,8 @@ void main() {
 
 	// figure out the sub block this index belongs to 
 	uvec3 index = gl_GlobalInvocationID.xyz;
-	ivec3 sizeSB = ivec3( volumeDims / numSB );	
-	ivec3 currSB = ivec3( index / sizeSB );
+	ivec3 sizeSB = ivec3( ivec3(volumeDims) / numSB );	
+	ivec3 currSB = ivec3( ivec3(index) / sizeSB );
 
 	// if we are not within the volume of interest -> return 
 	if ( index.x >= volumeDims.x || index.y >= volumeDims.y || index.z >= volumeDims.z ) {
@@ -43,7 +38,7 @@ void main() {
 
 	// get the gray value of the Volume
 	uint volSample = imageLoad( volume, ivec3(index + offset) ).x;
-	uint histIndex = (currSB.z * numSB.x * numSB.y + currSB.y * numSB.x + currSB.x);
+	uint histIndex = uint(currSB.z * numSB.x * numSB.y + currSB.y * numSB.x + currSB.x);
 	
 	// Increment the appropriate histogram
 	uint grayIndex = (NUM_OUT_BINS * histIndex) + volSample;
