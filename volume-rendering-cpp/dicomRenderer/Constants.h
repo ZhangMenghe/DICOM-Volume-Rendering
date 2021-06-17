@@ -6,6 +6,7 @@ namespace dvr{
     enum PARAM_BOOL{
         CHECK_RAYCAST=0,
         CHECK_OVERLAY,
+        CHECK_CLAHE,
         CHECK_CUTTING,
         CHECK_FREEZE_VOLUME,
         CHECK_FREEZE_CPLANE,
@@ -117,6 +118,11 @@ namespace dvr{
         ORGAN_ILEUM,
         ORGAN_AROTA,
         ORGAN_END
+    };
+    enum CLAHE_OPTIONS {
+        CLAHE_3D=0,
+        CLAHE_FOCUSED,
+        CLAHE_MASKED
     };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;

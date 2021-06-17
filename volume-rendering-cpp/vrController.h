@@ -53,6 +53,12 @@ public:
     void setVolumePosition(glm::vec3 pv){PosVec3_ = pv;volume_model_dirty=true;}
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setOverlayRects(int id, int width, int height, int left, int top);
+    void setCLAHEOption(int id){
+        if(claheManager_!=nullptr){
+            claheManager_->setCurrentTexMode((dvr::CLAHE_OPTIONS)id);
+            Manager::baked_dirty_ = true;
+        }
+    }
 
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
@@ -112,8 +118,6 @@ private:
             1.0,-1.0,-1.0,1.0,
             1.0, -1.0, -1.0, 1.0 };
 
-    //TODO:ADD TO PARAM_BOOL
-    bool m_use_raw_data = true;
     static bool isRayCasting(){
         return Manager::param_bool[dvr::CHECK_RAYCAST];
     }

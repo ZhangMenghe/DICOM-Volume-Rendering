@@ -86,6 +86,9 @@ JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint id){
 //    Manager::color_scheme_id = id;
 //    Manager::baked_dirty_ = true;
 }
+JUI_METHOD(void, JUIsetCLAHEOptionNative)(JNIEnv * env, jclass, jint id){
+    m_sceneRenderer->setCLAHEOption(id);
+}
 JUI_METHOD(void, JUIsetTraversalTargetNative)(JNIEnv * env, jclass, jint id){
     Manager::traversal_target_id = (id == 0)?dvr::ORGAN_COLON:dvr::ORGAN_ILEUM;
     LOGE("====ID: %d", id);

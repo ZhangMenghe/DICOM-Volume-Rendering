@@ -29,6 +29,7 @@
 <!--    panel on/off names-->
     <string name="check_panel_group_name">Panels</string>
     <string name="panel_rendering_name">Rendering</string>
+    <string name="panel_clahe_name">CLAHE</string>
     <string name="panel_mask_name">Organs</string>
     <string name="panel_cut_name">Cut Planes</string>
     <string name="panel_ar_name">AR</string>
@@ -39,7 +40,10 @@
     <string name="raycast_render_mode_name">Raycasting</string>
     <string name="tune_widget_name_prefix">Id</string>
 
-<!--    mask panel subs-->
+<!--    clahe panel subs-->
+    <string name="clahe_check_name">Apply CLAHE</string>
+
+    <!--    mask panel subs-->
     <string name="mask_check_name">Show</string>
 
 <!--    cut panel subs-->

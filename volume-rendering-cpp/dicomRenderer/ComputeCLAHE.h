@@ -48,9 +48,7 @@ private:
 	GLuint computeLerp_Masked(glm::uvec3 volDims, bool useLUT);
 
 public:
-	ComputeCLAHE() {};
-	ComputeCLAHE(GLuint volumeTexture, GLuint maskTexture, glm::ivec3 volDims, unsigned int finalGrayVals, 
-				unsigned int inGrayVals, unsigned int numOrgans);
+	ComputeCLAHE();
 	~ComputeCLAHE();
 
 	void Init(GLuint volumeTexture, GLuint maskTexture, glm::ivec3 volDims, unsigned int finalGrayVals, 

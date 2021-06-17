@@ -92,6 +92,11 @@ public class JUIInterface {
         JUIsetColorSchemeNative(id);
         if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.COLOR_SCHEME, id);
     }
+
+    static void JUIsetCLAHEOption(int id){
+        JUIsetCLAHEOptionNative(id);
+        //TODO:BROCADAST
+    }
     static void JUIsetTraversalTarget(int id){
         JUIsetTraversalTargetNative(id);
         if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.SET_TARGET, id, 2);
@@ -142,6 +147,7 @@ public class JUIInterface {
     public static native float[] JUIgetCuttingPlaneStatusNative();
     public static native void JUIsetMaskBitsNative(int num, int mbits);
     public static native void JUIsetColorSchemeNative(int id);
+    public static native void JUIsetCLAHEOptionNative(int id);
     public static native void JUIsetTraversalTargetNative(int id);
 
     //touch action

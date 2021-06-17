@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
 import helmsley.vr.DUIs.arUIs;
+import helmsley.vr.DUIs.claheUIs;
 import helmsley.vr.DUIs.cutplaneUIs;
 import helmsley.vr.DUIs.mainUIs;
 import helmsley.vr.DUIs.maskUIs;
@@ -33,6 +34,7 @@ public class UIsManager {
     private LinkedHashMap<Integer, BasePanel> sub_panels_;
     private final static Integer[] sub_panel_name_ids_={
             R.string.panel_rendering_name,
+            R.string.panel_clahe_name,
             R.string.panel_cut_name,
             R.string.panel_mask_name,
             R.string.panel_ar_name
@@ -49,9 +51,10 @@ public class UIsManager {
 
         //order matters
         sub_panels_.put(sub_panel_name_ids_[0], new renderUIs(activity_, this, parent_view));
-        sub_panels_.put(sub_panel_name_ids_[1], new cutplaneUIs(activity_, parent_view));
-        sub_panels_.put(sub_panel_name_ids_[2], new maskUIs(activity_, parent_view));
-        sub_panels_.put(sub_panel_name_ids_[3], new arUIs(activity_, parent_view));
+        sub_panels_.put(sub_panel_name_ids_[1], new claheUIs(activity_, parent_view));
+        sub_panels_.put(sub_panel_name_ids_[2], new cutplaneUIs(activity_, parent_view));
+        sub_panels_.put(sub_panel_name_ids_[3], new maskUIs(activity_, parent_view));
+        sub_panels_.put(sub_panel_name_ids_[4], new arUIs(activity_, parent_view));
 
         RequestReset();
     }
@@ -78,6 +81,7 @@ public class UIsManager {
         cam_map.put("center", new ArrayList<Float>(Arrays.asList(v[28], v[29], v[30])));
 
         LinkedHashMap tf_map = sub_panels_.get(R.string.panel_rendering_name).getCurrentStates();
+        LinkedHashMap clahe_map = sub_panels_.get(R.string.panel_clahe_name).getCurrentStates();
         LinkedHashMap cut_map = sub_panels_.get(R.string.panel_cut_name).getCurrentStates();
         LinkedHashMap mask_map = sub_panels_.get(R.string.panel_mask_name).getCurrentStates();
         LinkedHashMap ar_map = sub_panels_.get(R.string.panel_ar_name).getCurrentStates();
@@ -86,6 +90,7 @@ public class UIsManager {
         map.put("camera", cam_map);
         map.put("render mode", (current_texray_id == tex_id)? "Texture-based":"Raycasting");
         map.put("transfer function", tf_map);
+        map.put("clahe", clahe_map);
         map.put("cutting plane", cut_map);
         map.put("mask", mask_map);
         map.put("ar", ar_map);

@@ -3,6 +3,7 @@
 <!--UIManager: panels show/hide + JNI check params-->
     <string-array name="checkShowPanelName">
         <item>@string/panel_rendering_name</item>
+        <item>@string/panel_clahe_name</item>
         <item>@string/panel_cut_name</item>
         <item>@string/panel_mask_name</item>
         <item>@string/panel_ar_name</item>
@@ -12,9 +13,11 @@
         <item>false</item>
         <item>false</item>
         <item>false</item>
+        <item>false</item>
     </string-array>
     <string-array name="checkJNIParams">
         <item>@array/render_check_params</item>
+        <item>@array/clahe_check_params</item>
         <item>@array/mask_check_params</item>
         <item>@array/cut_check_params</item>
         <item>@array/ar_check_params</item>
@@ -29,7 +32,6 @@
         <item>false</item>
         <item>@bool/default_render_panel_on</item>
     </array>
-
 <!--    order matters!, consistent with uimanager static final values-->
     <string-array name="rendering_mode">
         <item>Slice by slice</item>
@@ -42,6 +44,20 @@
         <item>Fire</item>
         <item>CET-L08</item>
     </string-array>
+
+<!--clahe panel    -->
+    <string-array name="clahe_check_params">
+        <item>@string/clahe_check_name</item>
+    </string-array>
+    <array name="clahe_check_values">
+        <item>false</item>
+    </array>
+    <string-array name="clahe_options">
+        <item>3D CLAHE</item>
+        <item>Focus CLAHE</item>
+        <item>Mask CLAHE</item>
+    </string-array>
+
 <!--    mask panel-->
     <string-array name="mask_check_params">
         <item>Apply</item>

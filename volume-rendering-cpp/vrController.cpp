@@ -103,8 +103,7 @@ void vrController::assembleTexture(int update_target,
         tex_mask = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, mask_data);
     }
 
-    if(claheManager_!= nullptr){delete claheManager_; claheManager_= nullptr;}
-    claheManager_ = new claheManager(tex_volume->GLTexture(), tex_mask->GLTexture(), vol_dimension_);
+    claheManager_->onVolumeDataUpdate(tex_volume->GLTexture(), tex_mask->GLTexture(), vol_dimension_);
 
     auto* tb_data = new GLubyte[vsize * 4];
     if(tex_baked!= nullptr){delete tex_baked; tex_baked= nullptr;}
@@ -129,8 +128,9 @@ void vrController::setupCenterLine(int id, float* data){
 }
 
 void vrController::onViewCreated(){
-    texvrRenderer_ = new texvrRenderer();
-    raycastRenderer_ = new raycastRenderer();
+    texvrRenderer_ = new texvrRenderer;
+    raycastRenderer_ = new raycastRenderer;
+    claheManager_ = new claheManager;
     meshRenderer_ = new organMeshRenderer;
     cutter_ = new cuttingController;
     data_board_ = new dataBoard;
@@ -295,8 +295,8 @@ void vrController::precompute(){
     //todo!!!! add flip stuff
     bakeShader_->EnableKeyword("FLIPY");
 
-    if(m_use_raw_data)bakeShader_->EnableKeyword("RAW_DATA");
-    else bakeShader_->DisableKeyword("RAW_DATA");
+    if(Manager::param_bool[dvr::CHECK_CLAHE])bakeShader_->EnableKeyword("CLAHE");
+    else bakeShader_->DisableKeyword("CLAHE");
 
     if(Manager::param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");

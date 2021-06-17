@@ -4,7 +4,7 @@
 #pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT COLOR_FIRE COLOR_CET_L08
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 #pragma multi_compile FLIPY
-#pragma multi_compile RAW_DATA
+#pragma multi_compile CLAHE
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -146,10 +146,10 @@ void main(){
     #endif
 
     float intensity_01;
-    #ifdef RAW_DATA
-        intensity_01 = float(SampleRawTex(samplePos)) *1.53e-05 +u_base_value-0.5;
-    #else
+    #ifdef CLAHE
         intensity_01 = SampleCLAHETex(samplePos);
+    #else
+        intensity_01 = float(SampleRawTex(samplePos)) *1.53e-05 +u_base_value-0.5;
     #endif
 
     float alpha = .0;

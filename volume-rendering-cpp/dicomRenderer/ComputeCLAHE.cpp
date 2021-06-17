@@ -8,14 +8,7 @@
 using namespace std;
 
 void mapHistogram(uint32_t minVal, uint32_t maxVal, uint32_t numPixelsSB, uint32_t numBins, uint32_t* localHist);
-////////////////////////////////////////////////////////////////////////////////
-// Constructors/Destructors
 
-ComputeCLAHE::ComputeCLAHE(GLuint volumeTexture, GLuint maskTexture, glm::ivec3 volDims, 
-						unsigned int finalGrayVals, unsigned int inGrayVals, unsigned int numOrgans) {
-	
-	Init(volumeTexture, maskTexture, volDims, finalGrayVals, inGrayVals, numOrgans);
-}
 GLuint LinkProgram(GLuint shaderID_1, GLuint shaderID_2=0) {
 	GLint Result = GL_FALSE;
 	int InfoLogLength;
@@ -84,10 +77,8 @@ GLuint LoadComputeShader(std::string shaderCode){
 
 	return programID;
 }
-
-void ComputeCLAHE::Init(GLuint volumeTexture, GLuint maskTexture, glm::ivec3 volDims, 
-						unsigned int finalGrayVals, unsigned int inGrayVals, unsigned int numOrgans) {
-	// Load CLAHE/Focused CLAHE Shaders
+ComputeCLAHE::ComputeCLAHE(){
+// Load CLAHE/Focused CLAHE Shaders
 	LOGE("=====COMPUTE SHADER 0");
 	_minMaxShader = LoadComputeShader(Manager::shader_clahes[0]);
 	LOGE("=====COMPUTE SHADER 1");
@@ -131,12 +122,16 @@ void ComputeCLAHE::Init(GLuint volumeTexture, GLuint maskTexture, glm::ivec3 vol
 	LOGE("=====COMPUTE SHADER 13");
 
 	_clipShaderPass2_Masked = LoadComputeShader(Manager::shader_clahes[13]);
-	LOGE("=====COMPUTE SHADER 14");
 
+	LOGE("=====COMPUTE SHADER 14");
 	_lerpShader_Masked = LoadComputeShader(Manager::shader_clahes[14]);
 
-//	Manager::shader_clahes.clear();
-	// Volume Data 
+	Manager::shader_clahes.clear();
+}
+
+void ComputeCLAHE::Init(GLuint volumeTexture, GLuint maskTexture, glm::ivec3 volDims, 
+						unsigned int finalGrayVals, unsigned int inGrayVals, unsigned int numOrgans) {
+	// Volume Data
 	_volumeTexture = volumeTexture;			_maskTexture = maskTexture;
 	_numOutGrayVals = finalGrayVals;		_numInGrayVals = inGrayVals;
 	_volDims = volDims;
