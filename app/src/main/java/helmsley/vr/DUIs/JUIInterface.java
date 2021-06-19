@@ -97,6 +97,11 @@ public class JUIInterface {
         JUIsetCLAHEOptionNative(id);
         //TODO:BROCADAST
     }
+    static void JUIsetCLAHEVariableDeltaStep(boolean up, int var_id, int sub_var_id){
+        JUIsetCLAHEVariableDeltaStepNative(up, var_id, sub_var_id);
+        //TODO:BROCADAST
+    }
+
     static void JUIsetTraversalTarget(int id){
         JUIsetTraversalTargetNative(id);
         if(on_broadcast) operateClient.setTuneParams(TuneMsg.TuneType.SET_TARGET, id, 2);
@@ -148,7 +153,9 @@ public class JUIInterface {
     public static native void JUIsetMaskBitsNative(int num, int mbits);
     public static native void JUIsetColorSchemeNative(int id);
     public static native void JUIsetCLAHEOptionNative(int id);
+    public static native void JUIsetCLAHEVariableDeltaStepNative(boolean up, int var_id, int sub_var_id);
     public static native void JUIsetTraversalTargetNative(int id);
+    public static native void JUIApplyCLAHEChanges();
 
     //touch action
     public static native void JUIonSingleTouchDownNative(int target, float x, float y);

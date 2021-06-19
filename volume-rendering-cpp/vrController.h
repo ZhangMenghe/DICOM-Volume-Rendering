@@ -59,7 +59,11 @@ public:
             Manager::baked_dirty_ = true;
         }
     }
-
+    void setCLAHEVariableDeltaStep(bool up, dvr::CLAHE_VARIABLES var_id, int var_sub_id);
+    void ApplyCLAHEChanges(){
+        claheManager_->ApplyChanges();
+        Manager::baked_dirty_ = true;
+    }
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}

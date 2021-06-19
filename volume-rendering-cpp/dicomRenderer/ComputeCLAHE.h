@@ -31,7 +31,7 @@ private:
 	glm::ivec3 _minPixels = glm::ivec3(25, 25, 20);
 
 	// Masked CLAHE Parameters
-	int _numOrgans = 4;
+	int _numOrgans = 7;
 
 	// CLAHE Compute Shader Functions
 	void computeLUT(glm::uvec3 volDims, uint32_t* minMax, bool useLUT,  glm::uvec3 offset = glm::uvec3(0));

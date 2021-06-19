@@ -87,13 +87,6 @@ namespace dvr{
         SHADER_ANDROID_END,
         SHADER_ALL_END
     };
-//    enum CLAHE_SHADER_FILES{
-//        MIN_MAX_COMP,
-//        LUT_COMP,
-//
-//        SHADER_CLAHE_END
-//
-//    };
     enum TEX_IDS{
         BAKED_TEX_ID=0,
         CLAHE_TEX_ID,
@@ -124,6 +117,12 @@ namespace dvr{
         CLAHE_FOCUSED,
         CLAHE_MASKED
     };
+    enum CLAHE_VARIABLES {
+        CLAHE_CLIP_3D=0,
+        CLAHE_SUB_BLOCK_NUM,
+        CLAHE_BLOCK_SIZE,
+        CLAHE_BLOCK_POS
+    };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
@@ -142,6 +141,17 @@ namespace dvr{
     const glm::mat4 DEFAULT_ROTATE_AR = glm::mat4(1.0f);
     const glm::vec3 DEFAULT_SCALE_AR = glm::vec3(0.16f);
     const glm::vec3 DEFAULT_POS_AR = glm::vec3(.0f);
+
+    //SETTING for CLAHE
+    const glm::uvec3 DEFAULT_SUBLOCK_NUM = glm::uvec3(4, 4, 2);
+    const glm::uvec3 DEFAULT_BLOCK_SIZE = glm::uvec3(200, 200, 50);
+    const float DEFAULT_CLIP_3D = 0.85f;
+    const glm::uvec3 DEFAULT_STEP_SIZE[3]={
+            glm::uvec3(20,0,0),
+            glm::uvec3(0,20,0),
+            glm::uvec3(0,0,10),
+
+    };
 
     struct Rect{
         float width;float height;

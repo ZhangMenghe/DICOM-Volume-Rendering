@@ -7,10 +7,9 @@
 class claheManager{
 private:
     ComputeCLAHE* m_computer = nullptr;
-    glm::uvec3 numSB_3D = glm::uvec3(4, 4, 2);
-    glm::uvec3 min3D = glm::uvec3(200, 200, 40);
-    glm::uvec3 max3D = glm::uvec3(400, 400, 90);
-    float clipLimit3D = 0.85f;
+    glm::uvec3 numSB_3D;
+    glm::uvec3 min3D, max3D;
+    float clipLimit3D;
 
     GLuint _3D_CLAHE;
     GLuint _FocusedCLAHE;
@@ -20,9 +19,11 @@ private:
 
     unsigned int outputGrayvals_3D = 65536;
     unsigned int inputGrayvals_3D = 65536;
-    unsigned int numOrgans = 4;
-
-    void on_focus_change();
+    unsigned int numOrgans = 7;
+    float clipStep = 0.05f;
+    bool m_dirty;
+    glm::uvec3 m_3d_limit;
+    bool ready_to_compute = false;
 public:
     claheManager();
     GLuint getCLAHETexture(dvr::CLAHE_OPTIONS mode){
@@ -30,6 +31,8 @@ public:
         if(mode == dvr::CLAHE_FOCUSED) return _FocusedCLAHE;
         return _MaskedCLAHE;
     }
+    void onUpdate();
+    void ApplyChanges(){ready_to_compute = true;}
     GLuint getCurrentTexture(){return _currTexture;}
     void setCurrentTexMode(dvr::CLAHE_OPTIONS mode);
     void onVolumeDataUpdate(GLuint tex_volume, GLuint tex_mask, glm::vec3 volDim);

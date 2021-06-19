@@ -57,7 +57,23 @@
         <item>Focus CLAHE</item>
         <item>Mask CLAHE</item>
     </string-array>
-
+    <string-array name="clahe_tune">
+        <item>Clip 3D</item>
+        <item>Sub-block Num</item>
+        <item>Block Size</item>
+        <item>Block Position</item>
+    </string-array>
+    <string-array name="xyz_dim">
+        <item>X</item>
+        <item>Y</item>
+        <item>Z</item>
+    </string-array>
+    <string-array name="clahe_tune_dimension">
+        <item>1</item>
+        <item>1</item>
+        <item>3</item>
+        <item>3</item>
+    </string-array>
 <!--    mask panel-->
     <string-array name="mask_check_params">
         <item>Apply</item>

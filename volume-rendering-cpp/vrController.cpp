@@ -289,6 +289,8 @@ void vrController::precompute(){
         Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
 
     }
+    claheManager_->onUpdate();
+
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(Manager::instance()->getColorSchemeKeyword());
 
@@ -376,6 +378,11 @@ void vrController::setCuttingPlane(int id, int delta){
             isRayCasting()?raycastRenderer_->dirtyPrecompute():texvrRenderer_->dirtyPrecompute();
         }
     }
+}
+void vrController::setCLAHEVariableDeltaStep(bool up, dvr::CLAHE_VARIABLES var_id, int var_sub_id){
+    if(var_id == dvr::CLAHE_CLIP_3D) claheManager_->onClipLimitChange(up);
+    else if(var_id == dvr::CLAHE_SUB_BLOCK_NUM) claheManager_->onSubBlockNumChange(up);
+    else claheManager_->onFocusRegionChange(DEFAULT_STEP_SIZE[var_sub_id], var_id==dvr::CLAHE_BLOCK_SIZE, up);
 }
 void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
     cutter_->setCutPlane(pp, pn);
