@@ -26,6 +26,7 @@ private:
     bool ready_to_compute = false;
 public:
     claheManager();
+    void onReset();
     GLuint getCLAHETexture(dvr::CLAHE_OPTIONS mode){
         if(mode == dvr::CLAHE_3D) return _3D_CLAHE;
         if(mode == dvr::CLAHE_FOCUSED) return _FocusedCLAHE;

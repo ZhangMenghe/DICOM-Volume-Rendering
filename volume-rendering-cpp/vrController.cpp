@@ -35,6 +35,7 @@ void vrController::onReset() {
         m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
         volume_model_dirty = true;
     }
+    if(claheManager_)claheManager_->onReset();
     if(cutter_) cutter_->onReset();
 }
 void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
@@ -46,7 +47,7 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
         m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
         volume_model_dirty = true;
     }
-
+    if(claheManager_)claheManager_->onReset();
     if(cutter_) cutter_->onReset();
 }
 
