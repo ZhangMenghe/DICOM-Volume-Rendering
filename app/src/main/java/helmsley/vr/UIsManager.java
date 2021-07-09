@@ -25,7 +25,7 @@ public class UIsManager {
     final static String TAG = "UIsManager";
 
     //not pretty, but the most convenient solution
-    final static public int tex_id=0, raycast_id=1;
+    final static public int tex_id=0, view_aligned_id=1, raycast_id=2;
     static private int current_texray_id = -1;
 
     //Panels
@@ -56,9 +56,9 @@ public class UIsManager {
         RequestReset();
     }
 
-    public void onTexRaySwitch(boolean isRaycast){
-        current_texray_id = isRaycast?raycast_id:tex_id;
-        sub_panels_.get(R.string.panel_cut_name).onTexRayChange(isRaycast);
+    public void onRenderingMethodChange(int rid){
+        current_texray_id = rid;
+        sub_panels_.get(R.string.panel_cut_name).onRenderingMethodChange(current_texray_id);
     }
     public void onPanelCheckSwitch(int pos, boolean isPanelOn){
         sub_panels_.get(sub_panel_name_ids_[pos]).showHidePanel(isPanelOn, current_texray_id==raycast_id);

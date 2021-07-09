@@ -27,6 +27,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         style="@style/Spinner"/>
+    <Spinner
+        android:id="@+id/param_seekbar_spinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintStart_toEndOf="@+id/contrast_seekbar_spinner"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/Spinner"/>
 </android.support.constraint.ConstraintLayout>
 
 <android.support.constraint.ConstraintLayout

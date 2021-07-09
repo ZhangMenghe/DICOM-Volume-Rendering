@@ -1,8 +1,8 @@
 #ifndef VR_CONTROLLER_H
 #define VR_CONTROLLER_H
 
-#include <dicomRenderer/texturebasedRenderer.h>
-#include <dicomRenderer/raycastRenderer.h>
+#include <dicomRenderer/baseDicomRenderer.h>
+
 #include <dicomRenderer/organMeshRenderer.h>
 #include <dicomRenderer/centerLineRenderer.h>
 #include <dicomRenderer/cuttingController.h>
@@ -52,7 +52,17 @@ public:
     void setVolumePosition(glm::vec3 pv){PosVec3_ = pv;volume_model_dirty=true;}
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setOverlayRects(int id, int width, int height, int left, int top);
-
+    void setRenderingMethod(dvr::RENDER_METHOD method){
+        if(m_rmethod_id == method) return;
+        m_rmethod_id = method;//vRenderer_[m_rmethod_id]->dirtyPrecompute();
+    }
+    void setRenderingParameters(dvr::RENDER_METHOD method, float* values){
+        if(method < vRenderer_.size())
+            vRenderer_[method]->setRenderingParameters(values);
+        else{
+            Manager::indiv_rendering_params[method] = values[0];
+        }
+    }
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}
@@ -64,13 +74,16 @@ public:
     void getCuttingPlane(glm::vec3& pp, glm::vec3& pn){cutter_->getCuttingPlane(pp,pn);}
     bool isDirty();
 
+    bool isRayCut(){return isRayCasting() && Manager::param_bool[dvr::CHECK_CUTTING];}
+
 private:
     static vrController* myPtr_;
     std::shared_ptr<Manager> m_manager;
 
     //renderers
-    texvrRenderer* texvrRenderer_ = nullptr;
-    raycastRenderer* raycastRenderer_ = nullptr;
+    std::vector<baseDicomRenderer*> vRenderer_;
+    int m_rmethod_id = -1;
+
     organMeshRenderer* meshRenderer_ = nullptr;
     std::vector<organMeshRenderer*> mesh_renders;
     std::unordered_map<int, centerLineRenderer*> line_renderers_;
@@ -95,10 +108,12 @@ private:
     glm::fvec2 Mouse_old;
 
     //flags
-    bool volume_model_dirty;
+    bool volume_model_dirty, volume_rotate_dirty;
     
     //performance 
     perfMonitor pm_;
+
+//    float time_all = 0, time_count = 0;
 
     //vec3
     glm::vec4 ray_dir;
@@ -110,9 +125,7 @@ private:
             1.0,-1.0,-1.0,1.0,
             1.0, -1.0, -1.0, 1.0 };
     
-    static bool isRayCasting(){
-        return Manager::param_bool[dvr::CHECK_RAYCAST];
-    }
+    bool isRayCasting(){return m_rmethod_id == (int)dvr::RAYCASTING;}
     void updateVolumeModelMat();
     void precompute();
     bool check_ar_ray_intersect();

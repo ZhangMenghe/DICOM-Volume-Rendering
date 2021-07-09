@@ -1,41 +1,39 @@
 #ifndef TEXTUREBASED_RENDERER_H
 #define TEXTUREBASED_RENDERER_H
 
-#include <cstring>
-#include <vector>
-#include <GLPipeline/Mesh.h>
-#include <GLPipeline/Shader.h>
-#include <GLPipeline/Texture.h>
 
-class texvrRenderer{
+#include "baseDicomRenderer.h"
+
+class texvrRenderer:public baseDicomRenderer{
 private:
-    const float DENSE_FACTOR = 1.0f;
-    int dimensions; float dimension_inv;
+    int dimension_draw;
+    float dimension_draw_inv;
+    float dense_factor = 1.0f;
     float vol_thickness_factor = 1.0f;
-    const int MAX_DIMENSIONS = 1000;
+    const static int MAX_DIMENSIONS = 1000;
+    bool m_instance_data_dirty = false;
 
-    Shader* shader_;
-    GLuint frame_buff_ = 0;
     GLuint vao_front = 0, vbo_front;
     GLuint vao_back = 0, vbo_back;
 
     bool b_init_successful = false;
     int cut_id = 0;
 
+    float *m_vertices_front, *m_vertices_back;
+    unsigned int *m_indices=nullptr;
+
     //for screen baking
-    bool baked_dirty_ = true;
-    void init_vertices(GLuint &vao_slice, GLuint& vbo_instance,bool is_front);
+    void init_vertices(GLuint &vao, GLuint& vbo);
     void draw_scene(glm::mat4 model_mat);
     void draw_baked(glm::mat4 model_mat);
-    void update_instance_data(GLuint& vbo_instance,bool is_front);
-
+    void update_instance_data();
+    void on_update_dimension_draw();
 public:
     texvrRenderer();
     void setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale);
     void setCuttingPlane(float percent);
     void setCuttingPlaneDelta(int delta);
     void Draw(bool pre_draw, glm::mat4 model_mat);
-    void dirtyPrecompute(){baked_dirty_ = true;}
-    bool isPrecomputeDirty(){return baked_dirty_;}
+    void setRenderingParameters(float* values);
 };
 #endif

@@ -1,4 +1,4 @@
-#version 300 es
+#version 310 es
 #pragma multi_compile CUTTING_PLANE
 
 precision mediump float;
@@ -7,6 +7,10 @@ out vec4 fragColor;
 in vec3 vTexcoord;
 
 uniform mediump sampler3D uSampler_baked;
+//uniform float u_cut_texz;
+//uniform bool u_front;
+//uniform bool u_cut;
+//cutting-plane
 struct Plane{
 	vec3 p;
 	vec3 normal;
@@ -19,5 +23,5 @@ void main(){
 		vec3 pos = vTexcoord - 0.5;
 		if(dot(pos - uPlane.p, uPlane.normal) < .0) discard;
 	#endif
-	fragColor = texture(uSampler_baked, vTexcoord);
+	fragColor =  texture(uSampler_baked, vTexcoord);
 }

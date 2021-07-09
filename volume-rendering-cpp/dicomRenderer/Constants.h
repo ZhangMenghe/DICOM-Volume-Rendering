@@ -24,6 +24,15 @@ namespace dvr{
         CHECK_AR_DRAW_PLANE,
         CHECK_AR_3D_POINTER
     };
+    enum PARAM_TID{
+        TID_OPACITY=0,
+        TID_CONTRAST,
+        TID_TEXTURE_BASED,
+        TID_VIEW_ALIGNED,
+        TID_RAYCAST,
+        TID_CUTTING_PLANE,
+        TID_END
+    };
     enum PARAM_TUNE{
         TUNE_OVERALL=0,
         TUNE_LOWEST,
@@ -45,7 +54,6 @@ namespace dvr{
         PLACE_ANCHOR
     };
     enum PARAM_RENDER_TUNE{
-//        RENDER_CONTRAST_LEVEL=0,
         RENDER_CONTRAST_LOW=0,
         RENDER_CONTRAST_HIGH,
         RENDER_BRIGHTNESS,
@@ -55,6 +63,8 @@ namespace dvr{
     enum SHADER_FILES{
         SHADER_TEXTUREVOLUME_VERT=0,
         SHADER_TEXTUREVOLUME_FRAG,
+        SHADER_VIEW_ALIGNED_VERT,
+        SHADER_VIEW_ALIGNED_FRAG,
         SHADER_RAYCASTVOLUME_VERT,
         SHADER_RAYCASTVOLUME_FRAG,
         SHADER_RAYCASTCOMPUTE_GLSL,
@@ -110,6 +120,12 @@ namespace dvr{
         ORGAN_AROTA,
         ORGAN_END
     };
+    enum RENDER_METHOD{
+        TEXTURE_BASED = 0,
+        VIEW_ALIGN_SLICING,
+        RAYCASTING,
+        RENDER_METHOD_END
+    };
     //UIs
     const float MOUSE_ROTATE_SENSITIVITY = 0.005f;
     const float MOUSE_SCALE_SENSITIVITY = 0.8f;
@@ -118,6 +134,7 @@ namespace dvr{
     //SETTINGS
     static const ORGAN_IDS DEFAULT_TRAVERSAL_ORGAN = ORGAN_COLON;
     static const bool AR_CAPTURE_FRAMES = false;
+    static const bool VIEW_ALIGNED_LAZY_UPDATE = false;
 
     //TRS
     const glm::mat4 DEFAULT_ROTATE = glm::mat4(1.0f);

@@ -50,6 +50,8 @@ public class cutplaneUIs extends BasePanel{
 
     private final static int TRAVERSAL_CHECK_ID = 4;
     private final static int VIEW_SWITCH_ID = 5;
+    private final static int TID_CUTTING_PLANE = 5;
+
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
@@ -231,7 +233,7 @@ public class cutplaneUIs extends BasePanel{
         if(pos.length == 3) System.arraycopy(pos, 0, cut_pose, 0, 3);
         float[] norm = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("pnorm", new ArrayList<Float>()));
         if(norm.length == 3) System.arraycopy(norm, 0, cut_pose, 3, 3);
-        JUIInterface.JUIsetAllTuneParamById(2, cut_pose);
+        JUIInterface.JUIsetAllTuneParamById(TID_CUTTING_PLANE, cut_pose);
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
@@ -255,11 +257,13 @@ public class cutplaneUIs extends BasePanel{
     public void showHidePanel(boolean show_panel, boolean isRaycast){
         super.showHidePanel(show_panel);
     }
-    public void onTexRayChange(boolean isRaycast){
-        showHidePanel(panel_visible, isRaycast);
-        is_current_raycast = isRaycast;
+
+    public void onRenderingMethodChange(int rm_id){
+        boolean is_all_dir = (rm_id !=0 );
+        showHidePanel(panel_visible, is_all_dir);
+        is_current_raycast = is_all_dir;
         if(primary_checkbox.isChecked()){
-            if(isRaycast)primary_panel.setVisibility(View.VISIBLE);
+            if(is_all_dir)primary_panel.setVisibility(View.VISIBLE);
             else primary_panel.setVisibility(View.INVISIBLE);
         }
     }

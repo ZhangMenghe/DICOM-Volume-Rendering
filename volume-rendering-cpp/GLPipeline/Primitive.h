@@ -5,11 +5,11 @@
 const unsigned int quad_indices[6]= {0,1,2,
                                      0,2,3};
 
-const float quad_vertices_2d[8]={
-        0.5f, .5f,//top-right
-        -0.5f, .5f,//top-left
-        -0.5f, -.5f,//bottom-left
-        0.5f, -.5f,//bottom-right
+const float quad_vertices_3d[12]={
+        0.5f, .5f, .0,//top-right
+        -0.5f, .5f, .0,//top-left
+        -0.5f, -.5f, .0,//bottom-left
+        0.5f, -.5f, .0//bottom-right
 };
 const float quad_vertices_tex[24]={
         0.5f, 1.0, .0f,    1.0, 1.0, .0f,//top-right
@@ -24,7 +24,8 @@ const float quad_vertices_tex_standard[24] = {//Word          Texture
         -1.0f,1.0f,	.0, 0.0f,1.0f,.0
 };
 
-const float cuboid[24] = {//World
+
+const float cuboid[24] = {
         -0.5f,-0.5f,0.5f,
         0.5f,-0.5f,0.5f,
         0.5f,0.5f,0.5f,
@@ -34,8 +35,7 @@ const float cuboid[24] = {//World
         0.5f,0.5f,-0.5f,
         -0.5f,0.5f,-0.5f,
 };
-
-const float cuboid_with_texture[48] = {//World
+const float cuboid_with_texture[48] = {
         -0.5f,-0.5f,0.5f,   0.0f,0.0f,1.0f,
         0.5f,-0.5f,0.5f,    1.0f,0.0f,1.0f,
         0.5f,0.5f,0.5f,	    1.0f,1.0f,1.0f,

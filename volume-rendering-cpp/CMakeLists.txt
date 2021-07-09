@@ -33,6 +33,7 @@ SET(UTILS_FILES
 SET(DICOM_RENDERERS
         dicomRenderer/organMeshRenderer.cpp
         dicomRenderer/raycastRenderer.cpp
+        dicomRenderer/ViewAlignedSlicingRenderer.cpp
         dicomRenderer/texturebasedRenderer.cpp
         dicomRenderer/centerLineRenderer.cpp
         dicomRenderer/cuttingController.cpp

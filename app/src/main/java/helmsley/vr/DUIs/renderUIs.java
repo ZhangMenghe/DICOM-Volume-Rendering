@@ -33,9 +33,12 @@ public class renderUIs extends BasePanel{
     private textSimpleListAdapter rendermodeAdapter, colorAdapter;
     private widgetListAdapter widAdapter;
     private tunerListAdapter rendertuneAdapter;
+    private final int RENDERING_METHOD_NUM=3, TID_OPACITY=0, TID_CONTRAST=1, TID_FIRST_RENDER=2;
+    private tunerListAdapter indivAdapter[] = new tunerListAdapter[RENDERING_METHOD_NUM];
     private Button btn_hide;
+    private Spinner param_seekbar_spinner;
 
-    private static String CHECK_TEXRAY_NAME, CHECK_OVERLAYS;
+    private static String CHECK_OVERLAYS;//CHECK_TEXRAY_NAME;
 
     public renderUIs(final Activity activity, UIsManager manager, ViewGroup parent_view){
         super(activity, parent_view);
@@ -49,13 +52,25 @@ public class renderUIs extends BasePanel{
         //details of tune panel
         Spinner seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.tune_seekbar_spinner);
         seekbar_spinner.setDropDownVerticalOffset(150);
-        tunerListAdapter tunerAdapter = new tunerListAdapter(activity, 0, R.string.opacity_group_name, R.array.opaParams);
+        tunerListAdapter tunerAdapter = new tunerListAdapter(activity, TID_OPACITY, R.string.opacity_group_name, R.array.opaParams);
         seekbar_spinner.setAdapter(tunerAdapter);
 
         Spinner contrast_seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.contrast_seekbar_spinner);
         contrast_seekbar_spinner.setDropDownVerticalOffset(150);
-        rendertuneAdapter = new tunerListAdapter(activity,1, R.string.contrast_group_name, R.array.contrastParams);
+        rendertuneAdapter = new tunerListAdapter(activity,TID_CONTRAST, R.string.contrast_group_name, R.array.contrastParams);
         contrast_seekbar_spinner.setAdapter(rendertuneAdapter);
+
+        param_seekbar_spinner = (Spinner) tune_panel_.findViewById(R.id.param_seekbar_spinner);
+        contrast_seekbar_spinner.setDropDownVerticalOffset(150);
+
+        int[] indivual_param_group_name ={
+                R.array.TexturebasedParams,
+                R.array.ViewAlignParams,
+                R.array.RaycastParams
+        };
+
+        for(int i=0;i<RENDERING_METHOD_NUM;i++)
+            indivAdapter[i] = new tunerListAdapter(activity,i+TID_FIRST_RENDER, R.string.other_tune_group_name, indivual_param_group_name[i]);
 
         Spinner widget_spinner = (Spinner)tune_panel_.findViewById(R.id.tune_widget_id_spinner);
         widAdapter = new widgetListAdapter(activity, this, new tunerListAdapter[]{tunerAdapter});
@@ -127,7 +142,7 @@ public class renderUIs extends BasePanel{
         });
 
         setup_checks(R.array.render_check_params, R.array.render_check_values);
-        CHECK_TEXRAY_NAME = check_names_[0];//res.getStringArray(R.array.render_check_params)[0];
+//        CHECK_TEXRAY_NAME = check_names_[0];//res.getStringArray(R.array.render_check_params)[0];
         CHECK_OVERLAYS = check_names_[1];//res.getStringArray(R.array.render_check_params)[1];
     }
     public void Reset(){
@@ -135,6 +150,12 @@ public class renderUIs extends BasePanel{
         widAdapter.addItem();
         rendertuneAdapter.Reset();
         rendertuneAdapter.addInstance(0);
+
+        for(int i=0;i<RENDERING_METHOD_NUM;i++) {
+            indivAdapter[i].Reset();
+            indivAdapter[i].addInstance(0);
+            JUIInterface.JUIsetAllTuneParamById(indivAdapter[i].TID, indivAdapter[i].getDefaultValues());
+        }
         //render mode should be the first to set!!
         rendermodeAdapter.setTitleById(0);
         colorAdapter.setTitleById(0);
@@ -147,6 +168,11 @@ public class renderUIs extends BasePanel{
         //transfer-func: contrast
         rendertuneAdapter.Reset();
         rendertuneAdapter.addInstanceWithValue(0, Floats.toArray((ArrayList<Float>)tfmap.getOrDefault("contrast", new ArrayList<Float>())));
+
+        for(int i=0;i<RENDERING_METHOD_NUM;i++) {
+            indivAdapter[i].Reset();
+            indivAdapter[i].addInstance(0);
+        }
 
         //transfer-func: opacity widgets
         widAdapter.Reset();
@@ -191,9 +217,6 @@ public class renderUIs extends BasePanel{
         map.put("color scheme", colorAdapter.getTitle());
         return map;
     }
-    private void onTexRaySwitch(boolean isRaycast){
-        JUIInterface.JUIsetChecks(CHECK_TEXRAY_NAME, isRaycast);
-    }
     public void showHidePanel(boolean show_panel){
         if(panel_visible && !show_panel){
             for(View v:sub_panels_)parentRef.get().removeView(v);
@@ -207,6 +230,10 @@ public class renderUIs extends BasePanel{
     private void onWidgetChange(boolean visible){
         if(visible) btn_hide.setBackground(actRef.get().getResources().getDrawable(R.drawable.visible, null));
         else btn_hide.setBackground(actRef.get().getResources().getDrawable(R.drawable.invisible, null));
+    }
+    public void onRenderingMethodChange(int id){
+        param_seekbar_spinner.setAdapter(indivAdapter[id]);
+        mUIManagerRef.get().onRenderingMethodChange(id);
     }
     private static class tunerListAdapter extends ListAdapter{
         //TID: 0 for opacity, 1 for contrast
@@ -436,30 +463,27 @@ public class renderUIs extends BasePanel{
         }
     }
     private class renderListAdapter extends textSimpleListAdapter{
-        final private int RAYCAST_ID;
         int current_id = -1;
         renderListAdapter(Context context, int arrayId){
             super(context, arrayId);
-            RAYCAST_ID = UIsManager.raycast_id;
         }
         void onItemClick(int position){
-//            if(position == current_id) return;
-            mUIManagerRef.get().onTexRaySwitch(position == RAYCAST_ID);
-            onTexRaySwitch(RAYCAST_ID == position);
+            onRenderingMethodChange(position);
+            JUIInterface.JUIsetRenderingMethod(position);
             current_id = position;
         }
         void setTitleByText(String tt){
             super.setTitleByText(tt);
             int id = item_names.indexOf(this.title);
-            mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == id);
-            onTexRaySwitch(RAYCAST_ID == id);
+            onRenderingMethodChange(id);
+            JUIInterface.JUIsetRenderingMethod(id);
             current_id = id;
         }
         void setTitleById(int id){
 //            if(id == current_id) return;
             super.setTitleById(id);
-            mUIManagerRef.get().onTexRaySwitch(RAYCAST_ID == id);
-            onTexRaySwitch(RAYCAST_ID == id);
+            onRenderingMethodChange(id);
+            JUIInterface.JUIsetRenderingMethod(id);
             current_id = id;
         }
     }

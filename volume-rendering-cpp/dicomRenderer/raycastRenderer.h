@@ -1,15 +1,12 @@
 #ifndef RAYCAST_RENDERER_H
 #define RAYCAST_RENDERER_H
 
-#include <GLPipeline/Mesh.h>
-#include <GLPipeline/Shader.h>
-#include <GLPipeline/Texture.h>
-class raycastRenderer{
+#include "baseDicomRenderer.h"
+class raycastRenderer : public baseDicomRenderer{
 private:
-    Shader* shader_= nullptr, *cshader_ = nullptr;
+    Shader *cshader_ = nullptr;
     GLuint vao_cube_= 0;
-    GLuint frame_buff_ = 0;
-    bool baked_dirty_ = true;
+    float m_sample_steps = 100.f;
 
     void draw_to_texture(glm::mat4 model_mat);
     void draw_baked(glm::mat4 model_mat);
@@ -17,7 +14,6 @@ private:
 public:
     raycastRenderer();
     void Draw(bool pre_draw, glm::mat4 model_mat);
-    bool isPrecomputeDirty(){return baked_dirty_;}
-    void dirtyPrecompute(){baked_dirty_ = true;}
+    void setRenderingParameters(float* values){m_sample_steps = values[0];}
 };
 #endif

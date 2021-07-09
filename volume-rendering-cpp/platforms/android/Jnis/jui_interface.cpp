@@ -35,24 +35,23 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
 }
 
 JUI_METHOD(void, JUIsetTuneWidgetByIdNative)(JNIEnv *, jclass, jint wid){
-//    overlayController::instance()->setWidgetId(wid);
     m_manager->setOpacityWidgetId(wid);
 }
 JUI_METHOD(void, JUIremoveTuneWidgetByIdNative)(JNIEnv *, jclass, jint wid){
-//    overlayController::instance()->removeWidget(wid);
     m_manager->removeOpacityWidget(wid);
 }
 JUI_METHOD(void, JUIremoveAllTuneWidgetNative)(JNIEnv *, jclass){
-//    overlayController::instance()->removeAll();
     m_manager->removeAllOpacityWidgets();
 }
 JUI_METHOD(void, JUIsetTuneParamByIdNative)(JNIEnv *, jclass, jint tid, jint pid, jfloat value){
-    if(tid == 0 && pid < dvr::TUNE_END)
-//        overlayController::instance()->setTuneParameter(pid, value);
-        m_manager->setOpacityValue(pid, value);
-    else if(tid == 1)
-        m_manager->setRenderParam(pid, value);
-//       m_sceneRenderer->setRenderParam(pid, value);
+    if(tid == dvr::TID_OPACITY){
+        if(pid < dvr::TUNE_END)m_manager->setOpacityValue(pid, value);
+    }
+    else if(tid == dvr::TID_CONTRAST) m_manager->setRenderParam(pid, value);
+    else{
+        jfloat tmp[] = {value};
+        m_sceneRenderer->setRenderingParameters(dvr::RENDER_METHOD(tid-2), tmp);
+    }
 }
 JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint pid, jfloat minv, jfloat maxv){
 //    if(pid < dvr::DUAL_END)m_sceneRenderer->setDualParameter(pid, minv, maxv);
@@ -96,17 +95,23 @@ JUI_METHOD(void, JUIsetTraversalTargetNative)(JNIEnv * env, jclass, jint id){
     Manager::traversal_target_id = (id == 0)?dvr::ORGAN_COLON:dvr::ORGAN_ILEUM;
     LOGE("====ID: %d", id);
 }
+JUI_METHOD(void, JUIsetRenderingMethodNative)(JNIEnv * env, jclass, jint id){
+    m_sceneRenderer->setRenderingMethod(dvr::RENDER_METHOD(id));
+}
 JUI_METHOD(void, JUIsetGraphRectNative)(JNIEnv*, jclass, jint id, jint width, jint height, jint left, jint top){
 //    LOGE("====%d, %d, %d, %d,%d", id, width, height, left,top);
     m_sceneRenderer->setOverlayRects(id, width, height, left, top);
 }
-JUI_METHOD(void, JUIsetAllTuneParamByIdNative)(JNIEnv* env, jclass, jint id, jfloatArray jvalues){
+JUI_METHOD(void, JUIsetAllTuneParamByIdNative)(JNIEnv* env, jclass, jint tid, jfloatArray jvalues){
+    if (tid >= dvr::TID_END) return;
+
     jfloat* values = env->GetFloatArrayElements(jvalues, 0);
-    if(id == 1)
-        m_manager->setRenderParam(values);
-//        m_sceneRenderer->setRenderParam(values);
-    else if(id == 2)
+    if(tid == dvr::TID_CONTRAST)m_manager->setRenderParam(values);
+    else if(tid == dvr::TID_CUTTING_PLANE)
         m_sceneRenderer->setCuttingPlane(glm::vec3(values[0], values[1], values[2]), glm::vec3(values[3], values[4],values[5]));
+    else
+        m_sceneRenderer->setRenderingParameters(dvr::RENDER_METHOD(tid-2), values);
+
     env->ReleaseFloatArrayElements(jvalues,values,0);
 }
 JUI_METHOD(void, JUIsetTuneWidgetVisibilityNative)(JNIEnv*, jclass, jint wid, jboolean value){
