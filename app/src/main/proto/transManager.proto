@@ -59,6 +59,7 @@ service dataTransfer{
     rpc getVolumeFromDataset(Request) returns(stream volumeResponse);
     rpc Download(Request) returns (stream dcmImage);
     rpc DownloadVolume(RequestWholeVolume) returns(stream volumeWholeResponse);
+    rpc DownloadVolumeProcessed(RequestWholeVolume) returns(stream volumeWholeResponse);
     rpc DownloadMasks(Request) returns(stream dcmImage);
     rpc DownloadMasksVolume(Request) returns(stream volumeWholeResponse);
     rpc DownloadCenterLineData(Request) returns(stream centerlineData);

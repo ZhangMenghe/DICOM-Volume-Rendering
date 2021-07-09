@@ -6,6 +6,7 @@
 #include <dicomRenderer/organMeshRenderer.h>
 #include <dicomRenderer/centerLineRenderer.h>
 #include <dicomRenderer/cuttingController.h>
+#include <dicomRenderer/claheManager.h>
 #include <Utils/perfMonitor.h>
 #include <GLPipeline/Texture.h>
 #include "nEntrance.h"
@@ -63,6 +64,17 @@ public:
             Manager::indiv_rendering_params[method] = values[0];
         }
     }
+    void setCLAHEOption(int id){
+        if(claheManager_!=nullptr){
+            claheManager_->setCurrentTexMode((dvr::CLAHE_OPTIONS)id);
+            Manager::baked_dirty_ = true;
+        }
+    }
+    void setCLAHEVariableDeltaStep(bool up, dvr::CLAHE_VARIABLES var_id, int var_sub_id);
+    void ApplyCLAHEChanges(){
+        claheManager_->ApplyChanges();
+        Manager::baked_dirty_ = true;
+    }
     //getter funcs
     GLuint getVolumeTex(){return tex_volume->GLTexture();}
     GLuint getBakedTex(){return tex_baked->GLTexture();}
@@ -84,6 +96,7 @@ private:
     std::vector<baseDicomRenderer*> vRenderer_;
     int m_rmethod_id = -1;
 
+    claheManager* claheManager_ = nullptr;
     organMeshRenderer* meshRenderer_ = nullptr;
     std::vector<organMeshRenderer*> mesh_renders;
     std::unordered_map<int, centerLineRenderer*> line_renderers_;
@@ -94,7 +107,7 @@ private:
     Shader* bakeShader_ = nullptr;
 
     //Textures
-    Texture *tex_volume = nullptr, *tex_baked = nullptr;
+    Texture *tex_volume = nullptr, *tex_mask=nullptr, *tex_baked = nullptr;
 
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;

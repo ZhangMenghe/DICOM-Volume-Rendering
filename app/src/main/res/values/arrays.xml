@@ -3,6 +3,7 @@
 <!--UIManager: panels show/hide + JNI check params-->
     <string-array name="checkShowPanelName">
         <item>@string/panel_rendering_name</item>
+        <item>@string/panel_clahe_name</item>
         <item>@string/panel_cut_name</item>
         <item>@string/panel_mask_name</item>
         <item>@string/panel_ar_name</item>
@@ -12,9 +13,11 @@
         <item>false</item>
         <item>false</item>
         <item>false</item>
+        <item>false</item>
     </string-array>
     <string-array name="checkJNIParams">
         <item>@array/render_check_params</item>
+        <item>@array/clahe_check_params</item>
         <item>@array/mask_check_params</item>
         <item>@array/cut_check_params</item>
         <item>@array/ar_check_params</item>
@@ -29,7 +32,6 @@
         <item>false</item>
         <item>@bool/default_render_panel_on</item>
     </array>
-
 <!--    order matters!, consistent with uimanager static final values-->
     <string-array name="rendering_mode">
         <item>Slice by slice</item>
@@ -56,6 +58,35 @@
         <item>@array/RaycastParams</item>
     </string-array>
 
+<!--clahe panel    -->
+    <string-array name="clahe_check_params">
+        <item>@string/clahe_check_name</item>
+    </string-array>
+    <array name="clahe_check_values">
+        <item>false</item>
+    </array>
+    <string-array name="clahe_options">
+        <item>3D CLAHE</item>
+        <item>Focus CLAHE</item>
+        <item>Mask CLAHE</item>
+    </string-array>
+    <string-array name="clahe_tune">
+        <item>Clip 3D</item>
+        <item>Sub-block Num</item>
+        <item>Block Size</item>
+        <item>Block Position</item>
+    </string-array>
+    <string-array name="xyz_dim">
+        <item>X</item>
+        <item>Y</item>
+        <item>Z</item>
+    </string-array>
+    <string-array name="clahe_tune_dimension">
+        <item>1</item>
+        <item>1</item>
+        <item>3</item>
+        <item>3</item>
+    </string-array>
 <!--    mask panel-->
     <string-array name="mask_check_params">
         <item>Apply</item>

@@ -1,0 +1,56 @@
+#version 310 es
+
+layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;	// 64 threads
+
+// input Dicom Volume
+layout(binding = 0, r32ui) readonly uniform mediump uimage3D volume;
+layout(r32ui, binding = 1) readonly uniform mediump uimage3D mask;
+
+// input LUT
+layout(std430, binding = 2) buffer lutBuffer {
+    uint LUT[];
+};
+
+// output Histogram
+layout(std430, binding = 3) buffer outHist {
+    int hist[];
+};
+// output histogram max values 
+layout(std430, binding = 4) buffer outHistMax {
+	int histMax[];
+};
+
+uniform uint NUM_BINS;		// number of gray values in the Volume 
+uniform bool useLUT;		// if we need to use the LUT to map to a different bit range
+uniform uvec3 volumeDims;	// size of the section of the volume we are applying CLAHE to 
+
+void main() {
+
+	// figure out the sub block this index belongs to 
+	uvec3 index = gl_GlobalInvocationID.xyz;
+
+	// if we are not within the volume of interest -> return 
+	if ( index.x >= volumeDims.x || index.y >= volumeDims.y || index.z >= volumeDims.z ) {
+		return;
+	}
+	// if we are using the mask but are masked out -> return 
+	uint maskVal = imageLoad(mask, ivec3(index)).x;
+	if ( maskVal == uint(0) ) {
+		return;
+	}
+
+	// get the gray value of the Volume
+	uint volSample = imageLoad( volume, ivec3(index) ).x;
+	uint histIndex = uint(log2(float(maskVal)));
+	
+	// Increment the appropriate histogram
+	uint grayIndex = (NUM_BINS * histIndex) + volSample;
+	if (useLUT){
+		grayIndex = (NUM_BINS * histIndex) + LUT[ volSample ];
+	}
+	atomicAdd( hist[ grayIndex ], 1 );
+
+	// update the histograms max value
+	atomicMax( histMax[ histIndex ], hist[ grayIndex ] );
+
+}

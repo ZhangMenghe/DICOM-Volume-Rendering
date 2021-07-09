@@ -91,6 +91,15 @@ JUI_METHOD(void, JUIsetColorSchemeNative)(JNIEnv * env, jclass, jint id){
 //    Manager::color_scheme_id = id;
 //    Manager::baked_dirty_ = true;
 }
+JUI_METHOD(void, JUIsetCLAHEOptionNative)(JNIEnv * env, jclass, jint id){
+    m_sceneRenderer->setCLAHEOption(id);
+}
+JUI_METHOD(void, JUIsetCLAHEVariableDeltaStepNative)(JNIEnv * env, jclass, jboolean up, jint var_id, jint var_sub_id){
+    m_sceneRenderer->setCLAHEVariableDeltaStep(up, (dvr::CLAHE_VARIABLES)var_id, var_sub_id);
+}
+JUI_METHOD(void, JUIApplyCLAHEChanges)(JNIEnv * env, jclass){
+    m_sceneRenderer->ApplyCLAHEChanges();
+}
 JUI_METHOD(void, JUIsetTraversalTargetNative)(JNIEnv * env, jclass, jint id){
     Manager::traversal_target_id = (id == 0)?dvr::ORGAN_COLON:dvr::ORGAN_ILEUM;
     LOGE("====ID: %d", id);

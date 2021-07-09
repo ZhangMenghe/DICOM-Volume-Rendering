@@ -5,7 +5,7 @@
 Camera* Manager::camera = nullptr;
 std::vector<bool> Manager::param_bool;
 volumeSetupConstBuffer Manager::m_volset_data;
-std::vector<std::string> Manager::shader_contents;
+std::vector<std::string> Manager::shader_contents, Manager::shader_clahes;
 bool Manager::baked_dirty_, Manager::mvp_dirty_;
 bool Manager::new_data_available;
 dvr::ORGAN_IDS Manager::traversal_target_id;
@@ -23,6 +23,7 @@ Manager *Manager::instance()
 
 Manager::Manager(){
     shader_contents = std::vector<std::string>(dvr::SHADER_ALL_END-1);
+    shader_clahes = std::vector<std::string>(15);
     screen_w = 0; screen_h = 0;
     show_ar_ray = false;volume_ar_hold = false;
     onReset();
@@ -31,6 +32,7 @@ Manager::Manager(){
 Manager::~Manager(){
     param_bool.clear();
     shader_contents.clear();
+    shader_clahes.clear();
 
     m_mvp_status.clear();
     camera = nullptr;

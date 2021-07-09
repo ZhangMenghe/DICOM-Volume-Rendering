@@ -1,0 +1,159 @@
+#version 310 es
+
+layout(local_size_x = 4, local_size_y = 4, local_size_z = 4) in;	// 64 threads
+
+// input Dicom volume
+layout(r32ui, binding = 0) readonly uniform mediump uimage3D volume;
+// input LUT
+layout(std430, binding = 1) buffer lutBuffer {
+    uint LUT[];
+};
+// input Histogram
+layout(std430, binding = 2) buffer inHist {
+    uint hist[];
+};
+
+// output Volume Data
+layout(r32f, binding = 3) writeonly uniform mediump image3D newVolume;
+
+uniform ivec3 numSB;	// number of Sub Blocks
+uniform uint NUM_IN_BINS;	// number of gray values in the Volume 
+uniform uint NUM_OUT_BINS;	// number of gray values in the new Volume
+uniform bool useLUT;	// if we need to use the LUT to map to a different bit range
+
+void main_naive(){
+	uvec3 index = gl_GlobalInvocationID.xyz;
+	imageStore(newVolume, ivec3(index), vec4(1.0, .0, .0, .0));
+}
+void main() {
+	// figure out which block this voxel belongs to
+	uvec3 index = gl_GlobalInvocationID.xyz;
+	ivec3 volumeDims = imageSize(volume);
+
+	// number of blocks to interpolate over is 2x number of SB the volume is divided into
+	ivec3 numBlocks = numSB * ivec3(2);	
+	ivec3 sizeBlock = ivec3( volumeDims / numBlocks );
+	ivec3 currBlock = ivec3( ivec3(index) / sizeBlock );
+	
+
+	// find the neighbooring subBlocks and interpolation values (a,b,c) for the 
+	// block we are interpolating over
+	int xRight, xLeft, yUp, yDown, zFront, zBack;
+	int a, aInv, b, bInv, c, cInv;
+	ivec3 size = sizeBlock;
+
+	////////////////////////////////////////////////////////////////////////////
+	// X neighboors
+	if (currBlock.x == 0) {
+		xLeft = 0;							xRight = 0;
+		// X interpolation coefficients 
+		a = int(index.x) - currBlock.x * sizeBlock.x;
+	}
+	else if (currBlock.x == numBlocks.x - 1) {
+		xLeft = currBlock.x / 2 ;			xRight = xLeft;
+		// X interpolation coefficients 
+		a = int(index.x) - currBlock.x * sizeBlock.x;
+	}
+	else {
+		size.x *= 2;
+		if (currBlock.x % 2 == 0)	{
+			xLeft = currBlock.x / 2 - 1;	xRight = xLeft + 1;
+			a = int(index.x) - currBlock.x * sizeBlock.x + sizeBlock.x;
+
+		}
+		else {
+			xLeft = currBlock.x / 2;		xRight = xLeft + 1;
+			// X interpolation coefficients 
+			a = int(index.x) - currBlock.x * sizeBlock.x;
+		}
+	}
+	// X interpolation coefficients 
+	aInv = size.x - a;
+
+	////////////////////////////////////////////////////////////////////////////
+	// Y neighboors
+	if (currBlock.y == 0) {
+		yUp = 0;							yDown = 0;
+		b = int(index.y) - currBlock.y * sizeBlock.y;
+	}
+	else if (currBlock.y == numBlocks.y - 1) {
+		yUp = currBlock.y / 2;				yDown = yUp;
+		b = int(index.y) - currBlock.y * sizeBlock.y;
+	}
+	else {
+		size.y *= 2;
+		if (currBlock.y % 2 == 0) {
+			yUp = currBlock.y / 2 - 1;		yDown = yUp + 1;
+			b = int(index.y) - currBlock.y * sizeBlock.y + sizeBlock.y;
+		}
+		else {
+			yUp = currBlock.y / 2;			yDown = yUp + 1;
+			b = int(index.y) - currBlock.y * sizeBlock.y;
+		}
+	}
+	// Y interpolation coefficients 
+	bInv = size.y - b;
+
+	////////////////////////////////////////////////////////////////////////////
+	// Z neighboors
+	if (currBlock.z == 0) {
+		zFront = 0;							zBack = 0;
+		c = int(index.z) - currBlock.z * sizeBlock.z;
+	}
+	else if (currBlock.z == numBlocks.z - 1) {
+		zFront = currBlock.z / 2;			zBack = zFront;
+		c = int(index.z) - currBlock.z * sizeBlock.z;
+	}
+	else {
+		size.z *= 2;
+		if (currBlock.z % 2 == 0) {
+			zFront = currBlock.z / 2 - 1;	zBack = zFront + 1;
+			c = int(index.z) - currBlock.z * sizeBlock.z + sizeBlock.z;
+		}
+		else {
+			zFront = currBlock.z / 2;		zBack = zFront + 1;
+			c = int(index.z) - currBlock.z * sizeBlock.z;
+		}
+	}
+	// Z interpolation coefficients 
+	cInv = size.z - c;
+	
+
+	////////////////////////////////////////////////////////////////////////////
+	// get the histogram indices for the neighbooring subblocks 
+	uint LUF = NUM_IN_BINS * uint(zFront * numSB.x * numSB.y + yUp   * numSB.x + xLeft  );
+	uint RUF = NUM_IN_BINS * uint(zFront * numSB.x * numSB.y + yUp   * numSB.x + xRight );
+	uint LDF = NUM_IN_BINS * uint(zFront * numSB.x * numSB.y + yDown * numSB.x + xLeft  );
+	uint RDF = NUM_IN_BINS * uint(zFront * numSB.x * numSB.y + yDown * numSB.x + xRight );
+
+	uint LUB = NUM_IN_BINS * uint(zBack * numSB.x * numSB.y + yUp   * numSB.x + xLeft   );
+	uint RUB = NUM_IN_BINS * uint(zBack * numSB.x * numSB.y + yUp   * numSB.x + xRight  );
+	uint LDB = NUM_IN_BINS * uint(zBack * numSB.x * numSB.y + yDown * numSB.x + xLeft   );
+	uint RDB = NUM_IN_BINS * uint(zBack * numSB.x * numSB.y + yDown * numSB.x + xRight  );
+
+
+	////////////////////////////////////////////////////////////////////////////
+	// LERP
+
+	// get the current gray value 
+	uint greyValue = imageLoad(volume, ivec3(index)).x;
+	if (useLUT) {
+		greyValue = LUT [ greyValue ];
+	}
+
+	// bilinear interpolation - zFront
+	float up_front = float(aInv) * float(hist[LUF + greyValue]) / float(NUM_IN_BINS) + float(a) * float(hist[RUF + greyValue]) / float(NUM_IN_BINS);
+	float dn_front =  float(aInv)  * float(hist[LDF + greyValue]) / float(NUM_IN_BINS) + float(a) * float(hist[RDF + greyValue]) / float(NUM_IN_BINS);
+	float front  =  float(bInv) * up_front + float(b) * dn_front;
+
+	// bilinear interpolation - zBack
+	float up_back = float(aInv) * float(hist[LUB + greyValue]) / float(NUM_IN_BINS) + float(a) * float(hist[RUB + greyValue]) / float(NUM_IN_BINS);
+	float dn_back = float(aInv) * float(hist[LDB + greyValue]) / float(NUM_IN_BINS) + float(a) * float(hist[RDB + greyValue]) / float(NUM_IN_BINS);
+	float back  = float(bInv) * up_back + float(b) * dn_back;
+
+	// trilinear interpolation
+	float normFactor = float(size.x) * float(size.y) * float(size.z);
+	float ans = (float(cInv) * front + float(c) * back) / normFactor;
+	// use mask data only to get the mappings for the entire volume
+	imageStore(newVolume, ivec3(index), vec4(ans, .0, .0, .0));
+}

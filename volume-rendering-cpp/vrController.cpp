@@ -25,6 +25,7 @@ vrController::~vrController(){
     delete bakeShader_;
     delete tex_volume;
     delete tex_baked;
+    delete tex_mask;
 }
 vrController::vrController(const std::shared_ptr<Manager> &manager)
 :m_manager(manager){
@@ -37,6 +38,7 @@ void vrController::onReset() {
         m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
         volume_model_dirty = true;volume_rotate_dirty=true;
     }
+    if(claheManager_)claheManager_->onReset();
     if(cutter_) cutter_->onReset();
 }
 void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
@@ -48,13 +50,15 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
         m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
         volume_model_dirty = true;volume_rotate_dirty=true;
     }
-
+    if(claheManager_)claheManager_->onReset();
     if(cutter_) cutter_->onReset();
 }
 
-void vrController::assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num){
+void vrController::assembleTexture(int update_target,
+        int ph, int pw, int pd, float sh, float sw, float sd,
+        GLubyte * data, int channel_num){
     if(update_target==0 || update_target==2){
-        vol_dimension_ = glm::vec3(ph,pw,pd);
+        vol_dimension_ = glm::vec3(pw,ph,pd);
         if(sh<=0 || sw<=0 || sd<=0){
             if(pd > 200) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, 0.5f);
             else if(pd > 100) vol_dim_scale_ = glm::vec3(1.0f, 1.0f, pd / 300.f);
@@ -76,17 +80,34 @@ void vrController::assembleTexture(int update_target, int ph, int pw, int pd, fl
         cutter_->setDimension(pd, vol_dim_scale_.z);
     }
     auto vsize= ph*pw*pd;
-    uint32_t* vol_data  = new uint32_t[vsize];
-    uint16_t tm;
-    //fuse volume data
-    for(auto i=0, shift = 0; i<vsize; i++, shift+=channel_num) {
-        vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
-        tm = (channel_num==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
-        vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
-        // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
+    auto* vol_data  = new uint32_t[vsize];
+    // int16_t* vol_data  = new int16_t[vsize];
+    for(auto i=0, shift =0; i<vsize; i++, shift+=channel_num){
+        vol_data[i] = (((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift];
+        float tmp = float(vol_data[i]) * 0.0002442002442002442f;
+        vol_data[i] = uint32_t(tmp * 0xffff);
     }
-    if(tex_volume!= nullptr){delete tex_volume; tex_volume= nullptr;}
+
+//    uint32_t* vol_data  = new uint32_t[vsize];
+//    uint16_t tm;
+//    //fuse volume data
+//    for(auto i=0, shift = 0; i<vsize; i++, shift+=channel_num) {
+//        vol_data[i] = uint32_t((((uint32_t)data[shift+1])<<8) + (uint32_t)data[shift]);
+//        tm = (channel_num==4)?uint16_t((((uint16_t)data[shift+3])<<8)+data[shift+2]):(uint16_t)0;
+//        vol_data[i] = uint32_t((((uint32_t)tm)<<16)+vol_data[i]);
+//        // vol_data[i] = (((uint32_t)data[4*i+3])<<24)+(((uint32_t)data[4*i+3])<<16)+(((uint32_t)data[4*i+1])<<8) + ((uint32_t)data[4*i]);
+//    }
+
+    if(tex_volume!= nullptr){delete tex_volume; tex_volume=nullptr;}
     tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, vol_data);
+    if(channel_num == 4){
+        auto* mask_data  = new uint32_t[vsize];
+        for(auto i=0; i<vsize; i++)mask_data[i]=(uint32_t)data[channel_num*i+2];
+        if(tex_mask!=nullptr){delete tex_mask; tex_mask=nullptr;}
+        tex_mask = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, mask_data);
+    }
+
+    claheManager_->onVolumeDataUpdate(tex_volume->GLTexture(), tex_mask->GLTexture(), vol_dimension_);
 
     auto* tb_data = new GLubyte[vsize * 4];
     if(tex_baked!= nullptr){delete tex_baked; tex_baked= nullptr;}
@@ -116,6 +137,7 @@ void vrController::onViewCreated(){
     vRenderer_.emplace_back(new ViewAlignedSlicingRenderer);
     vRenderer_.emplace_back(new raycastRenderer);
 
+    claheManager_ = new claheManager;
     meshRenderer_ = new organMeshRenderer;
     cutter_ = new cuttingController;
     data_board_ = new dataBoard;
@@ -294,25 +316,39 @@ void vrController::precompute(){
             LOGE("Raycast=====Failed to create geometry shader");
         Manager::shader_contents[dvr::SHADER_RAYCASTVOLUME_GLSL]="";
     }
+    claheManager_->onUpdate();
+
     bakeShader_->DisableAllKeyword();
     bakeShader_->EnableKeyword(Manager::instance()->getColorSchemeKeyword());
 
     //todo!!!! add flip stuff
     bakeShader_->EnableKeyword("FLIPY");
+
+    if(Manager::param_bool[dvr::CHECK_CLAHE])bakeShader_->EnableKeyword("CLAHE");
+    else bakeShader_->DisableKeyword("CLAHE");
+
     if(Manager::param_bool[dvr::CHECK_MASKON]) bakeShader_->EnableKeyword("SHOW_ORGANS");
     else bakeShader_->DisableKeyword("SHOW_ORGANS");
 
     GLuint sp = bakeShader_->Use();
     glBindImageTexture(0, tex_volume->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
-    glBindImageTexture(1, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(1, (tex_mask==nullptr)?0:tex_mask->GLTexture(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
+    glBindImageTexture(2, tex_baked->GLTexture(), 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
+    glActiveTexture(GL_TEXTURE0+dvr::CLAHE_TEX_ID);
+    glBindTexture(GL_TEXTURE_3D, claheManager_->getCurrentTexture());
+    Shader::Uniform(sp, "uSampler_clahe", dvr::CLAHE_TEX_ID);
+    Shader::Uniform(sp, "u_tex_size_inverse", 1.0f/vol_dimension_);
 
     m_manager->updateVolumeSetupUniforms(sp);
 
-    glDispatchCompute((GLuint)(tex_volume->Width() + 7) / 8, (GLuint)(tex_volume->Height() + 7) / 8, (GLuint)(tex_volume->Depth() + 7) / 8);
+    glDispatchCompute((GLuint)(vol_dimension_.x+ 7) / 8, (GLuint)(vol_dimension_.y+ 7) / 8, (GLuint)(vol_dimension_.z + 7) / 8);
     glMemoryBarrier(GL_ALL_BARRIER_BITS);
 
-    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);//GL_RGBA16UI);//GL_RGBA8);
-    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+    glBindImageTexture(0, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
+    glBindImageTexture(1, 0, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
+    glBindImageTexture(2, 0, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_RGBA8);
+
 
     bakeShader_->UnUse();
 
@@ -373,6 +409,11 @@ void vrController::setCuttingPlane(int id, int delta){
             vRenderer_[m_rmethod_id]->dirtyPrecompute();
         }
     }
+}
+void vrController::setCLAHEVariableDeltaStep(bool up, dvr::CLAHE_VARIABLES var_id, int var_sub_id){
+    if(var_id == dvr::CLAHE_CLIP_3D) claheManager_->onClipLimitChange(up);
+    else if(var_id == dvr::CLAHE_SUB_BLOCK_NUM) claheManager_->onSubBlockNumChange(up);
+    else claheManager_->onFocusRegionChange(DEFAULT_STEP_SIZE[var_sub_id], var_id==dvr::CLAHE_BLOCK_SIZE, up);
 }
 void vrController::setCuttingPlane(glm::vec3 pp, glm::vec3 pn){
     cutter_->setCutPlane(pp, pn);

@@ -40,7 +40,9 @@ SET(DICOM_RENDERERS
         dicomRenderer/colorbarRenderer.cpp
         dicomRenderer/dataVisualizer.cpp
         dicomRenderer/graphRenderer.cpp
-        dicomRenderer/screenQuad.cpp)
+        dicomRenderer/screenQuad.cpp
+        dicomRenderer/claheManager.cpp
+        dicomRenderer/ComputeCLAHE.cpp)
 
 include_directories(${GLM_DIRECTORY})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

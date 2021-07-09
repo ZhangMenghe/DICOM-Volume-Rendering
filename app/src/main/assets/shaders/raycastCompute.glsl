@@ -4,6 +4,7 @@
 #pragma multi_compile COLOR_GRAYSCALE COLOR_HSV COLOR_BRIGHT COLOR_FIRE COLOR_CET_L08
 #pragma multi_compile LIGHT_DIRECTIONAL LIGHT_SPOT LIGHT_POINT
 #pragma multi_compile FLIPY
+#pragma multi_compile CLAHE
 
 #extension GL_EXT_shader_io_blocks:require
 #extension GL_EXT_geometry_shader:require
@@ -11,8 +12,13 @@
 precision mediump float;
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
 layout(binding = 0, r32ui)readonly uniform mediump uimage3D srcTex;
-layout(binding = 1, rgba8)writeonly uniform mediump image3D destTex;
+layout(binding = 1, r32ui)readonly uniform mediump uimage3D mskTex;
+layout(binding = 2, rgba8)writeonly uniform mediump image3D destTex;
+
+precision mediump float;
+uniform mediump sampler3D uSampler_clahe;
 
 uniform vec2 u_opacity[60];
 uniform int u_widget_num;
@@ -21,6 +27,7 @@ uniform int u_widget_num;
 uniform uint u_maskbits;// = uint(31);
 uniform uint u_organ_num;// = uint(4);
 uniform vec3 u_tex_size;
+uniform vec3 u_tex_size_inverse;
 uniform float u_contrast_low;
 uniform float u_contrast_high;
 uniform float u_brightness;
@@ -80,32 +87,22 @@ int getMaskBit(uint mask_value){
     return CHECK_BIT;
 }
 
-uvec2 Sample(ivec3 pos){
-    #ifdef FLIPY
-        pos = ivec3(pos.x, uint(u_tex_size.y-float(pos.y)),pos.z);
-    #endif
-    uint value = imageLoad(srcTex, pos).r;
-    //lower part as color, higher part as mask
-    return uvec2(value&uint(0xffff), value>>uint(16));
+uint SampleMask(ivec3 pos){
+    return (imageLoad(mskTex, pos).r)&uint(0x00ff);
+}
+uint SampleRawTex(ivec3 pos){
+    return (imageLoad(srcTex, pos).r)&uint(0xffff);
+}
+float SampleCLAHETex(ivec3 pos){
+    vec3 sample_point = vec3(pos) * u_tex_size_inverse;
+    return textureLod(uSampler_clahe, sample_point, 0.0).r;
 }
 
 //applied contrast, brightness, 12bit->8bit, return value 0-1
 float TransferIntensityStepOne(float intensity){
-    //max value 4095
-//
-
-
     intensity = (intensity - u_contrast_low) / (u_contrast_high - u_contrast_low);
-
     intensity = max(.0, min(1.0, intensity));
     intensity = clamp(intensity + u_brightness*2.0 - 1.0, .0, 1.0);
-
-//    if(intensity_01 > u_contrast_high||intensity_01 < u_contrast_low) intensity_01 = .0;
-
-//    intensity_01 = smoothstep(u_contrast_low, u_contrast_high, intensity_01);
-
-//    intensity_01 = (intensity_01 - u_contrast_low) / (u_contrast_high - u_contrast_low) * u_contrast_level;
-//    intensity_01 = clamp(u_brightness+intensity_01 - 0.5, .0, 1.0);
     return intensity;
 }
 vec3 AdjustContrastBrightness(vec3 color){
@@ -140,15 +137,21 @@ vec3 TransferColor(float intensity, int ORGAN_BIT){
 
 void main(){
     ivec3 storePos = ivec3(gl_GlobalInvocationID.xyz);
-    uvec2 sampled_value = Sample(storePos);
+    ivec3 samplePos = ivec3(storePos.x, int(u_tex_size.y-float(storePos.y)), storePos.z);
+
     int ORGAN_BIT = -1;
     #ifdef SHOW_ORGANS
-        ORGAN_BIT = getMaskBit(sampled_value.y);
-        if(ORGAN_BIT< 0) {imageStore(destTex, storePos, vec4(.0)); return;}
+        ORGAN_BIT = getMaskBit(SampleMask(samplePos));
+        if(ORGAN_BIT< 0) {imageStore(destTex, samplePos, vec4(.0)); return;}
     #endif
 
-    //intensity in 0-1
-    float intensity_01 = clamp(float(sampled_value.x) * 0.0002442002442002442+u_base_value-0.5, .0, 1.0);
+    float intensity_01;
+    #ifdef CLAHE
+        intensity_01 = SampleCLAHETex(samplePos);
+    #else
+        intensity_01 = float(SampleRawTex(samplePos)) *1.53e-05 +u_base_value-0.5;
+    #endif
+
     float alpha = .0;
     for(int i=0; i<u_widget_num; i++)
     if(((u_visible_bits >> i) & 1) == 1) alpha = max(alpha, UpdateOpacityAlpha(6*i, intensity_01));

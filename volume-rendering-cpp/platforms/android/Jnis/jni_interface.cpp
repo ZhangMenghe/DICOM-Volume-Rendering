@@ -66,6 +66,24 @@ namespace {
                 "shaders/ar_cutplane.vert",
                 "shaders/ar_cutplane.frag"
         };
+        const char* clahe_shader_file_names[15]={
+                "shaders/clahe/minMax.comp",
+                "shaders/clahe/LUT.comp",
+                "shaders/clahe/hist.comp",
+                "shaders/clahe/excess.comp",
+                "shaders/clahe/clipHist.comp",
+                "shaders/clahe/clipHist_p2.comp",
+                "shaders/clahe/lerp.comp",
+                "shaders/clahe/lerp_focused.comp",
+
+                "shaders/clahe/minMax_masked.comp",
+                "shaders/clahe/LUT_masked.comp",
+                "shaders/clahe/hist_masked.comp",
+                "shaders/clahe/excess_masked.comp",
+                "shaders/clahe/clipHist_masked.comp",
+                "shaders/clahe/clipHist_p2_masked.comp",
+                "shaders/clahe/lerp_masked.comp",
+        };
         for(int i = 0; i<int(dvr::SHADER_END); i++){
             std::string content;
             assetLoader::instance()->LoadTextFileFromAssetManager(shader_file_names[i], &content);
@@ -76,6 +94,11 @@ namespace {
             std::string content;
             assetLoader::instance()->LoadTextFileFromAssetManager(android_shader_file_names[i], &content);
             Manager::shader_contents[dvr::SHADER_END + i] = content;
+        }
+        for(int i=0; i<15; i++){
+            std::string content;
+            assetLoader::instance()->LoadTextFileFromAssetManager(clahe_shader_file_names[i], &content);
+            Manager::shader_clahes[i] = content;
         }
     }
 }
@@ -190,8 +213,11 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
     if(!g_VolumeTexData) return;
     jbyte *data = env->GetByteArrayElements(jdata, 0);
     GLubyte* buffer = g_VolumeTexData+n_data_offset[target];
-    if(chunk_size !=0 && unit_size == CHANEL_NUM) memcpy(buffer, data, (size_t)chunk_size);
-    else{
+    if(chunk_size !=0 && unit_size == CHANEL_NUM){
+        memcpy(buffer, data, (size_t)chunk_size);
+        n_data_offset[target] += chunk_size;
+    }
+    else if(unit_size == 2){
         int num = (chunk_size==0)? (g_img_h*g_img_w) : chunk_size / unit_size;
         if(target == LOAD_DCMI_ID){
             for(auto idx = 0; idx<num; idx++){
@@ -204,8 +230,17 @@ JNI_METHOD(void, JNIsendData)(JNIEnv*env, jclass, jint target, jint id, jint chu
                 buffer[CHANEL_NUM* idx + 3] = GLubyte(data[2*idx+1]);
             }
         }
+        n_data_offset[target] += CHANEL_NUM / unit_size *chunk_size;
     }
-    n_data_offset[target] += CHANEL_NUM / unit_size * chunk_size;
+    else if(unit_size == 1){//processed volume data, 8 bits only
+        int num = (chunk_size==0)? (g_img_h*g_img_w) : chunk_size;
+
+        for(auto idx = 0; idx<num; idx++){
+            buffer[CHANEL_NUM* idx] = GLubyte(data[idx]);
+            buffer[CHANEL_NUM* idx + 1] =  GLubyte(data[idx]);
+        }
+        n_data_offset[target] += 4 * num;
+    }
     env->ReleaseByteArrayElements(jdata, data, 0);
 }
 
