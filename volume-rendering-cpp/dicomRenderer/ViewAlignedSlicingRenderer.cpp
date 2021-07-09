@@ -143,21 +143,14 @@ void ViewAlignedSlicingRenderer::UpdateVertices(glm::mat4 model_mat){
     }
 
     glm::vec4 zmin_view = glm::vec4(.0f,.0f, z_min,1.0), zmax_view = glm::vec4(.0,.0,z_max,1.0);
+
     glm::vec4 zmin_modelv4 = model_view_inv* zmin_view, zmax_modelv4 = model_view_inv* zmax_view;
     glm::vec3 zmin_model = vec3(zmin_modelv4.x, zmin_modelv4.y, zmin_modelv4.z) / zmin_modelv4.w;
     glm::vec3 zmax_model = vec3(zmax_modelv4.x, zmax_modelv4.y, zmax_modelv4.z) / zmax_modelv4.w;
     glm::vec3 distance = zmax_model - zmin_model;
     float slice_distance = glm::length(distance);
-
     m_slice_num = min(int(float(dimensions_origin) * slice_distance * m_sampling_rate), MAX_DIMENSIONS);
-//    m_slice_amount+=m_slice_num;
-//    m_slice_count++;
-//    if(m_slice_count > 300){
-//        LOGE("=======SLICE NUM %f", m_slice_amount/m_slice_count);
-//        m_slice_amount = 0; m_slice_count=0;
-//    }
-    float slice_spacing = 1.0f/float(m_slice_num);
-
+    float slice_spacing = slice_distance/float(m_slice_num);
     //For each plane in front-to-back or back-to-front order
     vec3 aabb_min(-0.5f), aabb_max(0.5f);
     int id = 3*z_min_id;

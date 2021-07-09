@@ -18,18 +18,12 @@ private:
 
     int m_vertices_num, m_indices_num;
 
-    //    glm::vec3 m_last_vec3=glm::vec3(1e6);
-    //    float m_slice_amount = .0f, m_slice_count = 0;
-
     //for screen baking
     void draw_scene(glm::mat4 model_mat);
     void draw_baked(glm::mat4 model_mat);
 
 public:
     ViewAlignedSlicingRenderer();
-//    void setDimension(glm::vec3 vol_dim, glm::vec3 vol_scale);
-//    void setCuttingPlane(float percent);
-//    void setCuttingPlaneDelta(int delta);
     void Draw(bool pre_draw, glm::mat4 model_mat);
     void UpdateVertices(glm::mat4 model_mat);
     void setRenderingParameters(float* values);
