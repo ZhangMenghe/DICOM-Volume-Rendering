@@ -56,7 +56,7 @@ public:
     static dvr::ORGAN_IDS traversal_target_id;
     static int screen_w, screen_h;
     static bool show_ar_ray, volume_ar_hold;
-    static bool new_data_available;
+    static bool data_assemble_success;
     static float indiv_rendering_params[3];
 
     //static getters

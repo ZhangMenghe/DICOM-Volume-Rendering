@@ -194,6 +194,8 @@ void on_draw_native(){
     m_sceneRenderer->onDrawScene();
 }
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
+    if(Manager::data_assemble_success){Manager::data_assemble_success=false;assetLoader::instance()->announceDataLoadingFinished();}
+
     if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
         m_sceneRenderer->onDraw();
     }else{

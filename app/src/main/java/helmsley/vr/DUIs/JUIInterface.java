@@ -170,4 +170,8 @@ public class JUIInterface {
     public static native void JUIonTouchMoveNative(float x, float y);
     public static native void JUIonScaleNative(float sx, float sy);
     public static native void JUIonPanNative(float x, float y);
+
+    public static void onAssembleDataFinished(){
+        dialogUIs.onLoadingDataFinished();
+    }
 }

@@ -38,6 +38,7 @@ import helmsley.vr.proto.volumeResponse;
 public class dialogUIs {
     private static WeakReference<Activity> activityReference;
     private static WeakReference<mainUIs> muiRef;
+    private static boolean should_stop_main_progress=false;
 
     private final static String TAG = "dialogUIs";
     private rpcManager rpc_manager;
@@ -322,9 +323,12 @@ public class dialogUIs {
 
             }});
     }
+    public static void onLoadingDataFinished(){
+        should_stop_main_progress = true;
+    }
     void updateOnFrame(){
-        if(rpc_manager == null) return;
-        if(rpc_manager.CheckProcessFinished())onProgressFinish();
+        if(rpc_manager != null) rpc_manager.CheckDataLoading();
+        if(should_stop_main_progress){onProgressFinish();should_stop_main_progress=false;}
     }
     public void onProgressFinish(){
         activityReference.get().runOnUiThread(new Runnable()  {

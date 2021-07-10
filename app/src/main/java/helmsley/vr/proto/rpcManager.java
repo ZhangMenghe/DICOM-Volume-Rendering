@@ -54,11 +54,10 @@ public class rpcManager {
         data_manager.SetupLocal();
     }
 
-    public boolean CheckProcessFinished(){
+    public void CheckDataLoading(){
         if(data_manager.isDownloadingProcessFinished()){
             data_manager.Reset();
             JNIInterface.JNIsendDataDone();
-            return true;
         }
         if(data_manager.isDownloadingMaskProcessFinished()){
             data_manager.ResetMast();
@@ -68,7 +67,6 @@ public class rpcManager {
             data_manager.ResetCenterline();
             JNIInterface.JNIsendDataDone();
         }
-        return false;
     }
     public fileTransferClient getDataManager(){return data_manager;}
 }

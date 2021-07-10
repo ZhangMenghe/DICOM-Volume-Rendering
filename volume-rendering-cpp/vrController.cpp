@@ -10,6 +10,7 @@
 #include <dicomRenderer/raycastRenderer.h>
 #include <dicomRenderer/ViewAlignedSlicingRenderer.h>
 #include <chrono>
+
 using namespace dvr;
 using namespace glm;
 vrController* vrController::myPtr_ = nullptr;
@@ -116,6 +117,7 @@ void vrController::assembleTexture(int update_target,
     delete[]vol_data;
     Manager::baked_dirty_ = true;
     meshRenderer_->Setup(ph,pw,pd);
+    Manager::data_assemble_success = true;
 }
 void vrController::setupCenterLine(int id, float* data){
     int oid = 0;

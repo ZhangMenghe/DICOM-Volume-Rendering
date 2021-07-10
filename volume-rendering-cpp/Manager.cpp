@@ -7,7 +7,7 @@ std::vector<bool> Manager::param_bool;
 volumeSetupConstBuffer Manager::m_volset_data;
 std::vector<std::string> Manager::shader_contents, Manager::shader_clahes;
 bool Manager::baked_dirty_, Manager::mvp_dirty_;
-bool Manager::new_data_available;
+bool Manager::data_assemble_success;
 dvr::ORGAN_IDS Manager::traversal_target_id;
 int Manager::screen_w, Manager::screen_h;
 bool Manager::show_ar_ray, Manager::volume_ar_hold;
@@ -169,7 +169,6 @@ void Manager::setColorScheme(int id){
 }
 void Manager::setDimension(glm::vec3 dim){
     m_volset_data.u_tex_size = dim;
-    new_data_available = true;
 }
 void Manager::setOpacityWidgetId(int id)
 {

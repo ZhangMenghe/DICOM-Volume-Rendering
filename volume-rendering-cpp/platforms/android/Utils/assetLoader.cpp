@@ -123,6 +123,18 @@ bool assetLoader::saveDataToAndroidExternalStorage(const uint8_t* data){
             jniIds.helper_class, jniIds.save_data_method, retArray);
     return true;
 }
+void assetLoader::announceDataLoadingFinished(){
+    JNIEnv* env = GetJniEnv();
+    constexpr char kHelperClassName[] =
+            "helmsley/vr/DUIs/JUIInterface";
+    jclass helper_class = FindClass(kHelperClassName);
+    if (helper_class) {
+        helper_class = static_cast<jclass>(env->NewGlobalRef(helper_class));
+        jmethodID method = env->GetStaticMethodID(
+                helper_class, "onAssembleDataFinished", "()V");
+        env->CallStaticVoidMethod(helper_class, method);
+    }
+}
 bool assetLoader::LoadObjFile(const std::string& file_name,
                               std::vector<GLfloat>* out_vertices,
                               std::vector<GLfloat>* out_normals,
