@@ -106,9 +106,9 @@ public:
     void updateVolumeSetupUniforms(GLuint sp);
 
     //mvp status
-    bool addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status);
-    bool addMVPStatus(std::string name, bool use_as_current_status);
-    bool setMVPStatus(std::string status_name);
+    void addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status);
+    void addMVPStatus(std::string name, bool use_as_current_status);
+    void setMVPStatus(std::string status_name);
     void getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv);
 private:
     static Manager *myPtr_;

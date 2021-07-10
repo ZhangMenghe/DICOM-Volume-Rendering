@@ -35,10 +35,11 @@ vrController::vrController(const std::shared_ptr<Manager> &manager)
 }
 void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
-    if(m_manager->addMVPStatus("default_status", true)){
-        m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
-        volume_model_dirty = true;volume_rotate_dirty=true;
-    }
+
+    m_manager->addMVPStatus("default_status", true);
+    m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
+    volume_model_dirty = true;volume_rotate_dirty=true;
+
     if(claheManager_)claheManager_->onReset();
     if(cutter_) cutter_->onReset();
 }
@@ -47,10 +48,10 @@ void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam
 //    glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
 //                 * rm
 //                 * glm::scale(glm::mat4(1.0), sv);
-    if(m_manager->addMVPStatus("template", rm, sv, pv, cam, true)){
-        m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
-        volume_model_dirty = true;volume_rotate_dirty=true;
-    }
+    m_manager->addMVPStatus("template", rm, sv, pv, cam, true);
+    m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
+    volume_model_dirty = true;volume_rotate_dirty=true;
+
     if(claheManager_)claheManager_->onReset();
     if(cutter_) cutter_->onReset();
 }

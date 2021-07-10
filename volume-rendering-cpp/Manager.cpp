@@ -216,33 +216,29 @@ void Manager::updateVolumeSetupUniforms(GLuint sp){
     Shader::Uniform(sp, "u_brightness", m_volset_data.u_brightness);
     Shader::Uniform(sp, "u_base_value", m_volset_data.u_base_value);
 }
-bool Manager::addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status){
+void Manager::addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status){
     auto it = m_mvp_status.find(name);
-    if(it != m_mvp_status.end()) return false;
 
-    m_mvp_status[name] = reservedStatus(rm, sv, pv);
+    if(it == m_mvp_status.end()) m_mvp_status[name] = reservedStatus(rm, sv, pv);
+    else{m_mvp_status[name].pos_vec = pv; m_mvp_status[name].rot_mat=rm; m_mvp_status[name].scale_vec=sv;}
+
     m_mvp_status[name].vcam.Reset(cam);
     if(Manager::screen_w != 0)m_mvp_status[name].vcam.setProjMat(Manager::screen_w,Manager:: screen_h);
-    if(use_as_current_status) return setMVPStatus(name);
-    return true;
+    if(use_as_current_status) setMVPStatus(name);
 }
 
-bool Manager::addMVPStatus(std::string name, bool use_as_current_status){
+void Manager::addMVPStatus(std::string name, bool use_as_current_status){
     auto it = m_mvp_status.find(name);
-    if(it != m_mvp_status.end()) return false;
 
     m_mvp_status[name] = reservedStatus();
 
     if(screen_w != 0) m_mvp_status[name].vcam.setProjMat(Manager::screen_w, Manager::screen_h);
-    if(use_as_current_status) return setMVPStatus(name);
-    return true;
+    if(use_as_current_status) setMVPStatus(name);
 }
-bool Manager::setMVPStatus(std::string name){
-    if(name == m_current_mvp_name) return false;
+void Manager::setMVPStatus(std::string name){
+    if(name == m_current_mvp_name) return;
     camera = &m_mvp_status[name].vcam;
     m_last_mvp_name = m_current_mvp_name; m_current_mvp_name = name;
-//    LOGE("=====name %s", name.c_str());
-    return true;
 }
 void Manager::getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv){
     if(m_mvp_ar_dirty){
