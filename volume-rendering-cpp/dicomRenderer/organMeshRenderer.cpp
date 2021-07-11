@@ -99,13 +99,13 @@ void organMeshRenderer::draw_baked(glm::mat4 model_mat){
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     baked_dirty_ = false;
 }
-void organMeshRenderer::Draw(bool pre_draw, glm::mat4 model_mat) {
+void organMeshRenderer::Draw(bool pre_draw, GLuint mask_tex, glm::mat4 model_mat) {
     if(Manager::baked_dirty_){
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, buffer_vertices);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, buffer_triangle_table);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, buffer_configuration_table);
-        glBindImageTexture(2, vrController::instance()->getVolumeTex(), 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
-    
+        glBindImageTexture(2, mask_tex, 0, GL_TRUE, 0, GL_READ_ONLY, GL_R32UI);
+
         GLuint sp = shader_->Use();
         Shader::Uniform(sp, "u_maskbits", Manager::getMaskBits());
         Shader::Uniform(sp, "u_organ_num", Manager::getMaskNum());

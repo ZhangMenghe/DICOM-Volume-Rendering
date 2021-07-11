@@ -7,13 +7,7 @@ precision mediump float;
 
 layout (local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 
-layout(binding = 2, r32ui) readonly uniform mediump uimage3D u_volume;
-
-// layout(binding = 0, r8) readonly uniform mediump image3D u_volume;
-//layout(binding = 0, r8ui)readonly uniform mediump uimage3D u_volume;
-
-
-// layout (rgba16f, binding = 0) readonly uniform image3D u_volume;
+layout(binding = 2, r32ui) readonly uniform mediump uimage3D mskTex;
 
 layout(std430, binding = 0) writeonly buffer u_buffer_vertices
 {
@@ -70,9 +64,8 @@ bool check_mask_bit(uint value){
 	return false;
 }
 
-float map(ivec3 p){
-	uint sc = uint(imageLoad(u_volume, p).r);
-	sc = sc>>uint(16);
+float map(ivec3 pos){
+	uint sc = uint(imageLoad(mskTex, pos).r) & uint(0x00ff);
 	return check_mask_bit(sc)?-float(sc):1.0;
 }
 
@@ -88,8 +81,8 @@ vec3 CalculateGradient(ivec3 p){
 }
 Vertex find_vertex(float isolevel, ivec3 p1, ivec3 p2, float value_1, float value_2){
 	// The normals are stored in the YZW / GBA channels of the volume texture
-	vec3 n1 = CalculateGradient(p1);//imageLoad(u_volume, ivec3(p1)).gba;
-	vec3 n2 = CalculateGradient(p2);//imageLoad(u_volume, ivec3(p2)).gba;
+	vec3 n1 = CalculateGradient(p1);
+	vec3 n2 = CalculateGradient(p2);
 
 	const float eps = 0.00001;
 
@@ -117,7 +110,7 @@ Vertex find_vertex(float isolevel, ivec3 p1, ivec3 p2, float value_1, float valu
 void main(){
     ivec3 grid_pos = ivec3(gl_GlobalInvocationID.xyz);
 
-	ivec3 volume_size = imageSize(u_volume);
+	ivec3 volume_size = imageSize(mskTex);
 	vec3 inv_volume_size = 1.0 / vec3(volume_size);
 	vec3 inv_grid_size = 1.0 / u_gridsize;
 

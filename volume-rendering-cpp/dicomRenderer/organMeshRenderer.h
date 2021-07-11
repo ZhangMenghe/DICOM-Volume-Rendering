@@ -29,7 +29,7 @@ public:
     ~organMeshRenderer();
 
     void Setup(int h, int w, int d);
-    void Draw(bool pre_draw, glm::mat4 model_mat);
+    void Draw(bool pre_draw, GLuint mask_tex, glm::mat4 model_mat);
     void dirtyPrecompute(){baked_dirty_ = true;}
     bool isPrecomputeDirty(){return baked_dirty_;}
 };

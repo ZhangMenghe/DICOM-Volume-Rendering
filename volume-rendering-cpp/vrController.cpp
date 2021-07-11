@@ -97,14 +97,17 @@ void vrController::assembleTexture(int update_target,
 
     if(tex_volume!= nullptr){delete tex_volume; tex_volume=nullptr;}
     tex_volume = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, vol_data);
+
+    delete tex_mask;tex_mask=nullptr;
     if(channel_num == 4){
         auto* mask_data  = new uint32_t[vsize];
         for(auto i=0; i<vsize; i++)mask_data[i]=(uint32_t)data[channel_num*i+2];
-        if(tex_mask!=nullptr){delete tex_mask; tex_mask=nullptr;}
         tex_mask = new Texture(GL_R32UI, GL_RED_INTEGER, GL_UNSIGNED_INT, pw, ph, pd, mask_data);
     }
 
-    claheManager_->onVolumeDataUpdate(tex_volume->GLTexture(), tex_mask->GLTexture(), vol_dimension_);
+    claheManager_->onVolumeDataUpdate(tex_volume->GLTexture(),
+                                      (tex_mask==nullptr)?-1:tex_mask->GLTexture(),
+                                      vol_dimension_);
 
     auto* tb_data = new GLubyte[vsize * 4];
     if(tex_baked!= nullptr){delete tex_baked; tex_baked= nullptr;}
@@ -202,7 +205,7 @@ void vrController::onDrawScene(){
     }
 
     //mesh
-    if(Manager::isDrawMesh()) meshRenderer_->Draw(pre_draw_, model_mat);
+    if(tex_mask && Manager::isDrawMesh()) meshRenderer_->Draw(pre_draw_, tex_mask->GLTexture(), model_mat);
 
     //centerline
     if(Manager::isDrawCenterLine()){
