@@ -79,51 +79,22 @@ GLuint LoadComputeShader(std::string shaderCode){
 }
 ComputeCLAHE::ComputeCLAHE(){
 // Load CLAHE/Focused CLAHE Shaders
-	LOGE("=====COMPUTE SHADER 0");
 	_minMaxShader = LoadComputeShader(Manager::shader_clahes[0]);
-	LOGE("=====COMPUTE SHADER 1");
-
 	_LUTshader = LoadComputeShader(Manager::shader_clahes[1]);
-	LOGE("=====COMPUTE SHADER 2");
-
 	_histShader = LoadComputeShader(Manager::shader_clahes[2]);
-	LOGE("=====COMPUTE SHADER 3");
-
 	_excessShader = LoadComputeShader(Manager::shader_clahes[3]);
-	LOGE("=====COMPUTE SHADER 4");
-
 	_clipShaderPass1 = LoadComputeShader(Manager::shader_clahes[4]);
-	LOGE("=====COMPUTE SHADER 5");
-
 	_clipShaderPass2 = LoadComputeShader(Manager::shader_clahes[5]);
-	LOGE("=====COMPUTE SHADER 6");
-
 	_lerpShader = LoadComputeShader(Manager::shader_clahes[6]);
-	LOGE("=====COMPUTE SHADER 7");
-
 	_lerpShader_Focused = LoadComputeShader(Manager::shader_clahes[7]);
-
-	LOGE("=====COMPUTE SHADER 8");
 
 	// Load Masked CLAHE Shaders
 	_minMaxShader_Masked = LoadComputeShader(Manager::shader_clahes[8]);
-	LOGE("=====COMPUTE SHADER 9");
-
 	_LUTShader_Masked = LoadComputeShader(Manager::shader_clahes[9]);
-	LOGE("=====COMPUTE SHADER 10");
-
 	_histShader_Masked = LoadComputeShader(Manager::shader_clahes[10]);
-	LOGE("=====COMPUTE SHADER 11");
-
 	_excessShader_Masked = LoadComputeShader(Manager::shader_clahes[11]);
-	LOGE("=====COMPUTE SHADER 12");
-
 	_clipShaderPass1_Masked = LoadComputeShader(Manager::shader_clahes[12]);
-	LOGE("=====COMPUTE SHADER 13");
-
 	_clipShaderPass2_Masked = LoadComputeShader(Manager::shader_clahes[13]);
-
-	LOGE("=====COMPUTE SHADER 14");
 	_lerpShader_Masked = LoadComputeShader(Manager::shader_clahes[14]);
 
 	Manager::shader_clahes.clear();
@@ -393,7 +364,7 @@ void ComputeCLAHE::computeLUT_Masked(glm::uvec3 volDims, uint32_t* minData, uint
 	glDispatchCompute(	(GLuint)((volDims.x + 3) / 4),
 						(GLuint)((volDims.y + 3) / 4),
 						(GLuint)((volDims.z + 3) / 4));
-	// make sure writting to the image is finished before reading 
+	// make sure writing to the image is finished before reading
 	glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 	glUseProgram(0);
 

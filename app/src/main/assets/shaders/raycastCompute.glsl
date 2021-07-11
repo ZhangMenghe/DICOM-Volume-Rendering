@@ -88,7 +88,7 @@ int getMaskBit(uint mask_value){
 }
 
 uint SampleMask(ivec3 pos){
-    return (imageLoad(mskTex, pos).r)&uint(0x00ff);
+    return uint(imageLoad(mskTex, pos).r) & uint(0x00ff);
 }
 uint SampleRawTex(ivec3 pos){
     return (imageLoad(srcTex, pos).r)&uint(0xffff);
@@ -142,7 +142,7 @@ void main(){
     int ORGAN_BIT = -1;
     #ifdef SHOW_ORGANS
         ORGAN_BIT = getMaskBit(SampleMask(samplePos));
-        if(ORGAN_BIT< 0) {imageStore(destTex, samplePos, vec4(.0)); return;}
+        if(ORGAN_BIT< 0) {imageStore(destTex, storePos, vec4(.0)); return;}
     #endif
 
     float intensity_01;

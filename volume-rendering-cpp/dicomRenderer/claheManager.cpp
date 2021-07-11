@@ -29,10 +29,7 @@ void claheManager::onVolumeDataUpdate(GLuint tex_volume, GLuint tex_mask, glm::v
     m_computer->Init(tex_volume, tex_mask, volDim, outputGrayvals_3D, inputGrayvals_3D, numOrgans);
 
     onReset();
-
-    _3D_CLAHE = m_computer->Compute3D_CLAHE(numSB_3D, clipLimit3D);
-    _FocusedCLAHE = m_computer->ComputeFocused3D_CLAHE(min3D, max3D, clipLimit3D);
-    _MaskedCLAHE = m_computer->ComputeMasked3D_CLAHE(clipLimit3D);
+    m_dirty = true;ready_to_compute=true;
 }
 void claheManager::onUpdate(){
     if(m_dirty && ready_to_compute){

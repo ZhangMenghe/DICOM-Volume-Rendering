@@ -40,18 +40,16 @@ public class cutplaneUIs extends BasePanel{
     private centerIdListAdapter cid_adapter;
     private static boolean default_traversal_check;
     private View primary_panel, traversal_panel;
-    private final static float[]default_cut_pose={0,0,0,0,0,-1};
     private static float initial_progress;
     private static int max_progress_value;
     private Switch view_switch;
     private ColorStateList normal_color, highlight_color;
-    private int cutting_status = 0;//0 for none, 1 for cutting, 2 for traversal
     private boolean is_current_raycast;
 
     private final static int TRAVERSAL_CHECK_ID = 4;
     private final static int VIEW_SWITCH_ID = 5;
     private final static int TID_CUTTING_PLANE = 5;
-
+    private final static float[]default_cut_pose={0,0,0,0,0,-1};
 
     public cutplaneUIs(final Activity activity, ViewGroup parent_view){
         super(activity, parent_view);
@@ -183,9 +181,6 @@ public class cutplaneUIs extends BasePanel{
     }
 
     private void reset_checkbox_and_panel(){
-        if(default_primary_check)cutting_status = 1;
-        else if(default_traversal_check)cutting_status=2;
-
         primary_checkbox.setChecked(default_primary_check);
         traversal_check_box.setChecked(default_traversal_check);
 
