@@ -127,12 +127,6 @@ void vrController::setupCenterLine(int id, float* data){
     int oid = 0;
     while(id/=2)oid++;
     line_renderers_[oid] = new centerLineRenderer(oid);
-    // for(int i=0;i<4000;i++){
-    //     data[3*i] = i / 4000.0f - 0.5;
-    //     data[3*i+1] = i / 4000.0f - 0.5;
-    //     data[3*i+2] = .0f;
-
-    // }
     line_renderers_[oid]->updateVertices(4000, data);
     cutter_->setupCenterLine((dvr::ORGAN_IDS)oid, data);
 }
@@ -198,8 +192,8 @@ void vrController::onDrawScene(){
         cutter_->Update();
         if(Manager::param_bool[dvr::CHECK_CUTTING]){
             if(isRayCasting() && pre_draw_)draw_finished = true;
-            else{
-                cutter_->Draw(pre_draw_);
+            else {
+                if(Manager::param_bool[dvr::CHECK_SHOW_CPLANE]) cutter_->Draw(pre_draw_);
                 draw_finished=true;
             }
         }
@@ -244,7 +238,7 @@ void vrController::onDrawScene(){
             if((mask_bits>> (line.first+1)) & 1)line.second->onDraw(pre_draw_, model_mat);
     }
 
-    if(cp_update&&!draw_finished)cutter_->Draw(pre_draw_);
+    if(cp_update&&!draw_finished&&Manager::param_bool[dvr::CHECK_SHOW_CPLANE])cutter_->Draw(pre_draw_);
 
     //data board
     if(Manager::param_bool[dvr::CHECK_OVERLAY])
@@ -383,16 +377,15 @@ void vrController::updateVolumeModelMat(){
     }
 }
 
-
-
 void vrController::setCuttingPlane(float value){
-    if(Manager::param_bool[dvr::CHECK_CUTTING] && !isRayCasting()) {
+    /*if(Manager::param_bool[dvr::CHECK_CUTTING] && !isRayCasting()) {
         cutter_->setCutPlane(value);
         vRenderer_[0]->setCuttingPlane(value);
         vRenderer_[1]->setCuttingPlane(value);
 
         vRenderer_[m_rmethod_id]->dirtyPrecompute();
-    }else if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
+    }else*/
+    if( Manager::param_bool[dvr::CHECK_CENTER_LINE_TRAVEL]){
         if(!cutter_->IsCenterLineAvailable())return;
         cutter_->setCenterLinePos((int)(value * 4000.0f));
         if(Manager::param_bool[dvr::CHECK_TRAVERSAL_VIEW]) {

@@ -50,9 +50,11 @@
 <!--    cut panel subs-->
     <string name="cutting_check_name">Cutting</string>
     <string name="check_raycast_cut_option_name">Options</string>
+    <string name="show_plane_name">Show Plane</string>
     <string name="freezeplane_check_name">Freeze Plane</string>
     <string name="freezeVolume_check_name">Freeze Volume</string>
-    <string name="cutting_traversal_name">CenterLine</string>
+    <string name="cutting_traversal_name">Traversal</string>
+    <string name="cutting_view_switch_name">Traversal View</string>
     <string name="cutting_traversal_target">CID</string>
 
 <!--ar sub panel-->

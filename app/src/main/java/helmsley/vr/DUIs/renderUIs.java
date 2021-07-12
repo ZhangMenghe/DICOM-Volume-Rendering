@@ -34,6 +34,8 @@ public class renderUIs extends BasePanel{
     private widgetListAdapter widAdapter;
     private tunerListAdapter rendertuneAdapter;
     private final int RENDERING_METHOD_NUM=3, TID_OPACITY=0, TID_CONTRAST=1, TID_FIRST_RENDER=2;
+    public static final int RENDERING_MODE_TEXBASED=0, RENDERING_MODE_VIEWALIGNED=1, RENDERING_MODE_RAYCAST=2;
+
     private tunerListAdapter indivAdapter[] = new tunerListAdapter[RENDERING_METHOD_NUM];
     private Button btn_hide;
     private Spinner param_seekbar_spinner;

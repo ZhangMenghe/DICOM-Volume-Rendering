@@ -109,14 +109,16 @@
     <string-array name="cut_check_params">
         <item>@string/cutting_check_name</item>
         <item>@string/freezeVolume_check_name</item>
-        <item>@string/freezeplane_check_name</item>
+        <item>@string/show_plane_name</item>
+<!--        <item>@string/freezeplane_check_name</item>-->
         <item>Real Value</item>
-        <item>Center Line Travel</item>
-        <item>Traversal View</item>
+        <item>@string/cutting_traversal_name</item>
+        <item>@string/cutting_view_switch_name</item>
     </string-array>
     <string-array name="cut_raycast_options">
         <item>@string/freezeVolume_check_name</item>
-        <item>@string/freezeplane_check_name</item>
+        <item>@string/show_plane_name</item>
+        <!--        <item>@string/freezeplane_check_name</item>-->
         <item>Real Value</item>
     </string-array>
     <string-array name="cut_check_values">

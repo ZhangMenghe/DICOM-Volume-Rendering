@@ -3,42 +3,41 @@
 <android.support.constraint.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 
-<android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="0dp"
-    android:gravity="center"
     android:orientation="horizontal"
-    android:background="@color/paneColor"
-    android:fillAfter="true"
-    android:fillEnabled="true"
     app:layout_constraintHeight_percent="0.15"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintBottom_toBottomOf="parent">
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:background="@color/paneColor"
-        android:fillAfter="true"
-        android:fillEnabled="true"
-        app:layout_constraintWidth_percent="0.85"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+<LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="8"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="@color/paneColor"
+    android:fillAfter="true"
+    android:fillEnabled="true">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="horizontal">
         <LinearLayout
-            android:id="@+id/layout_check_cutting"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintHeight_percent="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
             <CheckBox
                 android:id="@+id/check_cutting_show"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:text="@string/cutting_check_name"
@@ -46,7 +45,7 @@
                 android:textColor="@color/brightBlue"/>
             <CheckBox
                 android:id="@+id/check_traversal_show"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:text="@string/cutting_traversal_name"
@@ -54,32 +53,25 @@
                 android:textColor="@color/brightBlue"/>
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/layout_cutting_plane"
+            android:id="@+id/cut_linear_layout"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintHeight_percent="0.5"
-            app:layout_constraintStart_toEndOf="@id/layout_check_cutting"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-        <Spinner
-            android:id="@+id/spinner_check_cutting_control"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:gravity="center"
-            android:spinnerMode="dropdown"
-            style="@style/Spinner"/>
+            android:orientation="vertical">
+            <Spinner
+                android:id="@+id/spinner_check_cutting_control"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="end"
+                style="@style/Spinner_light"/>
         </LinearLayout>
         <LinearLayout
-            android:id="@+id/layout_traversal_plane"
+            android:id="@+id/traversal_linear_layout"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            app:layout_constraintHeight_percent="0.5"
-            app:layout_constraintStart_toEndOf="@id/layout_check_cutting"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical">
             <Spinner
                 android:id="@+id/centerline_id_spinner"
                 android:layout_width="match_parent"
@@ -89,64 +81,50 @@
                 style="@style/Spinner"/>
             <Switch
                 android:id="@+id/toggle_view_switch"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:layout_gravity="end"
-                android:text="CuttingView   "
+                android:text="CutView"
                 android:textColor="@color/brightBlue"
                 style="@style/SCBSwitch"/>
         </LinearLayout>
+    </LinearLayout>
 
     <SeekBar
-        android:id="@+id/cutting_seekbar"
-        android:layout_width="0dp"
+        android:id="@+id/seekbar_traversal"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:theme="@style/Seekbar"
-        app:layout_constraintWidth_percent="0.9"
-        app:layout_constraintHeight_percent="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_weight="1"
+        android:theme="@style/Seekbar"/>
+</LinearLayout>
+<LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="match_parent"
+    android:layout_weight="1"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:background="@color/paneColor"
+    android:fillAfter="true"
+    android:fillEnabled="true">
+    <Button
+        android:id="@+id/cut_prev_button"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/up_icon"
+        style="@style/CommonButton"
+        app:layout_constraintDimensionRatio="1:1"/>
+    <Button
+        android:id="@+id/cut_next_button"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/down_icon"
+        style="@style/CommonButton"
+        app:layout_constraintDimensionRatio="1:1"/>
+</LinearLayout>
 
-        app:layout_constraintBottom_toBottomOf="parent"/>
-    </android.support.constraint.ConstraintLayout>
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:orientation="horizontal"
-        android:background="@color/midBlue"
-        android:fillAfter="true"
-        android:fillEnabled="true"
-        app:layout_constraintWidth_percent="0.15"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <Button
-            android:id="@+id/cut_prev_button"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/up_icon"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintDimensionRatio="1:1"
-            style="@style/CommonButton"/>
-        <Button
-            android:id="@+id/cut_next_button"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="10dp"
-
-            android:background="@drawable/down_icon"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintWidth_percent="0.5"
-            app:layout_constraintDimensionRatio="1:1"
-            style="@style/CommonButton"/>
-    </android.support.constraint.ConstraintLayout>
-    </android.support.constraint.ConstraintLayout>
+</LinearLayout>
 
 </android.support.constraint.ConstraintLayout>

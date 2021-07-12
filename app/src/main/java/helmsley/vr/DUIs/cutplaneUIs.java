@@ -17,12 +17,8 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
-
-import com.google.common.primitives.Floats;
-
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -32,22 +28,23 @@ public class cutplaneUIs extends BasePanel{
     final static String TAG = "cutplaneUIs";
 
     //widgets
-    private SeekBar seek_bar_;
     private Button btn_next, btn_prev;
-
-    CheckBox traversal_check_box;
-    private ctCheckboxListAdapter cbAdapter_;
-    private centerIdListAdapter cid_adapter;
-    private static boolean default_traversal_check;
-    private View primary_panel, traversal_panel;
-    private static float initial_progress;
-    private static int max_progress_value;
+    private CheckBox traversal_check_box;
+    private SeekBar traversal_seek_bar;
     private Switch view_switch;
-    private ColorStateList normal_color, highlight_color;
-    private boolean is_current_raycast;
+    private View cut_linear_layout, traversal_linear_layout;
 
-    private final static int TRAVERSAL_CHECK_ID = 4;
-    private final static int VIEW_SWITCH_ID = 5;
+    //adapters
+    private ctCheckboxListAdapter opt_adapter_;
+    private centerIdListAdapter cid_adapter;
+
+    private final String traversal_check_name, view_switch_name;
+    private final Boolean default_traversal_check_value, default_view_check_value;
+    private final float default_inital_seekbar_progress;
+    private final int default_max_seekbar;
+
+    private ColorStateList normal_color, highlight_color;
+
     private final static int TID_CUTTING_PLANE = 5;
     private final static float[]default_cut_pose={0,0,0,0,0,-1};
 
@@ -56,13 +53,55 @@ public class cutplaneUIs extends BasePanel{
         Resources res = activity.getResources();
 
         final LayoutInflater mInflater = LayoutInflater.from(activity);
-
         View panel_ = mInflater.inflate(R.layout.cutting_panel, parent_view, false);
 
+        //setup layout
+        cut_linear_layout = panel_.findViewById(R.id.cut_linear_layout);
+        traversal_linear_layout = panel_.findViewById(R.id.traversal_linear_layout);
+
+        String[] check_names = res.getStringArray(R.array.cut_check_params);
+        String[] check_values = res.getStringArray(R.array.cut_check_values);
+
         //setup spinner
-        Spinner spinner_check =  (Spinner)panel_.findViewById(R.id.spinner_check_cutting_control);
-        cbAdapter_ = new ctCheckboxListAdapter(activity);
-        spinner_check.setAdapter(cbAdapter_);
+        Spinner spinner_opt =  (Spinner)panel_.findViewById(R.id.spinner_check_cutting_control);
+        opt_adapter_ = new ctCheckboxListAdapter(activity);
+        spinner_opt.setAdapter(opt_adapter_);
+
+        //setup traversal id
+        Spinner cid_spinner = (Spinner)panel_.findViewById(R.id.centerline_id_spinner);
+        cid_adapter = new centerIdListAdapter(activity);
+        cid_spinner.setAdapter(cid_adapter);
+
+        //setup switch
+        view_switch = (Switch)panel_.findViewById(R.id.toggle_view_switch);
+        view_switch_name = res.getString(R.string.cutting_view_switch_name);
+        int VIEW_SWITCH_ID = java.util.Arrays.asList(check_names).indexOf(view_switch_name);
+        default_view_check_value = Boolean.parseBoolean(check_values[VIEW_SWITCH_ID]);
+        view_switch.setChecked(Boolean.parseBoolean(check_values[VIEW_SWITCH_ID]));
+        view_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                JUIInterface.JUIsetChecks(check_names[VIEW_SWITCH_ID], isChecked);
+            }
+        });
+
+        //setup seekbar
+        traversal_seek_bar = (SeekBar)panel_.findViewById(R.id.seekbar_traversal);
+        String params[] = activity.getResources().getStringArray(R.array.cutting_plane);
+        default_inital_seekbar_progress = Float.parseFloat(params[0]);
+        default_max_seekbar = Integer.parseInt(params[1]);
+        traversal_seek_bar.setMax(default_max_seekbar);
+        traversal_seek_bar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                JUIInterface.JUIsetCuttingPlane(1.0f * i / default_max_seekbar);
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
 
         //setup button
         highlight_color = ColorStateList.valueOf(ContextCompat.getColor(activity, R.color.yellowOrange));
@@ -94,154 +133,115 @@ public class cutplaneUIs extends BasePanel{
             }
         });
 
-        String[] check_names = res.getStringArray(R.array.cut_check_params);
-        String[] check_values = res.getStringArray(R.array.cut_check_values);
+        sub_panels_.add(panel_);
+        setup_checks(
+                panel_,
+                R.array.cut_check_params, R.array.cut_check_values,
+                R.id.check_cutting_show, 0);
 
-        String main_check_name = check_names[0];
-        default_primary_check = Boolean.parseBoolean(check_values[0]);
-
-        primary_checkbox = (CheckBox)panel_.findViewById(R.id.check_cutting_show);
+        //primary checkbox
         primary_checkbox.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
                 JUIInterface.JUIsetChecks(main_check_name, isChecked);
                 if(isChecked){
+                    cut_linear_layout.setVisibility(View.VISIBLE);
+
                     traversal_check_box.setChecked(false);
+                    traversal_seek_bar.setVisibility(View.INVISIBLE);
+                    traversal_linear_layout.setVisibility(View.INVISIBLE);
                     JUIInterface.JUISwitchCuttingPlane(0);
-                    if(is_current_raycast)primary_panel.setVisibility(View.VISIBLE);
-                    traversal_panel.setVisibility(View.INVISIBLE);
-                }else{
-                    primary_panel.setVisibility(View.INVISIBLE);
                 }
             }
         });
 
-        String default_traversal_name = check_names[TRAVERSAL_CHECK_ID];
-        default_traversal_check = Boolean.parseBoolean(check_values[TRAVERSAL_CHECK_ID]);
+        //traversal checkbox
+        traversal_check_name = res.getString(R.string.cutting_traversal_name);
+        int TRAVERSAL_CHECK_ID = java.util.Arrays.asList(check_names).indexOf(traversal_check_name);
+        default_traversal_check_value = Boolean.parseBoolean(check_values[TRAVERSAL_CHECK_ID]);
 
         traversal_check_box = panel_.findViewById(R.id.check_traversal_show);
+        traversal_check_box.setChecked(default_traversal_check_value);
         traversal_check_box.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
             @Override
             public void onCheckedChanged(CompoundButton buttonView,
                                          boolean isChecked) {
-                JUIInterface.JUIsetChecks(default_traversal_name, isChecked);
+                JUIInterface.JUIsetChecks(traversal_check_name, isChecked);
                 if(isChecked){
                     primary_checkbox.setChecked(false);
-                    primary_panel.setVisibility(View.INVISIBLE);
+                    cut_linear_layout.setVisibility(View.INVISIBLE);
+
+                    traversal_seek_bar.setVisibility(View.VISIBLE);
+                    traversal_linear_layout.setVisibility(View.VISIBLE);
                     JUIInterface.JUISwitchCuttingPlane(1);
-                    traversal_panel.setVisibility(View.VISIBLE);
-                    cbAdapter_.ResetAll();
-                }else{
-                    traversal_panel.setVisibility(View.INVISIBLE);
+                    opt_adapter_.ResetAll();
                 }
             }
         });
-
-        primary_panel = panel_.findViewById(R.id.layout_cutting_plane);
-        traversal_panel = panel_.findViewById(R.id.layout_traversal_plane);
-        reset_checkbox_and_panel();
-
-
-        //setup seekbar
-        seek_bar_ = (SeekBar)panel_.findViewById(R.id.cutting_seekbar);
-        String params[] = activity.getResources().getStringArray(R.array.cutting_plane);
-        initial_progress = Float.parseFloat(params[0]);
-        max_progress_value = Integer.parseInt(params[1]);
-        seek_bar_.setMax(max_progress_value);
-        seek_bar_.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                JUIInterface.JUIsetCuttingPlane(1.0f * i / max_progress_value);
-            }
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {}
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {}
-        });
-
-        //setup traversal id
-        Spinner cid_spinner = (Spinner)panel_.findViewById(R.id.centerline_id_spinner);
-        cid_adapter = new centerIdListAdapter(activity);
-        cid_spinner.setAdapter(cid_adapter);
-
-        //setup switch
-        view_switch = (Switch)panel_.findViewById(R.id.toggle_view_switch);
-        view_switch.setChecked(Boolean.parseBoolean(check_values[VIEW_SWITCH_ID]));
-        view_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                JUIInterface.JUIsetChecks(check_names[VIEW_SWITCH_ID], isChecked);
-            }
-        });
-
-        sub_panels_.add(panel_);
-        setup_checks(R.array.cut_check_params, R.array.cut_check_values);
+        traversal_seek_bar.setVisibility(default_traversal_check_value?View.VISIBLE:View.INVISIBLE);
+        cut_linear_layout.setVisibility(default_primary_check?View.VISIBLE:View.INVISIBLE);
+        traversal_linear_layout.setVisibility(default_traversal_check_value?View.VISIBLE:View.INVISIBLE);
     }
 
-    private void reset_checkbox_and_panel(){
-        primary_checkbox.setChecked(default_primary_check);
-        traversal_check_box.setChecked(default_traversal_check);
-
-        if(default_primary_check)primary_panel.setVisibility(View.VISIBLE);
-        else primary_panel.setVisibility(View.INVISIBLE);
-        if(default_traversal_check)traversal_panel.setVisibility(View.VISIBLE);
-        else traversal_panel.setVisibility(View.INVISIBLE);
-    }
     public void Reset(){
-        seek_bar_.setProgress((int)(initial_progress * max_progress_value));
-        reset_checkbox_and_panel();
-        view_switch.setChecked(false);
+        traversal_seek_bar.setProgress((int)(default_inital_seekbar_progress * default_max_seekbar));
+        traversal_check_box.setChecked(default_traversal_check_value);
+        view_switch.setChecked(default_view_check_value);
+        traversal_seek_bar.setVisibility(default_traversal_check_value?View.VISIBLE:View.INVISIBLE);
+        cut_linear_layout.setVisibility(default_primary_check?View.VISIBLE:View.INVISIBLE);
+        traversal_linear_layout.setVisibility(default_traversal_check_value?View.VISIBLE:View.INVISIBLE);
+        opt_adapter_.ResetAll();
         cid_adapter.setTitleById(0);
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
-        LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
-        if(cutmap == null) return;
-
-        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
-        int max_seek_value = Integer.parseInt(params[1]);
-        Float percent = (Float)cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
-        seek_bar_.setProgress((int)(percent * max_seek_value));
-
-        //todo:jui send cutting plane status(pos/ori)
-        boolean cut_status = (Boolean) cutmap.getOrDefault("status", default_primary_check);
-        boolean freeze_volume = (Boolean) cutmap.getOrDefault("freeze volume", default_check_vales[1]);
-        boolean freeze_plane = (Boolean) cutmap.getOrDefault("freeze plane", default_check_vales[2]);
-        boolean real_sampled = (Boolean) cutmap.getOrDefault("real value", default_check_vales[3]);
-        boolean center_line_traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_traversal_check);
-        boolean b_traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", false);
-
-        primary_checkbox.setChecked(cut_status);
-        cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);cbAdapter_.setValue(2,real_sampled);
-        traversal_check_box.setChecked(center_line_traversal);
-        view_switch.setChecked(b_traversal_view);
-        cid_adapter.setTitleByText((String) cutmap.getOrDefault("traversal target", "Colon"));
-
-        Collections.addAll(names, check_names_);
-        values.add(cut_status);values.add(freeze_volume);values.add(freeze_plane);values.add(center_line_traversal);values.add(b_traversal_view);
-
-
-        float[] cut_pose = default_cut_pose.clone();
-
-        float[] pos = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("ppoint", new ArrayList<Float>()));
-        if(pos.length == 3) System.arraycopy(pos, 0, cut_pose, 0, 3);
-        float[] norm = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("pnorm", new ArrayList<Float>()));
-        if(norm.length == 3) System.arraycopy(norm, 0, cut_pose, 3, 3);
-        JUIInterface.JUIsetAllTuneParamById(TID_CUTTING_PLANE, cut_pose);
+//        LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
+//        if(cutmap == null) return;
+//
+//        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
+//        int max_seek_value = Integer.parseInt(params[1]);
+//        Float percent = (Float)cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
+//        seek_bar_.setProgress((int)(percent * max_seek_value));
+//
+//        //todo:jui send cutting plane status(pos/ori)
+//        boolean cut_status = (Boolean) cutmap.getOrDefault("status", default_primary_check);
+//        boolean freeze_volume = (Boolean) cutmap.getOrDefault("freeze volume", default_check_vales[1]);
+//        boolean freeze_plane = (Boolean) cutmap.getOrDefault("freeze plane", default_check_vales[2]);
+//        boolean real_sampled = (Boolean) cutmap.getOrDefault("real value", default_check_vales[3]);
+//        boolean center_line_traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_traversal_check);
+//        boolean b_traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", false);
+//
+//        primary_checkbox.setChecked(cut_status);
+//        cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);cbAdapter_.setValue(2,real_sampled);
+//        traversal_check_box.setChecked(center_line_traversal);
+//        view_switch.setChecked(b_traversal_view);
+//        cid_adapter.setTitleByText((String) cutmap.getOrDefault("traversal target", "Colon"));
+//
+//        Collections.addAll(names, check_names_);
+//        values.add(cut_status);values.add(freeze_volume);values.add(freeze_plane);values.add(center_line_traversal);values.add(b_traversal_view);
+//
+//
+//        float[] cut_pose = default_cut_pose.clone();
+//
+//        float[] pos = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("ppoint", new ArrayList<Float>()));
+//        if(pos.length == 3) System.arraycopy(pos, 0, cut_pose, 0, 3);
+//        float[] norm = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("pnorm", new ArrayList<Float>()));
+//        if(norm.length == 3) System.arraycopy(norm, 0, cut_pose, 3, 3);
+//        JUIInterface.JUIsetAllTuneParamById(TID_CUTTING_PLANE, cut_pose);
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
         String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         float[] cpv = JUIInterface.JUIgetCuttingPlaneStatus();
         map.put("status", primary_checkbox.isChecked());
-        map.put("freeze volume", cbAdapter_.getValue(0));
-        map.put("freeze plane", cbAdapter_.getValue(1));
-        map.put("real value", cbAdapter_.getValue(2));
+        map.put("freeze volume", opt_adapter_.getValue(0));
+//        map.put("freeze plane", cbAdapter_.getValue(1));
+        map.put("show plane", opt_adapter_.getValue(1));
+        map.put("real value", opt_adapter_.getValue(2));
         map.put("Center Line Travel", traversal_check_box.isChecked());
         map.put("Traversal View", view_switch.isChecked());
 
-        map.put("percentage", (float)seek_bar_.getProgress() / Integer.parseInt(params[1]));
+        map.put("percentage", (float)traversal_seek_bar.getProgress() / Integer.parseInt(params[1]));
 
         map.put("ppoint", new ArrayList<Float>(Arrays.asList(cpv[0], cpv[1], cpv[2])));
         map.put("pnorm", new ArrayList<Float>(Arrays.asList(cpv[3], cpv[4], cpv[5])));
@@ -249,19 +249,10 @@ public class cutplaneUIs extends BasePanel{
 
         return map;
     }
-    public void showHidePanel(boolean show_panel, boolean isRaycast){
+    public void showHidePanel(boolean show_panel){
         super.showHidePanel(show_panel);
     }
 
-    public void onRenderingMethodChange(int rm_id){
-        boolean is_all_dir = (rm_id !=0 );
-        showHidePanel(panel_visible, is_all_dir);
-        is_current_raycast = is_all_dir;
-        if(primary_checkbox.isChecked()){
-            if(is_all_dir)primary_panel.setVisibility(View.VISIBLE);
-            else primary_panel.setVisibility(View.INVISIBLE);
-        }
-    }
     private static class centerIdListAdapter extends textSimpleListAdapter{
         centerIdListAdapter(Context context){
             super(context, R.array.cutting_traversal_target);
@@ -280,24 +271,17 @@ public class cutplaneUIs extends BasePanel{
     }
     private static class ctCheckboxListAdapter extends ListAdapter {
         List<Boolean> item_values;
-        boolean is_cutting;
         ctCheckboxListAdapter(Context context) {
             super(context, context.getString(R.string.check_raycast_cut_option_name));
             //setup values
             Resources res = context.getResources();
             item_names = Arrays.asList(res.getStringArray(R.array.cut_raycast_options));
             TypedArray check_values = res.obtainTypedArray(R.array.cut_check_values);
-            is_cutting = check_values.getBoolean(0, false);
             item_values = new ArrayList<>();
             for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+1, false));
             check_values.recycle();
         }
-        void setValue(int id, boolean value){
-            if(id < item_values.size() && item_values.get(id)!=value) {
-                item_values.set(id, value);
-                notifyDataSetChanged();
-            }
-        }
+
         void ResetAll(){
             boolean data_changed = false;
             for(int i=0; i<item_values.size();i++){
@@ -331,15 +315,6 @@ public class cutplaneUIs extends BasePanel{
                     if(item_values.get(position) == isChecked) return;
                     item_values.set(position, isChecked);
                     JUIInterface.JUIsetChecks(item_names.get(position), isChecked);
-
-                    if(position<2){
-                    int relpos = 1-position;
-                    if(isChecked && item_values.get(relpos)){
-                        //update another one
-                        JUIInterface.JUIsetChecks(item_names.get(relpos), false);
-                        item_values.set(relpos, false);
-                        notifyDataSetChanged();
-                    }}
                 }
             });
             holder.checkBox.setTag(position);

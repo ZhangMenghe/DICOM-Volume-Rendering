@@ -25,6 +25,8 @@ public abstract class BasePanel {
     ArrayList<View> sub_panels_ = new ArrayList<>();
     boolean panel_visible;
     boolean default_primary_check;
+    protected String main_check_name;
+
     BasePanel(final Activity activity, ViewGroup parent_view){
         actRef = new WeakReference<>(activity);
         parentRef = new WeakReference<>(parent_view);
@@ -63,13 +65,13 @@ public abstract class BasePanel {
         default_check_values_id = check_value_id;
         check_names_ = actRef.get().getResources().getStringArray(default_check_array_id);
     }
-    void setup_checks(View parent_view,  int check_array_id, int check_value_id, int main_checkbox_resid, int main_checkbox_index) {
+    void setup_checks(View parent_view, int check_array_id, int check_value_id, int main_checkbox_resid, int main_checkbox_index) {
         setup_checks(check_array_id, check_value_id);
         setup_jni_show_hide_checkbox(parent_view, main_checkbox_resid, main_checkbox_index);
     }
     private void setup_jni_show_hide_checkbox(View parent_view, int cb_id, int check_idx){
         Resources res = actRef.get().getResources();
-        String main_check_name = res.getStringArray(default_check_array_id)[check_idx];
+        main_check_name = res.getStringArray(default_check_array_id)[check_idx];
         default_primary_check = Boolean.parseBoolean(res.getStringArray(default_check_values_id)[check_idx]);
 
         primary_checkbox = (CheckBox)parent_view.findViewById(cb_id);

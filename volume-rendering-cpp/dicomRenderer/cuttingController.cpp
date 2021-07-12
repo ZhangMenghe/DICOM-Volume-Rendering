@@ -38,6 +38,11 @@ void cuttingController::onReset(){
     p_norm_ = vec3(.0, .0, -1.0);
     p_rotate_mat_ = rotMatFromDir(p_norm_);
     update_plane_();
+
+    rt.point = glm::vec3(1000);
+    rt.scale = glm::vec3(.0f);
+    rt.rotate_mat = glm::mat4(1.0f);
+    rt.move_value = .0f;
 }
 void cuttingController::update_plane_(){
     p_point_ = p_start_;
@@ -81,7 +86,7 @@ void cuttingController::setCuttingParams(GLuint sp){
     Shader::Uniform(sp,"uPlane.p", p_point_);
     Shader::Uniform(sp,"uPlane.normal", p_norm_);
     Shader::Uniform(sp,"uPlane.r", CUTTING_RADIUS * p_scale.x);
-    Shader::Uniform(sp, "u_plane_color", plane_color_);
+    Shader::Uniform(sp, "u_plane_color", (Manager::param_bool[dvr::CHECK_SHOW_CPLANE])?plane_color_:glm::vec4(.0f));
 }
 void cuttingController::getCuttingPlane(glm::vec3& pp, glm::vec3& pn){
     pp = p_point_; pn=p_norm_;
@@ -154,7 +159,8 @@ void cuttingController::setCutPlane(float value){
     baked_dirty=true;
 }
 bool cuttingController::keep_cutting_position(){
-    return Manager::param_bool[dvr::CHECK_FREEZE_CPLANE];
+//    return Manager::param_bool[dvr::CHECK_FREEZE_CPLANE];
+    return false;
 }
 void cuttingController::setCutPlane(glm::vec3 normal){}
 void cuttingController::setCutPlane(glm::vec3 pp, glm::vec3 normal){

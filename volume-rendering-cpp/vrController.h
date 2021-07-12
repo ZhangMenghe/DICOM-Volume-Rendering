@@ -18,12 +18,12 @@
 class vrController:public nEntrance{
 public:
     static vrController* instance();
-    bool isDrawing(){return tex_volume!= nullptr;}
 
     vrController(const std::shared_ptr<Manager> &manager);
     ~vrController();
     void assembleTexture(int update_target, int ph, int pw, int pd, float sh, float sw, float sd, GLubyte * data, int channel_num = 4);
     void setupCenterLine(int id, float* data);
+
     /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height);
@@ -55,7 +55,7 @@ public:
     void setOverlayRects(int id, int width, int height, int left, int top);
     void setRenderingMethod(dvr::RENDER_METHOD method){
         if(m_rmethod_id == method) return;
-        m_rmethod_id = method;//vRenderer_[m_rmethod_id]->dirtyPrecompute();
+        m_rmethod_id = method;
     }
     void setRenderingParameters(dvr::RENDER_METHOD method, float* values){
         if(method < vRenderer_.size())
