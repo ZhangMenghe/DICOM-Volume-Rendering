@@ -132,7 +132,8 @@ namespace dvr{
     enum CLAHE_OPTIONS {
         CLAHE_3D=0,
         CLAHE_FOCUSED,
-        CLAHE_MASKED
+        CLAHE_MASKED,
+        CLAHE_OPTION_END
     };
     enum CLAHE_VARIABLES {
         CLAHE_CLIP_3D=0,

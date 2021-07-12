@@ -21,9 +21,10 @@ private:
     unsigned int inputGrayvals_3D = 65536;
     unsigned int numOrgans = 7;
     float clipStep = 0.05f;
-    bool m_dirty;
     glm::uvec3 m_3d_limit;
-    bool ready_to_compute = false;
+    bool m_dirty, ready_to_compute;
+    bool m_initialized[dvr::CLAHE_OPTION_END];
+
 public:
     claheManager();
     void onReset();

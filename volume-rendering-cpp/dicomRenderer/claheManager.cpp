@@ -23,6 +23,7 @@ void claheManager::onReset(){
     _textureMode = dvr::CLAHE_3D;
     _currTexture = _3D_CLAHE;
     m_dirty = false;ready_to_compute=false;
+    for(bool & init:m_initialized) init = false;
 }
 void claheManager::onVolumeDataUpdate(GLuint tex_volume, GLuint tex_mask, glm::vec3 volDim){
     m_3d_limit = glm::uvec3(volDim);
@@ -32,7 +33,7 @@ void claheManager::onVolumeDataUpdate(GLuint tex_volume, GLuint tex_mask, glm::v
     m_dirty = true;ready_to_compute=true;
 }
 void claheManager::onUpdate(){
-    if(m_dirty && ready_to_compute){
+    if(!m_initialized[_textureMode] || (m_dirty && ready_to_compute)){
         if (_textureMode == dvr::CLAHE_3D) {
             _3D_CLAHE = m_computer->Compute3D_CLAHE(numSB_3D, clipLimit3D);
             _currTexture = _3D_CLAHE;
@@ -48,7 +49,7 @@ void claheManager::onUpdate(){
             _MaskedCLAHE = m_computer->ComputeMasked3D_CLAHE(clipLimit3D);
             _currTexture = _MaskedCLAHE;
         }
-        m_dirty = false;ready_to_compute=false;
+        m_dirty = false;ready_to_compute=false;m_initialized[_textureMode]=true;
     }
 }
 void claheManager::onClipLimitChange(bool increase){
