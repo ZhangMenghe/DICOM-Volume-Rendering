@@ -165,6 +165,7 @@ JUI_METHOD(void, JUIonSingleTouchDownNative)(JNIEnv *, jclass, jint target, jflo
     else if(target == TOUCH_AR_BUTTON) arController::instance()->onSingleTouchDown(x,y);
 }
 JUI_METHOD(void, JUIonSingleTouchUpNative)(JNIEnv *, jobject){
+    m_sceneRenderer->onSingleTouchUp();
     arController::instance()->onSingleTouchUp();
 }
 JUI_METHOD(void, JUIonTouchMoveNative)(JNIEnv *, jclass, jfloat x, jfloat y){
@@ -194,4 +195,63 @@ JUI_METHOD(void, JUIonARRequest)(JNIEnv * env, jclass, jint id){
         if(arController::instance()->getTouchedPosition(pos));
             m_sceneRenderer->setVolumePosition(pos);
     }
+}
+
+JUI_METHOD(jboolean, JUIgetCurrentPose)(JNIEnv *env, jclass clazz,
+                                    jfloatArray position, jfloatArray rotation,
+                                    jfloatArray scale) {
+    glm::vec3 pos;
+    glm::quat rot;
+    float s = 1.f;
+    bool flag = m_sceneRenderer->getVolumePose(pos, rot, s);
+    if(flag){
+        jfloat* flt1 = env->GetFloatArrayElements(position,JNI_FALSE );
+        jfloat* flt2 = env->GetFloatArrayElements(rotation,JNI_FALSE );
+        jfloat* flt3 = env->GetFloatArrayElements(scale,JNI_FALSE );
+
+        flt1[0] = pos.x;
+        flt1[1] = pos.y;
+        flt1[2] = pos.z;
+
+        flt2[0] = rot.x;
+        flt2[1] = rot.y;
+        flt2[2] = rot.z;
+        flt2[3] = rot.w;
+
+        flt3[0] = s;
+
+        env->ReleaseFloatArrayElements(position, flt1, 0);
+        env->ReleaseFloatArrayElements(rotation, flt2, 0);
+        env->ReleaseFloatArrayElements(scale, flt3, 0);
+    }
+    return flag;
+}
+
+JUI_METHOD(jboolean, JUIsetCurrentPose)(JNIEnv *env, jclass clazz,
+                                        jfloatArray position, jfloatArray rotation,
+                                        jfloatArray scale) {
+    glm::vec3 pos;
+    glm::quat rot;
+    float s = 1.f;
+    jfloat* flt1 = env->GetFloatArrayElements(position,JNI_FALSE );
+    jfloat* flt2 = env->GetFloatArrayElements(rotation,JNI_FALSE );
+    jfloat* flt3 = env->GetFloatArrayElements(scale,JNI_FALSE );
+
+    pos.x = flt1[0];
+    pos.y = flt1[1];
+    pos.z = flt1[2];
+
+    rot.x = flt2[0];
+    rot.y = flt2[1];
+    rot.z = flt2[2];
+    rot.w = flt2[3];
+
+    s = flt3[0];
+
+    bool flag = m_sceneRenderer->setVolumePose(pos, rot, s);
+
+    env->ReleaseFloatArrayElements(position, flt1, 0);
+    env->ReleaseFloatArrayElements(rotation, flt2, 0);
+    env->ReleaseFloatArrayElements(scale, flt3, 0);
+    return flag;
 }

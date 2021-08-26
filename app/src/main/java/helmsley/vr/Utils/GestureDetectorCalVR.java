@@ -19,6 +19,7 @@ public class GestureDetectorCalVR {
 //                Log.e(TAG, "onOneFingerDown: ======down" );
 //                UIsController.JUIonSingleTouchDown(event.getX(), event.getY());
                 JUIInterface.JUIonSingleTouchDown(0, event.getX(), event.getY());
+                JUIInterface.JUIonTouchDown();
             }
             public void onOneFingerMove(MotionEvent event){
 //                Log.e(TAG, "onOneFingerDown: ======move" );
@@ -26,11 +27,14 @@ public class GestureDetectorCalVR {
                 JUIInterface.JUIonTouchMove(event.getX(), event.getY());
             }
 
-            public void onFling(int pointerNum, float srcx, float srcy, float dstx, float dsty){}
+            public void onFling(int pointerNum, float srcx, float srcy, float dstx, float dsty){
+                JUIInterface.JUIonTouchUp();
+            }
 
             // LEFT(0) OR Right(1) Single Tap [UP]
             public  void onSingleTapUp(int pointerNum, MotionEvent event){
                 JUIInterface.JUIonSingleTouchUp();
+                JUIInterface.JUIonTouchUp();
             }
 
             // TWO FINGERS (right mouse click)
@@ -38,6 +42,7 @@ public class GestureDetectorCalVR {
             public void onMoreFingersDown(int pointerNum, MotionEvent event){
 //                JniInterface.JNIonSingleTouchDown(pointerNum - 1, event.getX(), event.getY());
                 if(pointerNum != 2) return;
+                JUIInterface.JUIonTouchDown();
                 int id1 = event.findPointerIndex(event.getPointerId(0));
                 int id2 = event.findPointerIndex(event.getPointerId(1));
                 down_f1.set(event.getX(id1), event.getY(id1));

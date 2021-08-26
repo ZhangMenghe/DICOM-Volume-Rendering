@@ -100,7 +100,7 @@ message FrameUpdateMsg{
 service inspectorSync{
     rpc startBroadcast(Request) returns(commonResponse);
     rpc startReceiveBroadcast(Request) returns(commonResponse);
-    rpc gsVolumePose(VPMsg) returns(commonResponse);
+    rpc gsVolumePose(VPMsg) returns(VPMsg);
     rpc getOperations(Request) returns(OperationBatch);
     rpc getUpdates(Request) returns(FrameUpdateMsg);
 

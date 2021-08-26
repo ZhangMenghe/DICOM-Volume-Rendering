@@ -327,7 +327,10 @@ public class dialogUIs {
         should_stop_main_progress = true;
     }
     void updateOnFrame(){
-        if(rpc_manager != null) rpc_manager.CheckDataLoading();
+        if(rpc_manager != null) {
+            rpc_manager.CheckDataLoading();
+            rpc_manager.UpdateVolumePose();
+        }
         if(should_stop_main_progress){onProgressFinish();should_stop_main_progress=false;}
     }
     public void onProgressFinish(){

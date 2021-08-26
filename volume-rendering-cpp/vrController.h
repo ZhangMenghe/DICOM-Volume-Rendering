@@ -38,6 +38,9 @@ public:
     void AlignModelMatToTraversalPlane();
 
     void onSingleTouchDown(float x, float y);
+    void onSingleTouchUp(){
+        pressed -= 1;
+    }
     void onTouchMove(float x, float y);
     void onScale(float sx, float sy);
     void onPan(float x, float y);
@@ -85,6 +88,8 @@ public:
     float* getCuttingPlane();
     void getCuttingPlane(glm::vec3& pp, glm::vec3& pn){cutter_->getCuttingPlane(pp,pn);}
     bool isDirty();
+    bool getVolumePose(glm::vec3& pos, glm::quat& rot, float& scale);
+    bool setVolumePose(glm::vec3& pos, glm::quat& rot, float scale);
 
     bool isRayCut(){return isRayCasting() && Manager::param_bool[dvr::CHECK_CUTTING];}
 
@@ -111,6 +116,7 @@ private:
 
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
+    float uniScale_ = 1.0f;
     bool pre_draw_ = false;
 
     //volume
@@ -119,9 +125,11 @@ private:
 
     //ui
     glm::fvec2 Mouse_old;
+    int pressed = 0;
 
     //flags
     bool volume_model_dirty, volume_rotate_dirty;
+    bool dirty_since_last_query;
     
     //performance 
     perfMonitor pm_;

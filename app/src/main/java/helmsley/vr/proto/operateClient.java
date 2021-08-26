@@ -20,6 +20,7 @@ public class operateClient {
     final static String TAG = "operateClient";
 
     private static inspectorSyncGrpc.inspectorSyncStub operate_stub;
+    private static inspectorSyncGrpc.inspectorSyncBlockingStub blocking_stub;
 
     private static Request.Builder request_builder;
     private static GestureOp.Builder gesture_builder;
@@ -28,6 +29,7 @@ public class operateClient {
     private static CheckMsg.Builder check_builder;
     private static MaskMsg.Builder msk_builder;
     private static DataMsg.Builder data_builder;
+    private static VPMsg.Builder vpmsg_builder;
 
     private static List<FrameUpdateMsg.MsgType> type_pool = new ArrayList<>();
     private static List<TuneMsg> tune_pool = new ArrayList<>();
@@ -36,6 +38,7 @@ public class operateClient {
     private static MaskMsg reserve_msk= null;
 
     private static StreamObserver<commonResponse> observer;
+    private static StreamObserver<VPMsg> vpmsg_observer;
     private static int ops = 0;
     private static long last_timestamp = 0;
     private static DecimalFormat df = new DecimalFormat("0.00");
@@ -49,6 +52,7 @@ public class operateClient {
         check_builder = CheckMsg.newBuilder();
         msk_builder = MaskMsg.newBuilder();
         data_builder = DataMsg.newBuilder();
+        vpmsg_builder = VPMsg.newBuilder();
         observer = new StreamObserver<commonResponse>() {
             @Override
             public void onNext(commonResponse value) {
@@ -62,15 +66,57 @@ public class operateClient {
             public void onCompleted() {
             }
         };
+
+        vpmsg_observer = new StreamObserver<VPMsg>() {
+            @Override
+            public void onNext(VPMsg value) {
+            }
+
+            @Override
+            public void onError(Throwable t) {
+            }
+
+            @Override
+            public void onCompleted() {
+            }
+        };
     }
     void Setup(ManagedChannel channel){
         operate_stub = inspectorSyncGrpc.newStub(channel);
+        blocking_stub = inspectorSyncGrpc.newBlockingStub(channel);
         initialized = true;
     }
     public static void startBroadcast(){
         Request req = request_builder.setClientId(rpcManager.CLIENT_ID).build();
         operate_stub.startBroadcast(req, observer);
     }
+
+    public static List<Float> gsVolumePose(ReqType req_type, VPMsg.VPType vp_type, float[] values){
+        if(!initialized) return new ArrayList<Float>();
+        vpmsg_builder.clear();
+        VPMsg.Builder builder = vpmsg_builder.setReqType(req_type).setVolumePoseType(vp_type);
+        if(req_type == ReqType.SET){
+            int max_length = 0;
+            switch (vp_type){
+                case POS:
+                case ROT:
+                    max_length = 4;
+                    break;
+                case SCALE:
+                    max_length = 1;
+                    break;
+            }
+            for(int i = 0; i < max_length && i < values.length; i ++){
+                builder.addValues(values[i]);
+            }
+        }
+
+        VPMsg msg = builder.build();
+        msg = blocking_stub.gsVolumePose(msg);
+
+        return msg.getValuesList();
+    }
+
     public static void setGestureOp(GestureOp.OPType type, float x, float y){
         if(!initialized) return;
         gesture_builder.clear();
@@ -82,6 +128,7 @@ public class operateClient {
 //            last_timestamp = System.currentTimeMillis();
 //        }
     }
+
     public static void setCheckParams(String key, boolean value){
         if(!initialized) return;
         check_builder.clear();

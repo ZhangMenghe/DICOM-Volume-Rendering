@@ -251,6 +251,11 @@ void vrController::onDraw() {
     if(!tex_volume) return;
     glClearColor(.0f,.0f,.0f,.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if(volume_model_dirty || volume_rotate_dirty){
+        dirty_since_last_query = true;
+    }
+
     if(!pre_draw_){onDrawScene();return;}
 
     //for pre-draw option
@@ -262,6 +267,7 @@ void vrController::onDraw() {
 }
 void vrController::onSingleTouchDown(float x, float y){
     Mouse_old = glm::fvec2(x, y);
+    pressed += 1;
 }
 void vrController::onTouchMove(float x, float y) {
     if(!tex_volume) return;
@@ -282,6 +288,7 @@ void vrController::onTouchMove(float x, float y) {
 
     RotateMat_ = mouseRotateMat(RotateMat_, xoffset, yoffset);
     volume_model_dirty = true;volume_rotate_dirty=true;
+    dirty_since_last_query = true;
 }
 void vrController::onScale(float sx, float sy){
     if(!tex_volume) return;
@@ -293,8 +300,10 @@ void vrController::onScale(float sx, float sy){
     if(Manager::param_bool[dvr::CHECK_FREEZE_VOLUME]){
         cuttingController::instance()->onScale(sx);
     }else{
-        ScaleVec3_ = ScaleVec3_* sx;
+        //ScaleVec3_ = ScaleVec3_* sx;
+        uniScale_ = uniScale_ * sx;
         volume_model_dirty = true;
+        dirty_since_last_query = true;
     }
 }
 void vrController::onPan(float x, float y){
@@ -305,6 +314,7 @@ void vrController::onPan(float x, float y){
     PosVec3_.x += offx * ScaleVec3_.x;
     PosVec3_.y += offy * ScaleVec3_.y;
     volume_model_dirty = true;
+    dirty_since_last_query = true;
 }
 void vrController::precompute(){
     if(!Manager::baked_dirty_) return;
@@ -364,13 +374,15 @@ void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content)
 void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
     RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv;
     volume_model_dirty=true;volume_rotate_dirty=true;
+    dirty_since_last_query = true;
 }
 
 void vrController::updateVolumeModelMat(){
     ModelMat_ =
             glm::translate(glm::mat4(1.0), PosVec3_)
                  * RotateMat_
-                 * glm::scale(glm::mat4(1.0), ScaleVec3_);
+                 * glm::scale(glm::mat4(1.0), ScaleVec3_)
+                 * glm::scale( glm::mat4(1.0), glm::vec3(uniScale_,uniScale_,uniScale_));
     if(Manager::isARWithMarker()){
         float* pData = glm::value_ptr(ModelMat_);
         for(int i=0;i<16;i++) pData[i]*=m_inverse_[i];
@@ -440,6 +452,7 @@ void vrController::AlignModelMatToTraversalPlane(){
     RotateMat_ = glm::toMat4(glm::rotation(pn, glm::vec3(.0,.0,-1.0f)));
                 
     volume_model_dirty = true;volume_rotate_dirty=true;
+    dirty_since_last_query = true;
     vRenderer_[m_rmethod_id]->dirtyPrecompute();
 }
 
@@ -469,4 +482,22 @@ bool vrController::isDirty() {
     if(Manager::param_bool[dvr::CHECK_VOLUME_ON])
         return vRenderer_[m_rmethod_id]->isPrecomputeDirty();
     return false;
+}
+
+bool vrController::getVolumePose(glm::vec3& pos, glm::quat& rot, float& scale){
+    pos = this->PosVec3_;
+    rot = glm::quat_cast(this->RotateMat_);
+    scale = uniScale_;
+    bool flag = dirty_since_last_query;
+    dirty_since_last_query = false;
+    return flag;
+}
+
+bool vrController::setVolumePose(glm::vec3& pos, glm::quat& rot, float scale) {
+    PosVec3_ = pos;
+    RotateMat_ = glm::mat4_cast(rot);
+    uniScale_ = scale;
+    volume_model_dirty = true;
+    printf("update\n");
+    return true;
 }

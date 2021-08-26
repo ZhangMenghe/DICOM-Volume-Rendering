@@ -1,18 +1,31 @@
 package helmsley.vr.DUIs;
 
 import helmsley.vr.proto.GestureOp;
+import helmsley.vr.proto.ReqType;
 import helmsley.vr.proto.TuneMsg;
+import helmsley.vr.proto.VPMsg;
 import helmsley.vr.proto.operateClient;
 import helmsley.vr.proto.volumeInfo;
 
 public class JUIInterface {
     public static boolean on_broadcast = false;
+    public static int fingerCount = 0;
     static void setBroadcast(boolean on){
         if(on) {
             operateClient.startBroadcast();
         }
         on_broadcast = on;
     }
+
+    public static void JUIonChangePose(float[] position, float[] rotation, float scale){
+        if(on_broadcast){
+            operateClient.gsVolumePose(ReqType.SET, VPMsg.VPType.POS, position);
+            operateClient.gsVolumePose(ReqType.SET, VPMsg.VPType.ROT, rotation);
+            float[] scales = {scale};
+            operateClient.gsVolumePose(ReqType.SET, VPMsg.VPType.SCALE, scales);
+        }
+    }
+
     public static void JUIonChangeVolume(String ds_name, String vl_name){
         if(on_broadcast) operateClient.sendVolume(ds_name, vl_name);
     }
@@ -118,8 +131,17 @@ public class JUIInterface {
     }
     public static void JUIonSingleTouchUp(){
         JUIonSingleTouchUpNative();
-        if(on_broadcast) operateClient.setGestureOp(GestureOp.OPType.TOUCH_UP, .0f, .0f);
+        operateClient.setGestureOp(GestureOp.OPType.TOUCH_UP, .0f, .0f);
     }
+
+    public static void JUIonTouchDown(){
+        fingerCount += 1;
+    }
+
+    public static void JUIonTouchUp(){
+        fingerCount -= 1;
+    }
+
     public static void JUIonTouchMove(float x, float y){
         JUIonTouchMoveNative(x, y);
         if(on_broadcast) operateClient.setGestureOp(GestureOp.OPType.TOUCH_MOVE, x, y);
@@ -170,6 +192,10 @@ public class JUIInterface {
     public static native void JUIonTouchMoveNative(float x, float y);
     public static native void JUIonScaleNative(float sx, float sy);
     public static native void JUIonPanNative(float x, float y);
+
+    // Get pose info
+    public static native boolean JUIgetCurrentPose(float[] position, float[] rotation, float[] scale);
+    public static native boolean JUIsetCurrentPose(float[] position, float[] rotation, float[] scale);
 
     public static void onAssembleDataFinished(){
         dialogUIs.onLoadingDataFinished();
