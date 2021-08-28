@@ -60,9 +60,9 @@ public:
     void setRenderingParameters(dvr::RENDER_METHOD method, float* values){
         if(method < vRenderer_.size())
             vRenderer_[method]->setRenderingParameters(values);
-        else{
-            Manager::indiv_rendering_params[method] = values[0];
-        }
+        // else{
+        //     Manager::indiv_rendering_params[method] = values[0];
+        // }
     }
     void setCLAHEOption(int id){
         if(claheManager_!=nullptr){

@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">DICOM Viewer</string>
     <string name="fps">0.0 FPS</string>
-
-    <string name="DEFAULT_HOST">10.68.2.105</string>
-    <!--    <string name="DEFAULT_HOST">137.110.118.222</string>-->
+    <string name="DEFAULT_HOST">192.168.0.178</string>
     <string name="DEFAULT_PORT">23333</string>
 
     <string name="cf_b_cache">true</string>

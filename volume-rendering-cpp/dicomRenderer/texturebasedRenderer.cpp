@@ -92,7 +92,7 @@ void texvrRenderer::draw_scene(glm::mat4 model_mat){
 
     Shader::Uniform(sp, "uMVP", Manager::camera->getVPMat() * model_mat);
     Shader::Uniform(sp, "uVolumeThickness", vol_thickness_factor);
-    Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
+    // Shader::Uniform(sp, "u_cut", Manager::param_bool[dvr::CHECK_CUTTING]);
 
     if(Manager::IsCuttingEnabled())shader_->EnableKeyword("CUTTING_PLANE");
     else shader_->DisableKeyword("CUTTING_PLANE");
