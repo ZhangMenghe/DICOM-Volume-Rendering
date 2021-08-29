@@ -74,7 +74,7 @@ public class operateClient {
     public static void setGestureOp(GestureOp.OPType type, float x, float y){
         if(!initialized) return;
         gesture_builder.clear();
-        GestureOp req = gesture_builder.setGid(System.currentTimeMillis()).setType(type).setX(x).setY(y).build();
+        GestureOp req = gesture_builder.setClientId(rpcManager.CLIENT_ID).setGid(System.currentTimeMillis()).setType(type).setX(x).setY(y).build();
         operate_stub.setGestureOp(req, observer);
 //        ops++;
 //        if(System.currentTimeMillis() - last_timestamp > BACH_TIME_MILLS){
@@ -85,7 +85,7 @@ public class operateClient {
     public static void setCheckParams(String key, boolean value){
         if(!initialized) return;
         check_builder.clear();
-        CheckMsg cm = check_builder.setKey(key).setValue(value).build();
+        CheckMsg cm = check_builder.setClientId(rpcManager.CLIENT_ID).setKey(key).setValue(value).build();
 //        if(rpcManager.operate_stub == null)
 //            check_pool.add(cm);
 //        else
@@ -95,12 +95,13 @@ public class operateClient {
     public static void setMaskParams(int num, int mbits){
         if(!initialized) return;
         msk_builder.clear();
-        operate_stub.setMaskParams(msk_builder.setNum(num).setMbits(mbits).build(), observer);
+        operate_stub.setMaskParams(msk_builder.setClientId(rpcManager.CLIENT_ID).setNum(num).setMbits(mbits).build(), observer);
     }
 
     public static void reqestReset( String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(!initialized) return;
         reset_builder.clear();
+        reset_builder.setClientId(rpcManager.CLIENT_ID);
         for(String ck:check_keys)reset_builder.addCheckKeys(ck);
         for(boolean cv:check_value)reset_builder.addCheckValues(cv);
         for(float vp:volume_pose)reset_builder.addVolumePose(vp);
@@ -112,49 +113,49 @@ public class operateClient {
         tune_builder.clear();
 
         for(float vp:values)tune_builder.addValues(vp);
-        operate_stub.setTuneParams(tune_builder.setType(type).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int v){
         if(!initialized) return;
         tune_builder.clear();
 
-        operate_stub.setTuneParams(tune_builder.setType(type).setTarget(v).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).setTarget(v).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, float v){
         if(!initialized) return;
         tune_builder.clear();
 
-        operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setValue(v).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).setTarget(tar).setValue(v).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type){
         if(!initialized) return;
         tune_builder.clear();
 
-        operate_stub.setTuneParams(tune_builder.setType(type).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, boolean v){
         if(!initialized) return;
         tune_builder.clear();
 
-        operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setValue(v?1:0).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).setTarget(tar).setValue(v?1:0).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, float[] values){
         if(!initialized) return;
         tune_builder.clear();
 
         for(float vp:values)tune_builder.addValues(vp);
-        operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).setTarget(tar).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, int sub_tar){
         if(!initialized) return;
         tune_builder.clear();
-        operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setSubTarget(sub_tar).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).setTarget(tar).setSubTarget(sub_tar).build(), observer);
     }
     public static void setTuneParams(TuneMsg.TuneType type, int tar, int sub_tar, float value){
         if(!initialized) return;
         tune_builder.clear();
 
-        operate_stub.setTuneParams(tune_builder.setType(type).setTarget(tar).setSubTarget(sub_tar).setValue(value).build(), observer);
+        operate_stub.setTuneParams(tune_builder.setClientId(rpcManager.CLIENT_ID).setType(type).setTarget(tar).setSubTarget(sub_tar).setValue(value).build(), observer);
     }
 //    public static void setDisplayVolume(volumeInfo vinfo){
 //        if(JUIInterface.on_broadcast && initialized) operate_stub.setDisplayVolume(vinfo, observer);
@@ -168,7 +169,7 @@ public class operateClient {
         data_builder.setDsName(ds_name);
         data_builder.setVolumeName(vl_name);
         if(JUIInterface.on_broadcast &&initialized){
-            operate_stub.setDisplayVolume(data_builder.build(), observer);
+            operate_stub.setDisplayVolume(data_builder.setClientId(rpcManager.CLIENT_ID).build(), observer);
             Log.e(TAG, "============sendVolume: 1===" );
         }
     }

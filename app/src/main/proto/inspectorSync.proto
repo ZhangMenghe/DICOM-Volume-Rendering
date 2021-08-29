@@ -6,6 +6,7 @@ option java_outer_classname = "inspectorSyncProto";
 option objc_class_prefix = "TRP";
 
 package helmsley;
+
 import "common.proto";
 
 enum ReqType{
@@ -14,7 +15,7 @@ enum ReqType{
 }
 message VPMsg{
     int32 client_id = 1;
-    ReqType req_type = 2;
+    int32 gid = 2;
     enum VPType{
         POS = 0;
         SCALE = 1;
@@ -23,8 +24,9 @@ message VPMsg{
     VPType volume_pose_type = 3;
     repeated float values = 4;
 }
-
 message GestureOp{
+    int32 client_id = 1;
+    int64 gid = 2;
     enum OPType{
         TOUCH_DOWN = 0;
         TOUCH_UP = 1;
@@ -32,23 +34,28 @@ message GestureOp{
         SCALE = 3;
         PAN = 4;
     }
-    int64 gid = 1;
-    OPType type = 2;
-    float x = 3;
-    float y = 4;
+    OPType type = 3;
+    float x = 4;
+    float y = 5;
 }
 message OperationBatch{
     float bid = 1;
     repeated GestureOp gesture_op = 2;
 }
+message VolumePoseBatch{
+    float bid = 1;
+    repeated VPMsg pose_msgs = 2;
+}
 message ResetMsg{
-    repeated string check_keys = 1;
-    repeated bool check_values = 2;
-    repeated float volume_pose = 3;
-    repeated float camera_pose = 4;
+    int32 client_id = 1;
+    repeated string check_keys = 2;
+    repeated bool check_values = 3;
+    repeated float volume_pose = 4;
+    repeated float camera_pose = 5;
 }
 
 message TuneMsg{
+    int32 client_id = 1;
     enum TuneType{
         ADD_ONE = 0;
         REMOVE_ONE = 1;
@@ -61,24 +68,27 @@ message TuneMsg{
         COLOR_SCHEME = 8;
         RENDER_METHOD = 9;
     }
-    TuneType type = 1;
-    int32 target = 2;
-    int32 sub_target = 3;
-    float value = 4;
-    repeated float values = 5;
+    TuneType type = 2;
+    int32 target = 3;
+    int32 sub_target = 4;
+    float value = 5;
+    repeated float values = 6;
 }
 
 message CheckMsg{
-    string key = 1;
-    bool value = 2;
+    int32 client_id = 1;
+    string key = 2;
+    bool value = 3;
 }
 message MaskMsg{
-    int32 num = 1;
-    int32 mbits = 2;
+    int32 client_id = 1;
+    int32 num = 2;
+    int32 mbits = 3;
 }
 message DataMsg{
-    string ds_name = 1;
-    string volume_name = 2;
+    int32 client_id = 1;
+    string ds_name = 2;
+    string volume_name = 3;
 }
 message FrameUpdateMsg{
     enum MsgType{
@@ -100,11 +110,13 @@ message FrameUpdateMsg{
 service inspectorSync{
     rpc startBroadcast(Request) returns(commonResponse);
     rpc startReceiveBroadcast(Request) returns(commonResponse);
-    rpc gsVolumePose(VPMsg) returns(commonResponse);
+    rpc reqestReset(ResetMsg) returns(commonResponse);
+
+    rpc getVolumePoses(Request) returns(VolumePoseBatch);
     rpc getOperations(Request) returns(OperationBatch);
     rpc getUpdates(Request) returns(FrameUpdateMsg);
 
-    rpc reqestReset(ResetMsg) returns(commonResponse);
+    rpc setVolumePose(VPMsg) returns(commonResponse);
     rpc setGestureOp(GestureOp) returns(commonResponse);
     rpc setTuneParams(TuneMsg) returns(commonResponse);
     rpc setCheckParams(CheckMsg) returns(commonResponse);
