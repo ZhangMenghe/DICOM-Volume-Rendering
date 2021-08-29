@@ -110,7 +110,7 @@ message FrameUpdateMsg{
 service inspectorSync{
     rpc startBroadcast(Request) returns(commonResponse);
     rpc startReceiveBroadcast(Request) returns(commonResponse);
-    rpc reqestReset(ResetMsg) returns(commonResponse);
+    rpc requestReset(ResetMsg) returns(commonResponse);
 
     rpc getVolumePoses(Request) returns(VolumePoseBatch);
     rpc getOperations(Request) returns(OperationBatch);

@@ -19,7 +19,7 @@ public class JUIInterface {
     public static void JUIonReset(boolean update_local, int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(update_local) JUIonResetNative(num, check_keys, check_value, volume_pose, camera_pose);
         if(on_broadcast){
-            operateClient.reqestReset(check_keys, check_value, volume_pose, camera_pose);
+            operateClient.requestReset(check_keys, check_value, volume_pose, camera_pose);
         }
     }
     static void JUIsetGraphRect(int id, int width, int height, int left, int top){
