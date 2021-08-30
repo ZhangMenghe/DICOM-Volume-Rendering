@@ -2,17 +2,9 @@ package helmsley.vr.proto;
 
 import android.util.Log;
 
-import com.google.common.primitives.Booleans;
-import com.google.common.primitives.Floats;
-
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-import helmsley.vr.DUIs.BasePanel;
 import helmsley.vr.DUIs.JUIInterface;
-import helmsley.vr.JNIInterface;
 import io.grpc.ManagedChannel;
 import io.grpc.stub.StreamObserver;
 
@@ -20,25 +12,32 @@ public class operateClient {
     final static String TAG = "operateClient";
 
     private static inspectorSyncGrpc.inspectorSyncStub operate_stub;
+    private static inspectorSyncGrpc.inspectorSyncBlockingStub blocking_stub;
+
     private static StreamObserver<commonResponse> observer;
 
-    private static Request.Builder request_builder;
+    private static VPMsg.Builder pose_builder;
     private static GestureOp.Builder gesture_builder;
     private static ResetMsg.Builder reset_builder;
     private static TuneMsg.Builder tune_builder;
     private static CheckMsg.Builder check_builder;
     private static MaskMsg.Builder msk_builder;
     private static DataMsg.Builder data_builder;
+    private static Request common_request;
 
     private static boolean initialized = false;
+    private static int pose_id = 0;
     operateClient(){
-        request_builder = Request.newBuilder();
+        pose_builder = VPMsg.newBuilder();
         gesture_builder = GestureOp.newBuilder();
         reset_builder = ResetMsg.newBuilder();
         tune_builder = TuneMsg.newBuilder();
         check_builder = CheckMsg.newBuilder();
         msk_builder = MaskMsg.newBuilder();
         data_builder = DataMsg.newBuilder();
+
+        Request.Builder request_builder = Request.newBuilder();
+        common_request = request_builder.setClientId(rpcManager.CLIENT_ID).build();
         observer = new StreamObserver<commonResponse>() {
             @Override
             public void onNext(commonResponse value) {
@@ -55,11 +54,21 @@ public class operateClient {
     }
     void Setup(ManagedChannel channel){
         operate_stub = inspectorSyncGrpc.newStub(channel);
+        blocking_stub = inspectorSyncGrpc.newBlockingStub(channel);
         initialized = true;
     }
-    public static void startBroadcast(){
-        Request req = request_builder.setClientId(rpcManager.CLIENT_ID).build();
-        operate_stub.startBroadcast(req, observer);
+    public List<VPMsg> getPoseUpdates(){
+        VolumePoseBatch pose_batch = blocking_stub.getVolumePoses(common_request);
+        return pose_batch.getPoseMsgsList();
+    }
+    public void startBroadcast(){
+        operate_stub.startBroadcast(common_request, observer);
+    }
+    public void joinAsReceiver(){
+        operate_stub.startReceiveBroadcast(common_request, observer);
+    }
+    public void ExitSync(){
+        //TODO: WAIT FOR IMPLEMENTATION
     }
     public static void requestReset( String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
         if(!initialized) return;
@@ -70,6 +79,12 @@ public class operateClient {
         for(float vp:volume_pose)reset_builder.addVolumePose(vp);
         for(float cp:camera_pose)reset_builder.addCameraPose(cp);
         operate_stub.requestReset(reset_builder.build(), observer);
+    }
+    public static void setVolumePose(VPMsg.VPType type, int value_num, float[] values){
+        pose_builder.clear();
+        pose_builder.setVolumePoseType(type);
+        for(int i=0; i<value_num; i++) pose_builder.addValues(values[i]);
+        operate_stub.setVolumePose(pose_builder.setClientId(rpcManager.CLIENT_ID).setGid((pose_id++)%10000).build(), observer);
     }
     public static void setGestureOp(GestureOp.OPType type, float x, float y){
         if(!initialized) return;
@@ -149,7 +164,7 @@ public class operateClient {
         data_builder.clear();
         data_builder.setDsName(ds_name);
         data_builder.setVolumeName(vl_name);
-        if(JUIInterface.on_broadcast &&initialized){
+        if(rpcManager.G_STATUS_SENDER &&initialized){
             operate_stub.setDisplayVolume(data_builder.setClientId(rpcManager.CLIENT_ID).build(), observer);
             Log.e(TAG, "============sendVolume: 1===" );
         }

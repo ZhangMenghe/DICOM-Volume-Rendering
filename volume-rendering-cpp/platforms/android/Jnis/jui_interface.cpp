@@ -3,6 +3,7 @@
 #include "jui_interface.h"
 #include <vrController.h>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
 #include <platforms/android/ARHelpers/arController.h>
 #include <dicomRenderer/screenQuad.h>
 
@@ -159,6 +160,19 @@ JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
 
     env->ReleaseFloatArrayElements(jvol_pose, vol_arr, 0);
     env->ReleaseFloatArrayElements(jcam_pose, cam_arr, 0);
+}
+//volume array: RST in R(w,x,y,z), S(x,y,z), T(x,y,z)
+JUI_METHOD(void, JUIsetVolumePose)(JNIEnv * env, jclass, jbooleanArray jvol_pose_type, jfloatArray jvol_pose){
+    jboolean * type_arr = env->GetBooleanArrayElements(jvol_pose_type, 0);
+    jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
+    //unwrap pose information
+    m_sceneRenderer->setVolumeRST(
+            glm::mat4_cast(glm::quat(vol_arr[0], vol_arr[1], vol_arr[2], vol_arr[3])),
+            glm::vec3(vol_arr[4], vol_arr[5], vol_arr[6]),
+            glm::vec3(vol_arr[7], vol_arr[8], vol_arr[9]),
+            type_arr[0], type_arr[1], type_arr[2]);
+    env->ReleaseFloatArrayElements(jvol_pose, vol_arr, 0);
+    env->ReleaseBooleanArrayElements(jvol_pose_type, type_arr, 0);
 }
 JUI_METHOD(void, JUIonSingleTouchDownNative)(JNIEnv *, jclass, jint target, jfloat x, jfloat y){
     if(target == TOUCH_VOLUME) m_sceneRenderer->onSingleTouchDown(x, y);

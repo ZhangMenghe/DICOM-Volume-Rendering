@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 
 import helmsley.vr.R;
@@ -142,12 +143,15 @@ public class claheUIs extends BasePanel{
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
         LinkedHashMap mmap = (LinkedHashMap) map.getOrDefault("clahe", null);
         if(mmap == null) return;
-        boolean status = (Boolean) mmap.getOrDefault("status", default_primary_check);
+        boolean status = (Boolean) mmap.getOrDefault("Status", default_primary_check);
         primary_checkbox.setChecked(status);
+        
+        Collections.addAll(names, check_names_);
+        values.add(status);
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
-        map.put("status", primary_checkbox.isChecked());
+        map.put("Status", primary_checkbox.isChecked());
         return map;
     }
     @Override

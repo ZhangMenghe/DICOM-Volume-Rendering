@@ -118,14 +118,15 @@ public class dialogUIs {
         else on_start_broadcast();
     }
     void StopBroadcast(){
-        JUIInterface.setBroadcast(false);
+        //TODO:ADD EXIT SYNC UI
+        rpc_manager.changeSyncStatus(true, false);
         broadcast_icon.setVisibility(View.GONE);
     }
     private void on_start_broadcast(){
         LinkedHashMap map = new LinkedHashMap();
         muiRef.get().mUIManagerRef.get().getCurrentStates(map);
+        rpc_manager.changeSyncStatus(true, true);
         broadcast_icon.setVisibility(View.VISIBLE);
-        JUIInterface.setBroadcast(true);
         JUIInterface.JUIonChangeVolume(rpc_manager.getTargetDatasetName(), rpc_manager.getTargetVolumeName());
         muiRef.get().mUIManagerRef.get().RequestResetWithTemplate(map, false);
     }
@@ -327,7 +328,7 @@ public class dialogUIs {
         should_stop_main_progress = true;
     }
     void updateOnFrame(){
-        if(rpc_manager != null) rpc_manager.CheckDataLoading();
+        if(rpc_manager != null) rpc_manager.updateOnFrame();
         if(should_stop_main_progress){onProgressFinish();should_stop_main_progress=false;}
     }
     public void onProgressFinish(){

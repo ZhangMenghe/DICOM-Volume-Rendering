@@ -17,8 +17,12 @@ import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+
+import com.google.common.primitives.Floats;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -195,57 +199,54 @@ public class cutplaneUIs extends BasePanel{
         cid_adapter.setTitleById(0);
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
-//        LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
-//        if(cutmap == null) return;
-//
+        LinkedHashMap cutmap = (LinkedHashMap) map.getOrDefault("cutting plane", null);
+        if(cutmap == null) return;
+//      seekbar for explicit value
 //        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
 //        int max_seek_value = Integer.parseInt(params[1]);
 //        Float percent = (Float)cutmap.getOrDefault("percentage", Double.valueOf(params[0]));
 //        seek_bar_.setProgress((int)(percent * max_seek_value));
-//
-//        //todo:jui send cutting plane status(pos/ori)
-//        boolean cut_status = (Boolean) cutmap.getOrDefault("status", default_primary_check);
-//        boolean freeze_volume = (Boolean) cutmap.getOrDefault("freeze volume", default_check_vales[1]);
-//        boolean freeze_plane = (Boolean) cutmap.getOrDefault("freeze plane", default_check_vales[2]);
-//        boolean real_sampled = (Boolean) cutmap.getOrDefault("real value", default_check_vales[3]);
-//        boolean center_line_traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_traversal_check);
-//        boolean b_traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", false);
-//
-//        primary_checkbox.setChecked(cut_status);
-//        cbAdapter_.setValue(0, freeze_volume); cbAdapter_.setValue(1,freeze_plane);cbAdapter_.setValue(2,real_sampled);
-//        traversal_check_box.setChecked(center_line_traversal);
-//        view_switch.setChecked(b_traversal_view);
-//        cid_adapter.setTitleByText((String) cutmap.getOrDefault("traversal target", "Colon"));
-//
-//        Collections.addAll(names, check_names_);
-//        values.add(cut_status);values.add(freeze_volume);values.add(freeze_plane);values.add(center_line_traversal);values.add(b_traversal_view);
-//
-//
-//        float[] cut_pose = default_cut_pose.clone();
-//
-//        float[] pos = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("ppoint", new ArrayList<Float>()));
-//        if(pos.length == 3) System.arraycopy(pos, 0, cut_pose, 0, 3);
-//        float[] norm = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("pnorm", new ArrayList<Float>()));
-//        if(norm.length == 3) System.arraycopy(norm, 0, cut_pose, 3, 3);
-//        JUIInterface.JUIsetAllTuneParamById(TID_CUTTING_PLANE, cut_pose);
+
+        //todo:jui send cutting plane status(pos/ori)
+        boolean cut_status = (Boolean) cutmap.getOrDefault("Status", default_primary_check);
+        boolean freeze_volume = (Boolean) cutmap.getOrDefault("Freeze Volume", default_check_vales[1]);
+        boolean show_plane = (Boolean) cutmap.getOrDefault("Show Plane", default_check_vales[2]);
+        boolean real_sampled = (Boolean) cutmap.getOrDefault("Real Value", default_check_vales[3]);
+        boolean traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_check_vales[4]);
+        boolean traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", default_check_vales[5]);
+
+        primary_checkbox.setChecked(cut_status);
+        opt_adapter_.setValue(0, freeze_volume); opt_adapter_.setValue(1,show_plane);opt_adapter_.setValue(2,real_sampled);
+        traversal_check_box.setChecked(traversal);
+        view_switch.setChecked(traversal_view);
+        cid_adapter.setTitleByText((String) cutmap.getOrDefault("Traversal Target", "Colon"));
+
+        Collections.addAll(names, check_names_);
+        values.add(cut_status);values.add(freeze_volume);values.add(show_plane);values.add(real_sampled);values.add(traversal);values.add(traversal_view);
+
+        float[] cut_pose = default_cut_pose.clone();
+
+        float[] pos = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("Plane Point", new ArrayList<Float>()));
+        if(pos.length == 3) System.arraycopy(pos, 0, cut_pose, 0, 3);
+        float[] norm = Floats.toArray((ArrayList<Float>)cutmap.getOrDefault("Plane Normal", new ArrayList<Float>()));
+        if(norm.length == 3) System.arraycopy(norm, 0, cut_pose, 3, 3);
+        JUIInterface.JUIsetAllTuneParamById(TID_CUTTING_PLANE, cut_pose);
     }
     public LinkedHashMap getCurrentStates(){
         LinkedHashMap map = new LinkedHashMap();
-        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
+//        String[] params = actRef.get().getResources().getStringArray(R.array.cutting_plane);
         float[] cpv = JUIInterface.JUIgetCuttingPlaneStatus();
-        map.put("status", primary_checkbox.isChecked());
-        map.put("freeze volume", opt_adapter_.getValue(0));
+        map.put("Status", primary_checkbox.isChecked());
+        map.put("Freeze Volume", opt_adapter_.getValue(0));
 //        map.put("freeze plane", cbAdapter_.getValue(1));
-        map.put("show plane", opt_adapter_.getValue(1));
-        map.put("real value", opt_adapter_.getValue(2));
+        map.put("Show Plane", opt_adapter_.getValue(1));
+        map.put("Real Value", opt_adapter_.getValue(2));
         map.put("Center Line Travel", traversal_check_box.isChecked());
         map.put("Traversal View", view_switch.isChecked());
 
-        map.put("percentage", (float)traversal_seek_bar.getProgress() / Integer.parseInt(params[1]));
-
-        map.put("ppoint", new ArrayList<Float>(Arrays.asList(cpv[0], cpv[1], cpv[2])));
-        map.put("pnorm", new ArrayList<Float>(Arrays.asList(cpv[3], cpv[4], cpv[5])));
-        map.put("traversal target", cid_adapter.getTitle());
+        map.put("Plane Point", new ArrayList<Float>(Arrays.asList(cpv[0], cpv[1], cpv[2])));
+        map.put("Plane Normal", new ArrayList<Float>(Arrays.asList(cpv[3], cpv[4], cpv[5])));
+        map.put("Traversal Target", cid_adapter.getTitle());
 
         return map;
     }
@@ -292,6 +293,13 @@ public class cutplaneUIs extends BasePanel{
                 }
             }
             if(data_changed)notifyDataSetChanged();
+        }
+        void setValue(int id, boolean value){
+            if(item_values.get(id)!=value){
+                item_values.set(id, value);
+                JUIInterface.JUIsetChecks(item_names.get(id), value);
+                notifyDataSetChanged();
+            }
         }
         boolean getValue(int id){return (id<item_values.size())?item_values.get(id):false;}
         public View getDropDownView(int position, View convertView, ViewGroup parent){

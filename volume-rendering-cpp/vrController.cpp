@@ -361,9 +361,11 @@ void vrController::setShaderContents(dvr::SHADER_FILES fid, std::string content)
         Manager::shader_contents[fid] = content;
 }
 
-void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
-    RotateMat_=rm; ScaleVec3_=sv; PosVec3_=pv;
-    volume_model_dirty=true;volume_rotate_dirty=true;
+void vrController::setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, bool set_rot, bool set_scale, bool set_pos){
+    if(set_rot){RotateMat_=rm;volume_rotate_dirty=true;}
+    if(set_scale)ScaleVec3_=sv;
+    if(set_pos)PosVec3_=pv;
+    volume_model_dirty=true;
 }
 
 void vrController::updateVolumeModelMat(){

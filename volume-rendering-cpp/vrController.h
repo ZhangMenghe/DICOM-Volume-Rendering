@@ -49,7 +49,7 @@ public:
     void setCuttingPlane(int id, int delta);
     void setCuttingPlane(glm::vec3 pp, glm::vec3 pn);
     void setCuttingParams(GLuint sp);
-    void setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv);
+    void setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, bool set_rot=true, bool set_scale=true, bool set_pos = true);
     void setVolumePosition(glm::vec3 pv){PosVec3_ = pv;volume_model_dirty=true;}
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setOverlayRects(int id, int width, int height, int left, int top);
