@@ -1,7 +1,6 @@
 package helmsley.vr.proto;
 
 import android.app.Activity;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
@@ -91,17 +90,29 @@ public class rpcManager {
         boolean[]volume_pose_type = new boolean[]{false, false, false};
         float[]volume_pose = new float[10];
         List<VPMsg> msg_lst = opa_manager.getPoseUpdates();
-        for(VPMsg msg:msg_lst){
-            if(msg.getVolumePoseType() == VPMsg.VPType.ROT){
-                //rotation:(w,x,y,z)
-                for(int i=0; i<4; i++) volume_pose[i]= msg.getValues(i);
-                volume_pose_type[0] = true;
-            }else if(msg.getVolumePoseType() == VPMsg.VPType.SCALE){
-                for(int i=0; i<3; i++) volume_pose[4+i]= msg.getValues(i);
-                volume_pose_type[1] = true;
-            }else{
-                for(int i=0; i<3; i++) volume_pose[7+i]= msg.getValues(i);
-                volume_pose_type[2] = true;
+        if(msg_lst.isEmpty()){
+            List<GestureOp> op_lst = opa_manager.getOperations();
+            if(!op_lst.isEmpty()){
+                for(GestureOp op:op_lst){
+                    GestureOp.OPType type = op.getType();
+                    if(type == GestureOp.OPType.TOUCH_DOWN)JUIInterface.JUIonSingleTouchDownNative(0, op.getX(), op.getY());
+                    else if(type == GestureOp.OPType.TOUCH_MOVE)JUIInterface.JUIonTouchMoveNative(op.getX(), op.getY());
+                    else if(type == GestureOp.OPType.TOUCH_UP)JUIInterface.JUIonSingleTouchUpNative();
+                }
+            }
+        }else{
+            for(VPMsg msg:msg_lst){
+                if(msg.getVolumePoseType() == VPMsg.VPType.ROT){
+                    //rotation:(w,x,y,z)
+                    for(int i=0; i<4; i++) volume_pose[i]= msg.getValues(i);
+                    volume_pose_type[0] = true;
+                }else if(msg.getVolumePoseType() == VPMsg.VPType.SCALE){
+                    for(int i=0; i<3; i++) volume_pose[4+i]= msg.getValues(i);
+                    volume_pose_type[1] = true;
+                }else{
+                    for(int i=0; i<3; i++) volume_pose[7+i]= msg.getValues(i);
+                    volume_pose_type[2] = true;
+                }
             }
         }
         JUIInterface.JUIsetVolumePose(volume_pose_type, volume_pose);

@@ -57,6 +57,10 @@ public class operateClient {
         blocking_stub = inspectorSyncGrpc.newBlockingStub(channel);
         initialized = true;
     }
+    public List<GestureOp> getOperations(){
+        OperationBatch batch = blocking_stub.getOperations(common_request);
+        return batch.getGestureOpList();
+    }
     public List<VPMsg> getPoseUpdates(){
         VolumePoseBatch pose_batch = blocking_stub.getVolumePoses(common_request);
         return pose_batch.getPoseMsgsList();
