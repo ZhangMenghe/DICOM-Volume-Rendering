@@ -1,6 +1,8 @@
 package helmsley.vr.proto;
 
 import android.app.Activity;
+import android.view.View;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.ref.WeakReference;
@@ -17,6 +19,7 @@ public class rpcManager {
     public final static int CLIENT_ID = 1;
     public static boolean G_JOIN_SYNC = false;
     public static boolean G_STATUS_SENDER = false;
+    public static boolean G_FORCED_STOP_BROADCAST = false;
 
     private final WeakReference<Activity> actRef;
     private final WeakReference<dialogUIs> duiRef;
@@ -57,9 +60,16 @@ public class rpcManager {
         data_manager.SetupLocal();
     }
 
-    public void updateOnFrame(){
+    public void updateOnFrame() {
         check_data_loading();
-        if(!G_STATUS_SENDER && G_JOIN_SYNC)update_volume_pose();
+        if(G_FORCED_STOP_BROADCAST){
+            duiRef.get().onBroadCastStatusChanged(false);
+            G_FORCED_STOP_BROADCAST = false;
+        }
+        if (G_JOIN_SYNC) {
+            if (G_STATUS_SENDER) check_server_status();
+            else update_volume_pose();
+        }
     }
     public void changeSyncStatus(boolean join, boolean broadcast){
         G_JOIN_SYNC = join;
@@ -85,6 +95,9 @@ public class rpcManager {
             data_manager.ResetCenterline();
             JNIInterface.JNIsendDataDone();
         }
+    }
+    private void check_server_status(){
+        opa_manager.checkCurrentBroadcaster();
     }
     private void update_volume_pose(){
         boolean[]volume_pose_type = new boolean[]{false, false, false};

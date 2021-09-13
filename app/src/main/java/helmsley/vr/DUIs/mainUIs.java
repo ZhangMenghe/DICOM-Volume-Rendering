@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Spinner;
@@ -33,6 +32,7 @@ public class mainUIs {
 
     //Spinner adapter
     private checkpanelAdapter cb_panel_adapter;
+    private SysCallListAdapter func_panel_adapter;
 
     public mainUIs(final Activity activity, final ViewGroup parent_view, UIsManager manager){
         Resources res = activity.getResources();
@@ -49,9 +49,8 @@ public class mainUIs {
         cb_panel_adapter = new checkpanelAdapter(activity, manager);
         //function spinners
         Spinner spinner_func = (Spinner) activity.findViewById(R.id.funcSpinner);
-        syscallListAdapter fAdapter = new syscallListAdapter(activity, R.array.functions, R.string.sys_name);
-        spinner_func.setAdapter(fAdapter);
-
+        func_panel_adapter = new SysCallListAdapter(activity, R.array.functions, R.string.sys_name);
+        spinner_func.setAdapter(func_panel_adapter);
 
         Spinner spinner_data = (Spinner) activity.findViewById(R.id.dataSpinner);
         dataListAdapter dAdapter = new dataListAdapter(activity, R.array.data_loading, R.string.data_name);
@@ -79,6 +78,9 @@ public class mainUIs {
             e.printStackTrace();
         }
     }
+    void onBroadCastStatusChanged(boolean is_on){
+        func_panel_adapter.onBroadCastStatusChanged(is_on);
+    }
     String getExportConfig(String name, String comments){
         return cache_current_state_as_yaml(name, comments);
     }
@@ -102,61 +104,68 @@ public class mainUIs {
         return content;
     }
 
-    private class syscallListAdapter extends ListAdapter{
+    private class SysCallListAdapter extends ListAdapter{
         private final int BROADCAST_POS;
         private boolean is_on_broadcast;
-        syscallListAdapter(Context context, int arrayId, int titleId){
-                super(context, context.getResources().getString(titleId));
-                item_names = Arrays.asList(context.getResources().getStringArray(arrayId));
-                BROADCAST_POS = item_names.indexOf(NAME_START_BROADCAST);
-                is_on_broadcast = false;
-            }
-            public View getDropDownView(int position, View convertView, ViewGroup parent){
-                ViewContentHolder holder;
-                if (convertView == null) {
-                    holder = new ViewContentHolder();
-                    convertView = mInflater.inflate(R.layout.spinner_item, null);
-                    holder.text_name = (TextView) convertView.findViewById(R.id.funcName);
-                    convertView.setTag(R.layout.spinner_check_layout, holder);
-                } else {
-                    holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
-                }
-                if(BROADCAST_POS == position)
-                    holder.text_name.setText(is_on_broadcast?NAME_STOP_BROADCAST:NAME_START_BROADCAST);
-                else
-                    holder.text_name.setText(item_names.get(position));
-
-                holder.text_name.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        holder.text_name.setTextAppearance(R.style.itemHighlightText);
-                        String text_title = ((TextView)v).getText().toString();
-                        if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
-                        else if(text_title.equals(NAME_START_BROADCAST)){
-                            dialogController.StartBroadcast();
-                            is_on_broadcast = true;
-                            holder.text_name.setText(NAME_STOP_BROADCAST);
-                        }
-                        else if(text_title.equals(NAME_STOP_BROADCAST)){
-                            dialogController.StopBroadcast();
-                            is_on_broadcast = false;
-                            holder.text_name.setText(NAME_START_BROADCAST);
-                        }
-                        else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
-                        else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
-                        else if(text_title.equals(NAME_RECORDING))dialogController.onChangeRecordingPanel();
-
-                        new android.os.Handler().postDelayed(
-                                new Runnable() {
-                                    public void run() {
-                                        holder.text_name.setTextAppearance(R.style.itemText);
-                                    }
-                                },
-                                300);
-                    }
-                });
-            return convertView;
+        SysCallListAdapter(Context context, int arrayId, int titleId){
+            super(context, context.getResources().getString(titleId));
+            item_names = Arrays.asList(context.getResources().getStringArray(arrayId));
+            BROADCAST_POS = item_names.indexOf(NAME_START_BROADCAST);
+            is_on_broadcast = false;
         }
+        void onBroadCastStatusChanged(boolean is_on){
+            if(is_on != is_on_broadcast){
+                is_on_broadcast = is_on;
+                item_names.set(BROADCAST_POS, is_on_broadcast?NAME_STOP_BROADCAST:NAME_START_BROADCAST);
+                notifyDataSetChanged();
+            }
+        }
+        public View getDropDownView(int position, View convertView, ViewGroup parent){
+            ViewContentHolder holder;
+            if (convertView == null) {
+                holder = new ViewContentHolder();
+                convertView = mInflater.inflate(R.layout.spinner_item, null);
+                holder.text_name = (TextView) convertView.findViewById(R.id.funcName);
+                convertView.setTag(R.layout.spinner_check_layout, holder);
+            } else {
+                holder = (ViewContentHolder) convertView.getTag(R.layout.spinner_check_layout);
+            }
+            if(BROADCAST_POS == position)
+                holder.text_name.setText(is_on_broadcast?NAME_STOP_BROADCAST:NAME_START_BROADCAST);
+            else
+                holder.text_name.setText(item_names.get(position));
+
+            holder.text_name.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    holder.text_name.setTextAppearance(R.style.itemHighlightText);
+                    String text_title = ((TextView)v).getText().toString();
+                    if(text_title.equals(NAME_RESET)) mUIManagerRef.get().RequestReset();
+                    else if(text_title.equals(NAME_START_BROADCAST)){
+                        dialogController.StartBroadcast();
+                        is_on_broadcast = true;
+                        holder.text_name.setText(NAME_STOP_BROADCAST);
+                    }
+                    else if(text_title.equals(NAME_STOP_BROADCAST)){
+                        dialogController.StopBroadcast();
+                        is_on_broadcast = false;
+                        holder.text_name.setText(NAME_START_BROADCAST);
+                    }
+                    else if(text_title.equals(NAME_TEMPLATE_LOAD))dialogController.ShowConfigsRemote();
+                    else if(text_title.equals(NAME_TEMPLATE_SAVE))dialogController.ExportConfigs();
+                    else if(text_title.equals(NAME_RECORDING))dialogController.onChangeRecordingPanel();
+
+                    new android.os.Handler().postDelayed(
+                            new Runnable() {
+                                public void run() {
+                                    holder.text_name.setTextAppearance(R.style.itemText);
+                                }
+                            },
+                            300);
+                }
+            });
+        return convertView;
+    }
         private class ViewContentHolder{
             TextView text_name;
         }

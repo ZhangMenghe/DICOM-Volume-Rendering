@@ -54,7 +54,7 @@ public class dialogUIs {
     private boolean b_init_pick_alert = false;
     private DSCardRecyclerViewAdapter local_card_adp;
     private ConfigCardRecyclerViewAdapter config_adp;
-    private View download_progress, main_progress, broadcast_icon;
+    public View download_progress, main_progress, broadcast_icon;
     private boolean remote_layout_set = false, config_layout_set = false;
 
     //recording
@@ -118,9 +118,16 @@ public class dialogUIs {
         else on_start_broadcast();
     }
     void StopBroadcast(){
-        //TODO:ADD EXIT SYNC UI
         rpc_manager.changeSyncStatus(true, false);
         broadcast_icon.setVisibility(View.GONE);
+    }
+    public void onBroadCastStatusChanged(boolean is_on){
+        activityReference.get().runOnUiThread(new Runnable()  {
+            @Override
+            public void run()  {
+                broadcast_icon.setVisibility(is_on?View.VISIBLE:View.GONE);
+                muiRef.get().onBroadCastStatusChanged(is_on);
+            }});
     }
     private void on_start_broadcast(){
         LinkedHashMap map = new LinkedHashMap();

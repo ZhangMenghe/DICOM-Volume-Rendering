@@ -15,6 +15,7 @@ public class operateClient {
     private static inspectorSyncGrpc.inspectorSyncBlockingStub blocking_stub;
 
     private static StreamObserver<commonResponse> observer;
+    private static StreamObserver<StatusMsg> sm_observer;
 
     private static VPMsg.Builder pose_builder;
     private static GestureOp.Builder gesture_builder;
@@ -51,11 +52,31 @@ public class operateClient {
             public void onCompleted() {
             }
         };
+        sm_observer = new StreamObserver<StatusMsg>() {
+            @Override
+            public void onNext(StatusMsg value) {
+                if(rpcManager.CLIENT_ID!= value.getHostId()) {
+                    rpcManager.G_STATUS_SENDER=false;
+                    rpcManager.G_FORCED_STOP_BROADCAST = true;
+                }
+            }
+
+            @Override
+            public void onError(Throwable t) {
+            }
+
+            @Override
+            public void onCompleted() {
+            }
+        };
     }
     void Setup(ManagedChannel channel){
         operate_stub = inspectorSyncGrpc.newStub(channel);
         blocking_stub = inspectorSyncGrpc.newBlockingStub(channel);
         initialized = true;
+    }
+    void checkCurrentBroadcaster(){
+        operate_stub.getStatusMessage(common_request, sm_observer);
     }
     public List<GestureOp> getOperations(){
         OperationBatch batch = blocking_stub.getOperations(common_request);
