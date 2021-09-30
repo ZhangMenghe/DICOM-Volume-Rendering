@@ -107,7 +107,7 @@ void arController::onViewChange(int rot, int width, int height){
 }
 bool arController::onDrawMarkerBased(){
     std::lock_guard<std::mutex> lock(frame_image_in_use_mutex_);
-    ArImage * ar_image;
+    ArImage* ar_image = nullptr;
     ArStatus status = ArFrame_acquireCameraImage(ar_session_, ar_frame_, &ar_image);
     if(ar_image == nullptr || status != AR_SUCCESS) {
         return false;

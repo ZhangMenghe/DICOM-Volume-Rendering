@@ -146,7 +146,7 @@ public class UIsManager {
             BasePanel p = sub_panels_.get(sub_panel_name_ids_[i]);
             p.Reset();
             p.showHidePanel(panel_show_status[i]);
-            p.setCheckParams(res, check_items_param, check_values_param);
+            p.setCheckParams(check_items_param, check_values_param);
         }
         JUIInterface.JUIonReset(true,
                 m_cam_status_initialized?"":default_cam_status_name,

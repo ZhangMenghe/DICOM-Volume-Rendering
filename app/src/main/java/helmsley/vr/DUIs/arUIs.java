@@ -40,6 +40,8 @@ public class arUIs extends BasePanel{
     private View pop_parent;
     private View bottom_panel;
 
+    private final static int CHECK_USE_AR_CORE_IDX = 1;
+    private static boolean default_check_ar_core;
     public arUIs(final Activity activity, ViewGroup parent_view) {
         super(activity, parent_view);
         selfRef = new WeakReference<>(this);
@@ -104,8 +106,7 @@ public class arUIs extends BasePanel{
                 JUIInterface.JUIsetChecks("Use ARCore", isChecked);
             }
         });
-        check_arcore.setChecked(false);//TODO:GRAB VALUE FROM ar_check_values
-
+        default_check_ar_core = default_check_values[CHECK_USE_AR_CORE_IDX];
         setup_pop_dialog(activity, parent_view);
     }
     private void setup_pop_dialog(Activity activity, ViewGroup parent_view){
@@ -135,10 +136,10 @@ public class arUIs extends BasePanel{
     }
     @Override
     public void Reset(){
+        spinner_check_render.setVisibility(default_check_ar_core?View.VISIBLE:View.INVISIBLE);
         spinner_check_render.setAdapter(cb_adapter);
         primary_checkbox.setChecked(default_primary_check);
-        check_arcore.setChecked(false);
-//        bottom_panel.setVisibility(View.GONE);
+        check_arcore.setChecked(default_check_ar_core);
     }
     public void ResetWithTemplate(LinkedHashMap map, ArrayList<String> names, ArrayList<Boolean> values){
         LinkedHashMap maskmap = (LinkedHashMap) map.getOrDefault("mask", null);
@@ -161,6 +162,7 @@ public class arUIs extends BasePanel{
     private static class checklistAdapter extends ListAdapter {
         List<Boolean> item_values;
         WeakReference<View> m_panel_ref;
+        final static int m_check_offset = 2;
         checklistAdapter(Context context, View panel) {
             super(context, context.getString(R.string.ar_draw_name));
             //setup values
@@ -169,7 +171,7 @@ public class arUIs extends BasePanel{
             item_names = Arrays.asList(res.getStringArray(R.array.ar_render_params));
             TypedArray check_values = res.obtainTypedArray(R.array.ar_check_values);
             item_values = new ArrayList<>();
-            for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+2, false));
+            for (int i = 0; i < item_names.size(); i++) item_values.add(check_values.getBoolean(i+m_check_offset, false));
             check_values.recycle();
         }
         void setValue(int id, boolean value){

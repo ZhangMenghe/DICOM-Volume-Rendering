@@ -209,11 +209,11 @@ public class cutplaneUIs extends BasePanel{
 
         //todo:jui send cutting plane status(pos/ori)
         boolean cut_status = (Boolean) cutmap.getOrDefault("Status", default_primary_check);
-        boolean freeze_volume = (Boolean) cutmap.getOrDefault("Freeze Volume", default_check_vales[1]);
-        boolean show_plane = (Boolean) cutmap.getOrDefault("Show Plane", default_check_vales[2]);
-        boolean real_sampled = (Boolean) cutmap.getOrDefault("Real Value", default_check_vales[3]);
-        boolean traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_check_vales[4]);
-        boolean traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", default_check_vales[5]);
+        boolean freeze_volume = (Boolean) cutmap.getOrDefault("Freeze Volume", default_check_values[1]);
+        boolean show_plane = (Boolean) cutmap.getOrDefault("Show Plane", default_check_values[2]);
+        boolean real_sampled = (Boolean) cutmap.getOrDefault("Real Value", default_check_values[3]);
+        boolean traversal = (Boolean) cutmap.getOrDefault("Center Line Travel", default_check_values[4]);
+        boolean traversal_view = (Boolean) cutmap.getOrDefault("Traversal View", default_check_values[5]);
 
         primary_checkbox.setChecked(cut_status);
         opt_adapter_.setValue(0, freeze_volume); opt_adapter_.setValue(1,show_plane);opt_adapter_.setValue(2,real_sampled);
