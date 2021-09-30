@@ -136,8 +136,6 @@ bool arController::onDrawMarkerBased(){
         }
         m_aruco_tracker->setImageSize(ndk_image_width, ndk_image_height);
         initialized = true;
-
-        vrController::instance()->setVolumeRST(dvr::DEFAULT_ROTATE_AR, dvr::DEFAULT_SCALE_AR, dvr::DEFAULT_POS_AR);
     }
 
     int32_t length = 0;

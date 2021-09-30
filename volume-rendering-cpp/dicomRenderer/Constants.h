@@ -156,11 +156,6 @@ namespace dvr{
     const glm::vec3 DEFAULT_SCALE = glm::vec3(1.0f);
     const glm::vec3 DEFAULT_POS = glm::vec3(.0f);
 
-    //TRS AR
-    const glm::mat4 DEFAULT_ROTATE_AR = glm::mat4(1.0f);
-    const glm::vec3 DEFAULT_SCALE_AR = glm::vec3(0.16f);
-    const glm::vec3 DEFAULT_POS_AR = glm::vec3(.0f);
-
     //SETTING for CLAHE
     const glm::uvec3 DEFAULT_SUBLOCK_NUM = glm::uvec3(4, 4, 2);
     const glm::uvec3 DEFAULT_BLOCK_SIZE = glm::uvec3(200, 200, 50);
@@ -169,8 +164,11 @@ namespace dvr{
             glm::uvec3(20,0,0),
             glm::uvec3(0,20,0),
             glm::uvec3(0,0,10),
-
     };
+
+    //name
+    const std::string DEFAULT_AR_CAM_NAME="ARCam";
+    const std::string DEFAULT_MARKER_CAM_NAME="MarkerCam";
 
     struct Rect{
         float width;float height;

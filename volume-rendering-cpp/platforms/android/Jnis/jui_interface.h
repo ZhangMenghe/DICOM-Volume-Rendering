@@ -4,7 +4,7 @@
 
 extern "C"{
     JUI_METHOD(void, JUIsetAllTuneParamByIdNative)(JNIEnv*, jclass, jint, jfloatArray);
-    JUI_METHOD(void, JUIonResetNative)(JNIEnv*, jclass, jint, jobjectArray, jbooleanArray, jfloatArray, jfloatArray);
+    JUI_METHOD(void, JUIonResetNative)(JNIEnv*, jclass, jint, jobjectArray, jbooleanArray, jfloatArray, jfloatArray, jstring);
     JUI_METHOD(void, JUIonSingleTouchDownNative)(JNIEnv *, jclass, jint, jfloat, jfloat);
     JUI_METHOD(void, JUIonSingleTouchUpNative)(JNIEnv *, jobject);
     JUI_METHOD(void, JUIonTouchMoveNative)(JNIEnv *, jclass, jfloat, jfloat);

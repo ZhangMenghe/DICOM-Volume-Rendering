@@ -9,8 +9,8 @@ public class JUIInterface {
     public static void JUIonChangeVolume(String ds_name, String vl_name){
         if(rpcManager.G_STATUS_SENDER) operateClient.sendVolume(ds_name, vl_name);
     }
-    public static void JUIonReset(boolean update_local, int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
-        if(update_local) JUIonResetNative(num, check_keys, check_value, volume_pose, camera_pose);
+    public static void JUIonReset(boolean update_local, String status_name, int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose){
+        if(update_local) JUIonResetNative(num, check_keys, check_value, volume_pose, camera_pose, status_name);
         if(rpcManager.G_STATUS_SENDER){
             operateClient.requestReset(check_keys, check_value, volume_pose, camera_pose);
         }
@@ -128,7 +128,7 @@ public class JUIInterface {
     public static native void JUIonLongPress(float x, float y);
     public static native void JUIonARRequest(int id);
 
-    public static native void JUIonResetNative(int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose);
+    public static native void JUIonResetNative(int num, String[] check_keys, boolean[] check_value, float[] volume_pose, float[] camera_pose, String status_name);
     public static native void JUIsetGraphRectNative(int id, int width, int height, int left, int top);
 
     public static native void JUIaddTuneParamsNative(int[] nums, float[] values);

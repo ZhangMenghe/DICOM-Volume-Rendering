@@ -29,7 +29,7 @@ class Camera{
     }
 public:
     Camera(){
-        Reset(DEFAULT_CAM_POS, DEFAULT_CAM_UP, DEFAULT_VIEW_CENTER);
+        Reset();
     }
 //    Camera(const char* cam_name)
 //    :name_(cam_name){
@@ -42,12 +42,14 @@ public:
     void Reset(Camera* cam){
         Reset(cam->_eyePos, cam->_up, cam->_center);
     }
+    void Reset(){Reset(DEFAULT_CAM_POS, DEFAULT_CAM_UP, DEFAULT_VIEW_CENTER);}
     void Reset(glm::vec3 pos, glm::vec3 up, glm::vec3 center){
         _up = up;
         _eyePos = pos;
         _center = center;
         _front = glm::normalize(_center - _eyePos);
         _viewMat = glm::lookAt(pos, center, up);
+        poseMat_ = glm::inverse(_viewMat);
     }
 
     //setters

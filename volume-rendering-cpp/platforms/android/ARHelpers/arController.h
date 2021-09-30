@@ -24,7 +24,7 @@ public:
     void getTouchedAnchor(glm::mat4& rotMat, glm::vec3& pos);
     bool getTouchedPosition(glm::vec3& pos);
 
-/*Override*/
+    /*Override*/
     void onViewCreated();
     void onViewChange(int width, int height){}
     void onDraw();

@@ -12,7 +12,6 @@ public:
 private:
 	int m_img_width, m_img_height;
     cv::Mat m_cameraMatrix, m_distCoeffs;
-    std::vector<cv::Vec3d> m_rvecs, m_tvecs;
 };
 #endif
 

@@ -34,10 +34,8 @@ struct volumeSetupConstBuffer{
 };
 
 struct reservedStatus{
-    glm::mat4 rot_mat;//model_mat,
+    glm::mat4 rot_mat;
     glm::vec3 scale_vec, pos_vec;
-    Camera vcam;
-//    reservedStatus(){}
     reservedStatus(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv){
         rot_mat=rm; scale_vec=sv; pos_vec=pv;
     }
@@ -106,14 +104,15 @@ public:
     void updateVolumeSetupUniforms(GLuint sp);
 
     //mvp status
-    void addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status);
-    void addMVPStatus(std::string name, bool use_as_current_status);
-    void setMVPStatus(std::string status_name);
+    void addMVPStatus(const std::string& name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, bool use_as_current_status);
+    void addMVPStatus(const std::string& name, bool use_as_current_status);
+    bool removeMVPStatus(const std::string& name);
+    bool setMVPStatus(const std::string& name);
     void getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv);
 private:
     static Manager *myPtr_;
     static volumeSetupConstBuffer m_volset_data;
-    std::unordered_map<std::string, reservedStatus> m_mvp_status;
+    std::unordered_map<std::string, reservedStatus*> m_mvp_status;
 
     //contrast, brightness, etc
     float m_render_params[dvr::PARAM_RENDER_TUNE_END] = {.0f};
@@ -142,7 +141,6 @@ private:
     };
 
     //ar status
-    bool m_mvp_ar_dirty;
     void clear_opacity_widgets();
 };
 #endif //VOLUME_RENDERING_MANAGER_H

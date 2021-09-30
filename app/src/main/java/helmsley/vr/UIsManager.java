@@ -41,6 +41,8 @@ public class UIsManager {
     };
     private final static float[]default_vol_pose={0,0,0,1,1,1,1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1};
     private final static float[]default_cam_pose={0,0,4.0f,0,1,0,0,0,0.0f};
+    private final static String default_cam_status_name="AndroidCam";
+    private static boolean m_cam_status_initialized = false;
 
     UIsManager(final Activity activity_){
         actRef = new WeakReference<>(activity_);
@@ -124,7 +126,10 @@ public class UIsManager {
             if(center.length == 3) System.arraycopy(center, 0, cam_pose, 6, 3);
         }
 
-        JUIInterface.JUIonReset(update_local, check_items_param.size(),
+        JUIInterface.JUIonReset(
+                update_local,
+                "",
+                check_items_param.size(),
                 check_items_param.toArray(new String[0]),
                 Booleans.toArray(check_values_param),
                 vol_pose, cam_pose);
@@ -143,10 +148,13 @@ public class UIsManager {
             p.showHidePanel(panel_show_status[i]);
             p.setCheckParams(res, check_items_param, check_values_param);
         }
-        JUIInterface.JUIonReset(true, check_items_param.size(),
+        JUIInterface.JUIonReset(true,
+                m_cam_status_initialized?"":default_cam_status_name,
+                check_items_param.size(),
                 check_items_param.toArray(new String[0]),
                 Booleans.toArray(check_values_param),
                 default_vol_pose, default_cam_pose);
+        m_cam_status_initialized = true;
     }
     void updateOnFrame(){
         main_panel_.updateOnFrame();

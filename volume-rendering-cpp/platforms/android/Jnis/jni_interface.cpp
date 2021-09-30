@@ -196,9 +196,7 @@ void on_draw_native(){
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     if(Manager::data_assemble_success){Manager::data_assemble_success=false;assetLoader::instance()->announceDataLoadingFinished();}
 
-    if(!Manager::param_bool[dvr::CHECK_AR_ENABLED]){
-        m_sceneRenderer->onDraw();
-    }else{
+    if(Manager::param_bool[dvr::CHECK_AR_ENABLED]){
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
@@ -208,6 +206,9 @@ JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
         on_draw_native();
 
         screenQuad::instance()->Draw();
+    }else{
+        m_sceneRenderer->setSpaceMatrix(glm::mat4(1.0f));
+        m_sceneRenderer->onDraw();
     }
 }
 

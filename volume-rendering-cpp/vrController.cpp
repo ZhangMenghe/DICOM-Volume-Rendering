@@ -30,30 +30,26 @@ vrController::~vrController(){
 }
 vrController::vrController(const std::shared_ptr<Manager> &manager)
 :m_manager(manager){
-//    onReset();
     myPtr_ = this;
 }
+//For android, usually never called from outside
 void vrController::onReset() {
     Mouse_old = glm::fvec2(.0);
 
-    m_manager->addMVPStatus("default_status", true);
-    m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
     volume_model_dirty = true;volume_rotate_dirty=true;
-
     if(claheManager_)claheManager_->onReset();
     if(cutter_) cutter_->onReset();
 }
-void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam){
-    Mouse_old = glm::fvec2(.0f);
-//    glm::mat4 mm =  glm::translate(glm::mat4(1.0), pv)
-//                 * rm
-//                 * glm::scale(glm::mat4(1.0), sv);
-    m_manager->addMVPStatus("template", rm, sv, pv, cam, true);
-    m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
-    volume_model_dirty = true;volume_rotate_dirty=true;
-
-    if(claheManager_)claheManager_->onReset();
-    if(cutter_) cutter_->onReset();
+void vrController::onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam, const std::string& state_name){
+    onReset();
+    Manager::camera->Reset(cam);
+    if(state_name.empty()){
+        PosVec3_=pv; RotateMat_=rm; ScaleVec3_=sv;
+        if(Manager::screen_w != 0)Manager::camera->setProjMat(Manager::screen_w, Manager:: screen_h);
+    }else{
+        m_manager->addMVPStatus(state_name, rm, sv, pv, true);
+        m_manager->getCurrentMVPStatus(RotateMat_, ScaleVec3_, PosVec3_);
+    }
 }
 
 void vrController::assembleTexture(int update_target,
@@ -185,7 +181,9 @@ void vrController::onDrawScene(){
         RotateMat_ = Manager::camera->getRotationMatrixOfCameraDirection();
         updateVolumeModelMat();
     }
-    glm::mat4 model_mat = ModelMat_ * vol_dim_scale_mat_;
+    auto model_mat_tex = SpaceMat_ * ModelMat_;
+    auto model_mat = model_mat_tex * vol_dim_scale_mat_;
+
     bool cp_update = Manager::IsCuttingNeedUpdate();
     bool draw_finished =false;
     if(cp_update){
@@ -205,7 +203,7 @@ void vrController::onDrawScene(){
     if(Manager::isDrawVolume()){
         switch(m_rmethod_id){
             case dvr::TEXTURE_BASED:
-                vRenderer_[m_rmethod_id]->Draw(pre_draw_, ModelMat_);
+                vRenderer_[m_rmethod_id]->Draw(pre_draw_, model_mat_tex);
                 break;
             case dvr::VIEW_ALIGN_SLICING:
                 if(volume_rotate_dirty || vRenderer_[m_rmethod_id]->isVerticesDirty()) {

@@ -6,7 +6,7 @@
 #include <opencv2/calib3d.hpp>//Rodrigues
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include <Manager.h>
+#include <vrController.h>
 
 ArucoMarkerTracker::ArucoMarkerTracker(){
 //    m_cameraMatrix = (cv::Mat1d(3, 3) << 492.07322693, 0, 311.530553, 0, 492.19478694, 242.44158817, 0, 0, 1);
@@ -65,17 +65,19 @@ bool ArucoMarkerTracker::Update(const uint8_t* data){
 	if (ids.empty()) return false;
 
 	// if at least one marker detected
-	cv::aruco::estimatePoseSingleMarkers(corners, 0.16, m_cameraMatrix, m_distCoeffs, m_rvecs, m_tvecs);
+	std::vector<cv::Vec3d> rvecs, tvecs;
+	cv::aruco::estimatePoseSingleMarkers(corners, 0.16, m_cameraMatrix, m_distCoeffs, rvecs, tvecs);
 
-	glm::quat q = getQuaternion(m_rvecs[0]);
+	glm::quat q = getQuaternion(rvecs[0]);
 	q.y = -q.y;q.z = -q.z;
 	glm::mat4 rotmat = glm::toMat4(q);
 
-	auto tvec = m_tvecs[0];
-	glm::mat4 view_mat =
+	auto tvec = tvecs[0];
+	glm::mat4 Marker2Camera =
 			glm::translate(glm::mat4(1.0), glm::vec3(tvec[0], -tvec[1], -tvec[2]))
-			* rotmat;
-
-	Manager::camera->setViewMat(view_mat);
+			* rotmat
+			* glm::scale(glm::mat4(1.0), glm::vec3(0.16f));
+	vrController::instance()->setSpaceMatrix(Marker2Camera);
+	Manager::camera->setViewMat(glm::mat4(1.0f));
 	return true;
 }

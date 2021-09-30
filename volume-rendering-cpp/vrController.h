@@ -31,10 +31,10 @@ public:
     void onDrawScene();
     void onDraw();
     void onReset();
+    void onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam, const std::string& state_name = "");
     void onPause(){}
     void onDestroy(){}
     void onResume(void* env, void* context, void* activity){}
-    void onReset(glm::vec3 pv, glm::vec3 sv, glm::mat4 rm, Camera* cam);
     void AlignModelMatToTraversalPlane();
 
     void onSingleTouchDown(float x, float y);
@@ -51,6 +51,7 @@ public:
     void setCuttingParams(GLuint sp);
     void setVolumeRST(glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, bool set_rot=true, bool set_scale=true, bool set_pos = true);
     void setVolumePosition(glm::vec3 pv){PosVec3_ = pv;volume_model_dirty=true;}
+    void setSpaceMatrix(glm::mat4 space2world){SpaceMat_=space2world;}
     void SwitchCuttingPlane(dvr::PARAM_CUT_ID cut_plane_id);
     void setOverlayRects(int id, int width, int height, int left, int top);
     void setRenderingMethod(dvr::RENDER_METHOD method){
@@ -109,6 +110,7 @@ private:
     //Textures
     Texture *tex_volume = nullptr, *tex_mask=nullptr, *tex_baked = nullptr;
 
+    glm::mat4 SpaceMat_ = glm::mat4(1.0f);
     glm::mat4 ModelMat_, RotateMat_;
     glm::vec3 ScaleVec3_, PosVec3_;
     bool pre_draw_ = false;

@@ -42,13 +42,13 @@ void Manager::onReset(){
     m_mvp_status.clear();
     m_current_mvp_name.clear(); m_last_mvp_name.clear();
 
-    camera = nullptr;
+    camera = new Camera;
     clear_opacity_widgets();
-    baked_dirty_ = true; mvp_dirty_ = false; m_mvp_ar_dirty=false;
+    baked_dirty_ = true; mvp_dirty_ = false;
     m_dirty_wid = -1;
 }
 void Manager::onViewChange(int w, int h){
-    for(auto& status: m_mvp_status) status.second.vcam.setProjMat(w, h);
+    camera->setProjMat(w, h);
     screen_w = w; screen_h = h;
 }
 void Manager::clear_opacity_widgets(){
@@ -70,6 +70,8 @@ void Manager::InitCheckParams(std::vector<std::string> keys, std::vector<bool> v
         return;
     param_checks = keys;
     param_bool = values;
+
+    if(param_bool[dvr::CHECK_AR_ENABLED])setCheck(keys[dvr::CHECK_AR_ENABLED], true);
 
     m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
     m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
@@ -141,22 +143,28 @@ void Manager::setRenderParam(float *values)
 }
 void Manager::setCheck(std::string key, bool value){
     auto it = std::find(param_checks.begin(), param_checks.end(), key);
-    if (it != param_checks.end()){
-        int pi = it - param_checks.begin();
-        param_bool[pi] = value;
-        if(pi == (int)dvr::CHECK_AR_ENABLED){
-            setMVPStatus(value? "ARCam":"template");
-            mvp_dirty_ = true;
-        }else if(pi == (int)dvr::CHECK_AR_USE_ARCORE){
-            mvp_dirty_ = true;
-            m_mvp_ar_dirty = true;
+    if (it == param_checks.end()) return;
+
+    int pi = it - param_checks.begin();
+    param_bool[pi] = value;
+    if(pi == (int)dvr::CHECK_AR_ENABLED){
+        auto status_name = param_bool[dvr::CHECK_AR_USE_ARCORE]?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
+        if(value){
+            if(!setMVPStatus(status_name)) addMVPStatus(status_name, true);
+        }else{
+            setMVPStatus("AndroidCam");
         }
-        else{
-            m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
-            m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
-        }
-        baked_dirty_ = true;
+        mvp_dirty_ = true;
+    }else if(pi == (int)dvr::CHECK_AR_USE_ARCORE){
+        auto status_name = param_bool[dvr::CHECK_AR_USE_ARCORE]?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
+        if(!setMVPStatus(status_name)) addMVPStatus(status_name, true);
+        mvp_dirty_ = true;
     }
+    else{
+        m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
+        m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
+    }
+    baked_dirty_ = true;
 }
 void Manager::setMask(unsigned int num, unsigned int bits){
     m_volset_data.u_organ_num = num;
@@ -216,40 +224,41 @@ void Manager::updateVolumeSetupUniforms(GLuint sp){
     Shader::Uniform(sp, "u_brightness", m_volset_data.u_brightness);
     Shader::Uniform(sp, "u_base_value", m_volset_data.u_base_value);
 }
-void Manager::addMVPStatus(std::string name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, Camera* cam, bool use_as_current_status){
+void Manager::addMVPStatus(const std::string& name, glm::mat4 rm, glm::vec3 sv, glm::vec3 pv, bool use_as_current_status){
     auto it = m_mvp_status.find(name);
-
-    if(it == m_mvp_status.end()) m_mvp_status[name] = reservedStatus(rm, sv, pv);
-    else{m_mvp_status[name].pos_vec = pv; m_mvp_status[name].rot_mat=rm; m_mvp_status[name].scale_vec=sv;}
-
-    m_mvp_status[name].vcam.Reset(cam);
-    if(Manager::screen_w != 0)m_mvp_status[name].vcam.setProjMat(Manager::screen_w,Manager:: screen_h);
+    if(it == m_mvp_status.end()) m_mvp_status[name] = new reservedStatus(rm, sv, pv);
+    else{m_mvp_status[name]->pos_vec = pv; m_mvp_status[name]->rot_mat=rm; m_mvp_status[name]->scale_vec=sv;}
     if(use_as_current_status) setMVPStatus(name);
 }
 
-void Manager::addMVPStatus(std::string name, bool use_as_current_status){
+void Manager::addMVPStatus(const std::string& name, bool use_as_current_status){
     auto it = m_mvp_status.find(name);
-
-    m_mvp_status[name] = reservedStatus();
-
-    if(screen_w != 0) m_mvp_status[name].vcam.setProjMat(Manager::screen_w, Manager::screen_h);
+    if (it != m_mvp_status.end()) delete m_mvp_status[name];
+    m_mvp_status[name] = new reservedStatus();
     if(use_as_current_status) setMVPStatus(name);
 }
-void Manager::setMVPStatus(std::string name){
-    if(name == m_current_mvp_name) return;
-    camera = &m_mvp_status[name].vcam;
+bool Manager::removeMVPStatus(const std::string& name) {
+    auto it = m_mvp_status.find(name);
+    if (it == m_mvp_status.end()) return false;
+    m_mvp_status.erase(name);
+    setMVPStatus(m_mvp_status.begin()->first);
+}
+bool Manager::setMVPStatus(const std::string& name){
+    if(m_mvp_status.find(name) == m_mvp_status.end()) return false;
+    if(name == m_current_mvp_name) return true;
     m_last_mvp_name = m_current_mvp_name; m_current_mvp_name = name;
+    mvp_dirty_ = true;
+    return true;
 }
 void Manager::getCurrentMVPStatus(glm::mat4& rm, glm::vec3& sv, glm::vec3& pv){
-    if(m_mvp_ar_dirty){
-        rm = dvr::DEFAULT_ROTATE_AR; sv = dvr::DEFAULT_SCALE_AR; pv = dvr::DEFAULT_POS_AR;
-        m_mvp_ar_dirty = false;
-    }else{
-        if(!m_last_mvp_name.empty() && m_mvp_status.find(m_last_mvp_name)!=m_mvp_status.end()){
-            m_mvp_status[m_last_mvp_name].rot_mat = rm; m_mvp_status[m_last_mvp_name].scale_vec = sv;m_mvp_status[m_last_mvp_name].pos_vec = pv;
-        }
-        auto rstate_ = m_mvp_status[m_current_mvp_name];
-        rm=rstate_.rot_mat; sv=rstate_.scale_vec; pv=rstate_.pos_vec;
+    camera->Reset();
+    if(screen_w != 0)camera->setProjMat(screen_w, screen_h);
+
+    if(!m_last_mvp_name.empty() && m_mvp_status.find(m_last_mvp_name)!=m_mvp_status.end()){
+        m_mvp_status[m_last_mvp_name]->rot_mat = rm; m_mvp_status[m_last_mvp_name]->scale_vec = sv;m_mvp_status[m_last_mvp_name]->pos_vec = pv;
     }
+    auto rstate_ = m_mvp_status[m_current_mvp_name];
+    rm=rstate_->rot_mat; sv=rstate_->scale_vec; pv=rstate_->pos_vec;
+
     mvp_dirty_ = false;
 }
