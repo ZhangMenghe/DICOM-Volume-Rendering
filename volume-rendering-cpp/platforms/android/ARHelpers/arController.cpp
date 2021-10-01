@@ -3,7 +3,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <dicomRenderer/screenQuad.h>
 #include <glm/gtx/quaternion.hpp>
-#include <Manager.h>
+#include <vrController.h>
 #include <dicomRenderer/Constants.h>
 #include <platforms/android/Utils/assetLoader.h>
 
@@ -43,7 +43,7 @@ void arController::onResume(void* env, void* context, void* activity){
         ArInstallStatus install_status;
         bool user_requested_install = !install_requested_;
 
-        auto status = ArCoreApk_requestInstall(env, activity, user_requested_install,&install_status);
+        auto status = ArCoreApk_requestInstall(env, activity, user_requested_install, &install_status);
         CHECK( status == AR_SUCCESS);
 
 //        LOGE("=======C1 %d %d", status,install_status);
@@ -106,6 +106,8 @@ void arController::onViewChange(int rot, int width, int height){
     }
 }
 void arController::onDrawARChanged(bool b_ar_on){
+    if(b_ar_on && Manager::param_bool[dvr::CHECK_AR_USE_ARCORE])m_tracking_needs_reset = true;
+
     auto status_name = Manager::param_bool[dvr::CHECK_AR_USE_ARCORE]?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
     if(b_ar_on){
         if(!Manager::instance()->setMVPStatus(status_name)){
@@ -114,15 +116,18 @@ void arController::onDrawARChanged(bool b_ar_on){
             else
                 Manager::instance()->addMVPStatus(status_name, glm::mat4(1.0f), glm::vec3(1.f), glm::vec3(.0f),true);
         }
+//        onResume()
     }else{
         Manager::instance()->setMVPStatus("AndroidCam");
     }
     Manager::mvp_dirty_ = true;
 }
 void arController::onTrackingMethodChanged(bool use_ar_core){
+    if(use_ar_core) m_tracking_needs_reset = true;
+
     auto status_name = use_ar_core?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
     if(!Manager::instance()->setMVPStatus(status_name)){
-        if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE])
+        if(use_ar_core)
             Manager::instance()->addMVPStatus(status_name, glm::mat4(1.0f), glm::vec3(0.01f), glm::vec3(10000.0), true);
         else
             Manager::instance()->addMVPStatus(status_name, glm::mat4(1.0f), glm::vec3(1.f), glm::vec3(.0f),true);
@@ -172,6 +177,7 @@ bool arController::onDrawMarkerBased(){
     return true;
 }
 bool arController::onDrawARCoreBased(ArCamera*& camera){
+    if(m_tracking_needs_reset){onReset();m_tracking_needs_reset=false;}
 // If the camera isn't tracking don't bother rendering other objects.
     ArTrackingState camera_tracking_state;
     ArCamera_getTrackingState(ar_session_, camera, &camera_tracking_state);
@@ -236,7 +242,9 @@ void arController::onDraw(){
     ArCamera_getViewMatrix(ar_session_, camera, glm::value_ptr(view_mat));
     ArCamera_getProjectionMatrix(ar_session_, camera, 0.1f, 100.0f, glm::value_ptr(proj_mat));
     Manager::camera->setProjMat(proj_mat);
-    if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE]) Manager::camera->setViewMat(view_mat);
+    if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE]){
+        Manager::camera->setViewMat(view_mat);
+    }
 
     //draw background
     int32_t geometry_changed = 0;
@@ -439,7 +447,7 @@ bool arController::onLongPress(float x, float y){
         ArHitResultList_getItem(ar_session_, hit_result_list, i, ar_hit);
 
         if (ar_hit == nullptr) {
-            LOGE("HelloArApplication::OnTouched ArHitResultList_getItem error");
+            LOGE("======OnTouched ArHitResultList_getItem error");
             return false;
         }
 
@@ -481,7 +489,7 @@ bool arController::onLongPress(float x, float y){
         // pointer after using it. Call ArAnchor_release(anchor) to release.
         ArAnchor* anchor = nullptr;
         if (ArHitResult_acquireNewAnchor(ar_session_, ar_hit_result, &anchor) != AR_SUCCESS) {
-            LOGE("HelloArApplication::OnTouched ArHitResult_acquireNewAnchor error");
+            LOGE("=====OnTouched ArHitResult_acquireNewAnchor error");
             return false;
         }
 
@@ -523,9 +531,14 @@ bool arController::getTouchedPosition(glm::vec3& pos){
     return true;
 }
 
-
 void arController::onReset(){
     //todo:set reset values
+    tracked_planes.clear();
+    plane_vertices_.clear();
+    plane_triangles_.clear();
+    anchor_id = 0;
+//    if(last_anchor){delete last_anchor;last_anchor = nullptr;}
+    vrController::instance()->setVolumeRST(glm::mat4(1.0f), glm::vec3(.0f), glm::vec3(.0f));
 }
 
 void arController::onSingleTouchDown(float x, float y){

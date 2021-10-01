@@ -210,9 +210,15 @@ JUI_METHOD(void, JUIonLongPress)(JNIEnv *env, jobject obj, jfloat x, jfloat y){
     }
 }
 JUI_METHOD(void, JUIonARRequest)(JNIEnv * env, jclass, jint id){
-    if(id == dvr::PLACE_VOLUME){
+    if(m_draw_ar && Manager::param_bool[CHECK_AR_USE_ARCORE] && id == dvr::PLACE_VOLUME){
         glm::vec3 pos;
-        if(arController::instance()->getTouchedPosition(pos));
-            m_sceneRenderer->setVolumePosition(pos);
+        if(arController::instance()->getTouchedPosition(pos)){
+            auto sz = glm::length(Manager::camera->getCameraPosition()- pos);
+            m_sceneRenderer->setSpaceMatrix(
+                    glm::translate(glm::mat4(1.0f), pos)
+                    * glm::scale(glm::mat4(1.0f), glm::vec3(sz * 0.3f))
+                    );
+            m_sceneRenderer->setVolumeRST(glm::mat4(1.0f), glm::vec3(1.0f), glm::vec3(.0f));
+        }
     }
 }

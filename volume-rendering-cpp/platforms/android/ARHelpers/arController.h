@@ -82,6 +82,7 @@ private:
 
     bool background_tex_initialized = false;
     glm::mat4 view_mat, proj_mat;
+    bool m_tracking_needs_reset = false;
 
     const static int MAX_TRACKED_ANCHORS = 20;
     int anchor_id = 0;

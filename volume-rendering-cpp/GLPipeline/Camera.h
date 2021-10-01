@@ -14,8 +14,8 @@ class Camera{
 
     float fov;
 
-    float DEFAULT_NEAR_PLANE = 1.8f;
-    float DEFAULT_FAR_PLANE = 1000.0f;
+    float DEFAULT_NEAR_PLANE = 0.1f;
+    float DEFAULT_FAR_PLANE = 100.0f;
     float DEFAULT_FOV = 45.0f;
     glm::vec3 DEFAULT_CAM_POS = glm::vec3(0.0f, .0f, 4.f);
     glm::vec3 DEFAULT_CAM_UP = glm::vec3(0.0f, 1.0f, 0.0f);
