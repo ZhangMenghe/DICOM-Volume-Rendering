@@ -535,11 +535,14 @@ void ComputeCLAHE::computeClipHist(glm::uvec3 volDims, glm::uvec3 numSB, float c
 		glUniform1f(glGetUniformLocation(_excessShader, "clipLimit"), clipLimit);
 		glUniform1ui(glGetUniformLocation(_excessShader, "minClipValue"), minClipValue);
 
-		int width = 4096;
+//		int width = 4096;
 		int count = (histSize + 63) / 64;
-		GLuint dispatchWidth = count / (width*width);
-		GLuint dispatchHeight = (count / width) % width;
-		GLuint dispatchDepth = count % width;
+		GLuint dispatchWidth = count;
+		GLuint dispatchHeight = 1;
+		GLuint dispatchDepth = 1;
+//		GLuint dispatchWidth = count / (width*width);
+//		GLuint dispatchHeight = (count / width) % width;
+//		GLuint dispatchDepth = count % width;
 		glDispatchCompute(dispatchWidth, dispatchHeight, dispatchDepth);
 
 		// make sure writting to the image is finished before reading 
