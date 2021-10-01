@@ -71,8 +71,6 @@ void Manager::InitCheckParams(std::vector<std::string> keys, std::vector<bool> v
     param_checks = keys;
     param_bool = values;
 
-    if(param_bool[dvr::CHECK_AR_ENABLED])setCheck(keys[dvr::CHECK_AR_ENABLED], true);
-
     m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
     m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
 
@@ -141,29 +139,16 @@ void Manager::setRenderParam(float *values)
     m_volset_data.u_base_value = m_render_params[dvr::RENDER_BASE_VALUE];
     Manager::baked_dirty_ = true;
 }
-void Manager::setCheck(std::string key, bool value){
+
+void Manager::setCheck(std::string key, bool value, int& id){
     auto it = std::find(param_checks.begin(), param_checks.end(), key);
     if (it == param_checks.end()) return;
+    id = it - param_checks.begin();
+    param_bool[id] = value;
 
-    int pi = it - param_checks.begin();
-    param_bool[pi] = value;
-    if(pi == (int)dvr::CHECK_AR_ENABLED){
-        auto status_name = param_bool[dvr::CHECK_AR_USE_ARCORE]?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
-        if(value){
-            if(!setMVPStatus(status_name)) addMVPStatus(status_name, true);
-        }else{
-            setMVPStatus("AndroidCam");
-        }
-        mvp_dirty_ = true;
-    }else if(pi == (int)dvr::CHECK_AR_USE_ARCORE){
-        auto status_name = param_bool[dvr::CHECK_AR_USE_ARCORE]?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
-        if(!setMVPStatus(status_name)) addMVPStatus(status_name, true);
-        mvp_dirty_ = true;
-    }
-    else{
-        m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
-        m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
-    }
+    m_volset_data.u_show_organ = param_bool[dvr::CHECK_MASKON];
+    m_volset_data.u_mask_recolor = param_bool[dvr::CHECK_MASK_RECOLOR];
+
     baked_dirty_ = true;
 }
 void Manager::setMask(unsigned int num, unsigned int bits){

@@ -93,7 +93,7 @@ public:
     //Setters
     void setRenderParam(int id, float value);
     void setRenderParam(float *values);
-    void setCheck(std::string key, bool value);
+    void setCheck(std::string key, bool value, int& id);
     void setMask(unsigned int num, unsigned int bits);
     void setColorScheme(int id);
     void setDimension(glm::vec3 dim);

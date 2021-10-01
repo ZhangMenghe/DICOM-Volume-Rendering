@@ -196,7 +196,7 @@ void on_draw_native(){
 JNI_METHOD(void, JNIdrawFrame)(JNIEnv*, jclass){
     if(Manager::data_assemble_success){Manager::data_assemble_success=false;assetLoader::instance()->announceDataLoadingFinished();}
 
-    if(Manager::param_bool[dvr::CHECK_AR_ENABLED]){
+    if(m_draw_ar){
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 

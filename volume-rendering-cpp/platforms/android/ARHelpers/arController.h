@@ -20,6 +20,10 @@ public:
     void onViewChange(int rot, int width, int height);
     void onPause();
     void onResume(void* env, void* context, void* activity);
+
+    void onDrawARChanged(bool b_ar_on);
+    void onTrackingMethodChanged(bool use_ar_core);
+
     int getTouchedAnchorNum(){return anchor_id;}
     void getTouchedAnchor(glm::mat4& rotMat, glm::vec3& pos);
     bool getTouchedPosition(glm::vec3& pos);
@@ -89,7 +93,6 @@ private:
     const uint8_t* m_gray_frame_data = nullptr;
     int m_img_num = 0;
     bool initialized = false;
-    bool m_lasttime_arcore;
 
     std::vector<glm::vec3> plane_vertices_;
     std::vector<GLushort> plane_triangles_;

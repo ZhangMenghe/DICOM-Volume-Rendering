@@ -6,7 +6,6 @@
 #include <Manager.h>
 #include <dicomRenderer/Constants.h>
 #include <platforms/android/Utils/assetLoader.h>
-#include <vrController.h>
 
 arController* arController::_myPtr = nullptr;
 arController *arController::instance() {
@@ -44,18 +43,18 @@ void arController::onResume(void* env, void* context, void* activity){
         ArInstallStatus install_status;
         bool user_requested_install = !install_requested_;
 
-//        auto status = ArCoreApk_requestInstall(env, activity, user_requested_install,&install_status);
-//        CHECK( status== AR_SUCCESS);
-//
+        auto status = ArCoreApk_requestInstall(env, activity, user_requested_install,&install_status);
+        CHECK( status == AR_SUCCESS);
+
 //        LOGE("=======C1 %d %d", status,install_status);
-//        switch (install_status) {
-//            case AR_INSTALL_STATUS_INSTALLED:
-//                break;
-//            case AR_INSTALL_STATUS_INSTALL_REQUESTED:
-//                install_requested_ = true;
-//                return;
-//        }
-        LOGE("=======C2");
+        switch (install_status) {
+            case AR_INSTALL_STATUS_INSTALLED:
+                break;
+            case AR_INSTALL_STATUS_INSTALL_REQUESTED:
+                install_requested_ = true;
+                return;
+        }
+//        LOGE("=======C2");
 
         try {
             ArSession_create(env, context, &ar_session_);
@@ -78,7 +77,7 @@ void arController::onResume(void* env, void* context, void* activity){
         ArFocusMode focus_mode;
         ArPlaneFindingMode plane_finding_mode;
         ArUpdateMode update_mode;
-        LOGE("=======C3");
+//        LOGE("=======C3");
 
         ArConfig_create(ar_session_, &ar_config_);
         CHECK(ar_config_);
@@ -90,11 +89,12 @@ void arController::onResume(void* env, void* context, void* activity){
         ArConfig_setFocusMode(ar_session_, ar_config_, AR_FOCUS_MODE_AUTO);
         ArConfig_setUpdateMode(ar_session_, ar_config_, AR_UPDATE_MODE_LATEST_CAMERA_IMAGE);
         CHECK(ArSession_configure(ar_session_, ar_config_) == AR_SUCCESS);
-        LOGE("=======C4");
+//        LOGE("=======C4");
     }
 
     const ArStatus status = ArSession_resume(ar_session_);
-    LOGE("=======C5 %d", status);
+    CHECK( status == AR_SUCCESS);
+//    LOGE("=======C5 %d", status);
 }
 
 void arController::onViewChange(int rot, int width, int height){
@@ -105,6 +105,31 @@ void arController::onViewChange(int rot, int width, int height){
         ArSession_setDisplayGeometry(ar_session_, rot, width, height);
     }
 }
+void arController::onDrawARChanged(bool b_ar_on){
+    auto status_name = Manager::param_bool[dvr::CHECK_AR_USE_ARCORE]?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
+    if(b_ar_on){
+        if(!Manager::instance()->setMVPStatus(status_name)){
+            if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE])
+                Manager::instance()->addMVPStatus(status_name, glm::mat4(1.0f), glm::vec3(0.01f), glm::vec3(10000.0), true);
+            else
+                Manager::instance()->addMVPStatus(status_name, glm::mat4(1.0f), glm::vec3(1.f), glm::vec3(.0f),true);
+        }
+    }else{
+        Manager::instance()->setMVPStatus("AndroidCam");
+    }
+    Manager::mvp_dirty_ = true;
+}
+void arController::onTrackingMethodChanged(bool use_ar_core){
+    auto status_name = use_ar_core?dvr::DEFAULT_AR_CAM_NAME:dvr::DEFAULT_MARKER_CAM_NAME;
+    if(!Manager::instance()->setMVPStatus(status_name)){
+        if(Manager::param_bool[dvr::CHECK_AR_USE_ARCORE])
+            Manager::instance()->addMVPStatus(status_name, glm::mat4(1.0f), glm::vec3(0.01f), glm::vec3(10000.0), true);
+        else
+            Manager::instance()->addMVPStatus(status_name, glm::mat4(1.0f), glm::vec3(1.f), glm::vec3(.0f),true);
+    }
+    Manager::mvp_dirty_ = true;
+}
+
 bool arController::onDrawMarkerBased(){
     std::lock_guard<std::mutex> lock(frame_image_in_use_mutex_);
     ArImage* ar_image = nullptr;
@@ -130,7 +155,7 @@ bool arController::onDrawMarkerBased(){
         ArImage_getPlaneRowStride(ar_session_, ar_image, 0, &stride);
 
         if (ndk_image_width <= 0 || ndk_image_height <= 0 || num_plane <= 0 || stride <= 0) {
-            LOGE("===Fail to get ndk image");
+            LOGE("===Failed to get ndk image");
             ArImage_release(ar_image);
             return false;
         }
@@ -143,7 +168,7 @@ bool arController::onDrawMarkerBased(){
 
     m_aruco_tracker->Update(m_gray_frame_data);
     ArImage_release(ar_image);
-    m_lasttime_arcore = false;
+//    m_lasttime_arcore = false;
     return true;
 }
 bool arController::onDrawARCoreBased(ArCamera*& camera){
@@ -155,8 +180,9 @@ bool arController::onDrawARCoreBased(ArCamera*& camera){
 
     //update and render planes
     update_and_draw_planes();
-    if(!m_lasttime_arcore && !tracked_planes.empty())
-        vrController::instance()->setVolumeRST(tracked_planes[0].rotMat, glm::vec3(0.2f), tracked_planes[0].centerVec);
+    //todo: what to do with the planes
+//    if(!m_lasttime_arcore && !tracked_planes.empty())
+//        vrController::instance()->setVolumeRST(tracked_planes[0].rotMat, glm::vec3(0.2f), tracked_planes[0].centerVec);
 
     auto mVP = Manager::camera->getVPMat();
     // Update and render point cloud.
@@ -180,7 +206,7 @@ bool arController::onDrawARCoreBased(ArCamera*& camera){
     stroke_renderer->Draw(mVP);
     //draw cutting plane
     cutplane_renderer->Draw(mVP, stroke_renderer->getEndPosWorld(), Manager::camera->getViewDirection());
-    m_lasttime_arcore = true;
+//    m_lasttime_arcore = true;
     return true;
 }
 void arController::onDraw(){

@@ -30,7 +30,8 @@ void InitCheckParam(JNIEnv * env, jint num, jobjectArray jkeys, jbooleanArray jv
         LOGE("======SET INIT %s, %s", keys.back().c_str(), values[i]?"true":"false");
     }
     env->ReleaseBooleanArrayElements(jvalues,jvalue_arr,0);
-
+    m_draw_ar = values[dvr::CHECK_AR_ENABLED];
+    if(m_draw_ar) arController::instance()->onDrawARChanged(true);
     m_manager->InitCheckParams(keys, values);
 }
 
@@ -57,7 +58,14 @@ JUI_METHOD(void, JUIsetDualParamByIdNative)(JNIEnv *, jclass, jint pid, jfloat m
 //    if(pid < dvr::DUAL_END)m_sceneRenderer->setDualParameter(pid, minv, maxv);
 }
 JUI_METHOD(void, JUIsetChecksNative)(JNIEnv * env, jclass, jstring jkey, jboolean value){
-    m_manager->setCheck(dvr::jstring2string(env,jkey), value);
+    int id;
+    m_manager->setCheck(dvr::jstring2string(env,jkey), value, id);
+    if(id == dvr::CHECK_AR_ENABLED){
+        m_draw_ar = value;
+        arController::instance()->onDrawARChanged(value);
+    }else if(id == dvr::CHECK_AR_USE_ARCORE && m_draw_ar){
+        arController::instance()->onTrackingMethodChanged(value);
+    }
 }
 JUI_METHOD(void, JUISwitchCuttingPlaneNative)(JNIEnv * env, jclass, jint id){
     m_sceneRenderer->SwitchCuttingPlane((PARAM_CUT_ID)id);
@@ -175,10 +183,10 @@ JUI_METHOD(void, JUIsetVolumePose)(JNIEnv * env, jclass, jbooleanArray jvol_pose
 }
 JUI_METHOD(void, JUIonSingleTouchDownNative)(JNIEnv *, jclass, jint target, jfloat x, jfloat y){
     if(target == TOUCH_VOLUME) m_sceneRenderer->onSingleTouchDown(x, y);
-    else if(target == TOUCH_AR_BUTTON) arController::instance()->onSingleTouchDown(x,y);
+    else if(target == TOUCH_AR_BUTTON && m_draw_ar) arController::instance()->onSingleTouchDown(x,y);
 }
 JUI_METHOD(void, JUIonSingleTouchUpNative)(JNIEnv *, jobject){
-    arController::instance()->onSingleTouchUp();
+    if(m_draw_ar)arController::instance()->onSingleTouchUp();
 }
 JUI_METHOD(void, JUIonTouchMoveNative)(JNIEnv *, jclass, jfloat x, jfloat y){
     m_sceneRenderer->onTouchMove(x, y);
@@ -190,7 +198,7 @@ JUI_METHOD(void, JUIonPanNative)(JNIEnv *, jclass, jfloat x, jfloat y){
     m_sceneRenderer->onPan(x,y);
 }
 JUI_METHOD(void, JUIonLongPress)(JNIEnv *env, jobject obj, jfloat x, jfloat y){
-    if(arController::instance()->onLongPress(x,y)){
+    if(m_draw_ar && arController::instance()->onLongPress(x,y)){
         //call back to java
         jclass cls = env->FindClass("helmsley/vr/DUIs/arUIs");
         cls = static_cast<jclass>(env->NewGlobalRef(cls));

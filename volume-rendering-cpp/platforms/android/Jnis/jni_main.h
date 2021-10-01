@@ -22,6 +22,7 @@ namespace dvr{
 
     inline std::shared_ptr<Manager> m_manager;
     inline std::unique_ptr<vrController> m_sceneRenderer;
+    inline bool m_draw_ar = false;
 
     inline jlong getNativeClassAddr(nEntrance * native_controller){
         return reinterpret_cast<intptr_t>(native_controller);

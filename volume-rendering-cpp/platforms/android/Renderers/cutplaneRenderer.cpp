@@ -15,7 +15,7 @@ cutplaneRenderer::cutplaneRenderer(bool screen_baked)
     if(!shader_->AddShader(GL_VERTEX_SHADER,Manager::shader_contents[dvr::SHADER_CUT_PLANE_VERT])
        ||!shader_->AddShader(GL_FRAGMENT_SHADER,  Manager::shader_contents[dvr::SHADER_CUT_PLANE_FRAG])
        ||!shader_->CompileAndLink())
-        LOGE("AR Cutting plane===Failed to create raycast shader program===");
+        LOGE("AR Cutting plane===Failed to create ar cutting plane program===");
     Manager::shader_contents[dvr::SHADER_CUT_PLANE_VERT] = "";Manager::shader_contents[dvr::SHADER_CUT_PLANE_FRAG]="";
     scale_mat_ = glm::scale(glm::mat4(1.0), glm::vec3(4.0, 4.0, 1.0f));
 }

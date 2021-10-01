@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -98,12 +99,14 @@ public class arUIs extends BasePanel{
         check_arcore = (CheckBox)panel_.findViewById(R.id.check_float_widget);
 
         check_arcore.setOnCheckedChangeListener(new CheckBox.OnCheckedChangeListener(){
+            boolean m_initialized = false;
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 spinner_check_render.setVisibility(isChecked? View.VISIBLE:View.GONE);
                 if(isChecked && cb_adapter.getValue(2)) bottom_panel.setVisibility(View.VISIBLE);
                 else bottom_panel.setVisibility(View.GONE);
-                JUIInterface.JUIsetChecks("Use ARCore", isChecked);
+                if(m_initialized)JUIInterface.JUIsetChecks("Use ARCore", isChecked);
+                else m_initialized = true;
             }
         });
         default_check_ar_core = default_check_values[CHECK_USE_AR_CORE_IDX];

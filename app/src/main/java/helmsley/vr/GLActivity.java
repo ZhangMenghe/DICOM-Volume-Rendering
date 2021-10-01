@@ -52,7 +52,6 @@ public class GLActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        surfaceView.onResume();
     }
     @Override
     protected void onPause(){
