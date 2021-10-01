@@ -170,6 +170,9 @@ JUI_METHOD(void, JUIonResetNative)(JNIEnv* env, jclass,
 }
 //volume array: RST in R(w,x,y,z), S(x,y,z), T(x,y,z)
 JUI_METHOD(void, JUIsetVolumePose)(JNIEnv * env, jclass, jbooleanArray jvol_pose_type, jfloatArray jvol_pose){
+    //Only works for marker based scenario
+    if(!m_draw_ar || Manager::param_bool[CHECK_AR_USE_ARCORE]) return;
+
     jboolean * type_arr = env->GetBooleanArrayElements(jvol_pose_type, 0);
     jfloat* vol_arr = env->GetFloatArrayElements(jvol_pose, 0);
     //unwrap pose information

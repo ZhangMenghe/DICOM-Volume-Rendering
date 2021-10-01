@@ -100,10 +100,8 @@ public class rpcManager {
         opa_manager.checkCurrentBroadcaster();
     }
     private void update_volume_pose(){
-        boolean[]volume_pose_type = new boolean[]{false, false, false};
-        float[]volume_pose = new float[10];
         List<VPMsg> msg_lst = opa_manager.getPoseUpdates();
-        if(msg_lst.isEmpty()){
+        if(msg_lst.isEmpty()){//Check for operations
             List<GestureOp> op_lst = opa_manager.getOperations();
             if(!op_lst.isEmpty()){
                 for(GestureOp op:op_lst){
@@ -113,7 +111,10 @@ public class rpcManager {
                     else if(type == GestureOp.OPType.TOUCH_UP)JUIInterface.JUIonSingleTouchUpNative();
                 }
             }
-        }else{
+        }else{//Check for pose operations
+            boolean[]volume_pose_type = new boolean[]{false, false, false};
+            float[]volume_pose = new float[10];
+
             for(VPMsg msg:msg_lst){
                 if(msg.getVolumePoseType() == VPMsg.VPType.ROT){
                     //rotation:(w,x,y,z)
@@ -127,8 +128,8 @@ public class rpcManager {
                     volume_pose_type[2] = true;
                 }
             }
+            JUIInterface.JUIsetVolumePose(volume_pose_type, volume_pose);
         }
-        JUIInterface.JUIsetVolumePose(volume_pose_type, volume_pose);
     }
     public fileTransferClient getDataManager(){return data_manager;}
 }
